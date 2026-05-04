@@ -1,255 +1,278 @@
-# Specifica di Progetto - BookScout Mobile
+# Specifica di Progetto - GymTracker Mobile
 
 ## 1. Visione e contesto
 
 ### Problema da risolvere
 
-Chi cerca un libro da mobile spesso deve passare tra risultati poco leggibili, schede incomplete e assenza di continuità tra una ricerca e la successiva. Per un progetto didattico MAUI serve invece una app informativa con navigazione chiara, dati remoti affidabili e persistenza locale essenziale.
+Chi va in palestra spesso fatica a tenere traccia dei progressi, non ricorda i pesi usati la volta precedente e manca un modo semplice per monitorare l'evoluzione del proprio allenamento. Per un progetto didattico MAUI serve una app per registrare esercizi, pesi e progressi con navigazione chiara, dati locali persistenti e funzionalità social.
 
 ### Obiettivo del progetto
 
-Realizzare una applicazione `.NET MAUI` Android-first per cercare libri per titolo o autore, consultare un dettaglio completo, salvare preferiti in locale e mantenere una cronologia delle ricerche, con particolare attenzione a qualità della navigazione, chiarezza degli stati UI e separazione pulita tra ViewModel e Service.
+Realizzare una applicazione `.NET MAUI` Android-first per tracciare gli allenamenti con serie, ripetizioni e peso, consultare un catalogo di esercizi, monitorare il peso corporeo, visualizzare statistiche di progresso, competere con amici e usare piani di allenamento base per principianti.
 
 ### Utenti target
 
-- lettori occasionali che vogliono consultare rapidamente informazioni su un libro;
-- studenti che cercano libri per autore, titolo o categoria editoriale;
-- appassionati di lettura che desiderano tenere un elenco locale di libri di interesse.
+- principianti che iniziano ad allenarsi in palestra e necessitano di struttura;
+- appassionati di fitness che vogliono tracciare i progressi nel tempo;
+- utenti che vogliono competere in modo costruttivo con amici.
 
 ## 2. Ambito MVP
 
 ### Flusso principale da supportare
 
-1. L'utente apre l'app e inserisce una ricerca per titolo o autore.
-2. L'app mostra un elenco di risultati con copertina, titolo e autore.
-3. L'utente apre il dettaglio di un libro e consulta le informazioni estese.
-4. L'utente salva il libro tra i preferiti locali.
-5. L'utente può rivedere preferiti e cronologia ricerche nelle schermate dedicate.
+1. L'utente apre l'app e può iniziare un nuovo allenamento selezionando esercizi dal catalogo.
+2. L'utente registra serie, ripetizioni e peso per ogni esercizio.
+3. L'utente può inserire il proprio peso corporeo dopo l'allenamento.
+4. L'utente visualizza i progressi nel tempo tramite statistiche.
+5. L'utente può aggiungere amici e vedere i loro allenamenti per competere.
+6. L'utente può seguire piani di allenamento base predefiniti.
 
 ### Funzionalità obbligatorie
 
-- ricerca libri per titolo o autore tramite API remota;
-- pagina Search unica che integri input di ricerca e lista risultati nello stesso flusso;
-- elenco risultati con copertina, titolo e autore;
-- pagina dettaglio con descrizione, editore, anno, pagine, categorie e ISBN quando disponibili;
-- salvataggio e rimozione dei preferiti in locale;
-- cronologia locale delle ricerche effettuate;
-- gestione esplicita di loading state, error state, empty state e success state per i flussi di ricerca e dettaglio.
+- catalogo esercizi organizzato per gruppo muscolare;
+- registrazione allenamento con data, esercizi, serie, ripetizioni e peso;
+- storico allenamenti consultabile;
+- tracciamento peso corporeo nel tempo;
+- dashboard statistiche con grafici di progresso;
+- gestione amici (richieste, accettazione, lista);
+- visualizzazione allenamenti amici;
+- piani di allenamento base per principianti;
+- gestione esplicita di loading state, error state, empty state e success state.
 
 ### Funzionalità opzionali future
 
-- fase post-MVP 1: filtri per lingua o categoria e ordinamento per rilevanza, data o autore;
-- fase post-MVP 2: note personali associate ai libri salvati;
-- fase post-MVP 3: scansione ISBN tramite fotocamera;
-- fase post-MVP 4: modalità offline estesa per libri già memorizzati localmente;
-- supporto a provider alternativi come Open Library in una fase successiva, se necessario.
+- post-MVP 1: programmi personalizzabili e salvataggio piani utente;
+- post-MVP 2: timer per pause tra serie;
+- post-MVP 3: obiettivi settimanali e notifiche reminder;
+- post-MVP 4: export dati in formato CSV.
 
 ### Priorità roadmap post-MVP
 
-Il planning successivo dovrà mantenere questo ordine di priorità:
-
-1. filtri e ordinamento;
-2. note personali;
-3. barcode scanner ISBN;
-4. offline mode estesa.
+1. programmi personalizzabili;
+2. timer pause;
+3. obiettivi settimanali;
+4. export dati.
 
 ### Non-obiettivi
 
-- acquisto o prenotazione dei libri;
-- autenticazione utente o sincronizzazione cloud;
-- recensioni sociali, rating o commenti condivisi;
-- modifica dei dati editoriali remoti;
-- supporto offline completo per ricerche remote nel primo rilascio.
-- parità funzionale iOS rispetto ad Android nel primo rilascio.
+- acquisizione di dati di terze parti per esercizi;
+- integrazione con dispositivi smart (orologi, bilance);
+- pagamento o abbonamenti premium;
+- recensioni o rating sociali pubblici;
+- supporto offline completo per funzionalità social nel primo rilascio.
 
-## 3. Scenari d'uso principali
+## 3. Requisiti funzionali
 
-### Scenario 1 - Ricerca veloce di un libro
+- FR-01: l'app deve mostrare un catalogo di esercizi organizzato per gruppo muscolare (petto, schiena, spalle, braccia, gambe, addominali).
+- FR-02: l'utente deve poter avviare un nuovo allenamento selezionando esercizi dal catalogo.
+- FR-03: per ogni esercizio selezionato, l'utente deve poter aggiungere una o più serie con peso e ripetizioni.
+- FR-04: l'app deve salvare l'allenamento completo con data e ora.
+- FR-05: l'utente deve poter consultare lo storico degli allenamenti passati.
+- FR-06: l'utente deve poter registrare il proprio peso corporeo.
+- FR-07: l'app deve mostrare statistiche di progresso (peso usato nel tempo per esercizio, peso corporeo nel tempo).
+- FR-08: l'utente deve poter inviare richieste di amicizia ad altri utenti.
+- FR-09: l'utente deve poter accettare o rifiutare richieste di amicizia ricevute.
+- FR-10: l'utente deve poter vedere gli allenamenti degli amici.
+- FR-11: l'utente deve poter consultare piani di allenamento base predefiniti per principianti.
+- FR-12: l'app deve mostrare sempre stati UI chiari: loading, success, empty, error.
 
-Un utente cerca `Pride and Prejudice`, ottiene una lista di risultati con copertine e autori, identifica rapidamente il libro corretto e apre il dettaglio per leggerne descrizione e dati editoriali.
+## 4. Epic, user stories e criteri di accettazione
 
-### Scenario 2 - Consultazione approfondita
-
-Uno studente apre il dettaglio di un libro trovato via ricerca, controlla editore, anno, numero di pagine, categorie e ISBN, poi decide se salvarlo tra i preferiti per ritrovarlo in seguito.
-
-### Scenario 3 - Ripresa di una ricerca recente
-
-Un utente torna sull'app in un secondo momento, apre la schermata History, tocca una ricerca recente e rilancia la consultazione senza dover reinserire manualmente il testo.
-
-### Scenario 4 - Revisione dei libri salvati
-
-Un utente apre la schermata Favorites per rivedere i libri già salvati localmente, consultare di nuovo i dettagli e rimuovere quelli non più interessanti.
-
-## 4. Requisiti funzionali
-
-- FR-01: l'app deve consentire la ricerca di libri tramite testo libero per titolo o autore.
-- FR-02: la ricerca deve usare Google Books API come provider base dell'MVP, in particolare `GET /volumes?q={query}` per i risultati e `GET /volumes/{id}` per il dettaglio.
-- FR-03: l'app deve mostrare ogni risultato con almeno copertina, titolo e autore; in assenza della copertina deve mostrare un placeholder o uno stato visivo equivalente.
-- FR-04: selezionando un risultato, l'utente deve poter aprire una pagina dettaglio con informazioni estese disponibili: descrizione, editore, anno o data pubblicazione, numero di pagine, categorie e ISBN.
-- FR-05: l'app deve tollerare risposte API parziali o campi mancanti senza generare errori bloccanti di UI.
-- FR-06: l'utente deve poter aggiungere o rimuovere un libro dai preferiti locali.
-- FR-07: i preferiti devono restare disponibili dopo la chiusura e riapertura dell'app e devono includere una copia locale completa dei principali dati di dettaglio disponibili al momento del salvataggio.
-- FR-08: aprendo un libro dai Favorites, l'app deve mostrare subito i dati locali salvati e, se la rete è disponibile, tentare un refresh remoto in background senza bloccare la consultazione iniziale; se l'aggiornamento riesce, i dati possono aggiornarsi in modo silenzioso, mentre se fallisce deve essere mostrato un messaggio non bloccante.
-- FR-09: l'app deve salvare localmente la cronologia delle ricerche effettuate in forma deduplicata e mostrarla in una schermata dedicata.
-- FR-10: dalla cronologia l'utente deve poter rilanciare una ricerca con un tap, mantenendo l'ordinamento dal più recente al meno recente.
-- FR-11: l'utente deve poter cancellare manualmente l'intera cronologia locale e rimuovere singole voci.
-- FR-12: le schermate che caricano dati remoti devono sempre esporre uno stato tra loading, success, empty o error.
-- FR-13: la navigazione tra Search con risultati integrati, Detail, Favorites e History deve risultare coerente con Shell navigation.
-- FR-14: l'app deve gestire errori di rete o indisponibilità del servizio con messaggi comprensibili e possibilità di retry.
-
-## 5. Epic, user stories e criteri di accettazione
-
-### EPIC-01 - Ricerca e lista risultati
+### EPIC-01 - Catalogo esercizi
 
 **Obiettivo:**
 
-Consentire all'utente di trovare rapidamente libri tramite una query testuale e consultare un elenco chiaro di risultati.
+Consentire all'utente di selezionare esercizi da un elenco strutturato.
 
 **User stories:**
 
-- Come utente, voglio cercare un libro per titolo o autore così da trovare velocemente i contenuti rilevanti.
-- Come utente, voglio vedere risultati leggibili con copertina e autore così da distinguere i libri corretti.
-- Come utente, voglio feedback chiari durante il caricamento o in caso di errore così da capire cosa sta succedendo.
+- Come utente, voglio vedere un elenco di esercizi divisi per gruppo muscolare così da trovare rapidamente quello che mi serve.
+- Come utente, voglio cercare un esercizio per nome così da trovarlo anche senza conoscere il gruppo muscolare.
 
 **Criteri di accettazione:**
 
-- [ ] Inserendo una query valida, l'app avvia una ricerca remota e mostra subito uno stato di caricamento.
-- [ ] Se la ricerca restituisce risultati, la UI mostra una lista con almeno copertina, titolo e autore per ogni elemento.
-- [ ] Se la ricerca non restituisce risultati, la UI mostra uno stato empty esplicito invece di una pagina vuota.
-- [ ] Se la richiesta fallisce, la UI mostra un messaggio di errore e una azione di retry.
+- [ ] Il catalogo mostra gli esercizi raggruppati per gruppo muscolare.
+- [ ] Toccando un gruppo muscolare, vengono mostrati i relativi esercizi.
+- [ ] Toccando un esercizio, l'app mostra nome, gruppo muscolare e descrizione breve.
 
-### EPIC-02 - Dettaglio libro
+### EPIC-02 - Registrazione allenamento
 
 **Obiettivo:**
 
-Permettere all'utente di consultare tutte le informazioni editoriali utili relative a un libro selezionato.
+Permettere all'utente di registrare un allenamento completo con esercizi, serie, ripetizioni e peso.
 
 **User stories:**
 
-- Come utente, voglio aprire il dettaglio di un libro così da leggere descrizione e metadati estesi.
-- Come utente, voglio che i campi mancanti siano gestiti bene così da non trovare schermate rotte o incoerenti.
+- Come utente, voglio avviare un nuovo allenamento così da registrare la mia sessione.
+- Come utente, voglio aggiungere esercizi all'allenamento con le relative serie.
+- Come utente, voglio salvare l'allenamento così da consultarlo in seguito.
 
 **Criteri di accettazione:**
 
-- [ ] Toccando un risultato, l'utente raggiunge la schermata Detail del libro selezionato.
-- [ ] La schermata mostra descrizione, editore, data pubblicazione, pagine, categorie e ISBN quando disponibili.
-- [ ] Se alcuni campi non sono presenti nella risposta API, la schermata resta leggibile e non mostra errori tecnici.
-- [ ] La schermata dettaglio consente di salvare o rimuovere il libro dai preferiti locali.
+- [ ] L'utente può avviare un nuovo allenamento dalla schermata home.
+- [ ] L'utente può aggiungere esercizi selezionandoli dal catalogo.
+- [ ] Per ogni esercizio, l'utente può aggiungere una o più serie con peso e ripetizioni.
+- [ ] L'utente può salvare l'allenamento con data e ora correnti.
+- [ ] L'allenamento salvato compare nello storico.
 
-### EPIC-03 - Preferiti locali
+### EPIC-03 - Storico e dettaglio allenamento
 
 **Obiettivo:**
 
-Consentire all'utente di mantenere una piccola libreria personale locale dei libri di interesse.
+Consentire all'utente di consultare gli allenamenti passati.
 
 **User stories:**
 
-- Come utente, voglio salvare un libro tra i preferiti così da ritrovarlo facilmente.
-- Come utente, voglio rivedere i miei preferiti anche dopo aver chiuso l'app così da non perdere il mio elenco.
+- Come utente, voglio vedere l'elenco degli allenamenti passati così da avere una panoramica.
+- Come utente, voglio aprire un allenamento passato per vedere i dettagli.
 
 **Criteri di accettazione:**
 
-- [ ] Salvando un libro dai dettagli, il libro compare nella schermata Favorites.
-- [ ] Chiudendo e riaprendo l'app, i preferiti precedentemente salvati restano disponibili.
-- [ ] Aprendo un libro dalla schermata Favorites, i dati di dettaglio principali salvati localmente sono consultabili senza dipendere da una nuova chiamata remota.
-- [ ] Se la rete è disponibile, l'apertura di un libro dai Favorites può aggiornare in background i dati remoti senza bloccare la visualizzazione iniziale.
-- [ ] Se il refresh remoto fallisce, la schermata resta utilizzabile e mostra un feedback di errore non bloccante.
-- [ ] Se il refresh remoto riesce, il contenuto può aggiornarsi senza richiedere conferma esplicita all'utente.
-- [ ] L'utente può rimuovere un libro dai preferiti senza effetti collaterali sugli altri dati locali.
+- [ ] Lo storico mostra gli allenamenti in ordine dal più recente al meno recente.
+- [ ] Ogni elemento mostra data, durata (se calcolata) e numero esercizi.
+- [ ] Toccando un elemento, vengono mostrati tutti i dettagli (esercizi, serie, ripetizioni, peso).
 
-### EPIC-04 - Cronologia ricerche
+### EPIC-04 - Progressione peso corporeo
 
 **Obiettivo:**
 
-Permettere all'utente di riprendere rapidamente ricerche recenti senza reinserire ogni volta il testo.
+Permettere all'utente di tracciare il proprio peso corporeo nel tempo.
 
 **User stories:**
 
-- Come utente, voglio vedere le ricerche recenti così da riprendere velocemente un argomento già consultato.
-- Come utente, voglio rilanciare una ricerca dalla cronologia con un solo tap così da velocizzare l'uso ripetuto dell'app.
+- Come utente, voglio registrare il mio peso corporeo dopo l'allenamento.
+- Come utente, voglio vedere l'andamento del mio peso nel tempo.
 
 **Criteri di accettazione:**
 
-- [ ] Ogni ricerca completata aggiorna la cronologia locale.
-- [ ] Se una query già presente viene ripetuta, la cronologia non crea un duplicato ma riporta la voce in cima.
-- [ ] La schermata History mostra le query recenti in ordine dal più recente al meno recente.
-- [ ] Toccando una voce della cronologia, l'app rilancia la stessa ricerca e mostra i risultati aggiornati.
-- [ ] L'utente può cancellare tutta la cronologia con una azione esplicita.
-- [ ] L'utente può rimuovere una singola voce della cronologia senza svuotare l'intero elenco.
+- [ ] L'utente può registrare un nuovo peso corporeo.
+- [ ] L'app mostra un grafico dell'andamento del peso nel tempo.
+- [ ] Il grafico è consultabile dalla dashboard.
 
-## 6. Requisiti non funzionali
+### EPIC-05 - Statistiche e progressi
+
+**Obiettivo:**
+
+Mostrare all'utente i progressi nel tempo.
+
+**User stories:**
+
+- Come utente, voglio vedere il peso massimo sollevato per ogni esercizio.
+- Come utente, voglio vedere l'andamento degli allenamenti nel tempo.
+
+**Criteri di accettazione:**
+
+- [ ] La dashboard mostra statistiche aggregate degli allenamenti.
+- [ ] Per ogni esercizio, viene mostrato il peso massimo storico.
+- [ ] Viene mostrato il numero di allenamenti negli ultimi 7 giorni.
+
+### EPIC-06 - Gestione amici
+
+**Obiettivo:**
+
+Permettere all'utente di connettersi con altri utenti per competere.
+
+**User stories:**
+
+- Come utente, voglio inviare richieste di amicizia ad altri utenti.
+- Come utente, voglio accettare o rifiutare richieste di amicizia.
+- Come utente, voglio vedere gli allenamenti dei miei amici.
+
+**Criteri di accettazione:**
+
+- [ ] L'utente può cercare altri utenti per username.
+- [ ] L'utente può inviare una richiesta di amicizia.
+- [ ] L'utente riceve una notifica per nuove richieste di amicizia.
+- [ ] L'utente può accettare o rifiutare richieste pendenti.
+- [ ] L'utente può vedere la lista degli amici.
+- [ ] L'utente può vedere gli ultimi allenamenti degli amici.
+
+### EPIC-07 - Piani di allenamento
+
+**Obiettivo:**
+
+Offrire piani strutturati per principianti.
+
+**User stories:**
+
+- Come utente, voglio vedere piani di allenamento predefiniti.
+- Come utente, voglio seguire un piano per principianti.
+
+**Criteri di accettazione:**
+
+- [ ] L'app fornisce almeno 2 piani base per principianti (schema 2 giorni, schema 3 giorni).
+- [ ] Ogni piano indica quali esercizi fare per ogni sessione.
+- [ ] L'utente può avviare un allenamento da un piano.
+
+## 5. Requisiti non funzionali
 
 ### UX e stati UI
 
-- L'utente deve poter raggiungere la ricerca e il primo elenco risultati con un flusso semplice e senza passaggi ridondanti.
-- Nel MVP la ricerca e la lista risultati condividono la stessa schermata per ridurre passaggi e cambi di contesto.
-- Le schermate Search, Results e Detail non devono mai restare in uno stato ambiguo: devono mostrare chiaramente loading, empty, error o success.
-- Le immagini remote non devono compromettere la leggibilità del layout quando sono assenti, lente o non disponibili.
+- L'utente deve poter iniziare un allenamento dalla schermata home con un tap.
+- Le schermate devono mostrare sempre stati chiari: loading, success, empty, error.
+- Le liste devono essere scorrevoli e responsive.
 
 ### Prestazioni percepite
 
-- Dopo l'avvio di una ricerca, la UI deve reagire immediatamente mostrando un indicatore di caricamento o uno stato equivalente.
-- In condizioni di rete normali, i risultati della prima pagina dovrebbero diventare consultabili in pochi secondi.
-- Lo scrolling della lista risultati deve restare fluido su dispositivi Android di fascia media usati in contesto didattico.
+- L'apertura dell'app e la navigazione tra schermate devono essere immediate.
+- Il salvataggio di un allenamento deve completarsi senza ritardi percepibili.
+- Le statistiche devono caricarsi in pochi secondi.
 
 ### Affidabilità e gestione errori
 
-- Le eccezioni di rete o parsing non devono emergere come crash del flusso principale.
-- I messaggi di errore devono essere comprensibili e orientati all'azione, ad esempio riprovare la ricerca.
-- Le risposte JSON con campi mancanti o opzionali devono essere gestite in modo difensivo.
-- Il refresh remoto in background dai Favorites non deve bloccare la schermata né degradare la consultazione dei dati già salvati localmente.
-- In caso di fallimento del refresh remoto dai Favorites, il feedback utente deve essere visibile ma non invasivo.
+- Gli errori di rete devono mostrare messaggi comprensibili con opzione di retry.
+- Gli errori di parsing non devono causare crash.
+- La perdita di connettività durante un'operazione deve essere gestita gracefully.
 
 ### Privacy e dati
 
-- Nel MVP non è prevista autenticazione né invio di dati personali a backend proprietari.
-- Preferiti e cronologia sono memorizzati localmente sul dispositivo.
-- I preferiti salvano anche i principali dati di dettaglio disponibili al momento del salvataggio, per consentire rilettura locale coerente.
-- Eventuali note personali, se introdotte in una fase successiva, devono restare dati locali salvo requisito contrario esplicito.
+- I dati degli allenamenti sono memorizzati localmente con SQLite.
+- I dati social (amici, richieste) richiedono backend e connettività.
+- Il peso corporeo è un dato sensibile e rimane solo sul dispositivo dell'utente.
 
-## 7. Vincoli tecnici di progetto
+## 6. Vincoli tecnici di progetto
 
 - App `.NET MAUI` con target principale Android; iOS opzionale e secondario.
 - Architettura MVVM.
 - Navigazione basata su Shell.
 - `CommunityToolkit.Mvvm` per la gestione dei ViewModel.
-- `HttpClient` asincrono per le chiamate remote.
-- `System.Text.Json` per il parsing delle risposte API.
-- Persistenza locale con SQLite per favoriti e cronologia; `Preferences` solo per esigenze leggere eventuali.
-- Gestione esplicita di `IsBusy`, error state, empty state e presenza dati nei ViewModel.
+- `HttpClient` asincrono per chiamate remote al backend.
+- `System.Text.Json` per il parsing.
+- Persistenza locale con SQLite per allenamenti, esercizi, peso corporeo; `Preferences` per impostazioni leggere.
+- Gestione esplicita di `IsBusy`, error state, empty state nei ViewModel.
 - Nessuna logica REST o business logic nei code-behind.
-- Search e risultati nello stesso flusso di pagina; Detail, Favorites e History come viste dedicate.
-- La UI deve essere pensata per `SearchBar`, `CollectionView`, `ScrollView`, `Grid`, `Image`, `Label`, `SwipeView` e gesture semplici, coerenti con le schermate previste.
+- UI basata su `CollectionView`, `ScrollView`, `Grid`, `Label`, `Button`, `Entry`, `DatePicker`.
 
-## 8. Metriche di successo
+## 7. Metriche di successo
 
-- Un utente alla prima apertura riesce a eseguire il flusso `ricerca -> risultati -> dettaglio` senza spiegazioni aggiuntive e con al massimo 3 interazioni principali dopo il launch.
-- I flussi MVP `ricerca`, `apertura dettaglio`, `salvataggio preferito` e `riapertura da cronologia` risultano completabili senza crash in una sessione manuale di prova.
-- Preferiti e cronologia persistono correttamente dopo il riavvio dell'app in tutti i test manuali del flusso principale.
+- Un utente alla prima apertura riesce a completare il flusso `nuovo allenamento -> aggiungi esercizio -> registra serie -> salva` senza spiegazioni.
+- Lo storico degli allenamenti persiste correttamente dopo il riavvio dell'app.
+- Il grafico del peso corporeo visualizza correttamente i dati inseriti.
+- Le richieste di amicizia vengono inviate e ricevute correttamente (con backend attivo).
 
-## 9. Rischi, dipendenze e questioni aperte
+## 8. Rischi, dipendenze e questioni aperte
 
 ### Rischi
 
-- I dati restituiti da Google Books possono essere incompleti o incoerenti tra volumi diversi.
-- Le copertine remote possono essere assenti, lente o di qualità variabile.
-- I dettagli locali salvati nei preferiti possono diventare non allineati rispetto a eventuali aggiornamenti futuri del provider remoto.
-- Il refresh remoto in background dai Favorites può introdurre divergenze temporanee tra dati locali già mostrati e dati remoti aggiornati.
-- L'espansione verso barcode scanner e offline mode può introdurre complessità tecnica e nuove dipendenze non desiderate nel MVP.
+- Il backend per funzionalità social potrebbe non essere disponibile o richiedere autenticazione reale.
+- I dati degli amici potrebbero non essere sincronizzati in tempo reale.
+- La gestione di many-to-many per esercizi in SQLite potrebbe richiedere attenzione.
 
 ### Dipendenze
 
-- Disponibilità di Google Books API e connettività Internet per ricerca e dettaglio nel MVP.
-- Disponibilità di un layer di persistenza SQLite affidabile per i dati locali.
-- Eventuale uso di Open Library come alternativa solo se il provider principale non risultasse adeguato ai requisiti didattici.
+- Backend remoto per gestione amici e competizioni.
+- SQLite per persistenza locale.
+- Grafico/chart library per visualizzazioni statistiche (oppure implementazione custom).
 
-### Questioni aperte o `TBD`
+### Questioni aperte
 
-Al momento non risultano ulteriori `TBD` di prodotto aperti nello spec. Eventuali dettagli residui appartengono alla fase di planning e architettura.
+- TBD: Servizio backend effettivo da usare (custom, Firebase, mock).
+- TBD: Formato esatto delle API per amici e allenamenti.
+- TBD: Se usare una chart library oimplementare grafici semplici custom.
 
-## 10. Passaggio al planning
+## 9. Passaggio al planning
 
-Il prossimo passo è derivare i documenti di planning a partire da questo spec:
+Il prossimo passo è derivare i documenti di planning:
 
 - `docs/plan.md`
 - `docs/architecture.md`

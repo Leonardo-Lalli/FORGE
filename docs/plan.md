@@ -1,365 +1,215 @@
-# Piano di Progetto
+# Piano di Progetto - GymTracker Mobile
+
+## Panoramica
+
+- **Nome progetto**: GymTracker
+- **Tipo**: App mobile .NET MAUI Android-first
+- **Core functionality**: Diario per allenamenti in palestra con tracking esercizi, pesi, progressi e funzionalità social
+- **Target utenti**: Principianti e appassionati di fitness che vogliono tracciare i progressi
+
+## Architecture
+
+### Stack tecnologico
+
+- **Framework**: .NET MAUI 8.x
+- **Target**: Android (iOS secondario)
+- **Pattern**: MVVM con CommunityToolkit.Mvvm
+- **Navigazione**: Shell
+- **Persistenza locale**: SQLite (sqlite-net-pcl)
+- **HTTP**: HttpClient con System.Text.Json
+- **Backend**: API remota per social (amici, competizioni)
+
+### Struttura progetto
+
+```
+/Platforms/Android
+/Platforms/iOS        (opzionale)
+/src
+  /Models              # Entità (Exercise, Workout, Set, BodyWeight, User, Friend)
+  /Data               # Repositories, Database context
+  /Services           # Business logic, API clients
+  /ViewModels         # MVVM ViewModels
+  /Views/Pages        # UI XAML
+  /Views/Controls     # Custom controls
+  /Converters        # Value converters
+  /Resources         # Assets, styles
+/tests               # Unit tests opzionali
+docs
+```
 
-## 1. Sintesi operativa
+## Iterazioni
 
-### Obiettivo del progetto
+### Iteration 1: Struttura base e catalogo esercizi
 
-Realizzare `BookScout Mobile` come app `.NET MAUI` Android-first per ricerca libri, dettaglio completo, preferiti locali e cronologia locale, mantenendo MVVM, Shell navigation e una separazione chiara tra Views, ViewModels, servizi remoti e persistenza locale.
+**Obiettivo**: Creare progetto MAUI funzionante con shell navigation e catalogo esercizi
 
-Il repository contiene attualmente la documentazione di progetto e una cartella `src/` vuota. La prima iterazione dovrà quindi bootstrapare il progetto MAUI reale in `src/BookScout.Mobile/` prima di affrontare le feature applicative.
+**Scope**:
+- Setup progetto MAUI con target Android
+- Shell navigation con tabbar (Home, Workout, History, Stats, Profile)
+- Database SQLite con Migrations per Exercise, MuscleGroup
+- Catalogo esercizi precompilato (30-40 esercizi)
+- Pagina Catalogo con raggruppamento per gruppo muscolare
+- Loading state / empty state / error state
 
-### Vincoli principali
+**Criteri di accettazione**:
+- [ ] L'app compila e gira su Android emulator
+- [ ] Shell navigation funziona tra le tab principali
+- [ ] Database SQLite si crea correttamente al primo avvio
+- [ ] Il catalogo esercizi mostra almeno 30 esercizi divisi per gruppo muscolare
+- [ ] Ricerca esercizio funziona
 
-- `.NET MAUI` con target principale Android; iOS opzionale e secondario.
-- Architettura MVVM con `CommunityToolkit.Mvvm`.
-- Navigazione basata su Shell.
-- `HttpClient` asincrono e `System.Text.Json`.
-- Google Books API come provider base dell'MVP.
-- Search e Results in una singola schermata.
-- Stati UI espliciti: loading, error, empty, success.
-- Persistenza locale con SQLite per favoriti e cronologia.
-- Nessuna autenticazione, sincronizzazione cloud o funzionalità social nel v1.
+**Rischi**:
+- Dati esercizi iniziali devono essere coerenti e completi
 
-### Dipendenze esterne
+---
 
-- Google Books API per ricerca e dettaglio.
-- Connettività Internet per i flussi remoti del MVP.
-- Ambiente MAUI Android funzionante su macchina di sviluppo.
-- Layer SQLite locale per favoriti e cronologia.
+### Iteration 2: Registrazione allenamento
 
-## 2. Sequenza delle iterazioni
+**Obiettivo**: Permettere all'utente di registrare un allenamento completo
 
-| Iterazione | Obiettivo verificabile | Dipendenze | Rischio | Stato |
-| --- | --- | --- | --- | --- |
-| IT-01 | Bootstrap del progetto MAUI e Shell di base | Nessuna | medio | pianificata |
-| IT-02 | Ricerca libri con Google Books e risultati nella pagina Search | IT-01 | medio | pianificata |
-| IT-03 | Navigazione al dettaglio e rendering dati estesi del libro | IT-02 | medio | pianificata |
-| IT-04 | Favoriti locali persistiti con apertura immediata da cache e refresh remoto in background | IT-03 | medio-alto | pianificata |
-| IT-05 | Cronologia locale con deduplica, replay e cancellazione totale o selettiva | IT-02, IT-04 | medio | pianificata |
-| IT-06 | Hardening MVP, smoke regression e chiusura della baseline funzionale | IT-01, IT-02, IT-03, IT-04, IT-05 | medio | pianificata |
+**Scope**:
+- Modello Workout con data, durata, collezione di ExerciseSet
+- Modello ExerciseSet con Exercise, Weight, Reps, SetNumber
+- Pagina Nuovo Allenamento con aggiunta esercizi
+- Pagina Dettaglio esercizio per Serie/Peso/Reps
+- Salvataggio allenamento su SQLite
+- Pagina Storico Allenamenti
+- Pagina Dettaglio Allenamento passato
 
-## 3. Dettaglio iterazioni
+**Criteri di accettazione**:
+- [ ] L'utente può avviare un nuovo allenamento
+- [ ] L'utente può aggiungere esercizi dal catalogo
+- [ ] Per ogni esercizio può aggiungere serie con peso e ripetizioni
+- [ ] L'allenamento viene salvato su SQLite
+- [ ] Lo storico mostra gli allenamenti passati
+- [ ] Il dettaglio di un allenamento passato è consultabile
 
-### IT-01 - Bootstrap progetto MAUI e Shell di base
+**Rischi**:
+- Gestione corretta delle relazioni in SQLite (Workout -> ExerciseSets -> Exercise)
 
-**Obiettivo verificabile**
+---
 
-Creare il progetto MAUI in `src/BookScout.Mobile/`, avviarlo su Android e rendere raggiungibili le viste principali `Search`, `Favorites` e `History` tramite Shell, senza implementare ancora la logica applicativa del dominio.
+### Iteration 3: Tracking peso corporeo
 
-**In scope**
+**Obiettivo**: Permettere all'utente di tracciare il peso corporeo
 
-- creare il progetto `.NET MAUI` in `src/BookScout.Mobile/`;
-- impostare `App`, `AppShell` e `MauiProgram`;
-- predisporre cartelle `Models`, `Services`, `ViewModels`, `Views`, `Resources`;
-- creare le pagine iniziali `Search`, `Favorites` e `History` come placeholder MVVM-safe;
-- impostare dependency injection minima per servizi e ViewModels futuri.
+**Scope**:
+- Modello BodyWeight con data e peso
+- Pagina per inserimento peso corporeo
+- Storage su SQLite
+- Grafico semplice (line chart custom) per progressione peso
+- Visualizzazione nella dashboard
 
-**Out of scope**
+**Criteri di accettazione**:
+- [ ] L'utente può inserire il peso corporeo
+- [ ] Il peso viene salvato su SQLite
+- [ ] Un grafico mostra l'andamento nel tempo
 
-- integrazione con Google Books API;
-- pagina dettaglio libro completa;
-- persistenza locale di favoriti o cronologia;
-- gestione reale di ricerca, dettaglio, refresh o replay.
+**Rischi**:
+- Implementazione chart custom o use library
 
-**File o aree probabili**
+---
 
-- `src/BookScout.Mobile/BookScout.Mobile.csproj`
-- `src/BookScout.Mobile/App.xaml`
-- `src/BookScout.Mobile/App.xaml.cs`
-- `src/BookScout.Mobile/AppShell.xaml`
-- `src/BookScout.Mobile/AppShell.xaml.cs`
-- `src/BookScout.Mobile/MauiProgram.cs`
-- `src/BookScout.Mobile/Views/`
-- `src/BookScout.Mobile/ViewModels/`
+### Iteration 4: Statistiche e dashboard
 
-**Dipendenze**
+**Obiettivo**: Mostrare statistiche di progresso all'utente
 
-- `docs/spec.md` approvato;
-- workload MAUI funzionante sull'ambiente locale.
+**Scope**:
+- Query aggregate per esercizio (peso max storico, volume totale)
+- Statistiche settimanali (numero allenamenti)
+- Dashboard principale con schede informative
+- Pagina Statistiche dedicata
 
-**Criteri di accettazione**
+**Criteri di accettazione**:
+- [ ] Dashboard mostra numero allenamenti ultima settimana
+- [ ] Dashboard mostra peso max per esercizi principali
+- [ ] Pagina statistiche mostra dettagli completi
 
-- [ ] L'app compila e si avvia su Android.
-- [ ] Le sezioni `Search`, `Favorites` e `History` sono raggiungibili da Shell.
-- [ ] Le pagine create usano bindings e ViewModels, senza business logic nei code-behind.
-- [ ] La struttura delle cartelle del progetto è coerente con `docs/architecture.md`.
+**Rischi**:
+- Query efficienti su SQLite con dati crescenti
 
-**Verifiche principali**
+---
 
-- manuale: avvio app e navigazione tra le tre sezioni principali;
-- automatico: `dotnet build src/BookScout.Mobile/BookScout.Mobile.csproj`.
+### Iteration 5: Backend e autenticazione (TBD)
 
-**Rischi**
+**Obiettivo**: Preparare il layer per funzionalità social
 
-- introdurre logica di feature dentro il bootstrap invece di mantenere uno scheletro minimo;
-- creare una struttura iniziale incoerente che obblighi refactor precoci nelle iterazioni successive.
+**Scope**:
+- Modello User con ID, username
+- Servizio API astratto (da implementare con backend reale)
+- Autenticazione base (login/register mock o reale)
+- Struttura per FriendRequest
 
-### IT-02 - Ricerca libri e risultati in pagina unica
+**Criteri di accettazione**:
+- [ ] Layer API configurato
+- [ ] Modelli utente definiti
 
-**Obiettivo verificabile**
+**Rischi**:
+- Definizione API backend non ancora disponibile
 
-Consentire all'utente di cercare libri per titolo o autore dalla schermata `Search`, visualizzando risultati con copertina, titolo e autore nella stessa pagina, con gestione esplicita di loading, empty ed error state.
+---
 
-**In scope**
+### Iteration 6: Gestione amici
 
-- integrare Google Books API per `GET /volumes?q={query}`;
-- introdurre servizio remoto per la ricerca libri;
-- modellare DTO e mapping difensivo verso modelli di dominio per la lista risultati;
-- implementare `SearchViewModel` con query, comando di ricerca e stati UI;
-- implementare `SearchPage` con `SearchBar`, `CollectionView`, placeholder copertina e retry.
+**Obiettivo**: Permettere all'utente di aggiungere amici e vedere i loro allenamenti
 
-**Out of scope**
+**Scope**:
+- Pagina Ricerca utenti
+- Invio richieste di amicizia
+- Accettazione/rifiuto richieste
+- Lista amici
+- Pagina Feed amici (ultimi allenamenti)
+- Competizione: comparing stats con amici
 
-- apertura del dettaglio completo del libro;
-- salvataggio dei favoriti;
-- cronologia locale delle ricerche;
-- supporto multi-provider oltre a Google Books.
+**Criteri di accettazione**:
+- [ ] L'utente può cercare altri utenti
+- [ ] L'utente può inviare richiesta di amicizia
+- [ ] L'utente riceve e gestisce richieste pendenti
+- [ ] La lista amici è consultabile
+- [ ] Gli allenamenti degli amici sono visibili
 
-**File o aree probabili**
+**Rischi**:
+- Backend required per funzionamento reale
 
-- `src/BookScout.Mobile/Views/SearchPage.xaml`
-- `src/BookScout.Mobile/ViewModels/SearchViewModel.cs`
-- `src/BookScout.Mobile/Services/`
-- `src/BookScout.Mobile/Models/`
-- `src/BookScout.Mobile/Resources/`
+---
 
-**Dipendenze**
+### Iteration 7: Piani di allenamento
 
-- completamento di IT-01;
-- connettività Internet e disponibilità Google Books API.
+**Obiettivo**: Offrire piani strutturati per principianti
 
-**Criteri di accettazione**
+**Scope**:
+- Modello WorkoutPlan con elenco esercizi
+- 2 piani base precaricati (Schema A/B 2 giorni, Schema 3 giorni)
+- Pagina Piani con lista
+- Pagina Dettaglio piano
+- Avvio allenamento da piano
 
-- [ ] Inserendo una query valida, la pagina Search avvia la richiesta remota e mostra subito il loading state.
-- [ ] In caso di successo, la lista mostra almeno copertina, titolo e autore per ogni libro.
-- [ ] In caso di risposta vuota, la UI mostra uno stato empty esplicito.
-- [ ] In caso di errore o timeout, la UI mostra un messaggio comprensibile e una azione di retry.
-- [ ] L'assenza della copertina o di altri campi opzionali non genera crash della UI.
+**Criteri di accettazione**:
+- [ ] Almeno 2 piani predefiniti sono presenti
+- [ ] L'utente può consultare i dettagli di ogni piano
+- [ ] L'utente può avviare un allenamento da un piano
 
-**Verifiche principali**
+**Rischi**:
+- Dettagli esercizi nei piani devono essere coerenti con catalogo
 
-- manuale: ricerche con query valida, query senza risultati e simulazione di errore rete;
-- automatico: `dotnet build src/BookScout.Mobile/BookScout.Mobile.csproj` e controlli unitari del mapping/service layer se il progetto test viene introdotto nello stesso slice.
+---
 
-**Rischi**
+## Test matrix
 
-- risposte JSON parziali o inconsistenti da Google Books;
-- immagini remote lente o assenti che peggiorano la leggibilità della lista.
+Vedi `docs/test-matrix.md` per la matrice di test dettagliata.
 
-### IT-03 - Navigazione al dettaglio e dati estesi del libro
+## Definition of Done per iterazione
 
-**Obiettivo verificabile**
+Ogni iterazione deve soddisfare:
 
-Permettere l'apertura del dettaglio di un libro dalla lista risultati, caricando i dati estesi da Google Books e gestendo correttamente campi mancanti, loading e retry.
+1. Codice compila senza errori
+2. Feature testabile manualmente
+3. Stati UI gestiti (loading, error, empty, success)
+4. Dati persistono correttamente su SQLite
+5. Documentazione iterazione aggiornata in `docs/iterations/`
 
-**In scope**
+## Prossimi passi
 
-- registrare la route Shell per il dettaglio;
-- passare il parametro `bookId` dalla lista risultati al dettaglio;
-- integrare `GET /volumes/{id}`;
-- implementare `BookDetailViewModel` e `BookDetailPage`;
-- mostrare descrizione, editore, data pubblicazione, pagine, categorie e ISBN quando disponibili.
-
-**Out of scope**
-
-- salvataggio persistente nei favoriti;
-- apertura da Favorites con dati locali;
-- cronologia ricerche;
-- supporto offline esteso.
-
-**File o aree probabili**
-
-- `src/BookScout.Mobile/AppShell.xaml`
-- `src/BookScout.Mobile/AppShell.xaml.cs`
-- `src/BookScout.Mobile/Views/BookDetailPage.xaml`
-- `src/BookScout.Mobile/ViewModels/BookDetailViewModel.cs`
-- `src/BookScout.Mobile/Services/`
-- `src/BookScout.Mobile/Models/`
-
-**Dipendenze**
-
-- completamento di IT-02;
-- disponibilità dell'ID volume proveniente dalla ricerca.
-
-**Criteri di accettazione**
-
-- [ ] Toccando un risultato, l'utente raggiunge la pagina di dettaglio corretta.
-- [ ] Il dettaglio mostra i campi estesi previsti quando presenti.
-- [ ] In presenza di campi mancanti o null, la pagina resta leggibile e non mostra errori tecnici.
-- [ ] Il dettaglio mostra loading ed error state con azione di retry.
-
-**Verifiche principali**
-
-- manuale: apertura dettaglio da più risultati, inclusi libri con metadati incompleti;
-- automatico: `dotnet build src/BookScout.Mobile/BookScout.Mobile.csproj` e controlli unitari del mapping del dettaglio se introdotti.
-
-**Rischi**
-
-- propagazione errata dei parametri Shell;
-- differenze tra dati disponibili in lista e dettaglio che impattano il rendering.
-
-### IT-04 - Favoriti locali persistiti e refresh remoto non bloccante
-
-**Obiettivo verificabile**
-
-Permettere di salvare o rimuovere libri dai favoriti, mantenerli dopo la riapertura dell'app e aprirli dalla schermata `Favorites` mostrando subito i dati locali, con eventuale refresh remoto silenzioso in background.
-
-**In scope**
-
-- introdurre persistenza SQLite per i favoriti;
-- salvare una snapshot locale completa dei dati principali del dettaglio;
-- aggiungere toggle add/remove favoriti dalla pagina dettaglio;
-- implementare `FavoritesPage` e relativo ViewModel;
-- aprire un libro da Favorites caricando prima i dati locali e poi, se disponibile rete, tentare refresh remoto non bloccante;
-- mostrare solo feedback di errore non invasivo quando il refresh fallisce.
-
-**Out of scope**
-
-- cronologia ricerche;
-- note personali;
-- provider alternativi;
-- modalità offline estesa oltre alla consultazione dei favoriti salvati.
-
-**File o aree probabili**
-
-- `src/BookScout.Mobile/Views/FavoritesPage.xaml`
-- `src/BookScout.Mobile/ViewModels/FavoritesViewModel.cs`
-- `src/BookScout.Mobile/ViewModels/BookDetailViewModel.cs`
-- `src/BookScout.Mobile/Services/`
-- `src/BookScout.Mobile/Models/`
-
-**Dipendenze**
-
-- completamento di IT-03;
-- disponibilità del layer SQLite locale.
-
-**Criteri di accettazione**
-
-- [ ] Un libro può essere salvato e rimosso dai favoriti dal dettaglio.
-- [ ] I favoriti restano disponibili dopo chiusura e riapertura dell'app.
-- [ ] Aprendo un libro da Favorites, il dettaglio mostra subito la snapshot locale senza attendere la rete.
-- [ ] Se il refresh remoto fallisce, il contenuto locale resta visibile e il feedback di errore è non invasivo e non bloccante.
-- [ ] Se il refresh remoto riesce, il contenuto può aggiornarsi senza conferma esplicita dell'utente.
-
-**Verifiche principali**
-
-- manuale: salvataggio, riapertura app, apertura da Favorites online e offline, rimozione dal dettaglio e dalla lista;
-- automatico: `dotnet build src/BookScout.Mobile/BookScout.Mobile.csproj` e test di repository/ViewModel se il layer locale viene reso testabile.
-
-**Rischi**
-
-- schema locale troppo povero o troppo ampio rispetto ai dati necessari;
-- divergenza temporanea tra snapshot locale e dati remoti aggiornati.
-
-### IT-05 - Cronologia locale con deduplica, replay e pulizia
-
-**Obiettivo verificabile**
-
-Registrare le ricerche effettuate, mostrarle in `History` in ordine temporale decrescente, consentire replay della query e cancellazione sia totale sia di singole voci.
-
-**In scope**
-
-- persistenza locale della cronologia ricerche;
-- deduplica delle query ripetute, riportando in cima la più recente;
-- implementazione di `HistoryPage` e relativo ViewModel;
-- replay della ricerca tramite navigazione verso `Search` con query precompilata o rieseguita;
-- cancellazione totale della cronologia e rimozione selettiva di singole voci.
-
-**Out of scope**
-
-- suggerimenti intelligenti o analytics;
-- sincronizzazione cloud;
-- ordinamenti avanzati o filtri;
-- estensioni offline oltre al comportamento già previsto nel MVP.
-
-**File o aree probabili**
-
-- `src/BookScout.Mobile/Views/HistoryPage.xaml`
-- `src/BookScout.Mobile/ViewModels/HistoryViewModel.cs`
-- `src/BookScout.Mobile/ViewModels/SearchViewModel.cs`
-- `src/BookScout.Mobile/AppShell.xaml`
-- `src/BookScout.Mobile/Services/`
-- `src/BookScout.Mobile/Models/`
-
-**Dipendenze**
-
-- completamento di IT-02;
-- pattern di persistenza locale consolidato in IT-04.
-
-**Criteri di accettazione**
-
-- [ ] Ogni ricerca completata aggiorna la cronologia locale.
-- [ ] Una query ripetuta non genera duplicato ma torna in cima all'elenco.
-- [ ] Toccando una voce della cronologia, la ricerca viene rilanciata nella pagina Search.
-- [ ] L'utente può cancellare tutta la cronologia o una singola voce.
-- [ ] Dopo riavvio app, la cronologia resta coerente con lo stato salvato.
-
-**Verifiche principali**
-
-- manuale: più ricerche consecutive, query duplicate, replay, delete singolo, clear totale, riavvio app;
-- automatico: `dotnet build src/BookScout.Mobile/BookScout.Mobile.csproj` e test di persistenza/normalizzazione query se introdotti.
-
-**Rischi**
-
-- accoppiamento eccessivo tra `HistoryPage` e ciclo di vita della `SearchPage`;
-- deduplica incoerente in presenza di differenze di maiuscole, spazi o caratteri speciali.
-
-### IT-06 - Hardening MVP e baseline di regressione
-
-**Obiettivo verificabile**
-
-Stabilizzare il MVP, chiudere i principali gap trasversali di UI state e completare una baseline di verifiche manuali e automatiche leggere prima di passare al post-MVP.
-
-**In scope**
-
-- rifinire testi, placeholder, retry e feedback di errore sulle quattro schermate principali;
-- verificare coerenza dei flussi `Search -> Detail -> Favorites -> History`;
-- correggere eventuali difetti emersi dalle verifiche dell'MVP;
-- eseguire smoke manuale Android e verifiche di build;
-- aggiornare evidenze di test e log iterazione nella fase di esecuzione.
-
-**Out of scope**
-
-- filtri, ordinamento, note personali, barcode scanner, offline mode estesa;
-- provider alternativi a Google Books;
-- UI automation profonda se non richiesta esplicitamente.
-
-**File o aree probabili**
-
-- `src/BookScout.Mobile/Views/`
-- `src/BookScout.Mobile/ViewModels/`
-- `src/BookScout.Mobile/Services/`
-- `docs/test-matrix.md`
-- `docs/iterations/` per i log applicativi dell'MVP; non usare `docs/skill-iterations/`, che resta archivio storico delle iterazioni sulle skill.
-
-**Dipendenze**
-
-- completamento funzionale di IT-01, IT-02, IT-03, IT-04 e IT-05.
-
-**Criteri di accettazione**
-
-- [ ] Tutti i flussi MVP risultano eseguibili senza blocchi funzionali maggiori.
-- [ ] Search, Detail, Favorites e History espongono stati UI coerenti con lo spec.
-- [ ] La build Android del progetto riesce stabilmente.
-- [ ] Le verifiche manuali prioritarie del MVP sono pronte per essere registrate nel test matrix esecutivo.
-
-**Verifiche principali**
-
-- manuale: smoke completo end-to-end su Android/emulatore;
-- automatico: `dotnet build src/BookScout.Mobile/BookScout.Mobile.csproj` ed eventuale `dotnet test` se il progetto test è stato introdotto.
-
-**Rischi**
-
-- usare questa iterazione come contenitore di refactor larghi non pianificati;
-- rinviare problemi di stato UI che dovrebbero essere chiusi nelle iterazioni precedenti.
-
-## 4. Roadmap post-MVP
-
-Le estensioni oltre il MVP devono mantenere l'ordine deciso in `docs/spec.md`:
-
-1. filtri e ordinamento;
-2. note personali;
-3. barcode scanner ISBN;
-4. offline mode estesa.
-
-Queste fasi non devono essere assorbite dentro le iterazioni MVP sopra elencate.
+1. Executable build verificato sull'emulatore Android
+2. Shell navigation funzionante
+3. Iterazione 1 completata
