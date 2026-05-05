@@ -5,129 +5,246 @@
     xmlns:vm="clr-namespace:GymTracker.Mobile.ViewModels"
     x:Class="GymTracker.Mobile.Views.CatalogPage"
     x:DataType="vm:CatalogViewModel"
-    Title="Esercizi">
+    Title="GYM LOG">
 
-    <Grid RowDefinitions="Auto,Auto,*" Padding="20,16" RowSpacing="16">
+    <Grid RowDefinitions="Auto,Auto,*" BackgroundColor="{StaticResource Surface}">
 
-        <!-- Title + Subtitle -->
-        <VerticalStackLayout Grid.Row="0" Spacing="4">
-            <Label Text="Catalogo Esercizi"
-                   FontFamily="LexendBold" FontSize="28" FontAttributes="Bold"
-                   TextColor="{StaticResource OnSurface}" />
-            <Label Text="Esplora 1300+ esercizi con GIF animate"
-                   FontFamily="InterRegular" FontSize="14"
-                   TextColor="{StaticResource TextSecondary}" />
+        <!-- Header bar -->
+        <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto"
+              Padding="20,16" BackgroundColor="{StaticResource Surface}">
+            <Border Grid.Column="0"
+                    BackgroundColor="{StaticResource SurfaceContainer}"
+                    StrokeShape="RoundRectangle 12"
+                    Padding="8" HeightRequest="40" WidthRequest="40">
+                <Label Text="📊" FontSize="18"
+                       HorizontalOptions="Center" VerticalOptions="Center" />
+            </Border>
+            <Label Grid.Column="1" Text="GYM LOG"
+                   FontFamily="LexendBold" FontSize="18" FontAttributes="Bold"
+                   TextColor="{StaticResource OnSurface}"
+                   HorizontalOptions="Center" VerticalOptions="Center" />
+            <Border Grid.Column="2"
+                    BackgroundColor="{StaticResource SurfaceContainer}"
+                    StrokeShape="RoundRectangle 12"
+                    Padding="8" HeightRequest="40" WidthRequest="40">
+                <Label Text="🔍" FontSize="16"
+                       HorizontalOptions="Center" VerticalOptions="Center" />
+            </Border>
+        </Grid>
+
+        <!-- Search + Category Chips -->
+        <VerticalStackLayout Grid.Row="1" Padding="20,0,20,12" Spacing="12">
+            <SearchBar Placeholder="Cerca esercizio..."
+                       Text="{Binding SearchText}"
+                       SearchCommand="{Binding SearchCommand}"
+                       BackgroundColor="{StaticResource SurfaceContainer}"
+                       TextColor="{StaticResource OnSurface}"
+                       PlaceholderColor="{StaticResource Outline}"
+                       CancelButtonColor="{StaticResource Primary}" />
+            <!-- Muscle Group Chips -->
+            <FlexLayout Wrap="Wrap" JustifyContent="Start">
+                <Border BackgroundColor="{StaticResource LimeGreen}"
+                        StrokeShape="RoundRectangle 16" Padding="14,8" Margin="0,0,8,8">
+                    <Label Text="Tutti"
+                           FontFamily="InterBold" FontSize="12" FontAttributes="Bold"
+                           TextColor="{StaticResource OnSecondary}" />
+                </Border>
+                <Border BackgroundColor="{StaticResource SurfaceContainer}"
+                        StrokeShape="RoundRectangle 16" Padding="14,8" Margin="0,0,8,8">
+                    <Label Text="Petto"
+                           FontFamily="InterBold" FontSize="12" FontAttributes="Bold"
+                           TextColor="{StaticResource TextSecondary}" />
+                </Border>
+                <Border BackgroundColor="{StaticResource SurfaceContainer}"
+                        StrokeShape="RoundRectangle 16" Padding="14,8" Margin="0,0,8,8">
+                    <Label Text="Schiena"
+                           FontFamily="InterBold" FontSize="12" FontAttributes="Bold"
+                           TextColor="{StaticResource TextSecondary}" />
+                </Border>
+                <Border BackgroundColor="{StaticResource SurfaceContainer}"
+                        StrokeShape="RoundRectangle 16" Padding="14,8" Margin="0,0,8,8">
+                    <Label Text="Spalle"
+                           FontFamily="InterBold" FontSize="12" FontAttributes="Bold"
+                           TextColor="{StaticResource TextSecondary}" />
+                </Border>
+                <Border BackgroundColor="{StaticResource SurfaceContainer}"
+                        StrokeShape="RoundRectangle 16" Padding="14,8" Margin="0,0,8,8">
+                    <Label Text="Braccia"
+                           FontFamily="InterBold" FontSize="12" FontAttributes="Bold"
+                           TextColor="{StaticResource TextSecondary}" />
+                </Border>
+                <Border BackgroundColor="{StaticResource SurfaceContainer}"
+                        StrokeShape="RoundRectangle 16" Padding="14,8" Margin="0,0,8,8">
+                    <Label Text="Gambe"
+                           FontFamily="InterBold" FontSize="12" FontAttributes="Bold"
+                           TextColor="{StaticResource TextSecondary}" />
+                </Border>
+                <Border BackgroundColor="{StaticResource SurfaceContainer}"
+                        StrokeShape="RoundRectangle 16" Padding="14,8" Margin="0,0,8,8">
+                    <Label Text="Addome"
+                           FontFamily="InterBold" FontSize="12" FontAttributes="Bold"
+                           TextColor="{StaticResource TextSecondary}" />
+                </Border>
+            </FlexLayout>
         </VerticalStackLayout>
 
-        <!-- Search Bar -->
-        <SearchBar Grid.Row="1"
-                   Placeholder="Cerca per nome..."
-                   Text="{Binding SearchText}"
-                   SearchCommand="{Binding SearchCommand}"
-                   BackgroundColor="{StaticResource SurfaceContainer}"
-                   TextColor="{StaticResource OnSurface}"
-                   PlaceholderColor="{StaticResource Outline}"
-                   CancelButtonColor="{StaticResource Primary}" />
+        <!-- Exercise List -->
+        <ScrollView Grid.Row="2" Padding="20,0,20,100">
+            <VerticalStackLayout Spacing="8">
 
-        <!-- Content Area -->
-        <Grid Grid.Row="2">
-
-            <!-- Loading -->
-            <VerticalStackLayout IsVisible="{Binding IsBusy}"
-                                 VerticalOptions="Center" HorizontalOptions="Center" Spacing="16">
-                <ActivityIndicator IsRunning="{Binding IsBusy}" />
-                <Label Text="Caricamento esercizi..."
-                       FontFamily="InterRegular" FontSize="14"
-                       TextColor="{StaticResource TextSecondary}"
-                       HorizontalTextAlignment="Center" />
-            </VerticalStackLayout>
-
-            <!-- Error -->
-            <VerticalStackLayout IsVisible="{Binding HasError}"
-                                 VerticalOptions="Center" HorizontalOptions="Center" Spacing="16">
-                <Label Text="⚠️" FontSize="40" HorizontalTextAlignment="Center" />
-                <Label Text="{Binding ErrorMessage}"
-                       FontFamily="InterRegular" FontSize="14"
-                       TextColor="{StaticResource AlertRed}"
-                       HorizontalTextAlignment="Center" />
-                <Button Text="RIPROVA"
-                        Style="{StaticResource SecondaryButton}"
-                        HorizontalOptions="Center"
-                        Command="{Binding RefreshCommand}" />
-            </VerticalStackLayout>
-
-            <!-- Empty -->
-            <VerticalStackLayout IsVisible="{Binding IsEmptyState}"
-                                 VerticalOptions="Center" HorizontalOptions="Center" Spacing="16">
-                <Border Style="{StaticResource CardFrame}"
-                        HorizontalOptions="Center" Padding="20,24">
-                    <VerticalStackLayout Spacing="16" HorizontalOptions="Center">
-                        <Label Text="🔍" FontSize="48" HorizontalTextAlignment="Center" />
-                        <VerticalStackLayout Spacing="4">
-                            <Label Text="Cosa vuoi allenare oggi?"
-                                   FontFamily="LexendBold" FontSize="20" FontAttributes="Bold"
-                                   TextColor="{StaticResource OnSurface}"
-                                   HorizontalTextAlignment="Center" />
-                            <Label Text="Cerca un esercizio per nome o seleziona un gruppo muscolare."
-                                   FontFamily="InterRegular" FontSize="14"
-                                   TextColor="{StaticResource TextSecondary}"
-                                   HorizontalTextAlignment="Center" />
-                        </VerticalStackLayout>
-                    </VerticalStackLayout>
-                </Border>
-
-                <!-- Quick Select Chips -->
-                <VerticalStackLayout Spacing="12">
-                    <Label Text="GRUPPI MUSCOLARI"
-                           FontFamily="InterBold" FontSize="11" FontAttributes="Bold"
-                           TextColor="{StaticResource TextSecondary}" CharacterSpacing="0.8"
-                           Margin="4,0,0,0" />
-                    <FlexLayout Wrap="Wrap" JustifyContent="Center"
-                                AlignItems="Center">
-                        <Border Style="{StaticResource CardFrame}" Margin="4" Padding="12,8"
-                                StrokeShape="RoundRectangle 20">
-                            <Label Text="Petto" FontFamily="InterBold" FontSize="13"
-                                   TextColor="{StaticResource OnSurface}" />
-                        </Border>
-                        <Border Style="{StaticResource CardFrame}" Margin="4" Padding="12,8"
-                                StrokeShape="RoundRectangle 20">
-                            <Label Text="Schiena" FontFamily="InterBold" FontSize="13"
-                                   TextColor="{StaticResource OnSurface}" />
-                        </Border>
-                        <Border Style="{StaticResource CardFrame}" Margin="4" Padding="12,8"
-                                StrokeShape="RoundRectangle 20">
-                            <Label Text="Spalle" FontFamily="InterBold" FontSize="13"
-                                   TextColor="{StaticResource OnSurface}" />
-                        </Border>
-                        <Border Style="{StaticResource CardFrame}" Margin="4" Padding="12,8"
-                                StrokeShape="RoundRectangle 20">
-                            <Label Text="Braccia" FontFamily="InterBold" FontSize="13"
-                                   TextColor="{StaticResource OnSurface}" />
-                        </Border>
-                        <Border Style="{StaticResource CardFrame}" Margin="4" Padding="12,8"
-                                StrokeShape="RoundRectangle 20">
-                            <Label Text="Gambe" FontFamily="InterBold" FontSize="13"
-                                   TextColor="{StaticResource OnSurface}" />
-                        </Border>
-                        <Border Style="{StaticResource CardFrame}" Margin="4" Padding="12,8"
-                                StrokeShape="RoundRectangle 20">
-                            <Label Text="Addominali" FontFamily="InterBold" FontSize="13"
-                                   TextColor="{StaticResource OnSurface}" />
-                        </Border>
-                    </FlexLayout>
+                <!-- Empty State -->
+                <VerticalStackLayout IsVisible="{Binding IsEmptyState}"
+                                     Spacing="16" Padding="0,40">
+                    <Label Text="🔍" FontSize="48" HorizontalTextAlignment="Center" />
+                    <Label Text="Cerca un esercizio"
+                           FontFamily="LexendBold" FontSize="18" FontAttributes="Bold"
+                           TextColor="{StaticResource OnSurface}"
+                           HorizontalTextAlignment="Center" />
+                    <Label Text="Sfoglia il catalogo di 1300+ esercizi"
+                           FontFamily="InterRegular" FontSize="14"
+                           TextColor="{StaticResource TextSecondary}"
+                           HorizontalTextAlignment="Center" />
                 </VerticalStackLayout>
-            </VerticalStackLayout>
 
-            <!-- Has Data (placeholder for future CollectionView) -->
-            <VerticalStackLayout IsVisible="{Binding HasData}"
-                                 VerticalOptions="Center" HorizontalOptions="Center" Spacing="16">
-                <Label Text="I risultati appariranno qui"
-                       FontFamily="InterRegular" FontSize="14"
-                       TextColor="{StaticResource TextSecondary}"
-                       HorizontalTextAlignment="Center" />
-            </VerticalStackLayout>
+                <!-- Example exercises (placeholder, will be CollectionView with API data) -->
+                <VerticalStackLayout Spacing="8"
+                                     IsVisible="{Binding HasError, Converter={x:Null}}">
+                    <!-- Exercise 1 -->
+                    <Border Style="{StaticResource CardFrame}"
+                            BackgroundColor="{StaticResource SurfaceContainerHigh}">
+                        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                            <Border Grid.Column="0"
+                                    BackgroundColor="{StaticResource SurfaceContainer}"
+                                    StrokeShape="RoundRectangle 12"
+                                    WidthRequest="64" HeightRequest="64" Padding="0">
+                                <Label Text="🏋️" FontSize="28"
+                                       HorizontalOptions="Center" VerticalOptions="Center" />
+                            </Border>
+                            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="4">
+                                <Label Text="Barbell Bench Press"
+                                       FontFamily="LexendBold" FontSize="15" FontAttributes="Bold"
+                                       TextColor="{StaticResource OnSurface}" />
+                                <HorizontalStackLayout Spacing="8">
+                                    <Border BackgroundColor="{StaticResource SurfaceContainer}"
+                                            StrokeShape="RoundRectangle 8" Padding="8,3">
+                                        <Label Text="Petto"
+                                               FontFamily="InterBold" FontSize="10"
+                                               TextColor="{StaticResource Primary}" />
+                                    </Border>
+                                    <Border BackgroundColor="{StaticResource SurfaceContainer}"
+                                            StrokeShape="RoundRectangle 8" Padding="8,3">
+                                        <Label Text="Bilanciere"
+                                               FontFamily="InterBold" FontSize="10"
+                                               TextColor="{StaticResource TextSecondary}" />
+                                    </Border>
+                                </HorizontalStackLayout>
+                            </VerticalStackLayout>
+                            <Label Grid.Column="2" Text="›" FontSize="24"
+                                   TextColor="{StaticResource TextSecondary}"
+                                   VerticalOptions="Center" />
+                        </Grid>
+                    </Border>
 
-        </Grid>
+                    <!-- Exercise 2 -->
+                    <Border Style="{StaticResource CardFrame}"
+                            BackgroundColor="{StaticResource SurfaceContainerHigh}">
+                        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                            <Border Grid.Column="0"
+                                    BackgroundColor="{StaticResource SurfaceContainer}"
+                                    StrokeShape="RoundRectangle 12"
+                                    WidthRequest="64" HeightRequest="64" Padding="0">
+                                <Label Text="🏋️" FontSize="28"
+                                       HorizontalOptions="Center" VerticalOptions="Center" />
+                            </Border>
+                            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="4">
+                                <Label Text="Incline Dumbbell Press"
+                                       FontFamily="LexendBold" FontSize="15" FontAttributes="Bold"
+                                       TextColor="{StaticResource OnSurface}" />
+                                <HorizontalStackLayout Spacing="8">
+                                    <Border BackgroundColor="{StaticResource SurfaceContainer}"
+                                            StrokeShape="RoundRectangle 8" Padding="8,3">
+                                        <Label Text="Petto"
+                                               FontFamily="InterBold" FontSize="10"
+                                               TextColor="{StaticResource Primary}" />
+                                    </Border>
+                                    <Border BackgroundColor="{StaticResource SurfaceContainer}"
+                                            StrokeShape="RoundRectangle 8" Padding="8,3">
+                                        <Label Text="Manubri"
+                                               FontFamily="InterBold" FontSize="10"
+                                               TextColor="{StaticResource TextSecondary}" />
+                                    </Border>
+                                </HorizontalStackLayout>
+                            </VerticalStackLayout>
+                            <Label Grid.Column="2" Text="›" FontSize="24"
+                                   TextColor="{StaticResource TextSecondary}"
+                                   VerticalOptions="Center" />
+                        </Grid>
+                    </Border>
+
+                    <!-- Exercise 3 -->
+                    <Border Style="{StaticResource CardFrame}"
+                            BackgroundColor="{StaticResource SurfaceContainerHigh}">
+                        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                            <Border Grid.Column="0"
+                                    BackgroundColor="{StaticResource SurfaceContainer}"
+                                    StrokeShape="RoundRectangle 12"
+                                    WidthRequest="64" HeightRequest="64" Padding="0">
+                                <Label Text="🏋️" FontSize="28"
+                                       HorizontalOptions="Center" VerticalOptions="Center" />
+                            </Border>
+                            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="4">
+                                <Label Text="Cable Crossover"
+                                       FontFamily="LexendBold" FontSize="15" FontAttributes="Bold"
+                                       TextColor="{StaticResource OnSurface}" />
+                                <HorizontalStackLayout Spacing="8">
+                                    <Border BackgroundColor="{StaticResource SurfaceContainer}"
+                                            StrokeShape="RoundRectangle 8" Padding="8,3">
+                                        <Label Text="Petto"
+                                               FontFamily="InterBold" FontSize="10"
+                                               TextColor="{StaticResource Primary}" />
+                                    </Border>
+                                    <Border BackgroundColor="{StaticResource SurfaceContainer}"
+                                            StrokeShape="RoundRectangle 8" Padding="8,3">
+                                        <Label Text="Cavi"
+                                               FontFamily="InterBold" FontSize="10"
+                                               TextColor="{StaticResource TextSecondary}" />
+                                    </Border>
+                                </HorizontalStackLayout>
+                            </VerticalStackLayout>
+                            <Label Grid.Column="2" Text="›" FontSize="24"
+                                   TextColor="{StaticResource TextSecondary}"
+                                   VerticalOptions="Center" />
+                        </Grid>
+                    </Border>
+
+                </VerticalStackLayout>
+
+                <!-- Loading state -->
+                <VerticalStackLayout IsVisible="{Binding IsBusy}"
+                                     VerticalOptions="Center" Spacing="12" Padding="0,60">
+                    <ActivityIndicator IsRunning="{Binding IsBusy}" />
+                    <Label Text="Caricamento esercizi..."
+                           FontFamily="InterRegular" FontSize="14"
+                           TextColor="{StaticResource TextSecondary}"
+                           HorizontalTextAlignment="Center" />
+                </VerticalStackLayout>
+
+                <!-- Error state -->
+                <VerticalStackLayout IsVisible="{Binding HasError}"
+                                     VerticalOptions="Center" Spacing="12" Padding="0,40">
+                    <Label Text="{Binding ErrorMessage}"
+                           FontFamily="InterRegular" FontSize="14"
+                           TextColor="{StaticResource AlertRed}"
+                           HorizontalTextAlignment="Center" />
+                    <Button Text="RIPROVA"
+                            Style="{StaticResource SecondaryButton}"
+                            HorizontalOptions="Center"
+                            Command="{Binding RefreshCommand}" />
+                </VerticalStackLayout>
+
+            </VerticalStackLayout>
+        </ScrollView>
+
     </Grid>
 
 </ContentPage>

@@ -5,91 +5,187 @@
     xmlns:vm="clr-namespace:GymTracker.Mobile.ViewModels"
     x:Class="GymTracker.Mobile.Views.WorkoutPage"
     x:DataType="vm:WorkoutViewModel"
-    Title="Allenamento">
+    Title="GYM LOG">
 
-    <Grid RowDefinitions="Auto,*" Padding="20,16" RowSpacing="16">
+    <Grid RowDefinitions="Auto,*" BackgroundColor="{StaticResource Surface}">
 
-        <!-- Title -->
-        <VerticalStackLayout Grid.Row="0" Spacing="4">
-            <Label Text="Allenamento"
-                   FontFamily="LexendBold" FontSize="28" FontAttributes="Bold"
-                   TextColor="{StaticResource OnSurface}" />
-            <Label Text="Registra serie, peso e ripetizioni"
-                   FontFamily="InterRegular" FontSize="14"
-                   TextColor="{StaticResource TextSecondary}" />
-        </VerticalStackLayout>
+        <!-- Header bar -->
+        <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto"
+              Padding="20,16" BackgroundColor="{StaticResource Surface}">
+            <Border Grid.Column="0"
+                    BackgroundColor="{StaticResource SurfaceContainer}"
+                    StrokeShape="RoundRectangle 12"
+                    Padding="8" HeightRequest="40" WidthRequest="40">
+                <Label Text="📊" FontSize="18"
+                       HorizontalOptions="Center" VerticalOptions="Center" />
+            </Border>
+            <Label Grid.Column="1" Text="WORKOUT"
+                   FontFamily="LexendBold" FontSize="18" FontAttributes="Bold"
+                   TextColor="{StaticResource OnSurface}"
+                   HorizontalOptions="Center" VerticalOptions="Center" />
+            <Button Grid.Column="2"
+                    Text="CREA SCHEDA"
+                    FontFamily="InterBold" FontSize="10" FontAttributes="Bold"
+                    TextColor="{StaticResource OnSecondary}"
+                    BackgroundColor="{StaticResource LimeGreen}"
+                    CornerRadius="12" HeightRequest="36" Padding="12,0" />
+        </Grid>
 
-        <Grid Grid.Row="1">
+        <!-- Content -->
+        <ScrollView Grid.Row="1" Padding="20,0,20,100">
+            <VerticalStackLayout Spacing="16">
 
-            <!-- Empty - No workout yet -->
-            <VerticalStackLayout IsVisible="{Binding IsEmptyState}"
-                                 VerticalOptions="Center" HorizontalOptions="Center" Spacing="24">
-                <Border Style="{StaticResource CardFrame}" Padding="24,32" HorizontalOptions="Center">
-                    <VerticalStackLayout Spacing="20" HorizontalOptions="Center">
-                        <Label Text="💪" FontSize="64" HorizontalTextAlignment="Center" />
-                        <VerticalStackLayout Spacing="8">
-                            <Label Text="Pronto?"
-                                   FontFamily="LexendBold" FontSize="24" FontAttributes="Bold"
-                                   TextColor="{StaticResource OnSurface}"
-                                   HorizontalTextAlignment="Center" />
-                            <Label Text="Nessun allenamento in corso. Iniziane uno nuovo e registra le tue serie."
-                                   FontFamily="InterRegular" FontSize="14"
-                                   TextColor="{StaticResource TextSecondary}"
-                                   HorizontalTextAlignment="Center"
-                                   MaximumWidthRequest="280" />
-                        </VerticalStackLayout>
-                        <Button Text="INIZIA ALLENAMENTO"
-                                Style="{StaticResource PrimaryButton}"
-                                HorizontalOptions="Center"
-                                WidthRequest="240"
-                                HeightRequest="56"
-                                Command="{Binding StartWorkoutCommand}" />
-                    </VerticalStackLayout>
-                </Border>
-            </VerticalStackLayout>
-
-            <!-- Active Workout -->
-            <VerticalStackLayout IsVisible="{Binding HasData}" Spacing="16" Padding="0,8">
-
-                <!-- Workout header card -->
-                <Border Style="{StaticResource CardFrame}">
-                    <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto" RowSpacing="4">
-                        <Label Grid.Row="0" Grid.Column="0"
-                               Text="{Binding WorkoutTitle}"
-                               FontFamily="LexendBold" FontSize="20" FontAttributes="Bold"
-                               TextColor="{StaticResource OnSurface}" />
-                        <Border Grid.Row="0" Grid.Column="1"
-                                BackgroundColor="{StaticResource LimeGreen}"
-                                StrokeShape="RoundRectangle 12" Padding="10,4">
-                            <Label Text="IN CORSO"
-                                   FontFamily="InterBold" FontSize="10" FontAttributes="Bold"
-                                   TextColor="{StaticResource OnSecondary}" />
-                        </Border>
-                        <Label Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
-                               Text="0 esercizi · 0 serie · 0 kg"
-                               FontFamily="InterRegular" FontSize="13"
+                <!-- Date + Start Button -->
+                <Grid ColumnDefinitions="*,Auto" Padding="0,8">
+                    <VerticalStackLayout Grid.Column="0" Spacing="2">
+                        <Label Text="Oggi"
+                               FontFamily="InterRegular" FontSize="14"
                                TextColor="{StaticResource TextSecondary}" />
+                        <Label Text="Nuovo Allenamento"
+                               FontFamily="LexendBold" FontSize="24" FontAttributes="Bold"
+                               TextColor="{StaticResource OnSurface}" />
+                    </VerticalStackLayout>
+                    <Button Grid.Column="1"
+                            Text="INIZIA"
+                            Style="{StaticResource PrimaryButton}"
+                            HeightRequest="48" WidthRequest="120"
+                            FontSize="13"
+                            Command="{Binding StartWorkoutCommand}" />
+                </Grid>
+
+                <!-- Suggested Exercises from a Plan -->
+                <Label Text="SCHEMA PUSH (PETTO/SPALLE/TRICIPITI)"
+                       FontFamily="InterBold" FontSize="11" FontAttributes="Bold"
+                       TextColor="{StaticResource TextSecondary}" CharacterSpacing="0.8" />
+
+                <!-- Exercise Card 1 -->
+                <Border Style="{StaticResource CardFrame}"
+                        BackgroundColor="{StaticResource SurfaceContainerHigh}">
+                    <Grid ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto,Auto"
+                          ColumnSpacing="12" RowSpacing="6">
+                        <!-- Exercise Icon placeholder -->
+                        <Border Grid.Row="0" Grid.Column="0" Grid.RowSpan="3"
+                                BackgroundColor="{StaticResource SurfaceContainer}"
+                                StrokeShape="RoundRectangle 12"
+                                WidthRequest="64" HeightRequest="64" Padding="0">
+                            <Label Text="🏋️" FontSize="28"
+                                   HorizontalOptions="Center" VerticalOptions="Center" />
+                        </Border>
+                        <!-- Exercise name -->
+                        <Label Grid.Row="0" Grid.Column="1"
+                               Text="Panca Piana con Bilanciere"
+                               FontFamily="LexendBold" FontSize="15" FontAttributes="Bold"
+                               TextColor="{StaticResource OnSurface}" />
+                        <!-- Target -->
+                        <Label Grid.Row="1" Grid.Column="1"
+                               Text="Petto · Bilanciere"
+                               FontFamily="InterRegular" FontSize="12"
+                               TextColor="{StaticResource TextSecondary}" />
+                        <!-- Sets info -->
+                        <Label Grid.Row="2" Grid.Column="1"
+                               Text="4 serie · 8-12 reps"
+                               FontFamily="InterRegular" FontSize="12"
+                               TextColor="{StaticResource Primary}" />
+                        <!-- Add set button -->
+                        <Border Grid.Row="0" Grid.Column="2" Grid.RowSpan="3"
+                                BackgroundColor="{StaticResource SurfaceContainer}"
+                                StrokeShape="RoundRectangle 12"
+                                WidthRequest="44" HeightRequest="44" Padding="0">
+                            <Label Text="+" FontSize="24"
+                                   TextColor="{StaticResource Primary}"
+                                   HorizontalOptions="Center" VerticalOptions="Center" />
+                        </Border>
                     </Grid>
                 </Border>
 
-                <Button Text="AGGIUNGI ESERCIZIO"
-                        Style="{StaticResource SecondaryButton}"
-                        HeightRequest="52" />
+                <!-- Exercise Card 2 -->
+                <Border Style="{StaticResource CardFrame}"
+                        BackgroundColor="{StaticResource SurfaceContainerHigh}">
+                    <Grid ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto,Auto"
+                          ColumnSpacing="12" RowSpacing="6">
+                        <Border Grid.Row="0" Grid.Column="0" Grid.RowSpan="3"
+                                BackgroundColor="{StaticResource SurfaceContainer}"
+                                StrokeShape="RoundRectangle 12"
+                                WidthRequest="64" HeightRequest="64" Padding="0">
+                            <Label Text="🏋️" FontSize="28"
+                                   HorizontalOptions="Center" VerticalOptions="Center" />
+                        </Border>
+                        <Label Grid.Row="0" Grid.Column="1"
+                               Text="Shoulder Press con Manubri"
+                               FontFamily="LexendBold" FontSize="15" FontAttributes="Bold"
+                               TextColor="{StaticResource OnSurface}" />
+                        <Label Grid.Row="1" Grid.Column="1"
+                               Text="Spalle · Manubri"
+                               FontFamily="InterRegular" FontSize="12"
+                               TextColor="{StaticResource TextSecondary}" />
+                        <Label Grid.Row="2" Grid.Column="1"
+                               Text="3 serie · 10-15 reps"
+                               FontFamily="InterRegular" FontSize="12"
+                               TextColor="{StaticResource Primary}" />
+                        <Border Grid.Row="0" Grid.Column="2" Grid.RowSpan="3"
+                                BackgroundColor="{StaticResource SurfaceContainer}"
+                                StrokeShape="RoundRectangle 12"
+                                WidthRequest="44" HeightRequest="44" Padding="0">
+                            <Label Text="+" FontSize="24"
+                                   TextColor="{StaticResource Primary}"
+                                   HorizontalOptions="Center" VerticalOptions="Center" />
+                        </Border>
+                    </Grid>
+                </Border>
 
-                <!-- Storico recente placeholder -->
-                <Label Text="ALLENAMENTI RECENTI"
-                       FontFamily="InterBold" FontSize="11" FontAttributes="Bold"
-                       TextColor="{StaticResource TextSecondary}" CharacterSpacing="0.8"
-                       Margin="0,8,0,0" />
-                <Border Style="{StaticResource CardFrame}">
-                    <Label Text="Nessun allenamento precedente"
-                           FontFamily="InterRegular" FontSize="14"
-                           TextColor="{StaticResource Outline}" />
+                <!-- Exercise Card 3 -->
+                <Border Style="{StaticResource CardFrame}"
+                        BackgroundColor="{StaticResource SurfaceContainerHigh}">
+                    <Grid ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto,Auto"
+                          ColumnSpacing="12" RowSpacing="6">
+                        <Border Grid.Row="0" Grid.Column="0" Grid.RowSpan="3"
+                                BackgroundColor="{StaticResource SurfaceContainer}"
+                                StrokeShape="RoundRectangle 12"
+                                WidthRequest="64" HeightRequest="64" Padding="0">
+                            <Label Text="🏋️" FontSize="28"
+                                   HorizontalOptions="Center" VerticalOptions="Center" />
+                        </Border>
+                        <Label Grid.Row="0" Grid.Column="1"
+                               Text="Push Down ai Cavi"
+                               FontFamily="LexendBold" FontSize="15" FontAttributes="Bold"
+                               TextColor="{StaticResource OnSurface}" />
+                        <Label Grid.Row="1" Grid.Column="1"
+                               Text="Tricipiti · Cavi"
+                               FontFamily="InterRegular" FontSize="12"
+                               TextColor="{StaticResource TextSecondary}" />
+                        <Label Grid.Row="2" Grid.Column="1"
+                               Text="3 serie · 12-15 reps"
+                               FontFamily="InterRegular" FontSize="12"
+                               TextColor="{StaticResource Primary}" />
+                        <Border Grid.Row="0" Grid.Column="2" Grid.RowSpan="3"
+                                BackgroundColor="{StaticResource SurfaceContainer}"
+                                StrokeShape="RoundRectangle 12"
+                                WidthRequest="44" HeightRequest="44" Padding="0">
+                            <Label Text="+" FontSize="24"
+                                   TextColor="{StaticResource Primary}"
+                                   HorizontalOptions="Center" VerticalOptions="Center" />
+                        </Border>
+                    </Grid>
+                </Border>
+
+                <!-- Add Exercise button -->
+                <Border Style="{StaticResource CardFrame}"
+                        BackgroundColor="{StaticResource SurfaceContainer}"
+                        Stroke="{StaticResource Primary}" StrokeThickness="1"
+                        Padding="0" HeightRequest="56">
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12"
+                          HorizontalOptions="Center" VerticalOptions="Center">
+                        <Label Grid.Column="0" Text="+" FontSize="22"
+                               TextColor="{StaticResource Primary}" VerticalOptions="Center" />
+                        <Label Grid.Column="1" Text="Aggiungi esercizio"
+                               FontFamily="InterRegular" FontSize="15"
+                               TextColor="{StaticResource Primary}" VerticalOptions="Center" />
+                    </Grid>
                 </Border>
 
             </VerticalStackLayout>
+        </ScrollView>
 
-        </Grid>
     </Grid>
 
 </ContentPage>
