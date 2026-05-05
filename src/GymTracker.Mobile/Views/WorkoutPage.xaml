@@ -7,42 +7,89 @@
     x:DataType="vm:WorkoutViewModel"
     Title="Allenamento">
 
-    <Grid RowDefinitions="*" Padding="20">
+    <Grid RowDefinitions="Auto,*" Padding="20,16" RowSpacing="16">
 
-        <!-- Empty state (no workout active) -->
-        <VerticalStackLayout IsVisible="{Binding IsEmptyState}"
-                             VerticalOptions="Center"
-                             HorizontalOptions="Center"
-                             Spacing="24">
-            <Label Text="💪" FontSize="64" HorizontalTextAlignment="Center" />
-            <Label Text="Pronto ad allenarti?"
-                   Style="{StaticResource H2Bold}"
-                   HorizontalTextAlignment="Center" />
-            <Label Text="Avvia un nuovo allenamento e inizia a registrare le tue serie."
-                   Style="{StaticResource EmptyStateLabel}" />
-            <Button Text="INIZIA ALLENAMENTO"
-                    Style="{StaticResource PrimaryButton}"
-                    HorizontalOptions="Center"
-                    Command="{Binding StartWorkoutCommand}" />
+        <!-- Title -->
+        <VerticalStackLayout Grid.Row="0" Spacing="4">
+            <Label Text="Allenamento"
+                   FontFamily="LexendBold" FontSize="28" FontAttributes="Bold"
+                   TextColor="{StaticResource OnSurface}" />
+            <Label Text="Registra serie, peso e ripetizioni"
+                   FontFamily="InterRegular" FontSize="14"
+                   TextColor="{StaticResource TextSecondary}" />
         </VerticalStackLayout>
 
-        <!-- Active workout placeholder -->
-        <VerticalStackLayout IsVisible="{Binding HasData}"
-                             VerticalOptions="Center"
-                             HorizontalOptions="Center"
-                             Spacing="16">
-            <Label Text="{Binding WorkoutTitle}"
-                   Style="{StaticResource H1Bold}"
-                   HorizontalTextAlignment="Center" />
-            <Label Text="Aggiungi esercizi dal catalogo per iniziare."
-                   Style="{StaticResource BodyLg}"
-                   TextColor="{StaticResource TextSecondary}"
-                   HorizontalTextAlignment="Center" />
-            <Button Text="AGGIUNGI ESERCIZIO"
-                    Style="{StaticResource SecondaryButton}"
-                    HorizontalOptions="Center" />
-        </VerticalStackLayout>
+        <Grid Grid.Row="1">
 
+            <!-- Empty - No workout yet -->
+            <VerticalStackLayout IsVisible="{Binding IsEmptyState}"
+                                 VerticalOptions="Center" HorizontalOptions="Center" Spacing="24">
+                <Border Style="{StaticResource CardFrame}" Padding="24,32" HorizontalOptions="Center">
+                    <VerticalStackLayout Spacing="20" HorizontalOptions="Center">
+                        <Label Text="💪" FontSize="64" HorizontalTextAlignment="Center" />
+                        <VerticalStackLayout Spacing="8">
+                            <Label Text="Pronto?"
+                                   FontFamily="LexendBold" FontSize="24" FontAttributes="Bold"
+                                   TextColor="{StaticResource OnSurface}"
+                                   HorizontalTextAlignment="Center" />
+                            <Label Text="Nessun allenamento in corso. Iniziane uno nuovo e registra le tue serie."
+                                   FontFamily="InterRegular" FontSize="14"
+                                   TextColor="{StaticResource TextSecondary}"
+                                   HorizontalTextAlignment="Center"
+                                   MaximumWidthRequest="280" />
+                        </VerticalStackLayout>
+                        <Button Text="INIZIA ALLENAMENTO"
+                                Style="{StaticResource PrimaryButton}"
+                                HorizontalOptions="Center"
+                                WidthRequest="240"
+                                HeightRequest="56"
+                                Command="{Binding StartWorkoutCommand}" />
+                    </VerticalStackLayout>
+                </Border>
+            </VerticalStackLayout>
+
+            <!-- Active Workout -->
+            <VerticalStackLayout IsVisible="{Binding HasData}" Spacing="16" Padding="0,8">
+
+                <!-- Workout header card -->
+                <Border Style="{StaticResource CardFrame}">
+                    <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto" RowSpacing="4">
+                        <Label Grid.Row="0" Grid.Column="0"
+                               Text="{Binding WorkoutTitle}"
+                               FontFamily="LexendBold" FontSize="20" FontAttributes="Bold"
+                               TextColor="{StaticResource OnSurface}" />
+                        <Border Grid.Row="0" Grid.Column="1"
+                                BackgroundColor="{StaticResource LimeGreen}"
+                                StrokeShape="RoundRectangle 12" Padding="10,4">
+                            <Label Text="IN CORSO"
+                                   FontFamily="InterBold" FontSize="10" FontAttributes="Bold"
+                                   TextColor="{StaticResource OnSecondary}" />
+                        </Border>
+                        <Label Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
+                               Text="0 esercizi · 0 serie · 0 kg"
+                               FontFamily="InterRegular" FontSize="13"
+                               TextColor="{StaticResource TextSecondary}" />
+                    </Grid>
+                </Border>
+
+                <Button Text="AGGIUNGI ESERCIZIO"
+                        Style="{StaticResource SecondaryButton}"
+                        HeightRequest="52" />
+
+                <!-- Storico recente placeholder -->
+                <Label Text="ALLENAMENTI RECENTI"
+                       FontFamily="InterBold" FontSize="11" FontAttributes="Bold"
+                       TextColor="{StaticResource TextSecondary}" CharacterSpacing="0.8"
+                       Margin="0,8,0,0" />
+                <Border Style="{StaticResource CardFrame}">
+                    <Label Text="Nessun allenamento precedente"
+                           FontFamily="InterRegular" FontSize="14"
+                           TextColor="{StaticResource Outline}" />
+                </Border>
+
+            </VerticalStackLayout>
+
+        </Grid>
     </Grid>
 
 </ContentPage>

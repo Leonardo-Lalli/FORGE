@@ -7,24 +7,21 @@
     x:DataType="vm:CatalogViewModel"
     Title="Esercizi">
 
-    <Grid RowDefinitions="Auto,Auto,*" Padding="20" RowSpacing="16">
+    <Grid RowDefinitions="Auto,Auto,*" Padding="20,16" RowSpacing="16">
 
-        <!-- Error state -->
-        <VerticalStackLayout Grid.Row="0"
-                             IsVisible="{Binding HasError}"
-                             Spacing="8">
-            <Label Text="{Binding ErrorMessage}"
-                   Style="{StaticResource ErrorLabel}"
-                   HorizontalTextAlignment="Center" />
-            <Button Text="RIPROVA"
-                    Style="{StaticResource SecondaryButton}"
-                    HorizontalOptions="Center"
-                    Command="{Binding RefreshCommand}" />
+        <!-- Title + Subtitle -->
+        <VerticalStackLayout Grid.Row="0" Spacing="4">
+            <Label Text="Catalogo Esercizi"
+                   FontFamily="LexendBold" FontSize="28" FontAttributes="Bold"
+                   TextColor="{StaticResource OnSurface}" />
+            <Label Text="Esplora 1300+ esercizi con GIF animate"
+                   FontFamily="InterRegular" FontSize="14"
+                   TextColor="{StaticResource TextSecondary}" />
         </VerticalStackLayout>
 
         <!-- Search Bar -->
         <SearchBar Grid.Row="1"
-                   Placeholder="Cerca esercizio..."
+                   Placeholder="Cerca per nome..."
                    Text="{Binding SearchText}"
                    SearchCommand="{Binding SearchCommand}"
                    BackgroundColor="{StaticResource SurfaceContainer}"
@@ -32,40 +29,100 @@
                    PlaceholderColor="{StaticResource Outline}"
                    CancelButtonColor="{StaticResource Primary}" />
 
-        <!-- Main content -->
+        <!-- Content Area -->
         <Grid Grid.Row="2">
 
             <!-- Loading -->
             <VerticalStackLayout IsVisible="{Binding IsBusy}"
-                                 VerticalOptions="Center"
-                                 HorizontalOptions="Center"
-                                 Spacing="12">
+                                 VerticalOptions="Center" HorizontalOptions="Center" Spacing="16">
                 <ActivityIndicator IsRunning="{Binding IsBusy}" />
                 <Label Text="Caricamento esercizi..."
-                       Style="{StaticResource BodyMd}"
+                       FontFamily="InterRegular" FontSize="14"
+                       TextColor="{StaticResource TextSecondary}"
                        HorizontalTextAlignment="Center" />
             </VerticalStackLayout>
 
-            <!-- Empty state -->
+            <!-- Error -->
+            <VerticalStackLayout IsVisible="{Binding HasError}"
+                                 VerticalOptions="Center" HorizontalOptions="Center" Spacing="16">
+                <Label Text="⚠️" FontSize="40" HorizontalTextAlignment="Center" />
+                <Label Text="{Binding ErrorMessage}"
+                       FontFamily="InterRegular" FontSize="14"
+                       TextColor="{StaticResource AlertRed}"
+                       HorizontalTextAlignment="Center" />
+                <Button Text="RIPROVA"
+                        Style="{StaticResource SecondaryButton}"
+                        HorizontalOptions="Center"
+                        Command="{Binding RefreshCommand}" />
+            </VerticalStackLayout>
+
+            <!-- Empty -->
             <VerticalStackLayout IsVisible="{Binding IsEmptyState}"
-                                 VerticalOptions="Center"
-                                 HorizontalOptions="Center"
-                                 Spacing="16">
-                <Label Text="🏋️" FontSize="48" HorizontalTextAlignment="Center" />
-                <Label Text="Nessun esercizio trovato"
-                       Style="{StaticResource H2Bold}"
-                       HorizontalTextAlignment="Center" />
-                <Label Text="Cerca un esercizio per nome o esplora per gruppo muscolare."
-                       Style="{StaticResource EmptyStateLabel}" />
+                                 VerticalOptions="Center" HorizontalOptions="Center" Spacing="16">
+                <Border Style="{StaticResource CardFrame}"
+                        HorizontalOptions="Center" Padding="20,24">
+                    <VerticalStackLayout Spacing="16" HorizontalOptions="Center">
+                        <Label Text="🔍" FontSize="48" HorizontalTextAlignment="Center" />
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="Cosa vuoi allenare oggi?"
+                                   FontFamily="LexendBold" FontSize="20" FontAttributes="Bold"
+                                   TextColor="{StaticResource OnSurface}"
+                                   HorizontalTextAlignment="Center" />
+                            <Label Text="Cerca un esercizio per nome o seleziona un gruppo muscolare."
+                                   FontFamily="InterRegular" FontSize="14"
+                                   TextColor="{StaticResource TextSecondary}"
+                                   HorizontalTextAlignment="Center" />
+                        </VerticalStackLayout>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Quick Select Chips -->
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="GRUPPI MUSCOLARI"
+                           FontFamily="InterBold" FontSize="11" FontAttributes="Bold"
+                           TextColor="{StaticResource TextSecondary}" CharacterSpacing="0.8"
+                           Margin="4,0,0,0" />
+                    <FlexLayout Wrap="Wrap" JustifyContent="Center"
+                                AlignItems="Center">
+                        <Border Style="{StaticResource CardFrame}" Margin="4" Padding="12,8"
+                                StrokeShape="RoundRectangle 20">
+                            <Label Text="Petto" FontFamily="InterBold" FontSize="13"
+                                   TextColor="{StaticResource OnSurface}" />
+                        </Border>
+                        <Border Style="{StaticResource CardFrame}" Margin="4" Padding="12,8"
+                                StrokeShape="RoundRectangle 20">
+                            <Label Text="Schiena" FontFamily="InterBold" FontSize="13"
+                                   TextColor="{StaticResource OnSurface}" />
+                        </Border>
+                        <Border Style="{StaticResource CardFrame}" Margin="4" Padding="12,8"
+                                StrokeShape="RoundRectangle 20">
+                            <Label Text="Spalle" FontFamily="InterBold" FontSize="13"
+                                   TextColor="{StaticResource OnSurface}" />
+                        </Border>
+                        <Border Style="{StaticResource CardFrame}" Margin="4" Padding="12,8"
+                                StrokeShape="RoundRectangle 20">
+                            <Label Text="Braccia" FontFamily="InterBold" FontSize="13"
+                                   TextColor="{StaticResource OnSurface}" />
+                        </Border>
+                        <Border Style="{StaticResource CardFrame}" Margin="4" Padding="12,8"
+                                StrokeShape="RoundRectangle 20">
+                            <Label Text="Gambe" FontFamily="InterBold" FontSize="13"
+                                   TextColor="{StaticResource OnSurface}" />
+                        </Border>
+                        <Border Style="{StaticResource CardFrame}" Margin="4" Padding="12,8"
+                                StrokeShape="RoundRectangle 20">
+                            <Label Text="Addominali" FontFamily="InterBold" FontSize="13"
+                                   TextColor="{StaticResource OnSurface}" />
+                        </Border>
+                    </FlexLayout>
+                </VerticalStackLayout>
             </VerticalStackLayout>
 
-            <!-- Success state placeholder -->
+            <!-- Has Data (placeholder for future CollectionView) -->
             <VerticalStackLayout IsVisible="{Binding HasData}"
-                                 VerticalOptions="Center"
-                                 HorizontalOptions="Center"
-                                 Spacing="16">
-                <Label Text="I gruppi muscolari appariranno qui"
-                       Style="{StaticResource BodyMd}"
+                                 VerticalOptions="Center" HorizontalOptions="Center" Spacing="16">
+                <Label Text="I risultati appariranno qui"
+                       FontFamily="InterRegular" FontSize="14"
                        TextColor="{StaticResource TextSecondary}"
                        HorizontalTextAlignment="Center" />
             </VerticalStackLayout>

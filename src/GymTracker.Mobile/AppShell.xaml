@@ -15,26 +15,31 @@
     <TabBar>
         <ShellContent
             Title="Home"
+            Icon="icon_dashboard.svg"
             ContentTemplate="{DataTemplate views:DashboardPage}"
             Route="dashboard" />
 
         <ShellContent
             Title="Esercizi"
+            Icon="icon_search.svg"
             ContentTemplate="{DataTemplate views:CatalogPage}"
             Route="catalog" />
 
         <ShellContent
             Title="Workout"
+            Icon="icon_dumbbell.svg"
             ContentTemplate="{DataTemplate views:WorkoutPage}"
             Route="workout" />
 
         <ShellContent
             Title="Amici"
+            Icon="icon_social.svg"
             ContentTemplate="{DataTemplate views:SocialPage}"
             Route="social" />
 
         <ShellContent
             Title="Profilo"
+            Icon="icon_profile.svg"
             ContentTemplate="{DataTemplate views:ProfilePage}"
             Route="profile" />
     </TabBar>

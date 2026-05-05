@@ -8,64 +8,140 @@
     Title="Profilo">
 
     <ScrollView>
-        <VerticalStackLayout Padding="20" Spacing="20">
+        <VerticalStackLayout Padding="20,24" Spacing="24">
 
-            <!-- Avatar placeholder -->
-            <Border Style="{StaticResource CardFrame}"
-                   HorizontalOptions="Center"
-                   WidthRequest="100" HeightRequest="100"
-                   StrokeShape="RoundRectangle 50"
-                   Padding="0">
-                <Label Text="🏋️"
-                       FontSize="40"
-                       HorizontalOptions="Center"
-                       VerticalOptions="Center" />
-            </Border>
-
-            <!-- User info -->
-            <VerticalStackLayout HorizontalOptions="Center" Spacing="4">
-                <Label Text="{Binding Username}"
-                       Style="{StaticResource H2Bold}"
-                       HorizontalTextAlignment="Center" />
-                <Label Text="{Binding Email}"
-                       Style="{StaticResource BodyMd}"
-                       TextColor="{StaticResource TextSecondary}"
-                       HorizontalTextAlignment="Center" />
+            <!-- Avatar Section -->
+            <VerticalStackLayout HorizontalOptions="Center" Spacing="12">
+                <Border Style="{StaticResource CardFrame}"
+                        HorizontalOptions="Center"
+                        WidthRequest="96" HeightRequest="96"
+                        StrokeShape="RoundRectangle 48"
+                        Padding="0">
+                    <Label Text="🏋️" FontSize="42"
+                           HorizontalOptions="Center" VerticalOptions="Center" />
+                </Border>
+                <VerticalStackLayout Spacing="2">
+                    <Label Text="{Binding Username}"
+                           FontFamily="LexendBold" FontSize="22" FontAttributes="Bold"
+                           TextColor="{StaticResource OnSurface}"
+                           HorizontalTextAlignment="Center" />
+                    <Label Text="{Binding Email}"
+                           FontFamily="InterRegular" FontSize="14"
+                           TextColor="{StaticResource TextSecondary}"
+                           HorizontalTextAlignment="Center" />
+                </VerticalStackLayout>
+                <Border BackgroundColor="{StaticResource SurfaceContainer}"
+                        StrokeShape="RoundRectangle 12" Padding="12,6">
+                    <Label Text="ATLETA"
+                           FontFamily="InterBold" FontSize="10" FontAttributes="Bold"
+                           TextColor="{StaticResource Primary}" CharacterSpacing="1" />
+                </Border>
             </VerticalStackLayout>
 
-            <!-- Stats card -->
+            <!-- Stats Grid -->
+            <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto"
+                  ColumnSpacing="12" RowSpacing="12">
+
+                <Border Grid.Row="0" Grid.Column="0" Style="{StaticResource CardFrame}">
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="ALLENAMENTI"
+                               FontFamily="InterBold" FontSize="10" FontAttributes="Bold"
+                               TextColor="{StaticResource TextSecondary}" CharacterSpacing="0.6" />
+                        <Label Text="0"
+                               FontFamily="LexendBold" FontSize="32" FontAttributes="Bold"
+                               TextColor="{StaticResource LimeGreen}" />
+                        <Label Text="Totali"
+                               FontFamily="InterRegular" FontSize="12"
+                               TextColor="{StaticResource Outline}" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border Grid.Row="0" Grid.Column="1" Style="{StaticResource CardFrame}">
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="VOLUME"
+                               FontFamily="InterBold" FontSize="10" FontAttributes="Bold"
+                               TextColor="{StaticResource TextSecondary}" CharacterSpacing="0.6" />
+                        <Label Text="0 kg"
+                               FontFamily="LexendBold" FontSize="32" FontAttributes="Bold"
+                               TextColor="{StaticResource Primary}" />
+                        <Label Text="Carriera"
+                               FontFamily="InterRegular" FontSize="12"
+                               TextColor="{StaticResource Outline}" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border Grid.Row="1" Grid.Column="0" Style="{StaticResource CardFrame}">
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="AMICI"
+                               FontFamily="InterBold" FontSize="10" FontAttributes="Bold"
+                               TextColor="{StaticResource TextSecondary}" CharacterSpacing="0.6" />
+                        <Label Text="0"
+                               FontFamily="LexendBold" FontSize="32" FontAttributes="Bold"
+                               TextColor="{StaticResource LimeGreen}" />
+                        <Label Text="Connessi"
+                               FontFamily="InterRegular" FontSize="12"
+                               TextColor="{StaticResource Outline}" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border Grid.Row="1" Grid.Column="1" Style="{StaticResource CardFrame}">
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="BEST STREAK"
+                               FontFamily="InterBold" FontSize="10" FontAttributes="Bold"
+                               TextColor="{StaticResource TextSecondary}" CharacterSpacing="0.6" />
+                        <Label Text="0 gg"
+                               FontFamily="LexendBold" FontSize="32" FontAttributes="Bold"
+                               TextColor="{StaticResource Primary}" />
+                        <Label Text="Consecutivi"
+                               FontFamily="InterRegular" FontSize="12"
+                               TextColor="{StaticResource Outline}" />
+                    </VerticalStackLayout>
+                </Border>
+            </Grid>
+
+            <!-- Settings Section -->
             <Border Style="{StaticResource CardFrame}">
-                <VerticalStackLayout Spacing="12">
-                    <Label Text="STATISTICHE" Style="{StaticResource LabelCaps}" />
-                    <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" ColumnSpacing="16" RowSpacing="12">
-                        <VerticalStackLayout Grid.Row="0" Grid.Column="0" Spacing="2">
-                            <Label Text="0" Style="{StaticResource H2Bold}" TextColor="{StaticResource LimeGreen}" />
-                            <Label Text="Allenamenti" Style="{StaticResource BodyMd}" TextColor="{StaticResource TextSecondary}" />
-                        </VerticalStackLayout>
-                        <VerticalStackLayout Grid.Row="0" Grid.Column="1" Spacing="2">
-                            <Label Text="0 kg" Style="{StaticResource H2Bold}" TextColor="{StaticResource ElectricBlue}" />
-                            <Label Text="Volume Totale" Style="{StaticResource BodyMd}" TextColor="{StaticResource TextSecondary}" />
-                        </VerticalStackLayout>
-                        <VerticalStackLayout Grid.Row="1" Grid.Column="0" Spacing="2">
-                            <Label Text="0" Style="{StaticResource H2Bold}" TextColor="{StaticResource LimeGreen}" />
-                            <Label Text="Amici" Style="{StaticResource BodyMd}" TextColor="{StaticResource TextSecondary}" />
-                        </VerticalStackLayout>
-                        <VerticalStackLayout Grid.Row="1" Grid.Column="1" Spacing="2">
-                            <Label Text="0 gg" Style="{StaticResource H2Bold}" TextColor="{StaticResource ElectricBlue}" />
-                            <Label Text="Streak Best" Style="{StaticResource BodyMd}" TextColor="{StaticResource TextSecondary}" />
-                        </VerticalStackLayout>
+                <VerticalStackLayout Spacing="0">
+                    <Grid ColumnDefinitions="*,Auto" Padding="0,8">
+                        <Label Grid.Column="0" Text="Misurazioni"
+                               FontFamily="InterRegular" FontSize="15"
+                               TextColor="{StaticResource OnSurface}" />
+                        <Label Grid.Column="1" Text="→" FontSize="16"
+                               TextColor="{StaticResource TextSecondary}" />
+                    </Grid>
+                    <BoxView HeightRequest="1" Color="{StaticResource SurfaceContainerHigh}" Margin="0,4" />
+                    <Grid ColumnDefinitions="*,Auto" Padding="0,8">
+                        <Label Grid.Column="0" Text="Piani di Allenamento"
+                               FontFamily="InterRegular" FontSize="15"
+                               TextColor="{StaticResource OnSurface}" />
+                        <Label Grid.Column="1" Text="→" FontSize="16"
+                               TextColor="{StaticResource TextSecondary}" />
+                    </Grid>
+                    <BoxView HeightRequest="1" Color="{StaticResource SurfaceContainerHigh}" Margin="0,4" />
+                    <Grid ColumnDefinitions="*,Auto" Padding="0,8">
+                        <Label Grid.Column="0" Text="Impostazioni"
+                               FontFamily="InterRegular" FontSize="15"
+                               TextColor="{StaticResource OnSurface}" />
+                        <Label Grid.Column="1" Text="→" FontSize="16"
+                               TextColor="{StaticResource TextSecondary}" />
                     </Grid>
                 </VerticalStackLayout>
             </Border>
 
-            <!-- Buttons -->
-            <Button Text="IMPOSTAZIONI"
-                    Style="{StaticResource SecondaryButton}"
-                    HorizontalOptions="Fill" />
+            <!-- Logout -->
             <Button Text="ESCI"
-                    Style="{StaticResource PrimaryButton}"
-                    HorizontalOptions="Fill"
-                    BackgroundColor="{StaticResource AlertRed}" />
+                    BackgroundColor="{StaticResource AlertRed}"
+                    TextColor="White"
+                    FontFamily="InterBold" FontSize="15" FontAttributes="Bold"
+                    CornerRadius="24" HeightRequest="50"
+                    HorizontalOptions="Fill" />
+
+            <!-- Footer -->
+            <Label Text="Iron Rank v1.0 — Il fitness diventa leggenda"
+                   FontFamily="InterRegular" FontSize="12"
+                   TextColor="{StaticResource Outline}"
+                   HorizontalTextAlignment="Center"
+                   Margin="0,0,0,16" />
 
         </VerticalStackLayout>
     </ScrollView>

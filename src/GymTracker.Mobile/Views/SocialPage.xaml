@@ -7,38 +7,94 @@
     x:DataType="vm:SocialViewModel"
     Title="Amici">
 
-    <Grid RowDefinitions="*" Padding="20">
+    <Grid RowDefinitions="Auto,*" Padding="20,16" RowSpacing="16">
 
-        <!-- Empty state -->
-        <VerticalStackLayout IsVisible="{Binding IsEmptyState}"
-                             VerticalOptions="Center"
-                             HorizontalOptions="Center"
-                             Spacing="24">
-            <Label Text="🤝" FontSize="64" HorizontalTextAlignment="Center" />
-            <Label Text="Nessun amico... ancora!"
-                   Style="{StaticResource H2Bold}"
-                   HorizontalTextAlignment="Center" />
-            <Label Text="Connettiti con i tuoi amici per confrontare i progressi e competere nella classifica settimanale."
-                   Style="{StaticResource EmptyStateLabel}" />
-            <Button Text="CERCA AMICI"
-                    Style="{StaticResource PrimaryButton}"
-                    HorizontalOptions="Center" />
-            <Label Text="🔥 Sfida i tuoi amici e scala la leaderboard"
-                   Style="{StaticResource BodyMd}"
-                   TextColor="{StaticResource LimeGreen}"
-                   HorizontalTextAlignment="Center" />
+        <!-- Header -->
+        <VerticalStackLayout Grid.Row="0" Spacing="4">
+            <Label Text="Cerchia"
+                   FontFamily="LexendBold" FontSize="28" FontAttributes="Bold"
+                   TextColor="{StaticResource OnSurface}" />
+            <Label Text="Sfida i tuoi amici e scala la classifica"
+                   FontFamily="InterRegular" FontSize="14"
+                   TextColor="{StaticResource TextSecondary}" />
         </VerticalStackLayout>
 
-        <!-- Has data placeholder -->
-        <VerticalStackLayout IsVisible="{Binding HasData}"
-                             VerticalOptions="Center"
-                             HorizontalOptions="Center"
-                             Spacing="16">
-            <Label Text="Feed amici"
-                   Style="{StaticResource H1Bold}"
-                   HorizontalTextAlignment="Center" />
-        </VerticalStackLayout>
+        <Grid Grid.Row="1">
 
+            <!-- Empty State -->
+            <VerticalStackLayout IsVisible="{Binding IsEmptyState}"
+                                 VerticalOptions="Center" HorizontalOptions="Center" Spacing="24">
+                <Border Style="{StaticResource CardFrame}" Padding="24,32" HorizontalOptions="Center">
+                    <VerticalStackLayout Spacing="20" HorizontalOptions="Center">
+                        <Label Text="🤝" FontSize="64" HorizontalTextAlignment="Center" />
+                        <VerticalStackLayout Spacing="8">
+                            <Label Text="Nessun amico... ancora!"
+                                   FontFamily="LexendBold" FontSize="22" FontAttributes="Bold"
+                                   TextColor="{StaticResource OnSurface}"
+                                   HorizontalTextAlignment="Center" />
+                            <Label Text="Connettiti con altri atleti, confronta i progressi e scala la leaderboard insieme."
+                                   FontFamily="InterRegular" FontSize="14"
+                                   TextColor="{StaticResource TextSecondary}"
+                                   HorizontalTextAlignment="Center"
+                                   MaximumWidthRequest="280" />
+                        </VerticalStackLayout>
+                        <Button Text="CERCA AMICI"
+                                Style="{StaticResource PrimaryButton}"
+                                HorizontalOptions="Center"
+                                WidthRequest="220"
+                                HeightRequest="56" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- How it works -->
+                <VerticalStackLayout Spacing="12" HorizontalOptions="Center">
+                    <Label Text="COME FUNZIONA"
+                           FontFamily="InterBold" FontSize="11" FontAttributes="Bold"
+                           TextColor="{StaticResource TextSecondary}" CharacterSpacing="0.8"
+                           HorizontalTextAlignment="Center" />
+
+                    <HorizontalStackLayout Spacing="16" HorizontalOptions="Center">
+                        <VerticalStackLayout Spacing="6" HorizontalOptions="Center" WidthRequest="80">
+                            <Border Style="{StaticResource CardFrame}" Padding="12"
+                                    HorizontalOptions="Center">
+                                <Label Text="🔍" FontSize="24" />
+                            </Border>
+                            <Label Text="Cerca" FontFamily="InterBold" FontSize="11"
+                                   HorizontalTextAlignment="Center"
+                                   TextColor="{StaticResource TextSecondary}" />
+                        </VerticalStackLayout>
+                        <VerticalStackLayout Spacing="6" HorizontalOptions="Center" WidthRequest="80">
+                            <Border Style="{StaticResource CardFrame}" Padding="12"
+                                    HorizontalOptions="Center">
+                                <Label Text="🤝" FontSize="24" />
+                            </Border>
+                            <Label Text="Connetti" FontFamily="InterBold" FontSize="11"
+                                   HorizontalTextAlignment="Center"
+                                   TextColor="{StaticResource TextSecondary}" />
+                        </VerticalStackLayout>
+                        <VerticalStackLayout Spacing="6" HorizontalOptions="Center" WidthRequest="80">
+                            <Border Style="{StaticResource CardFrame}" Padding="12"
+                                    HorizontalOptions="Center">
+                                <Label Text="🏆" FontSize="24" />
+                            </Border>
+                            <Label Text="Competi" FontFamily="InterBold" FontSize="11"
+                                   HorizontalTextAlignment="Center"
+                                   TextColor="{StaticResource LimeGreen}" />
+                        </VerticalStackLayout>
+                    </HorizontalStackLayout>
+                </VerticalStackLayout>
+            </VerticalStackLayout>
+
+            <!-- Has Data placeholder -->
+            <VerticalStackLayout IsVisible="{Binding HasData}"
+                                 VerticalOptions="Center" HorizontalOptions="Center" Spacing="16">
+                <Label Text="Feed e leaderboard in arrivo"
+                       FontFamily="InterRegular" FontSize="14"
+                       TextColor="{StaticResource TextSecondary}"
+                       HorizontalTextAlignment="Center" />
+            </VerticalStackLayout>
+
+        </Grid>
     </Grid>
 
 </ContentPage>
