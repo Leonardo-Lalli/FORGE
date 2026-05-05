@@ -49,7 +49,7 @@ Realizzare una applicazione `.NET MAUI` Android-first per:
 - confronto diretto statistiche con un amico;
 - piani di allenamento base predefiniti per principianti (almeno 3);
 - gestione esplicita di loading state, error state, empty state e success state su ogni schermata;
-- UI progettata con Stitch (Google) per coerenza visiva.
+- UI progettata con Stitch (Google) — progetto "Iron Rank Fitness Social", tema "Performance Minimalist" (dark mode, Electric Blue `#007AFF`, Lime Green `#CCFF00`, font Lexend/Inter).
 
 ### Funzionalità opzionali future
 
@@ -297,7 +297,7 @@ Permettere all'utente di connettersi con amici e competere in modo sano.
 
 - Ogni schermata deve esporre sempre uno stato UI chiaro: loading (ActivityIndicator o shimmer), success (dati presenti), empty (messaggio + azione suggerita), error (messaggio + retry).
 - L'utente deve poter avviare un allenamento dalla Dashboard con massimo 1 tap.
-- Il design dell'interfaccia segue il Design System "GymTracker Iron Theme" creato con Stitch (dark mode, arancione energetico #FF6B2B, font SORA/INTER).
+- Il design dell'interfaccia segue il Design System "Performance Minimalist" creato con Stitch per il progetto "Iron Rank Fitness Social" (dark mode, Electric Blue `#007AFF`, Lime Green `#CCFF00`, font Lexend/Inter).
 
 ### Prestazioni percepite
 
@@ -335,7 +335,7 @@ Permettere all'utente di connettersi con amici e competere in modo sano.
 - Gestione esplicita di `IsBusy`, `ErrorMessage`, `HasData`, `IsEmptyState` nei ViewModel.
 - Nessuna logica REST o business logic nei code-behind.
 - Componenti UI: `CollectionView`, `ScrollView`, `Grid`, `Label`, `Button`, `Entry`, `DatePicker`, `Image` (per GIF esercizi).
-- Design System Stitch: progetto `16257064275276656346`, theme "GymTracker Iron Theme".
+- Design System Stitch: progetto `5765971046385640743` "Iron Rank Fitness Social", tema "Performance Minimalist" (dark mode, Electric Blue `#007AFF`, Lime Green `#CCFF00`, font Lexend/Inter).
 
 ## 8. Metriche di successo
 
@@ -363,7 +363,7 @@ Permettere all'utente di connettersi con amici e competere in modo sano.
 - **Firebase Auth**: autenticazione email/password. Richiede progetto Firebase configurato.
 - **Firebase Realtime Database / Firestore**: storage dati social. Richiede configurazione regole.
 - **SQLite** (`sqlite-net-pcl`): persistenza locale.
-- **Stitch** (Google): strumento di design UI, progetto `16257064275276656346`.
+- **Stitch** (Google): strumento di design UI, progetto `5765971046385640743` "Iron Rank Fitness Social".
 
 ### Questioni aperte
 

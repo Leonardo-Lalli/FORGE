@@ -11,7 +11,7 @@ App .NET MAUI Android-first per tracciare allenamenti in palestra, con catalogo 
 - MVVM con CommunityToolkit.Mvvm, Shell navigation, nessuna logica in code-behind.
 - Fonti dati remote: ExerciseDB API (RapidAPI) per esercizi, Firebase per social.
 - Persistenza locale: SQLite per cache esercizi, allenamenti, peso/misure, piani.
-- UI progettata con Stitch (dark theme, arancione #FF6B2B, font SORA/INTER).
+- UI progettata con Stitch ("Iron Rank Fitness Social", tema "Performance Minimalist": dark mode, Electric Blue `#007AFF`, Lime Green `#CCFF00`, font Lexend/Inter).
 - Gestione esplicita stati: loading, error, empty, success.
 
 ### Dipendenze esterne
@@ -46,7 +46,7 @@ Progetto MAUI compilabile su Android con Shell navigation a 5 tab e tema Stitch 
 - Creazione progetto `src/GymTracker.Mobile/`
 - AppShell con 5 tab: Dashboard, Catalogo, Allenamento, Social, Profilo
 - Pagine placeholder per ogni tab con titolo e messaggio di stato
-- Applicazione Design System Stitch: dark theme, colori `#FF6B2B`, font
+- Applicazione Design System Stitch: dark theme, colori `#007AFF` / `#CCFF00`, font Lexend/Inter
 - Dependency injection minima: registrazione ViewModel e pagine in `MauiProgram.cs`
 - `BaseViewModel` con `IsBusy`, `ErrorMessage`, `HasData`, `IsEmpty`
 - Cartelle `Models/`, `ViewModels/`, `Views/`, `Services/`, `Converters/`

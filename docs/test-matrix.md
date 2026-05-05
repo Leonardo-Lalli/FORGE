@@ -13,7 +13,7 @@
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | TM-01 | Build progetto MAUI senza errori | Build | No | Si | No | IT-01 | `dotnet build src/GymTracker.Mobile/GymTracker.Mobile.csproj` | Smoke minimo da ripetere ogni iterazione |
 | TM-02 | Avvio app e navigazione 5 tab Shell | Navigation | Si | No | No | IT-01 | Da eseguire | Verifica visiva su emulatore |
-| TM-03 | Tema dark Stitch applicato correttamente | UI state | Si | No | No | IT-01 | Da eseguire | Colori #FF6B2B, font SORA/INTER |
+| TM-03 | Tema dark Stitch "Performance Minimalist" applicato | UI state | Si | No | No | IT-01 | Da eseguire | Colori #007AFF/#CCFF00, font Lexend/Inter |
 | TM-04 | Fetch esercizi da ExerciseDB API per bodyPart | API | Si | Si | No | IT-02 | `dotnet test` | Mock HTTP per test unitario |
 | TM-05 | Ricerca esercizio per nome via API | API | Si | Si | No | IT-02 | `dotnet test` | Test service layer |
 | TM-06 | Filtro per attrezzatura funziona | Input | Si | Si | No | IT-02 | `dotnet test` | Verifica parametro equipment |

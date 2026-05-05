@@ -6,9 +6,9 @@
 Il diario di allenamento che trasforma la palestra in una sfida con i tuoi amici.
 
 [![.NET MAUI](https://img.shields.io/badge/.NET%20MAUI-Android--first-512BD4?logo=dotnet&logoColor=white)](https://learn.microsoft.com/dotnet/maui/)
-[![Firebase](https://img.shields.io/badge/Firebase-Auth%20%7C%20Database-FF6B2B?logo=firebase&logoColor=white)](https://firebase.google.com/)
+[![Firebase](https://img.shields.io/badge/Firebase-Auth%20%7C%20Database-007AFF?logo=firebase&logoColor=white)](https://firebase.google.com/)
 [![ExerciseDB](https://img.shields.io/badge/ExerciseDB-1300+%20esercizi-22C55E)](https://rapidapi.com/justin-WFnsXH_t6/api/exercisedb)
-[![Stitch UI](https://img.shields.io/badge/UI-Stitch%20Dark%20Theme-7C3AED)](https://stitch.google.com/)
+[![Stitch UI](https://img.shields.io/badge/UI-Stitch%20Iron%20Rank-7C3AED)](https://stitch.google.com/)
 [![Workflow](https://img.shields.io/badge/workflow-Man--in--the--Loop-0F766E)](docs/method/man-in-the-loop.md)
 [![Docs](https://img.shields.io/badge/docs-spec%20%7C%20plan%20%7C%20architecture%20%7C%20tests-2563EB)](docs/)
 
@@ -33,7 +33,7 @@ Il diario di allenamento che trasforma la palestra in una sfida con i tuoi amici
 - Tracciare peso corporeo e misure (petto, vita, braccia, gambe) con grafici di progresso.
 - Competere con gli amici tramite **leaderboard**, **streak settimanali** e **confronto diretto** delle statistiche.
 
-L'app usa **ExerciseDB API** come fonte primaria di esercizi, **Firebase** per autenticazione e funzionalità social, e **SQLite** per l'uso offline. L'interfaccia segue un Design System creato con **Google Stitch**.
+L'app usa **ExerciseDB API** come fonte primaria di esercizi, **Firebase** per autenticazione e funzionalità social, e **SQLite** per l'uso offline. L'interfaccia segue il Design System **"Performance Minimalist"** del progetto Stitch **"Iron Rank Fitness Social"** (dark mode, Electric Blue `#007AFF`, Lime Green `#CCFF00`).
 
 ## Perché GymTracker
 
@@ -117,7 +117,7 @@ GymTracker risolve tre problemi reali:
 | `HttpClient` + `System.Text.Json` | Chiamate API ExerciseDB e Firebase REST |
 | `Firebase Auth` | Registrazione e login email/password |
 | `Firebase Realtime DB / Firestore` | Dati social (utenti, amici, leaderboard) |
-| `Google Stitch` | Design System: dark theme, arancione `#FF6B2B`, font SORA/INTER |
+| `Google Stitch` | Design System: dark theme, Electric Blue `#007AFF`, Lime Green `#CCFF00`, font Lexend/Inter |
 
 ### Flusso offline-first
 
@@ -197,7 +197,7 @@ Il progetto segue il workflow **Man-in-the-Loop**: ogni iterazione è pianificat
 ## Prossimi Passi
 
 - [x] PRD e pianificazione completati
-- [ ] IT-01: Bootstrap MAUI + Shell + Design System Stitch
+- [ ] IT-01: Bootstrap MAUI + Shell + Design System "Iron Rank Fitness Social"
 - [ ] IT-02: Catalogo esercizi da ExerciseDB API
 - [ ] IT-03-08: Allenamento, corpo, social, statistiche, piani
 

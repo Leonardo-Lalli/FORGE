@@ -8,7 +8,7 @@ Costruire una app `.NET MAUI` Android-first per il tracking degli allenamenti ch
 - **Firebase** (Auth + Realtime Database/Firestore): autenticazione e dati social;
 - **SQLite** (locale): cache esercizi, allenamenti, peso/misure, piani, profilo.
 
-L'architettura deve supportare l'uso offline per la registrazione allenamenti (con esercizi in cache) e la sincronizzazione asincrona con Firebase quando la rete torna disponibile. Il design dell'interfaccia segue il Design System creato con Stitch.
+L'architettura deve supportare l'uso offline per la registrazione allenamenti (con esercizi in cache) e la sincronizzazione asincrona con Firebase quando la rete torna disponibile. Il design dell'interfaccia segue il Design System "Performance Minimalist" del progetto Stitch "Iron Rank Fitness Social" (`5765971046385640743`): dark mode, Electric Blue `#007AFF`, Lime Green `#CCFF00`, font Lexend/Inter.
 
 ## 2. Struttura del repository e del progetto
 
