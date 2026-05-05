@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:vm="clr-namespace:GymTracker.Mobile.ViewModels"
+    x:Class="GymTracker.Mobile.Views.SocialPage"
+    x:DataType="vm:SocialViewModel"
+    Title="Amici">
+
+    <Grid RowDefinitions="*" Padding="20">
+
+        <!-- Empty state -->
+        <VerticalStackLayout IsVisible="{Binding IsEmptyState}"
+                             VerticalOptions="Center"
+                             HorizontalOptions="Center"
+                             Spacing="24">
+            <Label Text="🤝" FontSize="64" HorizontalTextAlignment="Center" />
+            <Label Text="Nessun amico... ancora!"
+                   Style="{StaticResource H2Bold}"
+                   HorizontalTextAlignment="Center" />
+            <Label Text="Connettiti con i tuoi amici per confrontare i progressi e competere nella classifica settimanale."
+                   Style="{StaticResource EmptyStateLabel}" />
+            <Button Text="CERCA AMICI"
+                    Style="{StaticResource PrimaryButton}"
+                    HorizontalOptions="Center" />
+            <Label Text="🔥 Sfida i tuoi amici e scala la leaderboard"
+                   Style="{StaticResource BodyMd}"
+                   TextColor="{StaticResource LimeGreen}"
+                   HorizontalTextAlignment="Center" />
+        </VerticalStackLayout>
+
+        <!-- Has data placeholder -->
+        <VerticalStackLayout IsVisible="{Binding HasData}"
+                             VerticalOptions="Center"
+                             HorizontalOptions="Center"
+                             Spacing="16">
+            <Label Text="Feed amici"
+                   Style="{StaticResource H1Bold}"
+                   HorizontalTextAlignment="Center" />
+        </VerticalStackLayout>
+
+    </Grid>
+
+</ContentPage>

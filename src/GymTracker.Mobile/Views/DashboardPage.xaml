@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:vm="clr-namespace:GymTracker.Mobile.ViewModels"
+    x:Class="GymTracker.Mobile.Views.DashboardPage"
+    x:DataType="vm:DashboardViewModel"
+    Title="IRON RANK">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="20">
+
+            <!-- Header -->
+            <VerticalStackLayout Spacing="4">
+                <Label Text="IRON RANK"
+                       Style="{StaticResource H1Bold}" />
+                <Label Text="Il fitness diventa leggenda"
+                       Style="{StaticResource BodyLg}"
+                       TextColor="{StaticResource TextSecondary}" />
+            </VerticalStackLayout>
+
+            <!-- Streak Card -->
+            <Border Style="{StaticResource CardFrame}">
+                <HorizontalStackLayout Spacing="12">
+                    <Label Text="🔥" FontSize="32" VerticalOptions="Center" />
+                    <VerticalStackLayout VerticalOptions="Center">
+                        <Label Text="STREAK ATTIVO"
+                               Style="{StaticResource LabelCaps}" />
+                        <Label Text="{Binding StreakText}"
+                               Style="{StaticResource H2Bold}"
+                               TextColor="{StaticResource LimeGreen}" />
+                    </VerticalStackLayout>
+                </HorizontalStackLayout>
+            </Border>
+
+            <!-- Stats Grid -->
+            <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" ColumnSpacing="12" RowSpacing="12">
+
+                <!-- Peso -->
+                <Border Grid.Row="0" Grid.Column="0" Style="{StaticResource CardFrame}">
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="PESO" Style="{StaticResource LabelCaps}" />
+                        <Label Text="{Binding CurrentWeight}"
+                               Style="{StaticResource DisplayMetric}"
+                               TextColor="{StaticResource ElectricBlue}" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Posizione -->
+                <Border Grid.Row="0" Grid.Column="1" Style="{StaticResource CardFrame}">
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="CLASSIFICA" Style="{StaticResource LabelCaps}" />
+                        <Label Text="{Binding LeaderboardPosition, StringFormat='#{0}'}"
+                               Style="{StaticResource DisplayMetric}"
+                               TextColor="{StaticResource ElectricBlue}" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Volume -->
+                <Border Grid.Row="1" Grid.Column="0" Style="{StaticResource CardFrame}">
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="VOLUME SETTIMANALE" Style="{StaticResource LabelCaps}" />
+                        <Label Text="{Binding WeeklyVolume}"
+                               Style="{StaticResource H2Bold}"
+                               TextColor="{StaticResource OnSurface}" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Ultimo allenamento -->
+                <Border Grid.Row="1" Grid.Column="1" Style="{StaticResource CardFrame}">
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="ULTIMO ALLENAMENTO" Style="{StaticResource LabelCaps}" />
+                        <Label Text="{Binding LastWorkoutSummary}"
+                               Style="{StaticResource BodyMd}"
+                               TextColor="{StaticResource OnSurface}" />
+                    </VerticalStackLayout>
+                </Border>
+            </Grid>
+
+            <!-- Quick Actions -->
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                <Button Grid.Column="0"
+                        Text="NUOVO ALLENAMENTO"
+                        Style="{StaticResource PrimaryButton}"
+                        HeightRequest="56"
+                        Command="{Binding Source={RelativeSource AncestorType={x:Type Shell}}, Path=CurrentItem}" />
+                <Button Grid.Column="1"
+                        Text="ESPLORA ESERCIZI"
+                        Style="{StaticResource SecondaryButton}"
+                        HeightRequest="56" />
+            </Grid>
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

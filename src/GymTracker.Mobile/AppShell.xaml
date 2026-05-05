@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell
+    x:Class="GymTracker.Mobile.AppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:views="clr-namespace:GymTracker.Mobile.Views"
+    Shell.FlyoutBehavior="Disabled"
+    Shell.BackgroundColor="{StaticResource Surface}"
+    Shell.ForegroundColor="{StaticResource OnSurface}"
+    Shell.TabBarBackgroundColor="{StaticResource SurfaceContainerLow}"
+    Shell.TabBarForegroundColor="{StaticResource Primary}"
+    Shell.TabBarUnselectedColor="{StaticResource Outline}"
+    Shell.TabBarTitleColor="{StaticResource Primary}">
+
+    <TabBar>
+        <ShellContent
+            Title="Home"
+            ContentTemplate="{DataTemplate views:DashboardPage}"
+            Route="dashboard" />
+
+        <ShellContent
+            Title="Esercizi"
+            ContentTemplate="{DataTemplate views:CatalogPage}"
+            Route="catalog" />
+
+        <ShellContent
+            Title="Workout"
+            ContentTemplate="{DataTemplate views:WorkoutPage}"
+            Route="workout" />
+
+        <ShellContent
+            Title="Amici"
+            ContentTemplate="{DataTemplate views:SocialPage}"
+            Route="social" />
+
+        <ShellContent
+            Title="Profilo"
+            ContentTemplate="{DataTemplate views:ProfilePage}"
+            Route="profile" />
+    </TabBar>
+
+</Shell>

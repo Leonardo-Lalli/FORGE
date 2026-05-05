@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:vm="clr-namespace:GymTracker.Mobile.ViewModels"
+    x:Class="GymTracker.Mobile.Views.WorkoutPage"
+    x:DataType="vm:WorkoutViewModel"
+    Title="Allenamento">
+
+    <Grid RowDefinitions="*" Padding="20">
+
+        <!-- Empty state (no workout active) -->
+        <VerticalStackLayout IsVisible="{Binding IsEmptyState}"
+                             VerticalOptions="Center"
+                             HorizontalOptions="Center"
+                             Spacing="24">
+            <Label Text="💪" FontSize="64" HorizontalTextAlignment="Center" />
+            <Label Text="Pronto ad allenarti?"
+                   Style="{StaticResource H2Bold}"
+                   HorizontalTextAlignment="Center" />
+            <Label Text="Avvia un nuovo allenamento e inizia a registrare le tue serie."
+                   Style="{StaticResource EmptyStateLabel}" />
+            <Button Text="INIZIA ALLENAMENTO"
+                    Style="{StaticResource PrimaryButton}"
+                    HorizontalOptions="Center"
+                    Command="{Binding StartWorkoutCommand}" />
+        </VerticalStackLayout>
+
+        <!-- Active workout placeholder -->
+        <VerticalStackLayout IsVisible="{Binding HasData}"
+                             VerticalOptions="Center"
+                             HorizontalOptions="Center"
+                             Spacing="16">
+            <Label Text="{Binding WorkoutTitle}"
+                   Style="{StaticResource H1Bold}"
+                   HorizontalTextAlignment="Center" />
+            <Label Text="Aggiungi esercizi dal catalogo per iniziare."
+                   Style="{StaticResource BodyLg}"
+                   TextColor="{StaticResource TextSecondary}"
+                   HorizontalTextAlignment="Center" />
+            <Button Text="AGGIUNGI ESERCIZIO"
+                    Style="{StaticResource SecondaryButton}"
+                    HorizontalOptions="Center" />
+        </VerticalStackLayout>
+
+    </Grid>
+
+</ContentPage>

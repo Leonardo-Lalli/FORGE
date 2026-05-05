@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:vm="clr-namespace:GymTracker.Mobile.ViewModels"
+    x:Class="GymTracker.Mobile.Views.ProfilePage"
+    x:DataType="vm:ProfileViewModel"
+    Title="Profilo">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="20">
+
+            <!-- Avatar placeholder -->
+            <Border Style="{StaticResource CardFrame}"
+                   HorizontalOptions="Center"
+                   WidthRequest="100" HeightRequest="100"
+                   StrokeShape="RoundRectangle 50"
+                   Padding="0">
+                <Label Text="🏋️"
+                       FontSize="40"
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center" />
+            </Border>
+
+            <!-- User info -->
+            <VerticalStackLayout HorizontalOptions="Center" Spacing="4">
+                <Label Text="{Binding Username}"
+                       Style="{StaticResource H2Bold}"
+                       HorizontalTextAlignment="Center" />
+                <Label Text="{Binding Email}"
+                       Style="{StaticResource BodyMd}"
+                       TextColor="{StaticResource TextSecondary}"
+                       HorizontalTextAlignment="Center" />
+            </VerticalStackLayout>
+
+            <!-- Stats card -->
+            <Border Style="{StaticResource CardFrame}">
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="STATISTICHE" Style="{StaticResource LabelCaps}" />
+                    <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" ColumnSpacing="16" RowSpacing="12">
+                        <VerticalStackLayout Grid.Row="0" Grid.Column="0" Spacing="2">
+                            <Label Text="0" Style="{StaticResource H2Bold}" TextColor="{StaticResource LimeGreen}" />
+                            <Label Text="Allenamenti" Style="{StaticResource BodyMd}" TextColor="{StaticResource TextSecondary}" />
+                        </VerticalStackLayout>
+                        <VerticalStackLayout Grid.Row="0" Grid.Column="1" Spacing="2">
+                            <Label Text="0 kg" Style="{StaticResource H2Bold}" TextColor="{StaticResource ElectricBlue}" />
+                            <Label Text="Volume Totale" Style="{StaticResource BodyMd}" TextColor="{StaticResource TextSecondary}" />
+                        </VerticalStackLayout>
+                        <VerticalStackLayout Grid.Row="1" Grid.Column="0" Spacing="2">
+                            <Label Text="0" Style="{StaticResource H2Bold}" TextColor="{StaticResource LimeGreen}" />
+                            <Label Text="Amici" Style="{StaticResource BodyMd}" TextColor="{StaticResource TextSecondary}" />
+                        </VerticalStackLayout>
+                        <VerticalStackLayout Grid.Row="1" Grid.Column="1" Spacing="2">
+                            <Label Text="0 gg" Style="{StaticResource H2Bold}" TextColor="{StaticResource ElectricBlue}" />
+                            <Label Text="Streak Best" Style="{StaticResource BodyMd}" TextColor="{StaticResource TextSecondary}" />
+                        </VerticalStackLayout>
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Buttons -->
+            <Button Text="IMPOSTAZIONI"
+                    Style="{StaticResource SecondaryButton}"
+                    HorizontalOptions="Fill" />
+            <Button Text="ESCI"
+                    Style="{StaticResource PrimaryButton}"
+                    HorizontalOptions="Fill"
+                    BackgroundColor="{StaticResource AlertRed}" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>
