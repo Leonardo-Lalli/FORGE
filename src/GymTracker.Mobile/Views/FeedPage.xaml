@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:vm="clr-namespace:GymTracker.Mobile.ViewModels"
+    x:Class="GymTracker.Mobile.Views.FeedPage"
+    x:DataType="vm:FeedViewModel"
+    Title="Feed"
+    Shell.NavBarIsVisible="False">
+
+    <Grid RowDefinitions="Auto,*" BackgroundColor="{DynamicResource Surface}">
+
+        <!-- TopBar — exact mockup: avatar | FORGE | notifications -->
+        <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto"
+              Padding="24,16" BackgroundColor="{DynamicResource Surface}">
+            <Border Grid.Column="0" StrokeShape="RoundRectangle 999"
+                    WidthRequest="40" HeightRequest="40" Padding="0"
+                    BackgroundColor="{DynamicResource SurfaceVariant}">
+                <Image Source="https://lh3.googleusercontent.com/aida-public/AB6AXuB8YEDgh0r7xn0VIz9pvLLKPDffqEIvmaBifcmszWK1k3x18poIo0-E0d1_COZEN4PV-itaG6pxbfv_pD-7LSm5Mvw0R4VV7ArS-bb3yOHNVeJqKCx9T1QtG13MrW3zDshmuPt_m81cs6o0UBICyWRj8HZr7EAXFIMmEnbM2qbiNO4jhaVRTGvCWQRFnZOfCh4ruGMHT87sIyt-z0mYvcwKZHSILx3xEDrCNHC9yZ41F9ubSM461O5RgEDDnKmQJHFjqlIgEJig8f8"
+                       Aspect="AspectFill" WidthRequest="40" HeightRequest="40" />
+            </Border>
+            <Label Grid.Column="1" Text="FORGE"
+                   FontFamily="LexendBold" FontSize="32" FontAttributes="Bold"
+                   TextColor="{DynamicResource Primary}"
+                   HorizontalOptions="Center" VerticalOptions="Center"
+                   CharacterSpacing="-1" />
+            <Border Grid.Column="2" BackgroundColor="{DynamicResource SurfaceContainer}"
+                    StrokeShape="RoundRectangle 999" WidthRequest="40" HeightRequest="40" Padding="0"
+                    Stroke="{DynamicResource OutlineVariant}" StrokeThickness="0.5">
+                <Label Text="⚙" FontSize="16" TextColor="{DynamicResource OnSurfaceVariant}"
+                       HorizontalOptions="Center" VerticalOptions="Center">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnSettingsTapped" />
+                    </Label.GestureRecognizers>
+                </Label>
+            </Border>
+        </Grid>
+
+        <!-- Feed Scroll -->
+        <ScrollView Grid.Row="1" Padding="24,16,24,100">
+            <VerticalStackLayout Spacing="32"
+                BindableLayout.ItemsSource="{Binding Posts}">
+                <BindableLayout.ItemTemplate>
+                    <DataTemplate x:DataType="vm:FeedPost">
+
+                        <!-- Feed Card -->
+                        <Border BackgroundColor="{DynamicResource SurfaceContainerLowest}"
+                                StrokeShape="RoundRectangle 16"
+                                Stroke="{DynamicResource OutlineVariant}" StrokeThickness="0.5"
+                                Padding="24">
+                            <VerticalStackLayout Spacing="16">
+
+                                <!-- Header row -->
+                                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                                    <Border Grid.Column="0" StrokeShape="RoundRectangle 999"
+                                            WidthRequest="48" HeightRequest="48" Padding="0"
+                                            BackgroundColor="{DynamicResource SurfaceVariant}"
+                                            Stroke="{DynamicResource Surface}" StrokeThickness="2">
+                                        <Image Source="{Binding AvatarUrl}" Aspect="AspectFill"
+                                               WidthRequest="48" HeightRequest="48" />
+                                    </Border>
+                                    <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
+                                        <Label Text="{Binding UserName}"
+                                               FontFamily="InterRegular" FontSize="18" FontAttributes="Bold"
+                                               TextColor="{DynamicResource OnSurface}" />
+                                        <Label Text="{Binding TimeAgo}"
+                                               FontFamily="InterBold" FontSize="12" FontAttributes="Bold"
+                                               TextColor="{DynamicResource Outline}"
+                                               CharacterSpacing="0.6" />
+                                    </VerticalStackLayout>
+                                    <Border Grid.Column="2" BackgroundColor="{DynamicResource Primary}"
+                                            Opacity="0.20" StrokeShape="RoundRectangle 999"
+                                            Padding="12,4" VerticalOptions="Start">
+                                        <Label Text="{Binding Category}"
+                                               FontFamily="InterBold" FontSize="12" FontAttributes="Bold"
+                                               TextColor="{DynamicResource Primary}"
+                                               CharacterSpacing="0.6" />
+                                    </Border>
+                                </Grid>
+
+                                <!-- Title -->
+                                <Label Text="{Binding Title}"
+                                       FontFamily="InterBold" FontSize="24" FontAttributes="Bold"
+                                       TextColor="{DynamicResource Primary}" />
+
+                                <!-- 3-column data -->
+                                <Grid ColumnDefinitions="*,8,*,8,*" IsVisible="{Binding HasImage}">
+                                    <VerticalStackLayout Grid.Column="0" Spacing="2">
+                                        <Label Text="{Binding DataCol1Label}"
+                                               FontFamily="InterBold" FontSize="12" FontAttributes="Bold"
+                                               TextColor="{DynamicResource Outline}" CharacterSpacing="0.6" />
+                                        <Label Text="{Binding DataCol1Value}"
+                                               FontFamily="InterBold" FontSize="18"
+                                               TextColor="{DynamicResource OnSurface}" />
+                                    </VerticalStackLayout>
+                                    <BoxView Grid.Column="1" Color="{DynamicResource OutlineVariant}"
+                                             Opacity="0.3" WidthRequest="1" />
+                                    <VerticalStackLayout Grid.Column="2" Spacing="2">
+                                        <Label Text="{Binding DataCol2Label}"
+                                               FontFamily="InterBold" FontSize="12" FontAttributes="Bold"
+                                               TextColor="{DynamicResource Outline}" CharacterSpacing="0.6" />
+                                        <Label Text="{Binding DataCol2Value}"
+                                               FontFamily="InterBold" FontSize="18"
+                                               TextColor="{DynamicResource OnSurface}" />
+                                    </VerticalStackLayout>
+                                    <BoxView Grid.Column="3" Color="{DynamicResource OutlineVariant}"
+                                             Opacity="0.3" WidthRequest="1" />
+                                    <VerticalStackLayout Grid.Column="4" Spacing="2">
+                                        <Label Text="{Binding DataCol3Label}"
+                                               FontFamily="InterBold" FontSize="12" FontAttributes="Bold"
+                                               TextColor="{DynamicResource Outline}" CharacterSpacing="0.6" />
+                                        <Label Text="{Binding DataCol3Value}"
+                                               FontFamily="InterBold" FontSize="18"
+                                               TextColor="{DynamicResource OnSurface}" />
+                                    </VerticalStackLayout>
+                                </Grid>
+
+                                <!-- Description (for non-image posts) -->
+                                <Label Text="{Binding Description}"
+                                       FontFamily="InterRegular" FontSize="16"
+                                       TextColor="{DynamicResource OnSurfaceVariant}"
+                                       IsVisible="{Binding HasDataCards}" />
+
+                                <!-- 2-column volume/max cards -->
+                                <Grid ColumnDefinitions="*,16,*" IsVisible="{Binding HasDataCards}">
+                                    <Border Grid.Column="0" BackgroundColor="{DynamicResource SurfaceContainer}"
+                                            StrokeShape="RoundRectangle 12" Padding="16">
+                                        <VerticalStackLayout Spacing="4">
+                                            <Label Text="{Binding Card1Label}"
+                                                   FontFamily="InterBold" FontSize="12" FontAttributes="Bold"
+                                                   TextColor="{DynamicResource Outline}" CharacterSpacing="0.6" />
+                                            <Label Text="{Binding Card1Value}"
+                                                   FontFamily="InterBold" FontSize="24" FontAttributes="Bold"
+                                                   TextColor="{DynamicResource Primary}" />
+                                        </VerticalStackLayout>
+                                    </Border>
+                                    <Border Grid.Column="2" BackgroundColor="{DynamicResource SurfaceContainer}"
+                                            StrokeShape="RoundRectangle 12" Padding="16">
+                                        <VerticalStackLayout Spacing="4">
+                                            <Label Text="{Binding Card2Label}"
+                                                   FontFamily="InterBold" FontSize="12" FontAttributes="Bold"
+                                                   TextColor="{DynamicResource Outline}" CharacterSpacing="0.6" />
+                                            <Label Text="{Binding Card2Value}"
+                                                   FontFamily="InterBold" FontSize="24" FontAttributes="Bold"
+                                                   TextColor="{DynamicResource Primary}" />
+                                        </VerticalStackLayout>
+                                    </Border>
+                                </Grid>
+
+                                <!-- Image -->
+                                <Border IsVisible="{Binding HasImage}"
+                                        StrokeShape="RoundRectangle 12"
+                                        HeightRequest="192" Padding="0"
+                                        BackgroundColor="{DynamicResource SurfaceContainer}">
+                                    <Image Source="{Binding ImageUrl}" Aspect="AspectFill" />
+                                </Border>
+
+                                <!-- Interaction bar -->
+                                <Grid ColumnDefinitions="Auto,Auto,*,Auto" ColumnSpacing="24"
+                                      Padding="0,12,0,0">
+                                    <Border Grid.Column="0" StrokeThickness="0" BackgroundColor="Transparent"
+                                            Padding="0">
+                                        <HorizontalStackLayout Spacing="8">
+                                            <Label Text="♥" FontSize="16" TextColor="{DynamicResource OnSurfaceVariant}" />
+                                            <Label Text="{Binding Likes}" FontFamily="InterBold" FontSize="16"
+                                                   TextColor="{DynamicResource OnSurface}" VerticalOptions="Center" />
+                                        </HorizontalStackLayout>
+                                    </Border>
+                                    <Border Grid.Column="1" StrokeThickness="0" BackgroundColor="Transparent"
+                                            Padding="0">
+                                        <HorizontalStackLayout Spacing="8">
+                                            <Label Text="💬" FontSize="16" TextColor="{DynamicResource OnSurfaceVariant}" />
+                                            <Label Text="{Binding Comments}" FontFamily="InterBold" FontSize="16"
+                                                   TextColor="{DynamicResource OnSurface}" VerticalOptions="Center" />
+                                        </HorizontalStackLayout>
+                                    </Border>
+                                </Grid>
+
+                            </VerticalStackLayout>
+                        </Border>
+
+                    </DataTemplate>
+                </BindableLayout.ItemTemplate>
+            </VerticalStackLayout>
+        </ScrollView>
+
+    </Grid>
+
+</ContentPage>
