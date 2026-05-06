@@ -1,15 +1,14 @@
+using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using GymTracker.Mobile.Models;
 
 namespace GymTracker.Mobile.ViewModels;
 
 public partial class WorkoutViewModel : BaseViewModel
 {
     [ObservableProperty]
-    private bool isWorkoutActive;
-
-    [ObservableProperty]
-    private string workoutTitle = "Nuovo Allenamento";
+    private ObservableCollection<WorkoutPlan> savedPlans = new();
 
     public WorkoutViewModel()
     {
@@ -17,11 +16,30 @@ public partial class WorkoutViewModel : BaseViewModel
     }
 
     [RelayCommand]
-    private void StartWorkout()
+    private async Task CreateNewPlanAsync()
     {
-        IsWorkoutActive = true;
-        WorkoutTitle = "Allenamento in corso...";
-        HasData = true;
-        IsEmptyState = false;
+        await Shell.Current.GoToAsync("activeWorkout", new Dictionary<string, object>
+        {
+            ["mode"] = "create"
+        });
+    }
+
+    [RelayCommand]
+    private async Task StartEmptyWorkoutAsync()
+    {
+        await Shell.Current.GoToAsync("activeWorkout", new Dictionary<string, object>
+        {
+            ["mode"] = "free"
+        });
+    }
+
+    [RelayCommand]
+    private async Task OpenSavedPlanAsync(WorkoutPlan plan)
+    {
+        await Shell.Current.GoToAsync("activeWorkout", new Dictionary<string, object>
+        {
+            ["mode"] = "saved",
+            ["planId"] = plan.Id
+        });
     }
 }
