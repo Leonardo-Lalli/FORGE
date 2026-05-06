@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using GymTracker.Mobile.Models;
+using GymTracker.Mobile.Services;
 
 namespace GymTracker.Mobile.ViewModels;
 
@@ -12,7 +13,15 @@ public partial class WorkoutViewModel : BaseViewModel
 
     public WorkoutViewModel()
     {
-        IsEmptyState = true;
+        LoadPlans();
+    }
+
+    public void LoadPlans()
+    {
+        var plans = PlanStore.LoadPlans();
+        SavedPlans = new ObservableCollection<WorkoutPlan>(plans);
+        IsEmptyState = SavedPlans.Count == 0;
+        HasData = SavedPlans.Count > 0;
     }
 
     [RelayCommand]

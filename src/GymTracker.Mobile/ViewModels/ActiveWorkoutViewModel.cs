@@ -210,6 +210,22 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
             ShowNotification("Dai un nome alla scheda prima di salvarla.");
             return;
         }
+        if (Exercises.Count == 0)
+        {
+            ShowNotification("Aggiungi almeno un esercizio prima di salvare.");
+            return;
+        }
+
+        var plan = new WorkoutPlan
+        {
+            Name = PlanName,
+            RestSeconds = RestDuration,
+            Exercises = Exercises.ToList(),
+            CreatedAt = DateTime.Now,
+            UpdatedAt = DateTime.Now
+        };
+        PlanStore.SavePlan(plan);
+
         ShowNotification($"Scheda \"{PlanName}\" salvata!");
         WorkoutSession.Instance.End();
         await Shell.Current.GoToAsync("..");
