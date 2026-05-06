@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Forge - Elite Profile</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary-container": "#18f900",
+                        "on-tertiary-fixed-variant": "#5516be",
+                        "surface-variant": "#d5e3fd",
+                        "tertiary-container": "#7544df",
+                        "surface-tint": "#004ced",
+                        "surface-bright": "#f8f9ff",
+                        "inverse-surface": "#233144",
+                        "error": "#ba1a1a",
+                        "on-primary-container": "#dfe3ff",
+                        "on-tertiary": "#ffffff",
+                        "on-surface-variant": "#434656",
+                        "on-surface": "#0d1c2f",
+                        "on-secondary": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "tertiary": "#5c24c6",
+                        "outline": "#737688",
+                        "surface-container-high": "#dde9ff",
+                        "secondary-fixed": "#78ff5f",
+                        "on-secondary-container": "#076d00",
+                        "on-error": "#ffffff",
+                        "on-tertiary-fixed": "#23005c",
+                        "on-primary-fixed": "#001452",
+                        "inverse-primary": "#b7c4ff",
+                        "surface-dim": "#ccdbf4",
+                        "primary-fixed": "#dde1ff",
+                        "primary-container": "#0052ff",
+                        "surface-container-highest": "#d5e3fd",
+                        "surface-container": "#e6eeff",
+                        "surface": "#f8f9ff",
+                        "tertiary-fixed-dim": "#d0bcff",
+                        "primary": "#003ec7",
+                        "outline-variant": "#c3c5d9",
+                        "on-secondary-fixed-variant": "#045300",
+                        "on-secondary-fixed": "#012200",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary": "#076e00",
+                        "tertiary-fixed": "#e9ddff",
+                        "on-tertiary-container": "#ebe0ff",
+                        "primary-fixed-dim": "#b7c4ff",
+                        "on-background": "#0d1c2f",
+                        "inverse-on-surface": "#ebf1ff",
+                        "surface-container-low": "#eff4ff",
+                        "secondary-fixed-dim": "#16e600",
+                        "on-error-container": "#93000a",
+                        "background": "#f8f9ff",
+                        "error-container": "#ffdad6",
+                        "on-primary-fixed-variant": "#0038b6"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "unit": "8px",
+                        "stack-sm": "8px",
+                        "section-gap": "48px",
+                        "stack-lg": "32px",
+                        "gutter": "16px",
+                        "margin-mobile": "24px",
+                        "stack-md": "16px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Inter"],
+                        "label-caps": ["Inter"],
+                        "body-md": ["Inter"],
+                        "h2": ["Inter"],
+                        "h1": ["Inter"],
+                        "display": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "h2": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                        "h1": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                        "display": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "800"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        /* Custom ambient shadow for light mode surfaces as per spec */
+        .ambient-shadow {
+            box-shadow: 0 4px 20px rgba(0, 76, 237, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background min-h-screen flex flex-col font-body-md antialiased selection:bg-primary-container selection:text-on-primary-container">
+<header class="w-full sticky top-0 bg-surface/80 backdrop-blur-md shadow-sm flex justify-between items-center px-margin-mobile py-stack-md z-50 transition-all duration-300">
+<div class="w-10 h-10 rounded-full overflow-hidden shrink-0 ring-2 ring-primary bg-surface-container-high active:scale-95 transition-transform cursor-pointer">
+<img class="w-full h-full object-cover" data-alt="A close-up portrait of a determined, athletic individual in a bright, modern gym setting. The lighting is high-key and crisp, reflecting a professional light-mode aesthetic. The subject is wearing minimalist dark athletic gear that contrasts with the pristine white background, conveying focus and performance." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDk06TRZOkvomW3s1qwwLMldN8ihlvwB30HGTSSWlYNnJ6xmCXkFocvlHpHBkSQZSLYBm_6VX9A0-sLfxYybFk8w-9XsHUAGpuapC1mVzakhgke8Q-ZNR1YYnCVXYre-AxXPOqZBKQvrG4Mc57Q4krUROOqvYy82WSTc9dU7R7FcTQvKODiiFDuK_xD50HkelxwSjv50L9yG-d2j3GnU2yrOQU6LFESxVVf4m_r7Fjt_O9qQIGex4o7An8CoejRFEjmFe8LnILprcpx"/>
+</div>
+<h1 class="font-display text-display text-primary uppercase tracking-tighter">FORGE</h1>
+<button class="text-primary hover:opacity-80 transition-opacity active:scale-95">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">notifications</span>
+</button>
+</header>
+<main class="flex-1 w-full max-w-3xl mx-auto px-margin-mobile pb-section-gap pt-stack-lg">
+<section class="flex flex-col items-center mb-section-gap animate-fade-in-up">
+<div class="relative mb-stack-md group">
+<div class="w-32 h-32 rounded-full overflow-hidden ambient-shadow ring-4 ring-surface bg-surface-container-high z-10 relative">
+<img class="w-full h-full object-cover" data-alt="A close-up portrait of a determined, athletic individual in a bright, modern gym setting. The lighting is high-key and crisp, reflecting a professional light-mode aesthetic. The subject is wearing minimalist dark athletic gear that contrasts with the pristine white background, conveying focus and performance." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCtxRXSUJtPtpMyl8q_xt8O_ZphEpdneN_j7ba9EDZdPXorGlKXlnk7hP2bMiwckLbzC_M3xRXATAyrlDLzvIES5fnh0A-R4t66xi86x88gCvbjqHl33OlRubgXinET-Bg7FzxbPNQksc2hZkheJkFVcSD0DMBrSDwskR4s-GvhV9bhfpIJDRkGS3d7czGuKaCZGLFAPY2QvmwVVKdumZjvVbAcMLkKhzwt5tRFxSgiGpXhZbfXXFUvXXc7-VeNKMwTlcNJWTSlCeaR"/>
+</div>
+<button class="absolute bottom-0 right-0 bg-primary text-on-primary w-10 h-10 rounded-full flex items-center justify-center shadow-lg hover:bg-primary-fixed-variant transition-colors z-20 active:scale-90">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+</div>
+<h2 class="font-h1 text-h1 text-on-surface text-center mb-1">Marcus Kane</h2>
+<div class="flex items-center gap-2 text-on-surface-variant font-body-lg text-body-lg">
+<span class="w-2 h-2 rounded-full bg-secondary-fixed-dim"></span>
+<p>Elite Tier // Phase IV Conditioning</p>
+</div>
+</section>
+<section class="grid grid-cols-2 gap-gutter mb-section-gap">
+<div class="bg-surface rounded-xl p-6 ambient-shadow border border-surface-container-low flex flex-col items-center justify-center text-center relative overflow-hidden group">
+<div class="absolute inset-0 bg-primary-container/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+<span class="material-symbols-outlined text-primary/20 text-[64px] absolute -right-4 -bottom-4 rotate-12">fitness_center</span>
+<span class="font-display text-display text-primary mb-stack-sm leading-none relative z-10">342</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest relative z-10">Total Workouts</span>
+</div>
+<div class="bg-surface rounded-xl p-6 ambient-shadow border border-surface-container-low flex flex-col items-center justify-center text-center relative overflow-hidden group">
+<div class="absolute inset-0 bg-secondary-container/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+<span class="material-symbols-outlined text-secondary/10 text-[64px] absolute -left-4 -bottom-4 -rotate-12">bolt</span>
+<span class="font-display text-display text-secondary mb-stack-sm leading-none relative z-10">1.2M</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest relative z-10">Energy (Kcal)</span>
+</div>
+</section>
+<section>
+<div class="flex justify-between items-end mb-stack-lg border-b border-surface-container pb-stack-sm">
+<h3 class="font-h2 text-h2 text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">history</span>
+                    Recent Forges
+                </h3>
+<button class="font-label-caps text-label-caps text-primary hover:text-primary-fixed-variant transition-colors uppercase tracking-widest flex items-center gap-1 group">
+                    View All <span class="material-symbols-outlined text-[16px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</button>
+</div>
+<div class="flex flex-col gap-stack-lg">
+<article class="bg-surface rounded-xl p-6 ambient-shadow border border-surface-container-low group hover:-translate-y-1 transition-transform duration-300 ease-out cursor-pointer relative overflow-hidden">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-error rounded-l-xl"></div>
+<div class="flex justify-between items-start mb-stack-md pl-2">
+<div>
+<h4 class="font-h2 text-h2 text-on-surface mb-1 group-hover:text-primary transition-colors">Apex Metcon</h4>
+<p class="font-body-md text-body-md text-on-surface-variant flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px]">calendar_today</span> Today, 06:30 AM
+                            </p>
+</div>
+<span class="bg-error-container text-on-error-container font-label-caps text-label-caps px-3 py-1 rounded-full uppercase tracking-widest flex items-center gap-1 shadow-sm">
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">local_fire_department</span>
+                            High Intensity
+                        </span>
+</div>
+<div class="flex flex-wrap gap-gutter mb-stack-md pl-2">
+<div class="flex items-center gap-2 bg-surface-container-low px-3 py-2 rounded-lg">
+<span class="material-symbols-outlined text-primary text-[20px]">timer</span>
+<span class="font-body-md text-body-md font-bold text-on-surface">45m</span>
+</div>
+<div class="flex items-center gap-2 bg-surface-container-low px-3 py-2 rounded-lg">
+<span class="material-symbols-outlined text-secondary text-[20px]">monitor_heart</span>
+<span class="font-body-md text-body-md font-bold text-on-surface">162 bpm</span>
+</div>
+<div class="flex items-center gap-2 bg-surface-container-low px-3 py-2 rounded-lg">
+<span class="material-symbols-outlined text-tertiary text-[20px]">weight</span>
+<span class="font-body-md text-body-md font-bold text-on-surface">12k kg</span>
+</div>
+</div>
+<div class="pt-stack-md border-t border-surface-container pl-2">
+<h5 class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest mb-2">Protocol Outline</h5>
+<p class="font-body-md text-body-md text-on-surface leading-relaxed">
+                            Kettlebell swings (4x15, 24kg), Box jumps (4x10, 24"), Burpees (AMRAP 5m), Rowing (2km sprint pacing). Focus on explosive hip drive and minimal rest between modalities.
+                        </p>
+</div>
+</article>
+<article class="bg-surface rounded-xl p-6 ambient-shadow border border-surface-container-low group hover:-translate-y-1 transition-transform duration-300 ease-out cursor-pointer relative overflow-hidden">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-tertiary rounded-l-xl"></div>
+<div class="flex justify-between items-start mb-stack-md pl-2">
+<div>
+<h4 class="font-h2 text-h2 text-on-surface mb-1 group-hover:text-primary transition-colors">Hypertrophy Core</h4>
+<p class="font-body-md text-body-md text-on-surface-variant flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px]">calendar_today</span> Yesterday, 18:00 PM
+                            </p>
+</div>
+<span class="bg-tertiary-container text-on-tertiary-container font-label-caps text-label-caps px-3 py-1 rounded-full uppercase tracking-widest flex items-center gap-1 shadow-sm">
+<span class="material-symbols-outlined text-[14px]">fitness_center</span>
+                            Strength
+                        </span>
+</div>
+<div class="flex flex-wrap gap-gutter mb-stack-md pl-2">
+<div class="flex items-center gap-2 bg-surface-container-low px-3 py-2 rounded-lg">
+<span class="material-symbols-outlined text-primary text-[20px]">timer</span>
+<span class="font-body-md text-body-md font-bold text-on-surface">65m</span>
+</div>
+<div class="flex items-center gap-2 bg-surface-container-low px-3 py-2 rounded-lg">
+<span class="material-symbols-outlined text-secondary text-[20px]">monitor_heart</span>
+<span class="font-body-md text-body-md font-bold text-on-surface">128 bpm</span>
+</div>
+<div class="flex items-center gap-2 bg-surface-container-low px-3 py-2 rounded-lg">
+<span class="material-symbols-outlined text-tertiary text-[20px]">weight</span>
+<span class="font-body-md text-body-md font-bold text-on-surface">24k kg</span>
+</div>
+</div>
+<div class="pt-stack-md border-t border-surface-container pl-2">
+<h5 class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest mb-2">Protocol Outline</h5>
+<p class="font-body-md text-body-md text-on-surface leading-relaxed">
+                            Deadlifts (5x5, 85% 1RM), Weighted pull-ups (4x8), Bulgarian split squats (4x10/leg), Cable crunches (3x20). Maintained strict tempo 3-1-1-0.
+                        </p>
+</div>
+</article>
+</div>
+</section>
+</main>
+</body></html>

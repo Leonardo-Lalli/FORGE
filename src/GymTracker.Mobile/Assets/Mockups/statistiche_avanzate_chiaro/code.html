@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Advanced Analytics Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary-container": "#18f900",
+                        "on-tertiary-fixed-variant": "#5516be",
+                        "surface-variant": "#d5e3fd",
+                        "tertiary-container": "#7544df",
+                        "surface-tint": "#004ced",
+                        "surface-bright": "#f8f9ff",
+                        "inverse-surface": "#233144",
+                        "error": "#ba1a1a",
+                        "on-primary-container": "#dfe3ff",
+                        "on-tertiary": "#ffffff",
+                        "on-surface-variant": "#434656",
+                        "on-surface": "#0d1c2f",
+                        "on-secondary": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "tertiary": "#5c24c6",
+                        "outline": "#737688",
+                        "surface-container-high": "#dde9ff",
+                        "secondary-fixed": "#78ff5f",
+                        "on-secondary-container": "#076d00",
+                        "on-error": "#ffffff",
+                        "on-tertiary-fixed": "#23005c",
+                        "on-primary-fixed": "#001452",
+                        "inverse-primary": "#b7c4ff",
+                        "surface-dim": "#ccdbf4",
+                        "primary-fixed": "#dde1ff",
+                        "primary-container": "#0052ff",
+                        "surface-container-highest": "#d5e3fd",
+                        "surface-container": "#e6eeff",
+                        "surface": "#f8f9ff",
+                        "tertiary-fixed-dim": "#d0bcff",
+                        "primary": "#003ec7",
+                        "outline-variant": "#c3c5d9",
+                        "on-secondary-fixed-variant": "#045300",
+                        "on-secondary-fixed": "#012200",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary": "#076e00",
+                        "tertiary-fixed": "#e9ddff",
+                        "on-tertiary-container": "#ebe0ff",
+                        "primary-fixed-dim": "#b7c4ff",
+                        "on-background": "#0d1c2f",
+                        "inverse-on-surface": "#ebf1ff",
+                        "surface-container-low": "#eff4ff",
+                        "secondary-fixed-dim": "#16e600",
+                        "on-error-container": "#93000a",
+                        "background": "#f8f9ff",
+                        "error-container": "#ffdad6",
+                        "on-primary-fixed-variant": "#0038b6"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "unit": "8px",
+                        "stack-sm": "8px",
+                        "section-gap": "48px",
+                        "stack-lg": "32px",
+                        "gutter": "16px",
+                        "margin-mobile": "24px",
+                        "stack-md": "16px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Inter"],
+                        "label-caps": ["Inter"],
+                        "body-md": ["Inter"],
+                        "h2": ["Inter"],
+                        "h1": ["Inter"],
+                        "display": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "h2": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                        "h1": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                        "display": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "800"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface min-h-screen pb-safe">
+<!-- TopAppBar -->
+<header class="w-full sticky top-0 bg-surface/80 backdrop-blur-md shadow-sm flex justify-between items-center px-margin-mobile py-stack-md z-50">
+<div class="flex items-center gap-gutter">
+<div class="w-10 h-10 rounded-full bg-surface-variant overflow-hidden">
+<img alt="User profile photo" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDBE-UGhlA4gRKy_T6-TslZkHiOy79xYLsbphHwPhWdJBsSdQhxXmphpRiqKLnztF-dP4mB88vRKHFeQpigkSg1cbDneFASGqPT1dgUdzFlEGa2MIjNqvjrsx8D3uPLRPA0m9ti9a8w4IKKvRGUURflWkMdh1WSKgzm9IDH3mqcHVMLvdsbb86wC7kd_XJ-o_pocKDKsDtB_D5CMwuL0pxT1qoLRbKBhyoHTEsl79AbOQifrLkZuGGhdr4Qz8FMAfMUASq4lkec5Ya9"/>
+</div>
+<h1 class="font-display text-display text-primary uppercase tracking-tighter">FORGE</h1>
+</div>
+<button aria-label="notifications" class="text-on-surface-variant hover:opacity-80 transition-opacity active:scale-95 transition-transform">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">notifications</span>
+</button>
+</header>
+<!-- Main Content Canvas -->
+<main class="px-margin-mobile py-stack-lg max-w-7xl mx-auto flex flex-col gap-stack-lg md:pb-24">
+<!-- Dashboard Header -->
+<div class="flex flex-col gap-stack-sm">
+<h2 class="font-h1 text-h1 text-on-surface">Analytics</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Your performance overview</p>
+</div>
+<!-- Summary Tiles (Bento Grid) -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-gutter">
+<!-- Total Hours -->
+<div class="bg-surface-container-lowest rounded-xl p-5 shadow-[0_4px_12px_rgba(0,0,0,0.04)] border border-surface-variant flex flex-col justify-between">
+<div class="flex justify-between items-start mb-stack-md">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">Total Hours</span>
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">schedule</span>
+</div>
+<div>
+<div class="font-display text-display text-on-surface">42.5</div>
+<div class="font-label-caps text-label-caps text-secondary flex items-center mt-1">
+<span class="material-symbols-outlined text-[14px]">arrow_upward</span> 12% vs last month
+                    </div>
+</div>
+</div>
+<!-- Calories Burned -->
+<div class="bg-surface-container-lowest rounded-xl p-5 shadow-[0_4px_12px_rgba(0,0,0,0.04)] border border-surface-variant flex flex-col justify-between">
+<div class="flex justify-between items-start mb-stack-md">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">Calories</span>
+<span class="material-symbols-outlined text-tertiary" style="font-variation-settings: 'FILL' 1;">local_fire_department</span>
+</div>
+<div>
+<div class="font-display text-display text-on-surface">18k</div>
+<div class="font-label-caps text-label-caps text-secondary flex items-center mt-1">
+<span class="material-symbols-outlined text-[14px]">arrow_upward</span> 5% vs last month
+                    </div>
+</div>
+</div>
+<!-- Workouts -->
+<div class="bg-surface-container-lowest rounded-xl p-5 shadow-[0_4px_12px_rgba(0,0,0,0.04)] border border-surface-variant flex flex-col justify-between">
+<div class="flex justify-between items-start mb-stack-md">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">Workouts</span>
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">fitness_center</span>
+</div>
+<div>
+<div class="font-display text-display text-on-surface">24</div>
+<div class="font-label-caps text-label-caps text-on-surface-variant flex items-center mt-1">
+<span class="material-symbols-outlined text-[14px]">horizontal_rule</span> Steady pace
+                    </div>
+</div>
+</div>
+<!-- PRs -->
+<div class="bg-surface-container-lowest rounded-xl p-5 shadow-[0_4px_12px_rgba(0,0,0,0.04)] border border-surface-variant flex flex-col justify-between">
+<div class="flex justify-between items-start mb-stack-md">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">New PRs</span>
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">emoji_events</span>
+</div>
+<div>
+<div class="font-display text-display text-on-surface">3</div>
+<div class="font-label-caps text-label-caps text-secondary flex items-center mt-1">
+<span class="material-symbols-outlined text-[14px]">arrow_upward</span> Great week!
+                    </div>
+</div>
+</div>
+</div>
+<!-- Muscle Mass Gain Chart (Placeholder Structure) -->
+<div class="bg-surface-container-lowest rounded-xl p-6 shadow-[0_4px_12px_rgba(0,0,0,0.04)] border border-surface-variant flex flex-col gap-stack-md">
+<div class="flex justify-between items-center">
+<div>
+<h3 class="font-h2 text-h2 text-on-surface">Muscle Mass Gain</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Estimated lean mass trend</p>
+</div>
+<div class="bg-secondary-container/20 text-secondary px-3 py-1 rounded-full font-label-caps text-label-caps flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">trending_up</span> +2.4kg
+                </div>
+</div>
+<!-- Chart Area Representation -->
+<div class="h-48 w-full border-b border-l border-surface-variant relative flex items-end pt-4 pb-2">
+<!-- Grid Lines -->
+<div class="absolute w-full h-full border-t border-surface-variant/50 top-1/4"></div>
+<div class="absolute w-full h-full border-t border-surface-variant/50 top-2/4"></div>
+<div class="absolute w-full h-full border-t border-surface-variant/50 top-3/4"></div>
+<!-- Line Chart Mockup (SVG) -->
+<svg class="absolute inset-0 h-full w-full" preserveaspectratio="none" viewbox="0 0 100 100">
+<path class="text-primary" d="M0 90 Q 20 80, 40 60 T 60 40 T 80 20 T 100 10" fill="none" stroke="currentColor" stroke-width="2"></path>
+<path class="text-primary/10" d="M0 100 L 0 90 Q 20 80, 40 60 T 60 40 T 80 20 T 100 10 L 100 100 Z" fill="currentColor"></path>
+</svg>
+</div>
+<div class="flex justify-between font-label-caps text-label-caps text-on-surface-variant px-2">
+<span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span>May</span><span>Jun</span>
+</div>
+</div>
+<!-- Split View: Weekly Volume & Top Lifts -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-gutter">
+<!-- Weekly Volume Bar Chart -->
+<div class="bg-surface-container-lowest rounded-xl p-6 shadow-[0_4px_12px_rgba(0,0,0,0.04)] border border-surface-variant flex flex-col gap-stack-md">
+<div class="flex justify-between items-center mb-2">
+<h3 class="font-h2 text-h2 text-on-surface">Weekly Volume</h3>
+<span class="font-label-caps text-label-caps text-on-surface-variant">Tonnes</span>
+</div>
+<!-- Bar Chart Mockup -->
+<div class="h-40 w-full flex items-end justify-between gap-2">
+<div class="w-full bg-primary/20 rounded-t-sm h-[30%]"></div>
+<div class="w-full bg-primary/40 rounded-t-sm h-[50%]"></div>
+<div class="w-full bg-primary/60 rounded-t-sm h-[80%]"></div>
+<div class="w-full bg-primary/80 rounded-t-sm h-[60%]"></div>
+<div class="w-full bg-primary rounded-t-sm h-[90%]"></div>
+<div class="w-full bg-primary/50 rounded-t-sm h-[40%]"></div>
+<div class="w-full bg-primary/30 rounded-t-sm h-[70%]"></div>
+</div>
+<div class="flex justify-between font-label-caps text-label-caps text-on-surface-variant px-1 mt-2">
+<span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span>
+</div>
+</div>
+<!-- Top Lifts List -->
+<div class="bg-surface-container-lowest rounded-xl p-6 shadow-[0_4px_12px_rgba(0,0,0,0.04)] border border-surface-variant flex flex-col">
+<h3 class="font-h2 text-h2 text-on-surface mb-stack-md">Top Lifts</h3>
+<div class="flex flex-col gap-stack-sm flex-grow justify-center">
+<!-- Lift 1 -->
+<div class="flex justify-between items-center py-2">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-primary-container/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">fitness_center</span>
+</div>
+<div>
+<div class="font-body-lg text-body-lg text-on-surface font-semibold">Deadlift</div>
+<div class="font-label-caps text-label-caps text-on-surface-variant">1RM</div>
+</div>
+</div>
+<div class="font-h2 text-h2 text-on-surface">185kg</div>
+</div>
+<hr class="border-surface-variant border-t"/>
+<!-- Lift 2 -->
+<div class="flex justify-between items-center py-2">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-primary-container/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">accessibility_new</span>
+</div>
+<div>
+<div class="font-body-lg text-body-lg text-on-surface font-semibold">Squat</div>
+<div class="font-label-caps text-label-caps text-on-surface-variant">1RM</div>
+</div>
+</div>
+<div class="font-h2 text-h2 text-on-surface">150kg</div>
+</div>
+<hr class="border-surface-variant border-t"/>
+<!-- Lift 3 -->
+<div class="flex justify-between items-center py-2">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-primary-container/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">front_hand</span>
+</div>
+<div>
+<div class="font-body-lg text-body-lg text-on-surface font-semibold">Bench Press</div>
+<div class="font-label-caps text-label-caps text-on-surface-variant">1RM</div>
+</div>
+</div>
+<div class="font-h2 text-h2 text-on-surface">110kg</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 w-full z-50 bg-surface/90 backdrop-blur-xl border-t border-outline-variant/20 flex justify-around items-center h-20 px-4 pb-safe shadow-[0_-4px_12px_rgba(0,0,0,0.05)] md:hidden">
+<!-- Dashboard (Inactive) -->
+<button class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary active:scale-90 transition-all duration-200">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">dashboard</span>
+<span class="font-label-caps text-label-caps mt-1">Dashboard</span>
+</button>
+<!-- Feed (Inactive) -->
+<button class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary active:scale-90 transition-all duration-200">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">group</span>
+<span class="font-label-caps text-label-caps mt-1">Feed</span>
+</button>
+<!-- Stats (Active) -->
+<button class="flex flex-col items-center justify-center text-primary font-bold bg-primary-container/10 rounded-xl px-4 py-1 hover:text-primary active:scale-90 transition-all duration-200">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">insights</span>
+<span class="font-label-caps text-label-caps mt-1">Stats</span>
+</button>
+</nav>
+</body></html>

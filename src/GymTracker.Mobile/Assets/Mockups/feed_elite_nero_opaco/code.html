@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Forge Elite - Feed</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Lexend:wght@400;600&amp;family=Space+Grotesk:wght@500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "error": "#ffb4ab",
+                        "on-primary-container": "#00626e",
+                        "inverse-on-surface": "#313030",
+                        "surface-container-highest": "#353534",
+                        "surface-dim": "#131313",
+                        "on-primary-fixed": "#001f24",
+                        "secondary-fixed": "#c3f400",
+                        "on-secondary": "#283500",
+                        "secondary-container": "#c3f400",
+                        "primary-container": "#00e5ff",
+                        "surface": "#131313",
+                        "surface-container": "#201f1f",
+                        "primary-fixed-dim": "#00daf3",
+                        "on-surface-variant": "#bac9cc",
+                        "primary-fixed": "#9cf0ff",
+                        "outline-variant": "#3b494c",
+                        "surface-container-high": "#2a2a2a",
+                        "on-tertiary-fixed": "#1c1b1b",
+                        "on-primary-fixed-variant": "#004f58",
+                        "error-container": "#93000a",
+                        "on-secondary-container": "#556d00",
+                        "on-secondary-fixed": "#161e00",
+                        "tertiary-fixed": "#e5e2e1",
+                        "inverse-surface": "#e5e2e1",
+                        "secondary-fixed-dim": "#abd600",
+                        "on-primary": "#00363d",
+                        "surface-variant": "#353534",
+                        "on-secondary-fixed-variant": "#3c4d00",
+                        "on-error": "#690005",
+                        "inverse-primary": "#006875",
+                        "tertiary-fixed-dim": "#c8c6c5",
+                        "on-tertiary-container": "#5a5959",
+                        "surface-bright": "#3a3939",
+                        "secondary": "#ffffff",
+                        "background": "#131313",
+                        "tertiary": "#efeceb",
+                        "surface-container-low": "#1c1b1b",
+                        "on-background": "#e5e2e1",
+                        "on-tertiary": "#313030",
+                        "primary": "#c3f5ff",
+                        "surface-tint": "#00daf3",
+                        "on-tertiary-fixed-variant": "#474746",
+                        "tertiary-container": "#d2d0cf",
+                        "on-surface": "#e5e2e1",
+                        "on-error-container": "#ffdad6",
+                        "outline": "#849396",
+                        "surface-container-lowest": "#0e0e0e"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack-md": "16px",
+                        "unit": "4px",
+                        "section-gap": "48px",
+                        "stack-sm": "8px",
+                        "container-margin": "24px",
+                        "gutter": "16px",
+                        "stack-lg": "32px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Inter"],
+                        "label-sm": ["Lexend"],
+                        "label-caps": ["Lexend"],
+                        "headline-md": ["Space Grotesk"],
+                        "body-md": ["Inter"],
+                        "headline-lg": ["Space Grotesk"],
+                        "metric-xl": ["Space Grotesk"],
+                        "display-hero": ["Space Grotesk"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "label-sm": ["11px", { "lineHeight": "14px", "fontWeight": "400" }],
+                        "label-caps": ["12px", { "lineHeight": "16px", "letterSpacing": "0.1em", "fontWeight": "600" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "500" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "600" }],
+                        "metric-xl": ["48px", { "lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+                        "display-hero": ["72px", { "lineHeight": "72px", "letterSpacing": "-0.04em", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .cyan-glow {
+            box-shadow: 0 0 15px rgba(0, 229, 255, 0.4);
+        }
+        .cyan-glow-text {
+            text-shadow: 0 0 10px rgba(0, 229, 255, 0.5);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface antialiased min-h-screen pb-[100px] pt-16">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-surface/60 backdrop-blur-xl border-b border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.1)] flex justify-between items-center px-container-margin h-16">
+<div class="flex items-center gap-stack-sm active:scale-95 transition-transform">
+<img alt="User profile avatar" class="w-8 h-8 rounded-full object-cover border border-outline-variant" data-alt="A close-up portrait of a determined female athlete with a subtle cybernetic glow, looking intently into the camera. The background is a sleek, dark high-tech fitness lab illuminated by striking neon cyan and deep obsidian shadows. The lighting is cinematic, enhancing the intense, futuristic atmosphere." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAoCrmyZvhlF9d6YHUK_4Jy2Ern9UszCEJOw1rpEZFmU7FVXJDvs-RjoC-OzNu4edRPh6GHPHHcX3mH_qhq1PlVDL9j0F3zW6rWtwFcxFuyNcZ88DgLqstXUh6CgV-1_XqsOInsEq3IDJCLEuVE0JJwiGxTATPRVgQBU3j5BQ9WiFkWzTTDHw0eLpoffpUlt6hfEwcEYtl8DSdrJJjbPwhviNnyVzRuw3j-k60WzcqtY5tyV6xhX9m_FoGAvxtIldZ0E6E7V-LJqoNA"/>
+</div>
+<div class="font-display-hero text-headline-md tracking-tighter text-primary">FORGE ELITE</div>
+<div class="flex items-center active:scale-95 transition-transform hover:text-primary-fixed-dim transition-colors text-on-surface-variant cursor-pointer">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">settings</span>
+</div>
+</header>
+<!-- Main Content -->
+<main class="max-w-4xl mx-auto">
+<!-- Stories / Squad Activity -->
+<section class="w-full overflow-x-auto no-scrollbar py-stack-md px-container-margin">
+<div class="flex gap-stack-md items-center">
+<!-- Add Story -->
+<div class="flex flex-col items-center gap-unit cursor-pointer group">
+<div class="w-16 h-16 rounded-full border-2 border-outline-variant bg-surface-container flex items-center justify-center group-active:scale-95 transition-all">
+<span class="material-symbols-outlined text-primary text-headline-lg">add</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">You</span>
+</div>
+<!-- Active Story 1 -->
+<div class="flex flex-col items-center gap-unit cursor-pointer">
+<div class="w-16 h-16 rounded-full p-[2px] bg-gradient-to-tr from-primary-container to-secondary-container cyan-glow active:scale-95 transition-all">
+<img class="w-full h-full rounded-full object-cover border-2 border-background" data-alt="A profile shot of a muscular male athlete in motion, backlit by stark neon cyan lights. The setting is a minimalist, industrial-style gym space at night. Deep charcoal tones contrast with sharp, futuristic rim lighting to emphasize power and elite performance." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAbWCmj00BPuhuXQ7E8DrBNkvMGlKC7EGfM0BpggYx4_0igsgYp4x3rkFOVfDUHWlUl55nHjzljWRzU9EDFPE3kZImGX1XyHEI7HTUoCe5NUZDyqx3qRxfefsiDmqsYtd_mqvF4r_M4sOsyKF8woiWD9p7jG6KYPzYgnXe88tHo-gpWo651EPfIrSqq6HXFwgQ4FgOIe4Df58rpGuGfUA8-BCZhDTQ-wzbj30aRjdm1gW--y6GpQ0p9iV-hAvgghD0X-Y98vYM30n_T"/>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface">Jaxon</span>
+</div>
+<!-- Active Story 2 -->
+<div class="flex flex-col items-center gap-unit cursor-pointer">
+<div class="w-16 h-16 rounded-full p-[2px] bg-gradient-to-tr from-primary-container to-primary-fixed-dim cyan-glow active:scale-95 transition-all">
+<img class="w-full h-full rounded-full object-cover border-2 border-background" data-alt="An intense action shot of a sprinter exploding off the blocks, captured with a fast shutter speed. The environment features dark, sleek textures and subtle glowing telemetry overlays characteristic of a heads-up display. High-contrast lighting focuses entirely on the athlete's raw kinetic energy." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDpaC3PDv3lKlYzkhj5CJ8aWCrZxqoHPLsTTnEfz3208KeHuTitnMDNcBzAyPNu3Wd6v52HvJg5o4_p9P6mE0Y4CnRvtuyXAofVdJraUCEThISQc7Z93n3OF5231UXY6Tfzvjpk8xO1FHlsLUiQkegy4Hfs9rTi3UymcGMNHq92-dbx0FMr8nt2_2Xdgyrx2E1odp6pHRUz2fFRq4tyLIRYNhgmUT3l-Kx-jajItJV9GSjWYYHxB-rOQ_LXXQVgrgdQllFxVxGwcmi2"/>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface">Elena</span>
+</div>
+<!-- Inactive Story -->
+<div class="flex flex-col items-center gap-unit cursor-pointer">
+<div class="w-16 h-16 rounded-full p-[2px] bg-outline-variant active:scale-95 transition-all opacity-70 hover:opacity-100">
+<img class="w-full h-full rounded-full object-cover border-2 border-background" data-alt="A portrait of an athlete resting intensely, sweat glistening on their skin, framed against a pure matte black background. Minimalist composition with subtle cool undertones. The atmosphere is quiet but highly charged, reflecting post-workout exhaustion and determination." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB1J-_6JxknBUmlg41LDr76fOh6mqdoKufnIisU3rBoXQya_eJthZERxfwe_PFt3ykmXjVphW9VR9ZfFF78HvMlCSu0_V0o7vD3Y4kK1Q8P7_pGZcvaqy_7AWMIS5clRROmhXT8nqIx5T_kXtwDSIcuQLf4bcq3seI6Fo6Y6zKs6N2U4lfmj1DCTFufPHO2nYieuBbEgc8OeH0unTjnKWTiXwVexjf37fyk0FVcBkMH37D4KXMwBDtJizz7TqUXIpClxI4HYO6OkfJ8"/>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Marcus</span>
+</div>
+</div>
+</section>
+<!-- Feed List -->
+<section class="flex flex-col gap-stack-lg px-container-margin py-stack-md">
+<!-- Post 1 (Text & Stats focus) -->
+<article class="bg-surface/60 backdrop-blur-xl border border-white/5 rounded-xl shadow-[0_4px_30px_rgba(0,0,0,0.2)] p-stack-md flex flex-col gap-stack-md relative overflow-hidden group">
+<!-- Subtle top glow -->
+<div class="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-primary-container/30 to-transparent"></div>
+<!-- Header -->
+<header class="flex items-center justify-between">
+<div class="flex items-center gap-stack-sm">
+<img class="w-10 h-10 rounded-full object-cover" data-alt="A profile shot of a muscular male athlete in motion, backlit by stark neon cyan lights. The setting is a minimalist, industrial-style gym space at night. Deep charcoal tones contrast with sharp, futuristic rim lighting to emphasize power and elite performance." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCsBXCrVMEArBX9x-T4iVnldpjpEPd0elRBhbHCzZavIcLzZhTqnzbmDqR1Lj_FjdBMG4hLOCTq3o4GNxXN8b61EwWDNSdTIAPmAJfZsfc-X-GHubhctKlbKGERDGUZZB3w9P51WDUylW3BiTwwEhMkqKTwzfP7Ls263sQPntXek475HwxOxeetiTUAr0_nKMsB6bEBkwU2I98kwPA4LovyrHHxgfC3DWhU7ub_94GpL30kBxhXQDiVZCrgz64LeAFFWvquV3Y1ZS3q"/>
+<div>
+<div class="font-body-md text-body-md text-on-surface font-semibold">Jaxon Vance</div>
+<div class="font-label-sm text-label-sm text-on-surface-variant">2 hours ago</div>
+</div>
+</div>
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">more_horiz</span>
+</button>
+</header>
+<!-- Content -->
+<div class="font-body-md text-body-md text-on-surface/90">
+                    Shattered the previous deadlift plateau. The new neural conditioning program is pushing output past 90% efficiency. Deep focus, zero hesitation.
+                </div>
+<!-- Stats Bento -->
+<div class="grid grid-cols-3 gap-stack-sm">
+<div class="bg-surface-container/50 border border-outline-variant/30 rounded-lg p-stack-sm flex flex-col items-center justify-center gap-unit backdrop-blur-sm">
+<span class="material-symbols-outlined text-primary/70 text-lg">monitor_weight</span>
+<div class="font-headline-md text-headline-md text-primary cyan-glow-text">12.5k</div>
+<div class="font-label-caps text-label-caps text-on-surface-variant text-[9px]">LBS VOL</div>
+</div>
+<div class="bg-surface-container/50 border border-outline-variant/30 rounded-lg p-stack-sm flex flex-col items-center justify-center gap-unit backdrop-blur-sm">
+<span class="material-symbols-outlined text-primary/70 text-lg">timer</span>
+<div class="font-headline-md text-headline-md text-primary cyan-glow-text">1h 45m</div>
+<div class="font-label-caps text-label-caps text-on-surface-variant text-[9px]">DURATION</div>
+</div>
+<div class="bg-surface-container/50 border border-outline-variant/30 rounded-lg p-stack-sm flex flex-col items-center justify-center gap-unit backdrop-blur-sm">
+<span class="material-symbols-outlined text-primary/70 text-lg">local_fire_department</span>
+<div class="font-headline-md text-headline-md text-primary cyan-glow-text">92%</div>
+<div class="font-label-caps text-label-caps text-on-surface-variant text-[9px]">INTENSITY</div>
+</div>
+</div>
+<!-- Actions -->
+<footer class="flex items-center gap-stack-lg pt-stack-sm border-t border-white/5 mt-unit">
+<button class="flex items-center gap-unit text-primary hover:text-primary-fixed transition-colors active:scale-95">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">favorite</span>
+<span class="font-label-caps text-label-caps text-[10px]">24</span>
+</button>
+<button class="flex items-center gap-unit text-on-surface-variant hover:text-on-surface transition-colors active:scale-95">
+<span class="material-symbols-outlined">chat_bubble</span>
+<span class="font-label-caps text-label-caps text-[10px]">5</span>
+</button>
+<button class="flex items-center gap-unit text-on-surface-variant hover:text-on-surface transition-colors ml-auto active:scale-95">
+<span class="material-symbols-outlined">share</span>
+</button>
+</footer>
+</article>
+<!-- Post 2 (With Visuals) -->
+<article class="bg-surface/60 backdrop-blur-xl border border-white/5 rounded-xl shadow-[0_4px_30px_rgba(0,0,0,0.2)] p-stack-md flex flex-col gap-stack-md relative overflow-hidden">
+<header class="flex items-center justify-between">
+<div class="flex items-center gap-stack-sm">
+<img class="w-10 h-10 rounded-full object-cover" data-alt="An intense action shot of a sprinter exploding off the blocks, captured with a fast shutter speed. The environment features dark, sleek textures and subtle glowing telemetry overlays characteristic of a heads-up display. High-contrast lighting focuses entirely on the athlete's raw kinetic energy." src="https://lh3.googleusercontent.com/aida-public/AB6AXuApxn52viClEj0tV47_wU8gOXvCRN4XUiXw_etBfC29-OEKqkNECzqBo9dA7ONBwTFwaZl2jsMC9iqRAs72JexSJVQzqSR43pWaiqPe7R5mV_orm-93Z8d_ojh3t3PbhBWB_h_83E3-17tbzc8FqH42K3vmmJxETQqvkoDky3gqcl824Q06DqhRAqo95b4rXupmeLH0gx8Iemls34_ha5qkCXMVab2WyJjOXbPNOyMWSn2SWa-8eDLyIAAHLbiXR7ynCe4GNfRf7TrC"/>
+<div>
+<div class="font-body-md text-body-md text-on-surface font-semibold">Elena Rostova</div>
+<div class="font-label-sm text-label-sm text-on-surface-variant">5 hours ago</div>
+</div>
+</div>
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">more_horiz</span>
+</button>
+</header>
+<div class="font-body-md text-body-md text-on-surface/90">
+                    Cardio metabolic burn session. Maintained optimal heart rate zones throughout the primary sequence. The telemetry data on this run is beautiful.
+                </div>
+<!-- Media Preview using Required Image -->
+<div class="w-full h-48 rounded-lg overflow-hidden border border-outline-variant/20 relative group">
+<img alt="Workout Data Visualization" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" src="https://lh3.googleusercontent.com/aida/ADBb0ugKHraxkwMDO1SU6Tq8cbbcWyY_oG9EveghlkH5RI8Na9PPzJWXSYTcJ5ojlyKAx1bpFHbcylPAjUL2F3nsWjGwbBO3zZniJcbzi6QgYyyV9rrLnYUEvEcQeQ96s0PDuhRxMnyJdxaUyz_I-C4iaXKvTm0ay20NXRnzE_kH_SqQgl5pCBj-qWUweOTIJ_TUpu9op5bR9ustZpWw7c5SfkVQ2LZHoJLkuhYto7HJJmQeC12e_8XVrb6O3Gis"/>
+<div class="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent"></div>
+<div class="absolute bottom-stack-sm left-stack-sm flex items-center gap-unit text-primary">
+<span class="material-symbols-outlined text-sm">show_chart</span>
+<span class="font-label-caps text-label-caps text-[10px] tracking-widest cyan-glow-text">TELEMETRY SYNCED</span>
+</div>
+</div>
+<!-- Stats Row Minimal -->
+<div class="flex gap-stack-lg py-stack-sm">
+<div class="flex flex-col">
+<span class="font-label-caps text-label-caps text-on-surface-variant text-[9px]">DISTANCE</span>
+<span class="font-headline-md text-headline-md text-on-surface">8.4<span class="text-sm text-on-surface-variant">mi</span></span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-caps text-label-caps text-on-surface-variant text-[9px]">AVG HR</span>
+<span class="font-headline-md text-headline-md text-on-surface">164<span class="text-sm text-on-surface-variant">bpm</span></span>
+</div>
+</div>
+<footer class="flex items-center gap-stack-lg pt-stack-sm border-t border-white/5 mt-unit">
+<button class="flex items-center gap-unit text-on-surface-variant hover:text-primary transition-colors active:scale-95">
+<span class="material-symbols-outlined">favorite</span>
+<span class="font-label-caps text-label-caps text-[10px]">89</span>
+</button>
+<button class="flex items-center gap-unit text-on-surface-variant hover:text-on-surface transition-colors active:scale-95">
+<span class="material-symbols-outlined">chat_bubble</span>
+<span class="font-label-caps text-label-caps text-[10px]">12</span>
+</button>
+<button class="flex items-center gap-unit text-on-surface-variant hover:text-on-surface transition-colors ml-auto active:scale-95">
+<span class="material-symbols-outlined">share</span>
+</button>
+</footer>
+</article>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 w-full z-50 rounded-t-xl bg-surface/80 backdrop-blur-2xl border-t border-white/5 shadow-[0_-10px_40px_rgba(0,229,255,0.05)] flex justify-around items-center py-stack-sm pb-safe px-gutter md:hidden">
+<!-- Active: Feed -->
+<button class="flex flex-col items-center justify-center text-primary drop-shadow-[0_0_10px_rgba(0,229,255,0.5)] active:scale-90 transition-all duration-200">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dynamic_feed</span>
+<span class="font-label-caps text-label-caps mt-1">Feed</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant/60 hover:text-primary/80 active:scale-90 transition-all duration-200">
+<span class="material-symbols-outlined">fitness_center</span>
+<span class="font-label-caps text-label-caps mt-1">Train</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant/60 hover:text-primary/80 active:scale-90 transition-all duration-200">
+<span class="material-symbols-outlined">groups</span>
+<span class="font-label-caps text-label-caps mt-1">Squad</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant/60 hover:text-primary/80 active:scale-90 transition-all duration-200">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-label-caps text-label-caps mt-1">Metrics</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant/60 hover:text-primary/80 active:scale-90 transition-all duration-200">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-caps text-label-caps mt-1">Profile</span>
+</button>
+</nav>
+<!-- Desktop Nav Shell Override (Since requirements dictate adhering to mobile responsive pivot rules) -->
+<nav class="hidden md:flex fixed top-0 w-full z-40 bg-transparent justify-center pointer-events-none mt-16 pt-4">
+<div class="bg-surface/80 backdrop-blur-2xl border border-white/5 rounded-full shadow-[0_10px_40px_rgba(0,0,0,0.5)] px-8 py-3 flex gap-8 pointer-events-auto">
+<button class="flex items-center gap-2 text-primary drop-shadow-[0_0_10px_rgba(0,229,255,0.5)] hover:text-primary/80 transition-all">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dynamic_feed</span>
+<span class="font-label-caps text-label-caps">Feed</span>
+</button>
+<button class="flex items-center gap-2 text-on-surface-variant/60 hover:text-primary/80 transition-all">
+<span class="material-symbols-outlined">fitness_center</span>
+<span class="font-label-caps text-label-caps">Train</span>
+</button>
+<button class="flex items-center gap-2 text-on-surface-variant/60 hover:text-primary/80 transition-all">
+<span class="material-symbols-outlined">groups</span>
+<span class="font-label-caps text-label-caps">Squad</span>
+</button>
+<button class="flex items-center gap-2 text-on-surface-variant/60 hover:text-primary/80 transition-all">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-label-caps text-label-caps">Metrics</span>
+</button>
+</div>
+</nav>
+</body></html>

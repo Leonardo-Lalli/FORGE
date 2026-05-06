@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>FORGE Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-family: 'Material Symbols Outlined';
+            font-weight: normal;
+            font-style: normal;
+            font-size: 24px;
+            line-height: 1;
+            letter-spacing: normal;
+            text-transform: none;
+            display: inline-block;
+            white-space: nowrap;
+            word-wrap: normal;
+            direction: ltr;
+            -webkit-font-feature-settings: 'liga';
+            -webkit-font-smoothing: antialiased;
+        }
+        /* Hide scrollbar for horizontal scroll */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-variant": "#d5e3fd",
+                        "on-primary-fixed-variant": "#0038b6",
+                        "tertiary-container": "#7544df",
+                        "on-secondary-fixed": "#012200",
+                        "on-primary": "#ffffff",
+                        "on-tertiary-container": "#ebe0ff",
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary-container": "#076d00",
+                        "secondary": "#076e00",
+                        "surface-container-highest": "#d5e3fd",
+                        "on-error": "#ffffff",
+                        "on-primary-container": "#dfe3ff",
+                        "surface-tint": "#004ced",
+                        "on-primary-fixed": "#001452",
+                        "error-container": "#ffdad6",
+                        "surface": "#f8f9ff",
+                        "surface-dim": "#ccdbf4",
+                        "primary-fixed": "#dde1ff",
+                        "on-tertiary-fixed-variant": "#5516be",
+                        "tertiary-fixed": "#e9ddff",
+                        "error": "#ba1a1a",
+                        "inverse-on-surface": "#ebf1ff",
+                        "surface-bright": "#f8f9ff",
+                        "primary-container": "#0052ff",
+                        "background": "#f8f9ff",
+                        "on-secondary-fixed-variant": "#045300",
+                        "surface-container-low": "#eff4ff",
+                        "on-error-container": "#93000a",
+                        "on-secondary": "#ffffff",
+                        "on-surface": "#0d1c2f",
+                        "primary": "#003ec7",
+                        "outline": "#737688",
+                        "inverse-primary": "#b7c4ff",
+                        "secondary-fixed-dim": "#16e600",
+                        "surface-container-high": "#dde9ff",
+                        "surface-container": "#e6eeff",
+                        "on-tertiary": "#ffffff",
+                        "secondary-fixed": "#78ff5f",
+                        "tertiary-fixed-dim": "#d0bcff",
+                        "secondary-container": "#18f900",
+                        "primary-fixed-dim": "#b7c4ff",
+                        "on-surface-variant": "#434656",
+                        "on-background": "#0d1c2f",
+                        "on-tertiary-fixed": "#23005c",
+                        "outline-variant": "#c3c5d9",
+                        "inverse-surface": "#233144",
+                        "tertiary": "#5c24c6"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack-lg": "32px",
+                        "margin-mobile": "24px",
+                        "unit": "8px",
+                        "gutter": "16px",
+                        "stack-sm": "8px",
+                        "stack-md": "16px",
+                        "section-gap": "48px"
+                    },
+                    "fontFamily": {
+                        "h2": ["Inter", "sans-serif"],
+                        "body-md": ["Inter", "sans-serif"],
+                        "display": ["Inter", "sans-serif"],
+                        "label-caps": ["Inter", "sans-serif"],
+                        "body-lg": ["Inter", "sans-serif"],
+                        "h1": ["Inter", "sans-serif"]
+                    },
+                    "fontSize": {
+                        "h2": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "display": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "800" }],
+                        "label-caps": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "h1": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-background text-on-surface font-body-md min-h-screen pb-[100px]">
+<!-- TopAppBar -->
+<header class="w-full sticky top-0 bg-surface/80 dark:bg-background/80 backdrop-blur-md shadow-sm dark:border-b dark:border-outline-variant z-40">
+<div class="flex justify-between items-center px-margin-mobile py-stack-md w-full">
+<div class="w-10 h-10 rounded-full overflow-hidden bg-surface-variant flex items-center justify-center hover:opacity-80 transition-opacity active:scale-95 transition-transform">
+<img alt="User profile photo" class="w-full h-full object-cover" data-alt="A close up portrait of a young athletic woman with a neutral, determined expression. She is in a brightly lit, modern environment with soft white light highlighting her features. The aesthetic is clean, minimalist, and high-contrast, fitting a professional fitness application profile picture." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDumU9jCQ4mW9di_vFbQHOPhGyY_RtCpcmgjgBZMieO3axQHuD7YDU465yduVrPEeUouF1Tw1t168QWg_Xch2B_PISU7pswDK-wnsvx9-ohex5QKtZnkLevkx3hZBPtPCFqTGqYThcOUquhF82GigPkCmcHjCttMlk8nR8hl2KaSTHeh26vNoCP9tWotpqg5L9TUXhF2tDVeAq-rejTykS-RJErzreytXjpCswIHAEka4fxCDPRoDz380udfriWPzts0Ub6ArFrSMI"/>
+</div>
+<h1 class="font-display text-display text-primary dark:text-secondary-fixed-dim uppercase tracking-tighter">FORGE</h1>
+<button aria-label="notifications" class="w-10 h-10 flex items-center justify-center text-primary dark:text-inverse-primary hover:opacity-80 transition-opacity active:scale-95 transition-transform">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">notifications</span>
+</button>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="px-margin-mobile pt-stack-lg flex flex-col gap-stack-lg">
+<!-- Hero / Streak Bento Grid -->
+<section class="grid grid-cols-2 gap-gutter">
+<!-- Main Streak Card -->
+<div class="col-span-2 bg-surface rounded-[16px] p-[24px] shadow-[0_8px_24px_rgba(0,76,237,0.06)] flex flex-col justify-between relative overflow-hidden">
+<div class="absolute -right-6 -top-6 w-32 h-32 bg-primary/5 rounded-full blur-2xl"></div>
+<div class="flex items-center gap-2 mb-stack-md relative z-10">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">local_fire_department</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">Current Streak</span>
+</div>
+<div class="relative z-10">
+<h2 class="font-display text-[40px] leading-[44px] text-primary tracking-tighter font-extrabold mb-1">12 Weeks</h2>
+<p class="font-body-lg text-body-lg text-on-surface font-medium">on fire!</p>
+</div>
+</div>
+<!-- Quick Stat 1 -->
+<div class="bg-surface rounded-[16px] p-[20px] shadow-[0_4px_12px_rgba(0,76,237,0.04)] flex flex-col items-start">
+<span class="material-symbols-outlined text-outline mb-2">bolt</span>
+<span class="font-h2 text-h2 text-on-surface">850</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant mt-1">kcal burned</span>
+</div>
+<!-- Quick Stat 2 -->
+<div class="bg-surface rounded-[16px] p-[20px] shadow-[0_4px_12px_rgba(0,76,237,0.04)] flex flex-col items-start">
+<span class="material-symbols-outlined text-outline mb-2">timer</span>
+<span class="font-h2 text-h2 text-on-surface">45m</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant mt-1">active time</span>
+</div>
+</section>
+<!-- Quick Actions -->
+<section class="flex gap-gutter w-full">
+<button class="flex-1 bg-primary text-on-primary rounded-full py-4 px-6 flex items-center justify-center gap-2 shadow-[0_4px_16px_rgba(0,62,199,0.25)] hover:opacity-90 active:scale-95 transition-all">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+<span class="font-label-caps text-label-caps">Start Workout</span>
+</button>
+<button class="flex-1 border-2 border-primary text-primary bg-surface rounded-full py-4 px-6 flex items-center justify-center gap-2 hover:bg-primary/5 active:scale-95 transition-all">
+<span class="material-symbols-outlined">restaurant</span>
+<span class="font-label-caps text-label-caps">Log Meal</span>
+</button>
+</section>
+<!-- Weekly Activity -->
+<section class="bg-surface rounded-[16px] p-[24px] shadow-[0_4px_16px_rgba(0,76,237,0.05)]">
+<div class="flex justify-between items-center mb-stack-md">
+<h3 class="font-h2 text-h2 text-on-surface">Weekly Activity</h3>
+<button class="text-primary hover:opacity-80 transition-opacity">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+<!-- Minimalist Bar Chart representation -->
+<div class="flex items-end justify-between h-[120px] pt-stack-sm">
+<!-- Day 1 -->
+<div class="flex flex-col items-center gap-2 w-8">
+<div class="w-full bg-surface-container rounded-t-sm h-full flex items-end justify-center relative overflow-hidden">
+<div class="w-full bg-primary rounded-t-sm h-[60%]"></div>
+</div>
+<span class="font-label-caps text-[10px] text-on-surface-variant">M</span>
+</div>
+<!-- Day 2 -->
+<div class="flex flex-col items-center gap-2 w-8">
+<div class="w-full bg-surface-container rounded-t-sm h-full flex items-end justify-center relative overflow-hidden">
+<div class="w-full bg-primary rounded-t-sm h-[80%]"></div>
+</div>
+<span class="font-label-caps text-[10px] text-on-surface-variant">T</span>
+</div>
+<!-- Day 3 -->
+<div class="flex flex-col items-center gap-2 w-8">
+<div class="w-full bg-surface-container rounded-t-sm h-full flex items-end justify-center relative overflow-hidden">
+<div class="w-full bg-primary rounded-t-sm h-[40%]"></div>
+</div>
+<span class="font-label-caps text-[10px] text-on-surface-variant">W</span>
+</div>
+<!-- Day 4 (Today) -->
+<div class="flex flex-col items-center gap-2 w-8">
+<div class="w-full bg-surface-container rounded-t-sm h-full flex items-end justify-center relative overflow-hidden">
+<div class="w-full bg-tertiary-container rounded-t-sm h-[90%] shadow-[0_0_12px_rgba(117,68,223,0.4)]"></div>
+</div>
+<span class="font-label-caps text-[10px] text-tertiary-container font-bold">T</span>
+</div>
+<!-- Day 5 -->
+<div class="flex flex-col items-center gap-2 w-8">
+<div class="w-full bg-surface-container rounded-t-sm h-full flex items-end justify-center relative overflow-hidden">
+<div class="w-full bg-surface-variant rounded-t-sm h-0"></div>
+</div>
+<span class="font-label-caps text-[10px] text-outline">F</span>
+</div>
+<!-- Day 6 -->
+<div class="flex flex-col items-center gap-2 w-8">
+<div class="w-full bg-surface-container rounded-t-sm h-full flex items-end justify-center relative overflow-hidden">
+<div class="w-full bg-surface-variant rounded-t-sm h-0"></div>
+</div>
+<span class="font-label-caps text-[10px] text-outline">S</span>
+</div>
+<!-- Day 7 -->
+<div class="flex flex-col items-center gap-2 w-8">
+<div class="w-full bg-surface-container rounded-t-sm h-full flex items-end justify-center relative overflow-hidden">
+<div class="w-full bg-surface-variant rounded-t-sm h-0"></div>
+</div>
+<span class="font-label-caps text-[10px] text-outline">S</span>
+</div>
+</div>
+</section>
+<!-- Squad Activity Horizontal Scroll -->
+<section class="flex flex-col gap-stack-md pb-stack-lg">
+<h3 class="font-h2 text-h2 text-on-surface">Squad Activity</h3>
+<div class="flex gap-4 overflow-x-auto no-scrollbar snap-x snap-mandatory py-2 -mx-margin-mobile px-margin-mobile">
+<!-- Story 1 -->
+<div class="flex flex-col items-center gap-2 snap-start shrink-0 cursor-pointer hover:opacity-90 transition-opacity">
+<div class="relative w-[72px] h-[72px] rounded-full p-[3px] bg-gradient-to-tr from-primary to-primary-fixed-dim shadow-sm">
+<div class="w-full h-full rounded-full border-[3px] border-background overflow-hidden bg-surface-variant">
+<img alt="Alex's Activity" class="w-full h-full object-cover" data-alt="A headshot of a fit young man smiling outdoors. The lighting is bright daylight, creating a high-contrast, energetic mood. The aesthetic matches a clean, modern fitness app with crisp details and a light background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAPs45iG8mOQJNJQn3tmoAtcNBmPJ3g2GtIB77tb9YOQOFgvm4FWT5nEgKOFOZf2W4i1cmxCSIsQ3WgEAO4fVo65lpMuKY7rJgTwZvr7T5ptwgbFlcnIXtYN-0vG1sy8yikZ8w_LfibyFSl3lXLFOO8U9lRyUXyk_XXy8dyuGuFqHPZS93g9pA8iQn2x0OXqX18Xh1Y2qP1NplpAmRcJqfEfvz20bm4UBOt_lls5jxKmM_W3XP4iI_etbJRVx5DYcbNoRvaA60IyF0"/>
+</div>
+</div>
+<span class="font-label-caps text-[12px] text-on-surface">Alex R.</span>
+</div>
+<!-- Story 2 -->
+<div class="flex flex-col items-center gap-2 snap-start shrink-0 cursor-pointer hover:opacity-90 transition-opacity">
+<div class="relative w-[72px] h-[72px] rounded-full p-[3px] bg-gradient-to-tr from-primary to-primary-fixed-dim shadow-sm">
+<div class="w-full h-full rounded-full border-[3px] border-background overflow-hidden bg-surface-variant">
+<img alt="Sarah's Activity" class="w-full h-full object-cover" data-alt="A bright, high-key portrait of a smiling woman in activewear. The lighting is soft but vibrant, emphasizing a healthy, energetic lifestyle. The background is minimal and clean, perfectly suiting a premium light-mode fitness application design." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDMCddEJa4P8poS9xAKrwnmTICExl_vir3SdxGlRg5wXJs9aieHU3z3lE0FlOI1wmoe_lmLbasttIA7jpe6rOD08rmNZEMH3SjnJt7mgHIhVAxLjjoLIEDLEkrk7EVs8-rnDUzTckO96Bfh-9fisyOl6u8Gp9KF0IHCCcuzQsSe4K3QUf1minzPsoVpePU3KpVeYcaKyUxXlwvtZ4UqTtsfhYhfApOX5UWog1CvULN_OvDMF5jQ_zsdBafeNSKhmj9H0LM6fifEz_8"/>
+</div>
+</div>
+<span class="font-label-caps text-[12px] text-on-surface">Sarah M.</span>
+</div>
+<!-- Story 3 -->
+<div class="flex flex-col items-center gap-2 snap-start shrink-0 cursor-pointer hover:opacity-90 transition-opacity">
+<div class="relative w-[72px] h-[72px] rounded-full p-[3px] bg-outline-variant shadow-sm">
+<div class="w-full h-full rounded-full border-[3px] border-background overflow-hidden bg-surface-variant flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">person</span>
+</div>
+</div>
+<span class="font-label-caps text-[12px] text-on-surface-variant">David K.</span>
+</div>
+<!-- Story 4 -->
+<div class="flex flex-col items-center gap-2 snap-start shrink-0 cursor-pointer hover:opacity-90 transition-opacity">
+<div class="relative w-[72px] h-[72px] rounded-full p-[3px] bg-outline-variant shadow-sm">
+<div class="w-full h-full rounded-full border-[3px] border-background overflow-hidden bg-surface-variant flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">person</span>
+</div>
+</div>
+<span class="font-label-caps text-[12px] text-on-surface-variant">Emma W.</span>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 w-full z-50 bg-surface/90 dark:bg-background/90 backdrop-blur-xl border-t border-outline-variant/20 shadow-[0_-4px_12px_rgba(0,0,0,0.05)] dark:shadow-none">
+<div class="flex justify-around items-center h-20 px-4 pb-safe">
+<!-- Dashboard (Active) -->
+<button class="flex flex-col items-center justify-center text-primary dark:text-secondary-fixed-dim font-bold bg-primary-container/10 dark:bg-secondary-container/20 rounded-xl px-4 py-1 hover:text-primary dark:hover:text-secondary-fixed active:scale-90 transition-all duration-200">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+<span class="font-label-caps text-label-caps">Dashboard</span>
+</button>
+<!-- Feed (Inactive) -->
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline hover:text-primary dark:hover:text-secondary-fixed active:scale-90 transition-all duration-200">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 0;">group</span>
+<span class="font-label-caps text-label-caps">Feed</span>
+</button>
+<!-- Stats (Inactive) -->
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline hover:text-primary dark:hover:text-secondary-fixed active:scale-90 transition-all duration-200">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 0;">insights</span>
+<span class="font-label-caps text-label-caps">Stats</span>
+</button>
+</div>
+</nav>
+</body></html>

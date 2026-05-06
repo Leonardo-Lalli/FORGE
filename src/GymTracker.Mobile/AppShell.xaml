@@ -16,8 +16,8 @@
         <ShellContent
             Title="Home"
             Icon="icon_dashboard.svg"
-            ContentTemplate="{DataTemplate views:DashboardPage}"
-            Route="dashboard" />
+            ContentTemplate="{DataTemplate views:HomePage}"
+            Route="home" />
 
         <ShellContent
             Title="Workout"
