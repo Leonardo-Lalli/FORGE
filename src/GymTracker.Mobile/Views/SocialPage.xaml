@@ -16,174 +16,117 @@
                    FontFamily="LexendBold" FontSize="22" FontAttributes="Bold"
                    TextColor="{StaticResource OnSurface}" />
             <HorizontalStackLayout Spacing="8">
-            <Border BackgroundColor="{StaticResource LimeGreen}"
-                    StrokeShape="RoundRectangle 16" Padding="16,8">
-                <Label Text="VOLUME"
-                       FontFamily="InterBold" FontSize="12" FontAttributes="Bold"
-                       TextColor="{StaticResource OnSecondary}" />
-            </Border>
-            <Border BackgroundColor="{StaticResource SurfaceContainer}"
-                    StrokeShape="RoundRectangle 16" Padding="16,8">
-                <Label Text="MASSIMALE"
-                       FontFamily="InterBold" FontSize="12" FontAttributes="Bold"
-                       TextColor="{StaticResource TextSecondary}" />
-            </Border>
-            <Border BackgroundColor="{StaticResource SurfaceContainer}"
-                    StrokeShape="RoundRectangle 16" Padding="16,8">
-                <Label Text="XP"
-                       FontFamily="InterBold" FontSize="12" FontAttributes="Bold"
-                       TextColor="{StaticResource TextSecondary}" />
-            </Border>
-        </HorizontalStackLayout>
+                <Border BackgroundColor="{StaticResource LimeGreen}"
+                        StrokeShape="RoundRectangle 16" Padding="16,8">
+                    <Label Text="VOLUME"
+                           FontFamily="InterBold" FontSize="12" FontAttributes="Bold"
+                           TextColor="{StaticResource OnSecondary}" />
+                </Border>
+                <Border BackgroundColor="{StaticResource SurfaceContainer}"
+                        StrokeShape="RoundRectangle 16" Padding="16,8">
+                    <Label Text="MASSIMALE"
+                           FontFamily="InterBold" FontSize="12" FontAttributes="Bold"
+                           TextColor="{StaticResource TextSecondary}" />
+                </Border>
+                <Border BackgroundColor="{StaticResource SurfaceContainer}"
+                        StrokeShape="RoundRectangle 16" Padding="16,8">
+                    <Label Text="XP"
+                           FontFamily="InterBold" FontSize="12" FontAttributes="Bold"
+                           TextColor="{StaticResource TextSecondary}" />
+                </Border>
+            </HorizontalStackLayout>
         </VerticalStackLayout>
 
-        <!-- Ranking List -->
+        <!-- Compact Ranking List -->
         <ScrollView Grid.Row="1" Padding="20,0,20,100">
-            <VerticalStackLayout Spacing="8">
+            <VerticalStackLayout Spacing="6">
 
                 <!-- #1 Sofia -->
-                <Border Style="{StaticResource CardFrame}"
-                        BackgroundColor="{StaticResource SurfaceContainerHigh}">
-                    <Grid ColumnDefinitions="Auto,Auto,*,Auto" RowDefinitions="Auto,Auto"
-                          ColumnSpacing="12" RowSpacing="2">
-                        <!-- Rank -->
-                        <Border Grid.Row="0" Grid.Column="0" Grid.RowSpan="2"
-                                BackgroundColor="{StaticResource SurfaceContainer}"
-                                StrokeShape="RoundRectangle 10"
-                                WidthRequest="44" HeightRequest="44" Padding="0">
-                            <Label Text="1"
-                                   FontFamily="LexendBold" FontSize="20" FontAttributes="Bold"
+                <Border Style="{StaticResource CardFrame}" BackgroundColor="{StaticResource SurfaceContainerHigh}"
+                        Padding="14,12">
+                    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                        <Border Grid.Column="0" BackgroundColor="{StaticResource SurfaceContainer}"
+                                StrokeShape="RoundRectangle 8" WidthRequest="36" HeightRequest="36" Padding="0">
+                            <Label Text="1" FontFamily="LexendBold" FontSize="16"
                                    TextColor="{StaticResource LimeGreen}"
                                    HorizontalOptions="Center" VerticalOptions="Center" />
                         </Border>
-                        <!-- Crown icon -->
-                        <Label Grid.Row="0" Grid.Column="1" Grid.RowSpan="2"
-                               Text="👑" FontSize="22"
-                               VerticalOptions="Center" />
-                        <!-- Name -->
-                        <Label Grid.Row="0" Grid.Column="2"
-                               Text="Sofia"
+                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="1">
+                            <Label Text="Sofia" FontFamily="LexendBold" FontSize="14" FontAttributes="Bold"
+                                   TextColor="{StaticResource OnSurface}" />
+                            <Label Text="Prima in classifica" FontFamily="InterRegular" FontSize="11"
+                                   TextColor="{StaticResource LimeGreen}" />
+                        </VerticalStackLayout>
+                        <Label Grid.Column="2" Text="16.850 kg"
                                FontFamily="LexendBold" FontSize="16" FontAttributes="Bold"
-                               TextColor="{StaticResource OnSurface}" />
-                        <!-- Metric -->
-                        <Label Grid.Row="0" Grid.Column="3" Grid.RowSpan="2"
-                               Text="16.850"
-                               FontFamily="LexendBold" FontSize="22" FontAttributes="Bold"
-                               TextColor="{StaticResource Primary}"
-                               VerticalOptions="Center" />
-                        <Label Grid.Row="1" Grid.Column="2"
-                               Text="kg"
-                               FontFamily="InterRegular" FontSize="12"
-                               TextColor="{StaticResource TextSecondary}" />
+                               TextColor="{StaticResource Primary}" VerticalOptions="Center" />
                     </Grid>
                 </Border>
 
                 <!-- #2 Marco (you) -->
-                <Border Style="{StaticResource CardFrame}"
-                        BackgroundColor="{StaticResource PrimaryContainer}"
-                        Stroke="{StaticResource Primary}"
-                        StrokeThickness="1.5">
-                    <Grid ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto"
-                          ColumnSpacing="12" RowSpacing="2">
-                        <Border Grid.Row="0" Grid.Column="0" Grid.RowSpan="2"
-                                BackgroundColor="{StaticResource Primary}"
-                                StrokeShape="RoundRectangle 10"
-                                WidthRequest="44" HeightRequest="44" Padding="0">
-                            <Label Text="2"
-                                   FontFamily="LexendBold" FontSize="20" FontAttributes="Bold"
+                <Border Style="{StaticResource CardFrame}" BackgroundColor="{StaticResource PrimaryContainer}"
+                        Stroke="{StaticResource Primary}" StrokeThickness="1.5" Padding="14,12">
+                    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                        <Border Grid.Column="0" BackgroundColor="{StaticResource Primary}"
+                                StrokeShape="RoundRectangle 8" WidthRequest="36" HeightRequest="36" Padding="0">
+                            <Label Text="2" FontFamily="LexendBold" FontSize="16"
                                    TextColor="{StaticResource OnPrimary}"
                                    HorizontalOptions="Center" VerticalOptions="Center" />
                         </Border>
-                        <Label Grid.Row="0" Grid.Column="1"
-                               Text="Tu · Marco"
+                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="1">
+                            <Label Text="Tu · Marco" FontFamily="LexendBold" FontSize="14" FontAttributes="Bold"
+                                   TextColor="{StaticResource OnSurface}" />
+                            <Label Text="2° posto" FontFamily="InterRegular" FontSize="11"
+                                   TextColor="{StaticResource TextSecondary}" />
+                        </VerticalStackLayout>
+                        <Label Grid.Column="2" Text="14.100 kg"
                                FontFamily="LexendBold" FontSize="16" FontAttributes="Bold"
-                               TextColor="{StaticResource OnSurface}" />
-                        <Label Grid.Row="0" Grid.Column="2" Grid.RowSpan="2"
-                               Text="14.100"
-                               FontFamily="LexendBold" FontSize="22" FontAttributes="Bold"
-                               TextColor="{StaticResource OnSurface}"
-                               VerticalOptions="Center" />
-                        <Label Grid.Row="1" Grid.Column="1"
-                               Text="kg"
-                               FontFamily="InterRegular" FontSize="12"
-                               TextColor="{StaticResource TextSecondary}" />
+                               TextColor="{StaticResource OnSurface}" VerticalOptions="Center" />
                     </Grid>
                 </Border>
 
                 <!-- #3 Luca -->
-                <Border Style="{StaticResource CardFrame}"
-                        BackgroundColor="{StaticResource SurfaceContainerHigh}">
-                    <Grid ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto"
-                          ColumnSpacing="12" RowSpacing="2">
-                        <Border Grid.Row="0" Grid.Column="0" Grid.RowSpan="2"
-                                BackgroundColor="{StaticResource SurfaceContainer}"
-                                StrokeShape="RoundRectangle 10"
-                                WidthRequest="44" HeightRequest="44" Padding="0">
-                            <Label Text="3"
-                                   FontFamily="LexendBold" FontSize="20" FontAttributes="Bold"
+                <Border Style="{StaticResource CardFrame}" BackgroundColor="{StaticResource SurfaceContainerHigh}"
+                        Padding="14,12">
+                    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                        <Border Grid.Column="0" BackgroundColor="{StaticResource SurfaceContainer}"
+                                StrokeShape="RoundRectangle 8" WidthRequest="36" HeightRequest="36" Padding="0">
+                            <Label Text="3" FontFamily="LexendBold" FontSize="16"
                                    TextColor="{StaticResource TextSecondary}"
                                    HorizontalOptions="Center" VerticalOptions="Center" />
                         </Border>
-                        <Label Grid.Row="0" Grid.Column="1"
-                               Text="Luca"
+                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="1">
+                            <Label Text="Luca" FontFamily="LexendBold" FontSize="14" FontAttributes="Bold"
+                                   TextColor="{StaticResource OnSurface}" />
+                            <Label Text="3° posto" FontFamily="InterRegular" FontSize="11"
+                                   TextColor="{StaticResource TextSecondary}" />
+                        </VerticalStackLayout>
+                        <Label Grid.Column="2" Text="12.900 kg"
                                FontFamily="LexendBold" FontSize="16" FontAttributes="Bold"
-                               TextColor="{StaticResource OnSurface}" />
-                        <Label Grid.Row="0" Grid.Column="2" Grid.RowSpan="2"
-                               Text="12.900"
-                               FontFamily="LexendBold" FontSize="22" FontAttributes="Bold"
-                               TextColor="{StaticResource Primary}"
-                               VerticalOptions="Center" />
-                        <Label Grid.Row="1" Grid.Column="1"
-                               Text="kg"
-                               FontFamily="InterRegular" FontSize="12"
-                               TextColor="{StaticResource TextSecondary}" />
+                               TextColor="{StaticResource Primary}" VerticalOptions="Center" />
                     </Grid>
                 </Border>
 
                 <!-- #4 Andrea -->
-                <Border Style="{StaticResource CardFrame}"
-                        BackgroundColor="{StaticResource SurfaceContainerHigh}">
-                    <Grid ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto"
-                          ColumnSpacing="12" RowSpacing="2">
-                        <Border Grid.Row="0" Grid.Column="0" Grid.RowSpan="2"
-                                BackgroundColor="{StaticResource SurfaceContainer}"
-                                StrokeShape="RoundRectangle 10"
-                                WidthRequest="44" HeightRequest="44" Padding="0">
-                            <Label Text="4"
-                                   FontFamily="LexendBold" FontSize="20" FontAttributes="Bold"
+                <Border Style="{StaticResource CardFrame}" BackgroundColor="{StaticResource SurfaceContainerHigh}"
+                        Padding="14,12">
+                    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                        <Border Grid.Column="0" BackgroundColor="{StaticResource SurfaceContainer}"
+                                StrokeShape="RoundRectangle 8" WidthRequest="36" HeightRequest="36" Padding="0">
+                            <Label Text="4" FontFamily="LexendBold" FontSize="16"
                                    TextColor="{StaticResource TextSecondary}"
                                    HorizontalOptions="Center" VerticalOptions="Center" />
                         </Border>
-                        <Label Grid.Row="0" Grid.Column="1"
-                               Text="Andrea"
+                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="1">
+                            <Label Text="Andrea" FontFamily="LexendBold" FontSize="14" FontAttributes="Bold"
+                                   TextColor="{StaticResource OnSurface}" />
+                            <Label Text="4° posto" FontFamily="InterRegular" FontSize="11"
+                                   TextColor="{StaticResource TextSecondary}" />
+                        </VerticalStackLayout>
+                        <Label Grid.Column="2" Text="12.550 kg"
                                FontFamily="LexendBold" FontSize="16" FontAttributes="Bold"
-                               TextColor="{StaticResource OnSurface}" />
-                        <Label Grid.Row="0" Grid.Column="2" Grid.RowSpan="2"
-                               Text="12.550"
-                               FontFamily="LexendBold" FontSize="22" FontAttributes="Bold"
-                               TextColor="{StaticResource Primary}"
-                               VerticalOptions="Center" />
-                        <Label Grid.Row="1" Grid.Column="1"
-                               Text="kg"
-                               FontFamily="InterRegular" FontSize="12"
-                               TextColor="{StaticResource TextSecondary}" />
+                               TextColor="{StaticResource Primary}" VerticalOptions="Center" />
                     </Grid>
-                </Border>
-
-                <!-- Motivation CTA -->
-                <Border Style="{StaticResource CardFrame}"
-                        BackgroundColor="{StaticResource SurfaceContainer}"
-                        Margin="0,4,0,0">
-                    <VerticalStackLayout Spacing="4" HorizontalOptions="Center">
-                        <Label Text="⚡ QUASI IN VETTA!"
-                               FontFamily="LexendBold" FontSize="16" FontAttributes="Bold"
-                               TextColor="{StaticResource LimeGreen}"
-                               HorizontalTextAlignment="Center" />
-                        <Label Text="Continua così, sei tra i migliori!"
-                               FontFamily="InterRegular" FontSize="13"
-                               TextColor="{StaticResource TextSecondary}"
-                               HorizontalTextAlignment="Center" />
-                    </VerticalStackLayout>
                 </Border>
 
             </VerticalStackLayout>
