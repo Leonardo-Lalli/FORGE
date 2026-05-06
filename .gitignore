@@ -5,6 +5,7 @@
 
 # dotenv files
 .env
+**/Resources/Raw/*.env
 
 # User-specific files
 *.rsuser

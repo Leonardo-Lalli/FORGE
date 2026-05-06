@@ -1,4 +1,5 @@
-﻿using GymTracker.Mobile.ViewModels;
+﻿using GymTracker.Mobile.Services;
+using GymTracker.Mobile.ViewModels;
 using GymTracker.Mobile.Views;
 using Microsoft.Extensions.Logging;
 
@@ -19,6 +20,9 @@ public static class MauiProgram
                 fonts.AddFont("Inter-Regular.ttf", "InterRegular");
                 fonts.AddFont("Inter-Bold.ttf", "InterBold");
             });
+
+        // Services
+        builder.Services.AddSingleton<BuildSecrets>();
 
         // ViewModels
         builder.Services.AddTransient<DashboardViewModel>();

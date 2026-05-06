@@ -65,10 +65,18 @@
 		<MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
 	</ItemGroup>
 
-	<ItemGroup>
-		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
-		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.0" />
-		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
-	</ItemGroup>
+ 	<ItemGroup>
+ 		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
+ 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.0" />
+ 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+ 	</ItemGroup>
+
+	<!-- Build-time secrets injection: copy .env to Resources/Raw/gymtracker.env -->
+	<Target Name="CopyEnvFile" BeforeTargets="BeforeBuild">
+		<Copy SourceFiles="..\..\.env"
+		      DestinationFiles="Resources\Raw\gymtracker.env"
+		      Condition="Exists('..\..\.env')"
+		      SkipUnchangedFiles="true" />
+	</Target>
 
 </Project>
