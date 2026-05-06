@@ -23,9 +23,11 @@ public static class MauiProgram
 
         // Services
         builder.Services.AddSingleton<BuildSecrets>();
+        builder.Services.AddSingleton<ThemeService>();
 
         // ViewModels
         builder.Services.AddTransient<HomeViewModel>();
+        builder.Services.AddTransient<SettingsViewModel>();
         builder.Services.AddTransient<DashboardViewModel>();
         builder.Services.AddTransient<CatalogViewModel>();
         builder.Services.AddTransient<WorkoutViewModel>();
@@ -43,6 +45,7 @@ public static class MauiProgram
         builder.Services.AddTransient<SocialPage>();
         builder.Services.AddTransient<ProfilePage>();
         builder.Services.AddTransient<NotificationsPage>();
+        builder.Services.AddTransient<SettingsPage>();
 
 #if DEBUG
         builder.Logging.AddDebug();
