@@ -26,7 +26,7 @@
             Route="workout" />
 
         <ShellContent
-            Title="Food"
+            Title="Esercizi"
             Icon="icon_search.svg"
             ContentTemplate="{DataTemplate views:CatalogPage}"
             Route="catalog" />

@@ -11,8 +11,8 @@
 
     <Grid RowDefinitions="Auto,Auto,Auto,*,Auto" BackgroundColor="{StaticResource Surface}">
 
-        <!-- Header: back + plan name + elapsed + save -->
-        <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" Padding="20,12" ColumnSpacing="12">
+        <!-- Header -->
+        <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto,Auto" Padding="20,12" ColumnSpacing="8">
             <Border Grid.Column="0" BackgroundColor="{StaticResource SurfaceContainer}"
                     StrokeShape="RoundRectangle 12" Padding="10" HeightRequest="40" WidthRequest="40">
                 <Label Text="←" FontSize="18" TextColor="{StaticResource OnSurface}"
@@ -25,10 +25,19 @@
             <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" HorizontalOptions="Center">
                 <Label Text="{Binding PlanName}" FontFamily="LexendBold" FontSize="16" FontAttributes="Bold"
                        TextColor="{StaticResource OnSurface}" HorizontalTextAlignment="Center" />
-                <Label Text="{Binding ElapsedTime, StringFormat='⏱ {0}'}" FontFamily="InterBold" FontSize="13"
+                <Label Text="{Binding ElapsedTime, StringFormat='⏱ {0}'}" FontFamily="InterBold" FontSize="12"
                        TextColor="{StaticResource LimeGreen}" HorizontalTextAlignment="Center" />
             </VerticalStackLayout>
             <Border Grid.Column="2" BackgroundColor="{StaticResource SurfaceContainer}"
+                    StrokeShape="RoundRectangle 12" Padding="10" HeightRequest="40" WidthRequest="40"
+                    IsVisible="{Binding IsTimerRunning}">
+                <Label Text="🔽" FontSize="16" HorizontalOptions="Center" VerticalOptions="Center">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding MinimizeWorkoutCommand}" />
+                    </Label.GestureRecognizers>
+                </Label>
+            </Border>
+            <Border Grid.Column="3" BackgroundColor="{StaticResource SurfaceContainer}"
                     StrokeShape="RoundRectangle 12" Padding="10" HeightRequest="40">
                 <Label Text="💾" FontSize="18" HorizontalOptions="Center" VerticalOptions="Center">
                     <Label.GestureRecognizers>
@@ -38,7 +47,7 @@
             </Border>
         </Grid>
 
-        <!-- Notification banner -->
+        <!-- Notification -->
         <Border Grid.Row="1" IsVisible="{Binding IsNotificationVisible}"
                 BackgroundColor="{StaticResource PrimaryContainer}" Padding="14,10" Margin="16,4"
                 StrokeShape="RoundRectangle 10">
@@ -46,7 +55,7 @@
                    TextColor="{StaticResource OnPrimaryContainer}" />
         </Border>
 
-        <!-- Rest Timer Bar -->
+        <!-- Rest Timer -->
         <Border Grid.Row="2" IsVisible="{Binding IsRestTimerActive}"
                 BackgroundColor="{StaticResource SurfaceContainerHigh}" Padding="14,10" Margin="16,4"
                 Stroke="{StaticResource LimeGreen}" StrokeThickness="1.5" StrokeShape="RoundRectangle 12">
@@ -69,144 +78,137 @@
             </Grid>
         </Border>
 
-        <!-- Exercise List -->
-        <CollectionView Grid.Row="3" ItemsSource="{Binding Exercises}" Margin="0,4,0,0">
-            <CollectionView.ItemTemplate>
-                <DataTemplate x:DataType="models:WorkoutExercise">
-                    <Border Style="{StaticResource CardFrame}" BackgroundColor="{StaticResource SurfaceContainerHigh}" Margin="16,4">
-                        <VerticalStackLayout Spacing="10">
+        <!-- Content -->
+        <Grid Grid.Row="3">
 
-                            <!-- Exercise header -->
-                            <Grid ColumnDefinitions="Auto,*,Auto,Auto,Auto,Auto" ColumnSpacing="6">
-                                <Border Grid.Column="0" BackgroundColor="{StaticResource SurfaceContainer}"
-                                        StrokeShape="RoundRectangle 8" WidthRequest="32" HeightRequest="32" Padding="0">
-                                    <Label Text="{Binding Order}" FontFamily="LexendBold" FontSize="13"
-                                           TextColor="{StaticResource Primary}"
-                                           HorizontalOptions="Center" VerticalOptions="Center" />
-                                </Border>
-                                <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="1">
-                                    <Label Text="{Binding ExerciseName}" FontFamily="LexendBold" FontSize="14" FontAttributes="Bold"
-                                           TextColor="{StaticResource OnSurface}" LineBreakMode="TailTruncation" />
-                                    <Label Text="{Binding BodyPart}" FontFamily="InterRegular" FontSize="10"
-                                           TextColor="{StaticResource TextSecondary}" />
-                                </VerticalStackLayout>
-                                <Label Grid.Column="2" Text="▲" FontSize="11" TextColor="{StaticResource TextSecondary}" VerticalOptions="Center">
-                                    <Label.GestureRecognizers>
-                                        <TapGestureRecognizer Command="{Binding Source={x:Reference workoutPage}, Path=BindingContext.MoveExerciseUpCommand}" CommandParameter="{Binding .}" />
-                                    </Label.GestureRecognizers>
-                                </Label>
-                                <Label Grid.Column="3" Text="▼" FontSize="11" TextColor="{StaticResource TextSecondary}" VerticalOptions="Center">
-                                    <Label.GestureRecognizers>
-                                        <TapGestureRecognizer Command="{Binding Source={x:Reference workoutPage}, Path=BindingContext.MoveExerciseDownCommand}" CommandParameter="{Binding .}" />
-                                    </Label.GestureRecognizers>
-                                </Label>
-                                <Label Grid.Column="4" Text="✕" FontSize="13" TextColor="{StaticResource AlertRed}" VerticalOptions="Center">
-                                    <Label.GestureRecognizers>
-                                        <TapGestureRecognizer Command="{Binding Source={x:Reference workoutPage}, Path=BindingContext.RemoveExerciseCommand}" CommandParameter="{Binding .}" />
-                                    </Label.GestureRecognizers>
-                                </Label>
-                                <!-- Per-exercise rest timer -->
-                                <Border Grid.Column="5" BackgroundColor="{StaticResource SurfaceContainer}"
-                                        StrokeShape="RoundRectangle 6" WidthRequest="32" HeightRequest="32" Padding="0">
-                                    <Label Text="⏱" FontSize="14" HorizontalOptions="Center" VerticalOptions="Center">
-                                        <Label.GestureRecognizers>
-                                            <TapGestureRecognizer Command="{Binding Source={x:Reference workoutPage}, Path=BindingContext.StartExerciseRestTimerCommand}" CommandParameter="{Binding .}" />
-                                        </Label.GestureRecognizers>
-                                    </Label>
-                                </Border>
-                            </Grid>
+            <!-- Creating mode: start button prompt -->
+            <VerticalStackLayout IsVisible="{Binding IsCreating}"
+                                 VerticalOptions="Center" HorizontalOptions="Center" Spacing="16" Padding="20">
+                <Label Text="🏋️" FontSize="48" HorizontalTextAlignment="Center" />
+                <Label Text="Scheda pronta?" FontFamily="LexendBold" FontSize="20" FontAttributes="Bold"
+                       TextColor="{StaticResource OnSurface}" HorizontalTextAlignment="Center" />
+                <Label Text="Aggiungi esercizi, serie e pesi, poi inizia l'allenamento."
+                       FontFamily="InterRegular" FontSize="13" TextColor="{StaticResource TextSecondary}"
+                       HorizontalTextAlignment="Center" MaximumWidthRequest="280" />
+                <Button Text="INIZIA ALLENAMENTO" Style="{StaticResource PrimaryButton}"
+                        HorizontalOptions="Center" WidthRequest="240" HeightRequest="56"
+                        Command="{Binding StartWorkoutCommand}" />
+            </VerticalStackLayout>
 
-                            <!-- Sets -->
-                            <CollectionView ItemsSource="{Binding Sets}">
-                                <CollectionView.ItemTemplate>
-                                    <DataTemplate x:DataType="models:ExerciseSet">
-                                        <Border Padding="8,6" Margin="0,2"
-                                                BackgroundColor="{StaticResource SurfaceContainer}"
-                                                StrokeShape="RoundRectangle 8">
-                                            <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto,Auto,*,Auto,Auto,Auto"
-                                                  ColumnSpacing="5">
-                                                <!-- Set number -->
-                                                <Border Grid.Column="0" BackgroundColor="{StaticResource Primary}"
-                                                        StrokeShape="RoundRectangle 6" WidthRequest="26" HeightRequest="26" Padding="0">
-                                                    <Label Text="{Binding SetNumber}" FontFamily="InterBold" FontSize="10"
-                                                           TextColor="{StaticResource OnPrimary}"
-                                                           HorizontalOptions="Center" VerticalOptions="Center" />
-                                                </Border>
-                                                <!-- Weight -->
-                                                <Label Grid.Column="1" Text="kg" FontFamily="InterRegular" FontSize="10"
-                                                       TextColor="{StaticResource TextSecondary}" VerticalOptions="Center" />
-                                                <Button Grid.Column="2" Text="−" FontSize="12"
-                                                        BackgroundColor="{StaticResource SurfaceContainerHigh}" TextColor="{StaticResource TextPrimary}"
-                                                        WidthRequest="28" HeightRequest="28" CornerRadius="6" Padding="0"
-                                                        Command="{Binding Source={x:Reference workoutPage}, Path=BindingContext.DecrementWeightCommand}"
-                                                        CommandParameter="{Binding .}" />
-                                                <Label Grid.Column="3" Text="{Binding WeightKg}" FontFamily="LexendBold" FontSize="14"
-                                                       TextColor="{StaticResource OnSurface}" HorizontalTextAlignment="Center" VerticalOptions="Center" />
-                                                <Button Grid.Column="4" Text="+" FontSize="12"
-                                                        BackgroundColor="{StaticResource SurfaceContainerHigh}" TextColor="{StaticResource TextPrimary}"
-                                                        WidthRequest="28" HeightRequest="28" CornerRadius="6" Padding="0"
-                                                        Command="{Binding Source={x:Reference workoutPage}, Path=BindingContext.IncrementWeightCommand}"
-                                                        CommandParameter="{Binding .}" />
-                                                <!-- Reps -->
-                                                <Label Grid.Column="5" Text="×" FontFamily="InterRegular" FontSize="10"
-                                                       TextColor="{StaticResource TextSecondary}" VerticalOptions="Center" HorizontalTextAlignment="Center" />
-                                                <Button Grid.Column="6" Text="−" FontSize="12"
-                                                        BackgroundColor="{StaticResource SurfaceContainerHigh}" TextColor="{StaticResource TextPrimary}"
-                                                        WidthRequest="28" HeightRequest="28" CornerRadius="6" Padding="0"
-                                                        Command="{Binding Source={x:Reference workoutPage}, Path=BindingContext.DecrementRepsCommand}"
-                                                        CommandParameter="{Binding .}" />
-                                                <Label Grid.Column="7" Text="{Binding Reps}" FontFamily="LexendBold" FontSize="14"
-                                                       TextColor="{StaticResource OnSurface}" HorizontalTextAlignment="Center" VerticalOptions="Center" />
-                                                <Button Grid.Column="8" Text="+" FontSize="12"
-                                                        BackgroundColor="{StaticResource SurfaceContainerHigh}" TextColor="{StaticResource TextPrimary}"
-                                                        WidthRequest="28" HeightRequest="28" CornerRadius="6" Padding="0"
-                                                        Command="{Binding Source={x:Reference workoutPage}, Path=BindingContext.IncrementRepsCommand}"
-                                                        CommandParameter="{Binding .}" />
-                                                <!-- Complete -->
-                                                <Button Grid.Column="9" Text="✓" FontSize="12"
-                                                        BackgroundColor="{StaticResource LimeGreen}" TextColor="{StaticResource OnSecondary}"
-                                                        WidthRequest="30" HeightRequest="26" CornerRadius="6" Padding="0"
-                                                        Command="{Binding Source={x:Reference workoutPage}, Path=BindingContext.CompleteSetCommand}"
-                                                        CommandParameter="{Binding .}" />
-                                            </Grid>
+            <!-- Active workout: exercise list -->
+            <VerticalStackLayout IsVisible="{Binding IsTimerRunning}" Spacing="0">
+                <CollectionView ItemsSource="{Binding Exercises}" Margin="0,4,0,0">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="models:WorkoutExercise">
+                            <Border Style="{StaticResource CardFrame}" BackgroundColor="{StaticResource SurfaceContainerHigh}" Margin="16,4">
+                                <VerticalStackLayout Spacing="10">
+                                    <Grid ColumnDefinitions="Auto,*,Auto,Auto,Auto,Auto" ColumnSpacing="6">
+                                        <Border Grid.Column="0" BackgroundColor="{StaticResource SurfaceContainer}"
+                                                StrokeShape="RoundRectangle 8" WidthRequest="32" HeightRequest="32" Padding="0">
+                                            <Label Text="{Binding Order}" FontFamily="LexendBold" FontSize="13"
+                                                   TextColor="{StaticResource Primary}" HorizontalOptions="Center" VerticalOptions="Center" />
                                         </Border>
-                                    </DataTemplate>
-                                </CollectionView.ItemTemplate>
-                            </CollectionView>
+                                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="1">
+                                            <Label Text="{Binding ExerciseName}" FontFamily="LexendBold" FontSize="14" FontAttributes="Bold"
+                                                   TextColor="{StaticResource OnSurface}" LineBreakMode="TailTruncation" />
+                                            <Label Text="{Binding BodyPart}" FontFamily="InterRegular" FontSize="10"
+                                                   TextColor="{StaticResource TextSecondary}" />
+                                        </VerticalStackLayout>
+                                        <Label Grid.Column="2" Text="▲" FontSize="11" TextColor="{StaticResource TextSecondary}" VerticalOptions="Center">
+                                            <Label.GestureRecognizers>
+                                                <TapGestureRecognizer Command="{Binding Source={x:Reference workoutPage}, Path=BindingContext.MoveUpCommand}" CommandParameter="{Binding .}" />
+                                            </Label.GestureRecognizers>
+                                        </Label>
+                                        <Label Grid.Column="3" Text="▼" FontSize="11" TextColor="{StaticResource TextSecondary}" VerticalOptions="Center">
+                                            <Label.GestureRecognizers>
+                                                <TapGestureRecognizer Command="{Binding Source={x:Reference workoutPage}, Path=BindingContext.MoveDownCommand}" CommandParameter="{Binding .}" />
+                                            </Label.GestureRecognizers>
+                                        </Label>
+                                        <Label Grid.Column="4" Text="✕" FontSize="13" TextColor="{StaticResource AlertRed}" VerticalOptions="Center">
+                                            <Label.GestureRecognizers>
+                                                <TapGestureRecognizer Command="{Binding Source={x:Reference workoutPage}, Path=BindingContext.RemoveExerciseCommand}" CommandParameter="{Binding .}" />
+                                            </Label.GestureRecognizers>
+                                        </Label>
+                                        <Border Grid.Column="5" BackgroundColor="{StaticResource SurfaceContainer}"
+                                                StrokeShape="RoundRectangle 6" WidthRequest="32" HeightRequest="32" Padding="0">
+                                            <Label Text="⏱" FontSize="14" HorizontalOptions="Center" VerticalOptions="Center">
+                                                <Label.GestureRecognizers>
+                                                    <TapGestureRecognizer Command="{Binding Source={x:Reference workoutPage}, Path=BindingContext.StartExerciseRestTimerCommand}" CommandParameter="{Binding .}" />
+                                                </Label.GestureRecognizers>
+                                            </Label>
+                                        </Border>
+                                    </Grid>
 
-                            <!-- Add set + replace -->
-                            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
-                                <Border Grid.Column="0" BackgroundColor="{StaticResource SurfaceContainer}"
-                                        StrokeShape="RoundRectangle 8" Padding="10,6">
-                                    <Label Text="+ Aggiungi serie" FontFamily="InterBold" FontSize="10"
-                                           TextColor="{StaticResource Primary}">
-                                        <Label.GestureRecognizers>
-                                            <TapGestureRecognizer Command="{Binding Source={x:Reference workoutPage}, Path=BindingContext.AddSetCommand}" CommandParameter="{Binding .}" />
-                                        </Label.GestureRecognizers>
-                                    </Label>
-                                </Border>
-                                <BoxView Grid.Column="1" Color="Transparent" />
-                                <Border Grid.Column="2" BackgroundColor="{StaticResource SurfaceContainer}"
-                                        StrokeShape="RoundRectangle 8" Padding="10,6">
-                                    <Label Text="🔄 Sostituisci" FontFamily="InterBold" FontSize="10"
-                                           TextColor="{StaticResource TextSecondary}">
-                                        <Label.GestureRecognizers>
-                                            <TapGestureRecognizer Command="{Binding Source={x:Reference workoutPage}, Path=BindingContext.ReplaceExerciseCommand}" CommandParameter="{Binding .}" />
-                                        </Label.GestureRecognizers>
-                                    </Label>
-                                </Border>
-                            </Grid>
-                        </VerticalStackLayout>
-                    </Border>
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
-        </CollectionView>
+                                    <CollectionView ItemsSource="{Binding Sets}">
+                                        <CollectionView.ItemTemplate>
+                                            <DataTemplate x:DataType="models:ExerciseSet">
+                                                <Border Padding="8,6" Margin="0,2" BackgroundColor="{StaticResource SurfaceContainer}" StrokeShape="RoundRectangle 8">
+                                                    <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto,Auto,*,Auto,Auto,Auto" ColumnSpacing="5">
+                                                        <Border Grid.Column="0" BackgroundColor="{StaticResource Primary}"
+                                                                StrokeShape="RoundRectangle 6" WidthRequest="26" HeightRequest="26" Padding="0">
+                                                            <Label Text="{Binding SetNumber}" FontFamily="InterBold" FontSize="10"
+                                                                   TextColor="{StaticResource OnPrimary}" HorizontalOptions="Center" VerticalOptions="Center" />
+                                                        </Border>
+                                                        <Label Grid.Column="1" Text="kg" FontFamily="InterRegular" FontSize="10"
+                                                               TextColor="{StaticResource TextSecondary}" VerticalOptions="Center" />
+                                                        <Button Grid.Column="2" Text="−" FontSize="12" BackgroundColor="{StaticResource SurfaceContainerHigh}"
+                                                                TextColor="{StaticResource TextPrimary}" WidthRequest="28" HeightRequest="28" CornerRadius="6" Padding="0"
+                                                                Command="{Binding Source={x:Reference workoutPage}, Path=BindingContext.DecWeightCommand}" CommandParameter="{Binding .}" />
+                                                        <Label Grid.Column="3" Text="{Binding WeightKg}" FontFamily="LexendBold" FontSize="14"
+                                                               TextColor="{StaticResource OnSurface}" HorizontalTextAlignment="Center" VerticalOptions="Center" />
+                                                        <Button Grid.Column="4" Text="+" FontSize="12" BackgroundColor="{StaticResource SurfaceContainerHigh}"
+                                                                TextColor="{StaticResource TextPrimary}" WidthRequest="28" HeightRequest="28" CornerRadius="6" Padding="0"
+                                                                Command="{Binding Source={x:Reference workoutPage}, Path=BindingContext.IncWeightCommand}" CommandParameter="{Binding .}" />
+                                                        <Label Grid.Column="5" Text="×" FontFamily="InterRegular" FontSize="10"
+                                                               TextColor="{StaticResource TextSecondary}" VerticalOptions="Center" HorizontalTextAlignment="Center" />
+                                                        <Button Grid.Column="6" Text="−" FontSize="12" BackgroundColor="{StaticResource SurfaceContainerHigh}"
+                                                                TextColor="{StaticResource TextPrimary}" WidthRequest="28" HeightRequest="28" CornerRadius="6" Padding="0"
+                                                                Command="{Binding Source={x:Reference workoutPage}, Path=BindingContext.DecRepsCommand}" CommandParameter="{Binding .}" />
+                                                        <Label Grid.Column="7" Text="{Binding Reps}" FontFamily="LexendBold" FontSize="14"
+                                                               TextColor="{StaticResource OnSurface}" HorizontalTextAlignment="Center" VerticalOptions="Center" />
+                                                        <Button Grid.Column="8" Text="+" FontSize="12" BackgroundColor="{StaticResource SurfaceContainerHigh}"
+                                                                TextColor="{StaticResource TextPrimary}" WidthRequest="28" HeightRequest="28" CornerRadius="6" Padding="0"
+                                                                Command="{Binding Source={x:Reference workoutPage}, Path=BindingContext.IncRepsCommand}" CommandParameter="{Binding .}" />
+                                                        <Button Grid.Column="9" Text="✓" FontSize="12" BackgroundColor="{StaticResource LimeGreen}"
+                                                                TextColor="{StaticResource OnSecondary}" WidthRequest="30" HeightRequest="26" CornerRadius="6" Padding="0"
+                                                                Command="{Binding Source={x:Reference workoutPage}, Path=BindingContext.CompleteSetCommand}" CommandParameter="{Binding .}" />
+                                                    </Grid>
+                                                </Border>
+                                            </DataTemplate>
+                                        </CollectionView.ItemTemplate>
+                                    </CollectionView>
 
-        <!-- Bottom: add exercise -->
-        <Border Grid.Row="4" x:Name="addExerciseBar" Margin="16,8,16,100"
-                BackgroundColor="{StaticResource SurfaceContainerHigh}"
-                Stroke="{StaticResource Primary}" StrokeThickness="1.5"
-                StrokeShape="RoundRectangle 12" Padding="0" HeightRequest="52">
+                                    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
+                                        <Border Grid.Column="0" BackgroundColor="{StaticResource SurfaceContainer}"
+                                                StrokeShape="RoundRectangle 8" Padding="10,6">
+                                            <Label Text="+ Aggiungi serie" FontFamily="InterBold" FontSize="10" TextColor="{StaticResource Primary}">
+                                                <Label.GestureRecognizers>
+                                                    <TapGestureRecognizer Command="{Binding Source={x:Reference workoutPage}, Path=BindingContext.AddSetCommand}" CommandParameter="{Binding .}" />
+                                                </Label.GestureRecognizers>
+                                            </Label>
+                                        </Border>
+                                        <BoxView Grid.Column="1" Color="Transparent" />
+                                        <Border Grid.Column="2" BackgroundColor="{StaticResource SurfaceContainer}"
+                                                StrokeShape="RoundRectangle 8" Padding="10,6">
+                                            <Label Text="🔄 Sostituisci" FontFamily="InterBold" FontSize="10" TextColor="{StaticResource TextSecondary}">
+                                                <Label.GestureRecognizers>
+                                                    <TapGestureRecognizer Command="{Binding Source={x:Reference workoutPage}, Path=BindingContext.ReplaceExerciseCommand}" CommandParameter="{Binding .}" />
+                                                </Label.GestureRecognizers>
+                                            </Label>
+                                        </Border>
+                                    </Grid>
+                                </VerticalStackLayout>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </VerticalStackLayout>
+        </Grid>
+
+        <!-- Bottom add exercise bar -->
+        <Border Grid.Row="4" Margin="16,8,16,100" BackgroundColor="{StaticResource SurfaceContainerHigh}"
+                Stroke="{StaticResource Primary}" StrokeThickness="1.5" StrokeShape="RoundRectangle 12"
+                Padding="0" HeightRequest="52">
             <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12" HorizontalOptions="Center" VerticalOptions="Center">
                 <Label Grid.Column="0" Text="+" FontSize="20" TextColor="{StaticResource Primary}" VerticalOptions="Center" />
                 <Label Grid.Column="1" Text="Aggiungi esercizio" FontFamily="InterRegular" FontSize="14"
@@ -220,5 +222,4 @@
         </Border>
 
     </Grid>
-
 </ContentPage>

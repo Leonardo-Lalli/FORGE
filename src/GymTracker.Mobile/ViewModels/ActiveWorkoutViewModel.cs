@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using GymTracker.Mobile.Models;
+using GymTracker.Mobile.Services;
 
 namespace GymTracker.Mobile.ViewModels;
 
@@ -18,7 +19,6 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
     [ObservableProperty] private string planId = string.Empty;
     [ObservableProperty] private string planName = "Nuovo Allenamento";
     [ObservableProperty] private ObservableCollection<WorkoutExercise> exercises = new();
-    [ObservableProperty] private WorkoutExercise? selectedExercise;
     [ObservableProperty] private int restDuration = 90;
     [ObservableProperty] private bool isRestTimerActive;
     [ObservableProperty] private string restTimerText = "90s";
@@ -28,14 +28,23 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
     [ObservableProperty] private string notificationMessage = string.Empty;
     [ObservableProperty] private string restTimerLabel = "pausa";
     [ObservableProperty] private bool isNotificationVisible;
+    [ObservableProperty] private bool isTimerRunning;
+    [ObservableProperty] private bool isCreating; // true = modalità creazione scheda
 
     partial void OnModeChanged(string value)
     {
         PlanName = value switch { "free" => "Allenamento Libero", "create" => "Nuova Scheda", _ => "Scheda Salvata" };
+        IsCreating = (value == "create");
+
         HasData = true;
-        IsEmptyState = false;
         workoutStartTime = DateTime.Now;
-        _ = RunElapsedTimerAsync();
+
+        if (!IsCreating)
+        {
+            IsTimerRunning = true;
+            WorkoutSession.Instance.Start(PlanName);
+            _ = RunElapsedTimerAsync();
+        }
     }
 
     partial void OnNotificationMessageChanged(string value)
@@ -44,30 +53,45 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
     }
 
     [RelayCommand]
+    private void StartWorkout()
+    {
+        IsCreating = false;
+        IsTimerRunning = true;
+        workoutStartTime = DateTime.Now;
+        WorkoutSession.Instance.Start(PlanName);
+        _ = RunElapsedTimerAsync();
+        ShowNotification("Allenamento iniziato! Forza!");
+    }
+
+    [RelayCommand]
+    private void MinimizeWorkout()
+    {
+        WorkoutSession.Instance.Minimize();
+    }
+
+    [RelayCommand]
     private void AddExercise()
     {
-        var order = Exercises.Count + 1;
         Exercises.Add(new WorkoutExercise
         {
-            ExerciseName = $"Esercizio {order}",
+            ExerciseName = $"Esercizio {Exercises.Count + 1}",
             BodyPart = "Seleziona",
-            Order = order
+            Order = Exercises.Count + 1
         });
     }
 
     [RelayCommand]
-    private void RemoveExercise(WorkoutExercise exercise)
+    private void RemoveExercise(WorkoutExercise ex)
     {
-        Exercises.Remove(exercise);
+        Exercises.Remove(ex);
         for (int i = 0; i < Exercises.Count; i++) Exercises[i].Order = i + 1;
     }
 
     [RelayCommand]
-    private void AddSet(WorkoutExercise exercise)
+    private void AddSet(WorkoutExercise ex)
     {
-        var setNum = exercise.Sets.Count + 1;
-        var last = exercise.Sets.LastOrDefault();
-        exercise.Sets.Add(new ExerciseSet { SetNumber = setNum, WeightKg = last?.WeightKg ?? 20, Reps = last?.Reps ?? 10 });
+        var last = ex.Sets.LastOrDefault();
+        ex.Sets.Add(new ExerciseSet { SetNumber = ex.Sets.Count + 1, WeightKg = last?.WeightKg ?? 20, Reps = last?.Reps ?? 10 });
     }
 
     [RelayCommand]
@@ -78,17 +102,10 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
         for (int i = 0; i < parent?.Sets.Count; i++) parent.Sets[i].SetNumber = i + 1;
     }
 
-    [RelayCommand]
-    private void IncrementReps(ExerciseSet set) { set.Reps++; OnPropertyChanged(nameof(set)); }
-
-    [RelayCommand]
-    private void DecrementReps(ExerciseSet set) { if (set.Reps > 1) set.Reps--; OnPropertyChanged(nameof(set)); }
-
-    [RelayCommand]
-    private void IncrementWeight(ExerciseSet set) { set.WeightKg += 2.5; OnPropertyChanged(nameof(set)); }
-
-    [RelayCommand]
-    private void DecrementWeight(ExerciseSet set) { if (set.WeightKg >= 2.5) set.WeightKg -= 2.5; OnPropertyChanged(nameof(set)); }
+    [RelayCommand] private void IncReps(ExerciseSet s) { s.Reps++; OnPropertyChanged(nameof(s)); }
+    [RelayCommand] private void DecReps(ExerciseSet s) { if (s.Reps > 1) s.Reps--; OnPropertyChanged(nameof(s)); }
+    [RelayCommand] private void IncWeight(ExerciseSet s) { s.WeightKg += 2.5; OnPropertyChanged(nameof(s)); }
+    [RelayCommand] private void DecWeight(ExerciseSet s) { if (s.WeightKg >= 2.5) s.WeightKg -= 2.5; OnPropertyChanged(nameof(s)); }
 
     [RelayCommand]
     private void CompleteSet(ExerciseSet set)
@@ -99,59 +116,37 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
     }
 
     [RelayCommand]
-    private void MoveExerciseUp(WorkoutExercise exercise)
+    private void MoveUp(WorkoutExercise ex)
     {
-        var idx = Exercises.IndexOf(exercise);
-        if (idx > 0) { Exercises.Move(idx, idx - 1); for (int i = 0; i < Exercises.Count; i++) Exercises[i].Order = i + 1; }
+        var i = Exercises.IndexOf(ex);
+        if (i > 0) { Exercises.Move(i, i - 1); Renumber(); }
     }
 
     [RelayCommand]
-    private void MoveExerciseDown(WorkoutExercise exercise)
+    private void MoveDown(WorkoutExercise ex)
     {
-        var idx = Exercises.IndexOf(exercise);
-        if (idx < Exercises.Count - 1) { Exercises.Move(idx, idx + 1); for (int i = 0; i < Exercises.Count; i++) Exercises[i].Order = i + 1; }
+        var i = Exercises.IndexOf(ex);
+        if (i < Exercises.Count - 1) { Exercises.Move(i, i + 1); Renumber(); }
     }
 
-    [RelayCommand]
-    private void ReplaceExercise(WorkoutExercise exercise)
-    {
-        ShowNotification($"Sostituisci {exercise.ExerciseName} — seleziona dal catalogo");
-    }
+    private void Renumber() { for (int i = 0; i < Exercises.Count; i++) Exercises[i].Order = i + 1; }
 
     [RelayCommand]
-    private void StartExerciseRestTimer(WorkoutExercise exercise)
+    private void ReplaceExercise(WorkoutExercise ex) => ShowNotification($"Sostituisci {ex.ExerciseName} — seleziona dal catalogo");
+
+    [RelayCommand]
+    private void StartExerciseRestTimer(WorkoutExercise ex)
     {
         restCts?.Cancel();
         restCts = new CancellationTokenSource();
         var token = restCts.Token;
         restSecondsRemaining = RestDuration;
         IsRestTimerActive = true;
-        RestTimerLabel = $"pausa {exercise.ExerciseName}";
-        RestTimerText = $"{restSecondsRemaining}s";
+        RestTimerLabel = $"pausa {ex.ExerciseName}";
         RestTimerProgress = 1.0;
-
-        Task.Run(async () =>
-        {
-            try
-            {
-                while (restSecondsRemaining > 0 && !token.IsCancellationRequested)
-                {
-                    await Task.Delay(1000, token);
-                    restSecondsRemaining--;
-                    RestTimerProgress = (double)restSecondsRemaining / RestDuration;
-                    RestTimerText = $"{restSecondsRemaining}s";
-                    if (restSecondsRemaining is <= 5 and > 0)
-                        HapticFeedback.Default.Perform(HapticFeedbackType.Click);
-                }
-                if (!token.IsCancellationRequested)
-                {
-                    IsRestTimerActive = false;
-                    ShowNotification($"⏰ Pausa finita per {exercise.ExerciseName}!");
-                    HapticFeedback.Default.Perform(HapticFeedbackType.LongPress);
-                }
-            }
-            catch (TaskCanceledException) { }
-        }, token);
+        RefreshRestTimerUI();
+        WorkoutSession.Instance.UpdateRestTimer(true, RestTimerText);
+        RunTimerAsync(token);
     }
 
     private void StartRestTimer()
@@ -162,9 +157,14 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
         restSecondsRemaining = RestDuration;
         IsRestTimerActive = true;
         RestTimerLabel = "pausa automatica";
-        RestTimerText = $"{restSecondsRemaining}s";
         RestTimerProgress = 1.0;
+        RefreshRestTimerUI();
+        WorkoutSession.Instance.UpdateRestTimer(true, RestTimerText);
+        RunTimerAsync(token);
+    }
 
+    private void RunTimerAsync(CancellationToken token)
+    {
         Task.Run(async () =>
         {
             try
@@ -174,13 +174,15 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
                     await Task.Delay(1000, token);
                     restSecondsRemaining--;
                     RestTimerProgress = (double)restSecondsRemaining / RestDuration;
-                    RestTimerText = $"{restSecondsRemaining}s";
+                    RefreshRestTimerUI();
+                    WorkoutSession.Instance.UpdateRestTimer(true, RestTimerText);
                     if (restSecondsRemaining is <= 5 and > 0)
                         HapticFeedback.Default.Perform(HapticFeedbackType.Click);
                 }
                 if (!token.IsCancellationRequested)
                 {
                     IsRestTimerActive = false;
+                    WorkoutSession.Instance.UpdateRestTimer(false, "");
                     ShowNotification("⏰ Pausa finita! Tempo di spingere!");
                     HapticFeedback.Default.Perform(HapticFeedbackType.LongPress);
                 }
@@ -188,6 +190,8 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
             catch (TaskCanceledException) { }
         }, token);
     }
+
+    private void RefreshRestTimerUI() => RestTimerText = $"{restSecondsRemaining}s";
 
     [RelayCommand]
     private void SkipRestTimer()
@@ -207,6 +211,7 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
             return;
         }
         ShowNotification($"Scheda \"{PlanName}\" salvata!");
+        WorkoutSession.Instance.End();
         await Shell.Current.GoToAsync("..");
     }
 
@@ -215,13 +220,11 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
     {
         elapsedCts?.Cancel();
         ShowNotification($"Allenamento completato! {TotalSetsCompleted} serie, {Exercises.Count} esercizi.");
+        WorkoutSession.Instance.End();
         await Shell.Current.GoToAsync("..");
     }
 
-    private void ShowNotification(string message)
-    {
-        NotificationMessage = message;
-    }
+    private void ShowNotification(string message) => NotificationMessage = message;
 
     private async Task RunElapsedTimerAsync()
     {
@@ -232,8 +235,9 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
         {
             while (!token.IsCancellationRequested)
             {
-                var elapsed = DateTime.Now - workoutStartTime;
-                ElapsedTime = $"{(int)elapsed.TotalHours:D2}:{elapsed.Minutes:D2}:{elapsed.Seconds:D2}";
+                var e = DateTime.Now - workoutStartTime;
+                ElapsedTime = $"{(int)e.TotalHours:D2}:{e.Minutes:D2}:{e.Seconds:D2}";
+                WorkoutSession.Instance.UpdateElapsed(ElapsedTime);
                 await Task.Delay(1000, token);
             }
         }
