@@ -21,19 +21,27 @@ public partial class StatsViewModel : BaseViewModel
     [ObservableProperty] private string newPRs = "3";
     [ObservableProperty] private string newPRsTrend = "Great week!";
     [ObservableProperty] private string muscleGain = "+2.4kg";
-    [ObservableProperty] private ObservableCollection<double> weeklyVolume = new();
-    [ObservableProperty] private ObservableCollection<LiftEntry> topLifts = new();
+        [ObservableProperty] private ObservableCollection<double> weeklyVolume = new();
+        [ObservableProperty] private ObservableCollection<LiftEntry> topLifts = new();
 
-    public StatsViewModel()
-    {
-        HasData = true;
-        LoadMockData();
-    }
+        // Pre-calculated bar heights in pixels (160px container max)
+        public double BarHeight0 => 48;
+        public double BarHeight1 => 80;
+        public double BarHeight2 => 128;
+        public double BarHeight3 => 96;
+        public double BarHeight4 => 144;
+        public double BarHeight5 => 64;
+        public double BarHeight6 => 112;
 
-    private void LoadMockData()
-    {
-        WeeklyVolume = new ObservableCollection<double> { 0.3, 0.5, 0.8, 0.6, 0.9, 0.4, 0.7 };
-        TopLifts = new ObservableCollection<LiftEntry>
+        public StatsViewModel()
+        {
+            HasData = true;
+            LoadMockData();
+        }
+
+        private void LoadMockData()
+        {
+            TopLifts = new ObservableCollection<LiftEntry>
         {
             new() { Name = "Deadlift", Label = "1RM", Weight = "185kg" },
             new() { Name = "Squat", Label = "1RM", Weight = "150kg" },

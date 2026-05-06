@@ -230,16 +230,21 @@
                             </Grid>
                             <!-- Bar chart -->
                             <Grid HeightRequest="160" ColumnDefinitions="*,*,*,*,*,*,*" ColumnSpacing="3"
-                                  VerticalOptions="End"
-                                  BindableLayout.ItemsSource="{Binding WeeklyVolume}">
-                                <BindableLayout.ItemTemplate>
-                                    <DataTemplate x:DataType="x:Double">
-                                        <BoxView Color="{DynamicResource Primary}"
-                                                 CornerRadius="3,3,0,0"
-                                                 VerticalOptions="End"
-                                                 HeightRequest="{Binding .}" />
-                                    </DataTemplate>
-                                </BindableLayout.ItemTemplate>
+                                  VerticalOptions="End">
+                                <BoxView Grid.Column="0" Color="{DynamicResource Primary}" CornerRadius="3,3,0,0"
+                                         VerticalOptions="End" HeightRequest="{Binding BarHeight0}" Opacity="0.3" />
+                                <BoxView Grid.Column="1" Color="{DynamicResource Primary}" CornerRadius="3,3,0,0"
+                                         VerticalOptions="End" HeightRequest="{Binding BarHeight1}" Opacity="0.4" />
+                                <BoxView Grid.Column="2" Color="{DynamicResource Primary}" CornerRadius="3,3,0,0"
+                                         VerticalOptions="End" HeightRequest="{Binding BarHeight2}" Opacity="0.6" />
+                                <BoxView Grid.Column="3" Color="{DynamicResource Primary}" CornerRadius="3,3,0,0"
+                                         VerticalOptions="End" HeightRequest="{Binding BarHeight3}" Opacity="0.8" />
+                                <BoxView Grid.Column="4" Color="{DynamicResource Primary}" CornerRadius="3,3,0,0"
+                                         VerticalOptions="End" HeightRequest="{Binding BarHeight4}" />
+                                <BoxView Grid.Column="5" Color="{DynamicResource Primary}" CornerRadius="3,3,0,0"
+                                         VerticalOptions="End" HeightRequest="{Binding BarHeight5}" Opacity="0.5" />
+                                <BoxView Grid.Column="6" Color="{DynamicResource Primary}" CornerRadius="3,3,0,0"
+                                         VerticalOptions="End" HeightRequest="{Binding BarHeight6}" Opacity="0.3" />
                             </Grid>
                             <Grid ColumnDefinitions="*,*,*,*,*,*,*">
                                 <Label Grid.Column="0" Text="M" FontFamily="InterRegular" FontSize="11"
