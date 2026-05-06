@@ -8,7 +8,7 @@ public partial class DashboardViewModel : BaseViewModel
     private string lastWorkoutSummary = "Nessun allenamento";
 
     [ObservableProperty]
-    private string streakText = "🔥 0 giorni";
+    private string streakText = "0 giorni";
 
     [ObservableProperty]
     private string leaderboardPosition = "--";

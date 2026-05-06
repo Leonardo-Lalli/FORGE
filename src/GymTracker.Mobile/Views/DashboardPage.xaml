@@ -35,15 +35,14 @@
 
                 <!-- Streak + Rank -->
                 <Border Style="{StaticResource CardFrame}" BackgroundColor="{StaticResource SurfaceContainerHigh}">
-                    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="16">
-                        <Label Grid.Column="0" Text="🔥" FontSize="36" VerticalOptions="Center" />
-                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
+                        <VerticalStackLayout Grid.Column="0" VerticalOptions="Center" Spacing="2">
                             <Label Text="STREAK ATTIVO" FontFamily="InterBold" FontSize="11" FontAttributes="Bold"
                                    TextColor="{StaticResource TextSecondary}" CharacterSpacing="0.8" />
                             <Label Text="{Binding StreakText}" FontFamily="LexendBold" FontSize="28" FontAttributes="Bold"
                                    TextColor="{StaticResource LimeGreen}" />
                         </VerticalStackLayout>
-                        <Label Grid.Column="2" Text="{Binding LeaderboardPosition, StringFormat='#{0}'}"
+                        <Label Grid.Column="1" Text="{Binding LeaderboardPosition, StringFormat='#{0}'}"
                                FontFamily="LexendBold" FontSize="40" FontAttributes="Bold"
                                TextColor="{StaticResource Primary}" VerticalOptions="Center" />
                     </Grid>
