@@ -5,35 +5,17 @@
     xmlns:vm="clr-namespace:GymTracker.Mobile.ViewModels"
     x:Class="GymTracker.Mobile.Views.SocialPage"
     x:DataType="vm:SocialViewModel"
-    Title="GYM LOG">
+    Title="Social"
+    Shell.NavBarIsVisible="False">
 
-    <Grid RowDefinitions="Auto,Auto,*" BackgroundColor="{StaticResource Surface}">
+    <Grid RowDefinitions="Auto,*" BackgroundColor="{StaticResource Surface}">
 
-        <!-- Header bar -->
-        <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto"
-              Padding="20,16" BackgroundColor="{StaticResource Surface}">
-            <Border Grid.Column="0"
-                    BackgroundColor="{StaticResource SurfaceContainer}"
-                    StrokeShape="RoundRectangle 12"
-                    Padding="8" HeightRequest="40" WidthRequest="40">
-                <Label Text="📊" FontSize="18"
-                       HorizontalOptions="Center" VerticalOptions="Center" />
-            </Border>
-            <Label Grid.Column="1" Text="GYM LOG"
-                   FontFamily="LexendBold" FontSize="18" FontAttributes="Bold"
-                   TextColor="{StaticResource OnSurface}"
-                   HorizontalOptions="Center" VerticalOptions="Center" />
-            <Border Grid.Column="2"
-                    BackgroundColor="{StaticResource SurfaceContainer}"
-                    StrokeShape="RoundRectangle 12"
-                    Padding="8" HeightRequest="40" WidthRequest="40">
-                <Label Text="⚙️" FontSize="16"
-                       HorizontalOptions="Center" VerticalOptions="Center" />
-            </Border>
-        </Grid>
-
-        <!-- Tab Chips -->
-        <HorizontalStackLayout Grid.Row="1" Padding="20,0,20,12" Spacing="8">
+        <!-- Title + Tab Chips -->
+        <VerticalStackLayout Grid.Row="0" Padding="20,16,20,4" Spacing="10">
+            <Label Text="Classifica"
+                   FontFamily="LexendBold" FontSize="22" FontAttributes="Bold"
+                   TextColor="{StaticResource OnSurface}" />
+            <HorizontalStackLayout Spacing="8">
             <Border BackgroundColor="{StaticResource LimeGreen}"
                     StrokeShape="RoundRectangle 16" Padding="16,8">
                 <Label Text="VOLUME"
@@ -53,9 +35,10 @@
                        TextColor="{StaticResource TextSecondary}" />
             </Border>
         </HorizontalStackLayout>
+        </VerticalStackLayout>
 
         <!-- Ranking List -->
-        <ScrollView Grid.Row="2" Padding="20,0,20,100">
+        <ScrollView Grid.Row="1" Padding="20,0,20,100">
             <VerticalStackLayout Spacing="8">
 
                 <!-- #1 Sofia -->

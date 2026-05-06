@@ -6,34 +6,29 @@
     xmlns:models="clr-namespace:GymTracker.Mobile.Models"
     x:Class="GymTracker.Mobile.Views.WorkoutPage"
     x:DataType="vm:WorkoutViewModel"
-    Title="WORKOUT">
+    Title="Workout"
+    Shell.NavBarIsVisible="False">
 
-    <Grid RowDefinitions="Auto,Auto,*" BackgroundColor="{StaticResource Surface}">
+    <Grid RowDefinitions="Auto,*" BackgroundColor="{StaticResource Surface}">
 
-        <!-- Header -->
-        <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto"
-              Padding="20,16" BackgroundColor="{StaticResource Surface}">
-            <Border Grid.Column="0" BackgroundColor="{StaticResource SurfaceContainer}"
-                    StrokeShape="RoundRectangle 12" Padding="8" HeightRequest="40" WidthRequest="40">
-                <Label Text="📊" FontSize="18" HorizontalOptions="Center" VerticalOptions="Center" />
-            </Border>
-            <Label Grid.Column="1" Text="WORKOUT"
-                   FontFamily="LexendBold" FontSize="18" FontAttributes="Bold"
-                   TextColor="{StaticResource OnSurface}"
-                   HorizontalOptions="Center" VerticalOptions="Center" />
-            <Border Grid.Column="2" BackgroundColor="{StaticResource SurfaceContainer}"
-                    StrokeShape="RoundRectangle 12" Padding="8" HeightRequest="40" WidthRequest="40">
-                <Label Text="🔔" FontSize="18" HorizontalOptions="Center" VerticalOptions="Center" />
+        <!-- Title + Bell -->
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Padding="20,16,20,8">
+            <Label Grid.Column="0" Text="Le tue schede"
+                   FontFamily="LexendBold" FontSize="22" FontAttributes="Bold"
+                   TextColor="{StaticResource OnSurface}" VerticalOptions="Center" />
+            <Border Grid.Column="1" BackgroundColor="{StaticResource SurfaceContainer}"
+                    StrokeShape="RoundRectangle 12" Padding="8" HeightRequest="40" WidthRequest="40"
+                    VerticalOptions="Center">
+                <Label Text="⬤" FontSize="14" TextColor="{StaticResource Primary}"
+                       HorizontalOptions="Center" VerticalOptions="Center">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnBellTapped" />
+                    </Label.GestureRecognizers>
+                </Label>
             </Border>
         </Grid>
 
-        <!-- Subtitle -->
-        <Label Grid.Row="1" Text="Le tue schede"
-               FontFamily="LexendBold" FontSize="22" FontAttributes="Bold"
-               TextColor="{StaticResource OnSurface}"
-               Padding="20,8" />
-
-        <Grid Grid.Row="2" Padding="20,0,20,100">
+        <Grid Grid.Row="1" Padding="20,0,20,100">
 
             <!-- Empty State -->
             <VerticalStackLayout IsVisible="{Binding IsEmptyState}"

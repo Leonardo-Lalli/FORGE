@@ -5,35 +5,16 @@
     xmlns:vm="clr-namespace:GymTracker.Mobile.ViewModels"
     x:Class="GymTracker.Mobile.Views.CatalogPage"
     x:DataType="vm:CatalogViewModel"
-    Title="GYM LOG">
+    Title="Esercizi"
+    Shell.NavBarIsVisible="False">
 
-    <Grid RowDefinitions="Auto,Auto,*" BackgroundColor="{StaticResource Surface}">
+    <Grid RowDefinitions="Auto,*" BackgroundColor="{StaticResource Surface}">
 
-        <!-- Header bar -->
-        <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto"
-              Padding="20,16" BackgroundColor="{StaticResource Surface}">
-            <Border Grid.Column="0"
-                    BackgroundColor="{StaticResource SurfaceContainer}"
-                    StrokeShape="RoundRectangle 12"
-                    Padding="8" HeightRequest="40" WidthRequest="40">
-                <Label Text="📊" FontSize="18"
-                       HorizontalOptions="Center" VerticalOptions="Center" />
-            </Border>
-            <Label Grid.Column="1" Text="GYM LOG"
-                   FontFamily="LexendBold" FontSize="18" FontAttributes="Bold"
-                   TextColor="{StaticResource OnSurface}"
-                   HorizontalOptions="Center" VerticalOptions="Center" />
-            <Border Grid.Column="2"
-                    BackgroundColor="{StaticResource SurfaceContainer}"
-                    StrokeShape="RoundRectangle 12"
-                    Padding="8" HeightRequest="40" WidthRequest="40">
-                <Label Text="🔍" FontSize="16"
-                       HorizontalOptions="Center" VerticalOptions="Center" />
-            </Border>
-        </Grid>
-
-        <!-- Search + Category Chips -->
-        <VerticalStackLayout Grid.Row="1" Padding="20,0,20,12" Spacing="12">
+        <!-- Search + Title -->
+        <VerticalStackLayout Grid.Row="0" Padding="20,16,20,8" Spacing="12">
+            <Label Text="Catalogo Esercizi"
+                   FontFamily="LexendBold" FontSize="22" FontAttributes="Bold"
+                   TextColor="{StaticResource OnSurface}" />
             <SearchBar Placeholder="Cerca esercizio..."
                        Text="{Binding SearchText}"
                        SearchCommand="{Binding SearchCommand}"
@@ -89,7 +70,7 @@
         </VerticalStackLayout>
 
         <!-- Exercise List -->
-        <ScrollView Grid.Row="2" Padding="20,0,20,100">
+        <ScrollView Grid.Row="1" Padding="20,0,20,100">
             <VerticalStackLayout Spacing="8">
 
                 <!-- Empty State -->

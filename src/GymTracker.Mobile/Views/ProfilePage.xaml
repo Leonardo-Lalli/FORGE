@@ -5,40 +5,33 @@
     xmlns:vm="clr-namespace:GymTracker.Mobile.ViewModels"
     x:Class="GymTracker.Mobile.Views.ProfilePage"
     x:DataType="vm:ProfileViewModel"
-    Title="STATS">
+    Title="Stats"
+    Shell.NavBarIsVisible="False">
 
     <Grid RowDefinitions="Auto,*" BackgroundColor="{StaticResource Surface}">
 
-        <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" Padding="20,16" BackgroundColor="{StaticResource Surface}">
-            <Border Grid.Column="0" BackgroundColor="{StaticResource SurfaceContainer}"
-                    StrokeShape="RoundRectangle 12" Padding="8" HeightRequest="40" WidthRequest="40">
-                <Label Text="📊" FontSize="18" HorizontalOptions="Center" VerticalOptions="Center" />
-            </Border>
-            <Label Grid.Column="1" Text="PROGRESSI" FontFamily="LexendBold" FontSize="18" FontAttributes="Bold"
-                   TextColor="{StaticResource OnSurface}" HorizontalOptions="Center" VerticalOptions="Center" />
-            <Border Grid.Column="2" BackgroundColor="{StaticResource SurfaceContainer}"
-                    StrokeShape="RoundRectangle 12" Padding="8" HeightRequest="40" WidthRequest="40">
-                <Label Text="⚙️" FontSize="16" HorizontalOptions="Center" VerticalOptions="Center" />
-            </Border>
-        </Grid>
+        <!-- Title + Period Chips -->
+        <VerticalStackLayout Grid.Row="0" Padding="20,16,20,4" Spacing="10">
+            <Label Text="Progressi" FontFamily="LexendBold" FontSize="22" FontAttributes="Bold"
+                   TextColor="{StaticResource OnSurface}" />
+            <HorizontalStackLayout Spacing="8">
+                <Border BackgroundColor="{StaticResource LimeGreen}" StrokeShape="RoundRectangle 16" Padding="16,8">
+                    <Label Text="Settimana" FontFamily="InterBold" FontSize="12" FontAttributes="Bold"
+                           TextColor="{StaticResource OnSecondary}" />
+                </Border>
+                <Border BackgroundColor="{StaticResource SurfaceContainer}" StrokeShape="RoundRectangle 16" Padding="16,8">
+                    <Label Text="Mese" FontFamily="InterBold" FontSize="12" FontAttributes="Bold"
+                           TextColor="{StaticResource TextSecondary}" />
+                </Border>
+                <Border BackgroundColor="{StaticResource SurfaceContainer}" StrokeShape="RoundRectangle 16" Padding="16,8">
+                    <Label Text="Anno" FontFamily="InterBold" FontSize="12" FontAttributes="Bold"
+                           TextColor="{StaticResource TextSecondary}" />
+                </Border>
+            </HorizontalStackLayout>
+        </VerticalStackLayout>
 
         <ScrollView Grid.Row="1" Padding="20,0,20,100">
             <VerticalStackLayout Spacing="16">
-
-                <HorizontalStackLayout Padding="0,8" Spacing="8">
-                    <Border BackgroundColor="{StaticResource LimeGreen}" StrokeShape="RoundRectangle 16" Padding="16,8">
-                        <Label Text="Settimana" FontFamily="InterBold" FontSize="12" FontAttributes="Bold"
-                               TextColor="{StaticResource OnSecondary}" />
-                    </Border>
-                    <Border BackgroundColor="{StaticResource SurfaceContainer}" StrokeShape="RoundRectangle 16" Padding="16,8">
-                        <Label Text="Mese" FontFamily="InterBold" FontSize="12" FontAttributes="Bold"
-                               TextColor="{StaticResource TextSecondary}" />
-                    </Border>
-                    <Border BackgroundColor="{StaticResource SurfaceContainer}" StrokeShape="RoundRectangle 16" Padding="16,8">
-                        <Label Text="Anno" FontFamily="InterBold" FontSize="12" FontAttributes="Bold"
-                               TextColor="{StaticResource TextSecondary}" />
-                    </Border>
-                </HorizontalStackLayout>
 
                 <!-- Volume + Workouts -->
                 <Grid ColumnDefinitions="*,12,*" RowDefinitions="Auto">

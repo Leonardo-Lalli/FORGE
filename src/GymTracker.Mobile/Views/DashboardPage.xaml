@@ -5,34 +5,33 @@
     xmlns:vm="clr-namespace:GymTracker.Mobile.ViewModels"
     x:Class="GymTracker.Mobile.Views.DashboardPage"
     x:DataType="vm:DashboardViewModel"
-    Title="IRON RANK">
+    Title="Home"
+    Shell.NavBarIsVisible="False">
 
-    <Grid RowDefinitions="Auto,*" BackgroundColor="{StaticResource Surface}">
+    <Grid RowDefinitions="*" BackgroundColor="{StaticResource Surface}">
 
-        <!-- Header -->
-        <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" Padding="20,16" BackgroundColor="{StaticResource Surface}">
-            <Border Grid.Column="0" BackgroundColor="{StaticResource SurfaceContainer}"
-                    StrokeShape="RoundRectangle 12" Padding="8" HeightRequest="40" WidthRequest="40">
-                <Label Text="📊" FontSize="18" HorizontalOptions="Center" VerticalOptions="Center" />
-            </Border>
-            <Label Grid.Column="1" Text="IRON RANK"
-                   FontFamily="LexendBold" FontSize="18" FontAttributes="Bold"
-                   TextColor="{StaticResource OnSurface}" HorizontalOptions="Center" VerticalOptions="Center" />
-            <Border Grid.Column="2" BackgroundColor="{StaticResource SurfaceContainer}"
-                    StrokeShape="RoundRectangle 12" Padding="8" HeightRequest="40" WidthRequest="40">
-                <Label Text="🔔" FontSize="18" HorizontalOptions="Center" VerticalOptions="Center" />
-            </Border>
-        </Grid>
-
-        <ScrollView Grid.Row="1" Padding="20,8,20,100">
+        <ScrollView Padding="20,16,20,100">
             <VerticalStackLayout Spacing="16">
 
-                <!-- Greeting -->
-                <VerticalStackLayout Spacing="2">
-                    <Label Text="Oggi" FontFamily="InterRegular" FontSize="14" TextColor="{StaticResource TextSecondary}" />
-                    <Label Text="Ciao, IronAthlete" FontFamily="LexendBold" FontSize="26" FontAttributes="Bold"
-                           TextColor="{StaticResource OnSurface}" />
-                </VerticalStackLayout>
+                <!-- Greeting + Bell -->
+                <Grid ColumnDefinitions="*,Auto">
+                    <VerticalStackLayout Grid.Column="0" Spacing="2">
+                        <Label Text="Oggi" FontFamily="InterRegular" FontSize="14" TextColor="{StaticResource TextSecondary}" />
+                        <Label Text="Ciao, IronAthlete" FontFamily="LexendBold" FontSize="26" FontAttributes="Bold"
+                               TextColor="{StaticResource OnSurface}" />
+                    </VerticalStackLayout>
+                    <Border Grid.Column="1" BackgroundColor="{StaticResource SurfaceContainer}"
+                            StrokeShape="RoundRectangle 12" Padding="8" HeightRequest="40" WidthRequest="40"
+                            VerticalOptions="Center">
+                        <Label x:Name="BellIcon" Text="⬤" FontSize="14"
+                               TextColor="{StaticResource Primary}"
+                               HorizontalOptions="Center" VerticalOptions="Center">
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnBellTapped" />
+                            </Label.GestureRecognizers>
+                        </Label>
+                    </Border>
+                </Grid>
 
                 <!-- Streak + Rank -->
                 <Border Style="{StaticResource CardFrame}" BackgroundColor="{StaticResource SurfaceContainerHigh}">
