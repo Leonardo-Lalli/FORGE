@@ -8,27 +8,27 @@
     Title="Feed"
     Shell.NavBarIsVisible="False">
 
-    <Grid RowDefinitions="Auto,*" BackgroundColor="{StaticResource Surface}">
+    <Grid RowDefinitions="Auto,*" BackgroundColor="{DynamicResource Surface}">
 
         <!-- TopBar — exact mockup: avatar | FORGE | notifications -->
         <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto"
-              Padding="24,16" BackgroundColor="{StaticResource Surface}">
+              Padding="24,16" BackgroundColor="{DynamicResource Surface}">
             <Border Grid.Column="0" StrokeShape="RoundRectangle 999"
                     WidthRequest="40" HeightRequest="40" Padding="0"
-                    BackgroundColor="{StaticResource PrimaryContainer}">
+                    BackgroundColor="{DynamicResource PrimaryContainer}">
                 <Label Text="F" FontFamily="LexendBold" FontSize="18"
-                       TextColor="{StaticResource OnPrimaryContainer}"
+                       TextColor="{DynamicResource OnPrimaryContainer}"
                        HorizontalOptions="Center" VerticalOptions="Center" />
             </Border>
             <Label Grid.Column="1" Text="FORGE"
                    FontFamily="LexendBold" FontSize="32" FontAttributes="Bold"
-                   TextColor="{StaticResource Primary}"
+                   TextColor="{DynamicResource Primary}"
                    HorizontalOptions="Center" VerticalOptions="Center"
                    CharacterSpacing="-1" />
-            <Border Grid.Column="2" BackgroundColor="{StaticResource SurfaceContainer}"
+            <Border Grid.Column="2" BackgroundColor="{DynamicResource SurfaceContainer}"
                     StrokeShape="RoundRectangle 999" WidthRequest="40" HeightRequest="40" Padding="0"
-                    Stroke="{StaticResource OutlineVariant}" StrokeThickness="0.5">
-                <Label Text="⚙" FontSize="16" TextColor="{StaticResource OnSurfaceVariant}"
+                    Stroke="{DynamicResource OutlineVariant}" StrokeThickness="0.5">
+                <Label Text="⚙" FontSize="16" TextColor="{DynamicResource OnSurfaceVariant}"
                        HorizontalOptions="Center" VerticalOptions="Center">
                     <Label.GestureRecognizers>
                         <TapGestureRecognizer Tapped="OnSettingsTapped" />
@@ -45,9 +45,9 @@
                     <DataTemplate x:DataType="vm:FeedPost">
 
                         <!-- Feed Card -->
-                        <Border BackgroundColor="{StaticResource SurfaceContainerLowest}"
+                        <Border BackgroundColor="{DynamicResource SurfaceContainerLowest}"
                                 StrokeShape="RoundRectangle 16"
-                                Stroke="{StaticResource OutlineVariant}" StrokeThickness="0.5"
+                                Stroke="{DynamicResource OutlineVariant}" StrokeThickness="0.5"
                                 Padding="24">
                             <VerticalStackLayout Spacing="16">
 
@@ -55,28 +55,28 @@
                                 <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
                                     <Border Grid.Column="0" StrokeShape="RoundRectangle 999"
                                             WidthRequest="48" HeightRequest="48" Padding="0"
-                                            BackgroundColor="{StaticResource PrimaryContainer}"
-                                            Stroke="{StaticResource Surface}" StrokeThickness="2">
+                                            BackgroundColor="{DynamicResource PrimaryContainer}"
+                                            Stroke="{DynamicResource Surface}" StrokeThickness="2">
                                         <Label Text="{Binding Initial}"
                                                FontFamily="LexendBold" FontSize="20"
-                                               TextColor="{StaticResource OnPrimaryContainer}"
+                                               TextColor="{DynamicResource OnPrimaryContainer}"
                                                HorizontalOptions="Center" VerticalOptions="Center" />
                                     </Border>
                                     <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
                                         <Label Text="{Binding UserName}"
                                                FontFamily="InterRegular" FontSize="18" FontAttributes="Bold"
-                                               TextColor="{StaticResource OnSurface}" />
+                                               TextColor="{DynamicResource OnSurface}" />
                                         <Label Text="{Binding TimeAgo}"
                                                FontFamily="InterBold" FontSize="12" FontAttributes="Bold"
-                                               TextColor="{StaticResource Outline}"
+                                               TextColor="{DynamicResource Outline}"
                                                CharacterSpacing="0.6" />
                                     </VerticalStackLayout>
-                                    <Border Grid.Column="2" BackgroundColor="{StaticResource Primary}"
+                                    <Border Grid.Column="2" BackgroundColor="{DynamicResource Primary}"
                                             Opacity="0.20" StrokeShape="RoundRectangle 999"
                                             Padding="12,4" VerticalOptions="Start">
                                         <Label Text="{Binding Category}"
                                                FontFamily="InterBold" FontSize="12" FontAttributes="Bold"
-                                               TextColor="{StaticResource Primary}"
+                                               TextColor="{DynamicResource Primary}"
                                                CharacterSpacing="0.6" />
                                     </Border>
                                 </Grid>
@@ -84,68 +84,68 @@
                                 <!-- Title -->
                                 <Label Text="{Binding Title}"
                                        FontFamily="InterBold" FontSize="24" FontAttributes="Bold"
-                                       TextColor="{StaticResource Primary}" />
+                                       TextColor="{DynamicResource Primary}" />
 
                                 <!-- 3-column data -->
                                 <Grid ColumnDefinitions="*,8,*,8,*" IsVisible="{Binding HasImage}">
                                     <VerticalStackLayout Grid.Column="0" Spacing="2">
                                         <Label Text="{Binding DataCol1Label}"
                                                FontFamily="InterBold" FontSize="12" FontAttributes="Bold"
-                                               TextColor="{StaticResource Outline}" CharacterSpacing="0.6" />
+                                               TextColor="{DynamicResource Outline}" CharacterSpacing="0.6" />
                                         <Label Text="{Binding DataCol1Value}"
                                                FontFamily="InterBold" FontSize="18"
-                                               TextColor="{StaticResource OnSurface}" />
+                                               TextColor="{DynamicResource OnSurface}" />
                                     </VerticalStackLayout>
-                                    <BoxView Grid.Column="1" Color="{StaticResource OutlineVariant}"
+                                    <BoxView Grid.Column="1" Color="{DynamicResource OutlineVariant}"
                                              Opacity="0.3" WidthRequest="1" />
                                     <VerticalStackLayout Grid.Column="2" Spacing="2">
                                         <Label Text="{Binding DataCol2Label}"
                                                FontFamily="InterBold" FontSize="12" FontAttributes="Bold"
-                                               TextColor="{StaticResource Outline}" CharacterSpacing="0.6" />
+                                               TextColor="{DynamicResource Outline}" CharacterSpacing="0.6" />
                                         <Label Text="{Binding DataCol2Value}"
                                                FontFamily="InterBold" FontSize="18"
-                                               TextColor="{StaticResource OnSurface}" />
+                                               TextColor="{DynamicResource OnSurface}" />
                                     </VerticalStackLayout>
-                                    <BoxView Grid.Column="3" Color="{StaticResource OutlineVariant}"
+                                    <BoxView Grid.Column="3" Color="{DynamicResource OutlineVariant}"
                                              Opacity="0.3" WidthRequest="1" />
                                     <VerticalStackLayout Grid.Column="4" Spacing="2">
                                         <Label Text="{Binding DataCol3Label}"
                                                FontFamily="InterBold" FontSize="12" FontAttributes="Bold"
-                                               TextColor="{StaticResource Outline}" CharacterSpacing="0.6" />
+                                               TextColor="{DynamicResource Outline}" CharacterSpacing="0.6" />
                                         <Label Text="{Binding DataCol3Value}"
                                                FontFamily="InterBold" FontSize="18"
-                                               TextColor="{StaticResource OnSurface}" />
+                                               TextColor="{DynamicResource OnSurface}" />
                                     </VerticalStackLayout>
                                 </Grid>
 
                                 <!-- Description (for non-image posts) -->
                                 <Label Text="{Binding Description}"
                                        FontFamily="InterRegular" FontSize="16"
-                                       TextColor="{StaticResource OnSurfaceVariant}"
+                                       TextColor="{DynamicResource OnSurfaceVariant}"
                                        IsVisible="{Binding HasDataCards}" />
 
                                 <!-- 2-column volume/max cards -->
                                 <Grid ColumnDefinitions="*,16,*" IsVisible="{Binding HasDataCards}">
-                                    <Border Grid.Column="0" BackgroundColor="{StaticResource SurfaceContainer}"
+                                    <Border Grid.Column="0" BackgroundColor="{DynamicResource SurfaceContainer}"
                                             StrokeShape="RoundRectangle 12" Padding="16">
                                         <VerticalStackLayout Spacing="4">
                                             <Label Text="{Binding Card1Label}"
                                                    FontFamily="InterBold" FontSize="12" FontAttributes="Bold"
-                                                   TextColor="{StaticResource Outline}" CharacterSpacing="0.6" />
+                                                   TextColor="{DynamicResource Outline}" CharacterSpacing="0.6" />
                                             <Label Text="{Binding Card1Value}"
                                                    FontFamily="InterBold" FontSize="24" FontAttributes="Bold"
-                                                   TextColor="{StaticResource Primary}" />
+                                                   TextColor="{DynamicResource Primary}" />
                                         </VerticalStackLayout>
                                     </Border>
-                                    <Border Grid.Column="2" BackgroundColor="{StaticResource SurfaceContainer}"
+                                    <Border Grid.Column="2" BackgroundColor="{DynamicResource SurfaceContainer}"
                                             StrokeShape="RoundRectangle 12" Padding="16">
                                         <VerticalStackLayout Spacing="4">
                                             <Label Text="{Binding Card2Label}"
                                                    FontFamily="InterBold" FontSize="12" FontAttributes="Bold"
-                                                   TextColor="{StaticResource Outline}" CharacterSpacing="0.6" />
+                                                   TextColor="{DynamicResource Outline}" CharacterSpacing="0.6" />
                                             <Label Text="{Binding Card2Value}"
                                                    FontFamily="InterBold" FontSize="24" FontAttributes="Bold"
-                                                   TextColor="{StaticResource Primary}" />
+                                                   TextColor="{DynamicResource Primary}" />
                                         </VerticalStackLayout>
                                     </Border>
                                 </Grid>
@@ -154,11 +154,11 @@
                                 <Border IsVisible="{Binding HasImage}"
                                         StrokeShape="RoundRectangle 12"
                                         HeightRequest="192" Padding="0"
-                                        BackgroundColor="{StaticResource SurfaceVariant}"
-                                        Stroke="{StaticResource OutlineVariant}" StrokeThickness="0.5">
+                                        BackgroundColor="{DynamicResource SurfaceVariant}"
+                                        Stroke="{DynamicResource OutlineVariant}" StrokeThickness="0.5">
                                     <Label Text="Workout Route"
                                            FontFamily="InterRegular" FontSize="14"
-                                           TextColor="{StaticResource OnSurfaceVariant}"
+                                           TextColor="{DynamicResource OnSurfaceVariant}"
                                            HorizontalOptions="Center" VerticalOptions="Center" />
                                 </Border>
 
@@ -168,17 +168,17 @@
                                     <Border Grid.Column="0" StrokeThickness="0" BackgroundColor="Transparent"
                                             Padding="0">
                                         <HorizontalStackLayout Spacing="8">
-                                            <Label Text="♥" FontSize="16" TextColor="{StaticResource OnSurfaceVariant}" />
+                                            <Label Text="♥" FontSize="16" TextColor="{DynamicResource OnSurfaceVariant}" />
                                             <Label Text="{Binding Likes}" FontFamily="InterBold" FontSize="16"
-                                                   TextColor="{StaticResource OnSurface}" VerticalOptions="Center" />
+                                                   TextColor="{DynamicResource OnSurface}" VerticalOptions="Center" />
                                         </HorizontalStackLayout>
                                     </Border>
                                     <Border Grid.Column="1" StrokeThickness="0" BackgroundColor="Transparent"
                                             Padding="0">
                                         <HorizontalStackLayout Spacing="8">
-                                            <Label Text="💬" FontSize="16" TextColor="{StaticResource OnSurfaceVariant}" />
+                                            <Label Text="💬" FontSize="16" TextColor="{DynamicResource OnSurfaceVariant}" />
                                             <Label Text="{Binding Comments}" FontFamily="InterBold" FontSize="16"
-                                                   TextColor="{StaticResource OnSurface}" VerticalOptions="Center" />
+                                                   TextColor="{DynamicResource OnSurface}" VerticalOptions="Center" />
                                         </HorizontalStackLayout>
                                     </Border>
                                 </Grid>

@@ -23,6 +23,7 @@ public static class MauiProgram
 
         // Services
         builder.Services.AddSingleton<BuildSecrets>();
+        builder.Services.AddSingleton<ThemeService>();
 
         // ViewModels
         builder.Services.AddTransient<HomeViewModel>();
