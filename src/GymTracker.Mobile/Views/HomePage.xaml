@@ -8,27 +8,27 @@
     Title="FORGE_ELITE"
     Shell.NavBarIsVisible="False">
 
-    <Grid RowDefinitions="Auto,*" BackgroundColor="{DynamicResource Surface}">
+    <Grid RowDefinitions="Auto,*" BackgroundColor="{StaticResource Surface}">
 
         <!-- TopBar -->
         <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto"
-              Padding="24,20" BackgroundColor="{DynamicResource Surface}">
-            <Border Grid.Column="0" BackgroundColor="{DynamicResource SurfaceContainer}"
+              Padding="24,20" BackgroundColor="{StaticResource Surface}">
+            <Border Grid.Column="0" BackgroundColor="{StaticResource SurfaceContainer}"
                     StrokeShape="RoundRectangle 999" WidthRequest="40" HeightRequest="40" Padding="0"
-                    Stroke="{DynamicResource OutlineVariant}" StrokeThickness="0.5">
-                <Label Text="▸" FontSize="16" TextColor="{DynamicResource Primary}"
+                    Stroke="{StaticResource OutlineVariant}" StrokeThickness="0.5">
+                <Label Text="▸" FontSize="16" TextColor="{StaticResource Primary}"
                        HorizontalOptions="Center" VerticalOptions="Center"
                        Rotation="90" />
             </Border>
             <Label Grid.Column="1" Text="FORGE_ELITE"
                    FontFamily="LexendBold" FontSize="18" FontAttributes="Bold"
-                   TextColor="{DynamicResource Primary}"
+                   TextColor="{StaticResource Primary}"
                    HorizontalOptions="Center" VerticalOptions="Center"
                    CharacterSpacing="2" />
-            <Border Grid.Column="2" BackgroundColor="{DynamicResource SurfaceContainer}"
+            <Border Grid.Column="2" BackgroundColor="{StaticResource SurfaceContainer}"
                     StrokeShape="RoundRectangle 999" WidthRequest="40" HeightRequest="40" Padding="0"
-                    Stroke="{DynamicResource OutlineVariant}" StrokeThickness="0.5">
-                <Label Text="⚙" FontSize="16" TextColor="{DynamicResource OnSurfaceVariant}"
+                    Stroke="{StaticResource OutlineVariant}" StrokeThickness="0.5">
+                <Label Text="⚙" FontSize="16" TextColor="{StaticResource OnSurfaceVariant}"
                        HorizontalOptions="Center" VerticalOptions="Center">
                     <Label.GestureRecognizers>
                         <TapGestureRecognizer Tapped="OnSettingsTapped" />
@@ -45,7 +45,7 @@
                 <VerticalStackLayout Spacing="16">
                     <Label Text="Squad Activity"
                            FontFamily="LexendBold" FontSize="24" FontAttributes="Bold"
-                           TextColor="{DynamicResource OnSurface}" />
+                           TextColor="{StaticResource OnSurface}" />
                     <ScrollView Orientation="Horizontal" HorizontalScrollBarVisibility="Never">
                         <HorizontalStackLayout Spacing="16"
                             BindableLayout.ItemsSource="{Binding Squad}">
@@ -53,21 +53,23 @@
                                 <DataTemplate x:DataType="vm:SquadMember">
                                     <VerticalStackLayout Spacing="8" WidthRequest="72">
                                         <Border StrokeShape="RoundRectangle 999"
-                                                Stroke="{DynamicResource Primary}"
+                                                Stroke="{StaticResource Primary}"
                                                 StrokeThickness="2" Padding="2"
                                                 WidthRequest="64" HeightRequest="64"
-                                                BackgroundColor="{DynamicResource SurfaceVariant}">
+                                                BackgroundColor="{StaticResource PrimaryContainer}">
                                             <Border StrokeShape="RoundRectangle 999"
-                                                    Stroke="{DynamicResource Surface}"
-                                                    StrokeThickness="2" Padding="0">
-                                                <Image Source="{Binding AvatarUrl}"
-                                                       Aspect="AspectFill"
-                                                       WidthRequest="56" HeightRequest="56" />
+                                                    Stroke="{StaticResource Surface}"
+                                                    StrokeThickness="2" Padding="0"
+                                                    BackgroundColor="{StaticResource SurfaceVariant}">
+                                                <Label Text="{Binding Initial}"
+                                                       FontFamily="LexendBold" FontSize="22"
+                                                       TextColor="{StaticResource OnSurface}"
+                                                       HorizontalOptions="Center" VerticalOptions="Center" />
                                             </Border>
                                         </Border>
                                         <Label Text="{Binding Name}"
                                                FontFamily="InterRegular" FontSize="11"
-                                               TextColor="{DynamicResource OnSurfaceVariant}"
+                                               TextColor="{StaticResource OnSurfaceVariant}"
                                                HorizontalTextAlignment="Center" />
                                     </VerticalStackLayout>
                                 </DataTemplate>
@@ -77,40 +79,40 @@
                 </VerticalStackLayout>
 
                 <!-- ===== Current Streak Hero Card ===== -->
-                <Border BackgroundColor="{DynamicResource SurfaceContainerLowest}"
+                <Border BackgroundColor="{StaticResource SurfaceContainerLowest}"
                         StrokeShape="RoundRectangle 12"
-                        Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1"
+                        Stroke="{StaticResource OutlineVariant}" StrokeThickness="1"
                         Padding="24">
                     <VerticalStackLayout Spacing="16" HorizontalOptions="Center">
                         <HorizontalStackLayout Spacing="8" HorizontalOptions="Center">
-                            <Border BackgroundColor="{DynamicResource Primary}"
+                            <Border BackgroundColor="{StaticResource Primary}"
                                     Opacity="0.10" StrokeShape="RoundRectangle 999"
                                     WidthRequest="32" HeightRequest="32" Padding="0"
-                                    Stroke="{DynamicResource Primary}" StrokeThickness="1">
-                                <Label Text="✦" FontSize="14" TextColor="{DynamicResource Primary}"
+                                    Stroke="{StaticResource Primary}" StrokeThickness="1">
+                                <Label Text="✦" FontSize="14" TextColor="{StaticResource Primary}"
                                        HorizontalOptions="Center" VerticalOptions="Center" />
                             </Border>
                             <Label Text="CURRENT STREAK"
                                    FontFamily="InterBold" FontSize="12" FontAttributes="Bold"
-                                   TextColor="{DynamicResource OnSurfaceVariant}"
+                                   TextColor="{StaticResource OnSurfaceVariant}"
                                    CharacterSpacing="2.4" VerticalOptions="Center" />
                         </HorizontalStackLayout>
 
                         <Label Text="{Binding StreakCount}"
                                FontFamily="LexendBold" FontSize="72" FontAttributes="Bold"
-                               TextColor="{DynamicResource OnSurface}"
+                               TextColor="{StaticResource OnSurface}"
                                HorizontalTextAlignment="Center"
                                CharacterSpacing="-3" LineHeight="1" />
 
                         <Label Text="WEEKS"
                                FontFamily="LexendBold" FontSize="32" FontAttributes="Bold"
-                               TextColor="{DynamicResource Primary}"
+                               TextColor="{StaticResource Primary}"
                                HorizontalTextAlignment="Center"
                                CharacterSpacing="2" Margin="0,-8,0,0" />
 
                         <Label Text="You are crushing it. Keep the momentum going for another week."
                                FontFamily="InterRegular" FontSize="18"
-                               TextColor="{DynamicResource OnSurfaceVariant}"
+                               TextColor="{StaticResource OnSurfaceVariant}"
                                HorizontalTextAlignment="Center"
                                MaximumWidthRequest="320" />
                     </VerticalStackLayout>
@@ -119,43 +121,43 @@
                 <!-- ===== Next Workout + Hydration ===== -->
                 <Grid ColumnDefinitions="*,16,*" RowDefinitions="Auto">
 
-                    <Border Grid.Column="0" BackgroundColor="{DynamicResource SurfaceContainer}"
+                    <Border Grid.Column="0" BackgroundColor="{StaticResource SurfaceContainer}"
                             StrokeShape="RoundRectangle 12"
-                            Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1"
+                            Stroke="{StaticResource OutlineVariant}" StrokeThickness="1"
                             Padding="16" HeightRequest="128">
                         <VerticalStackLayout Spacing="0" VerticalOptions="End">
                             <HorizontalStackLayout>
-                                <Label Text="◉" FontSize="16" TextColor="{DynamicResource Primary}"
+                                <Label Text="◉" FontSize="16" TextColor="{StaticResource Primary}"
                                        VerticalOptions="Center" Margin="0,0,8,0" />
                                 <Label Text="Today" FontFamily="InterRegular" FontSize="11"
-                                       TextColor="{DynamicResource OnSurfaceVariant}"
+                                       TextColor="{StaticResource OnSurfaceVariant}"
                                        HorizontalOptions="End" VerticalOptions="Center" />
                             </HorizontalStackLayout>
                             <Label Text="{Binding NextWorkout}" FontFamily="LexendBold" FontSize="24"
-                                   FontAttributes="Bold" TextColor="{DynamicResource OnSurface}"
+                                   FontAttributes="Bold" TextColor="{StaticResource OnSurface}"
                                    Margin="0,4,0,0" />
                             <Label Text="{Binding WorkoutDuration}" FontFamily="InterRegular" FontSize="11"
-                                   TextColor="{DynamicResource Primary}" Margin="0,4,0,0" />
+                                   TextColor="{StaticResource Primary}" Margin="0,4,0,0" />
                         </VerticalStackLayout>
                     </Border>
 
-                    <Border Grid.Column="2" BackgroundColor="{DynamicResource SurfaceContainer}"
+                    <Border Grid.Column="2" BackgroundColor="{StaticResource SurfaceContainer}"
                             StrokeShape="RoundRectangle 12"
-                            Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1"
+                            Stroke="{StaticResource OutlineVariant}" StrokeThickness="1"
                             Padding="16" HeightRequest="128">
                         <VerticalStackLayout Spacing="0" VerticalOptions="End">
                             <HorizontalStackLayout>
-                                <Label Text="◎" FontSize="16" TextColor="{DynamicResource Primary}"
+                                <Label Text="◎" FontSize="16" TextColor="{StaticResource Primary}"
                                        VerticalOptions="Center" Margin="0,0,8,0" />
                                 <Label Text="{Binding HydrationText}" FontFamily="InterRegular" FontSize="11"
-                                       TextColor="{DynamicResource OnSurfaceVariant}"
+                                       TextColor="{StaticResource OnSurfaceVariant}"
                                        HorizontalOptions="End" VerticalOptions="Center" />
                             </HorizontalStackLayout>
                             <Label Text="Hydration" FontFamily="LexendBold" FontSize="24"
-                                   FontAttributes="Bold" TextColor="{DynamicResource OnSurface}"
+                                   FontAttributes="Bold" TextColor="{StaticResource OnSurface}"
                                    Margin="0,4,0,0" />
                             <ProgressBar Progress="{Binding HydrationProgress}"
-                                         ProgressColor="{DynamicResource Primary}"
+                                         ProgressColor="{StaticResource Primary}"
                                          Margin="0,10,0,0" />
                         </VerticalStackLayout>
                     </Border>
@@ -167,41 +169,41 @@
                     <Grid ColumnDefinitions="*,Auto">
                         <Label Grid.Column="0" Text="Achievements"
                                FontFamily="LexendBold" FontSize="24" FontAttributes="Bold"
-                               TextColor="{DynamicResource OnSurface}" />
+                               TextColor="{StaticResource OnSurface}" />
                         <Label Grid.Column="1" Text="View All"
                                FontFamily="InterRegular" FontSize="11"
-                               TextColor="{DynamicResource Primary}" VerticalOptions="Center" />
+                               TextColor="{StaticResource Primary}" VerticalOptions="Center" />
                     </Grid>
 
                     <VerticalStackLayout Spacing="8"
                         BindableLayout.ItemsSource="{Binding Achievements}">
                         <BindableLayout.ItemTemplate>
                             <DataTemplate x:DataType="vm:Achievement">
-                                <Border BackgroundColor="{DynamicResource SurfaceContainer}"
+                                <Border BackgroundColor="{StaticResource SurfaceContainer}"
                                         StrokeShape="RoundRectangle 8"
-                                        Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1"
+                                        Stroke="{StaticResource OutlineVariant}" StrokeThickness="1"
                                         Padding="16">
                                     <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="16">
-                                        <Border Grid.Column="0" BackgroundColor="{DynamicResource SurfaceVariant}"
+                                        <Border Grid.Column="0" BackgroundColor="{StaticResource SurfaceVariant}"
                                                 StrokeShape="RoundRectangle 999"
-                                                Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1"
+                                                Stroke="{StaticResource OutlineVariant}" StrokeThickness="1"
                                                 WidthRequest="48" HeightRequest="48" Padding="0">
                                             <Label Text="{Binding Icon}" FontSize="18"
-                                                   TextColor="{DynamicResource Primary}"
+                                                   TextColor="{StaticResource Primary}"
                                                    HorizontalOptions="Center" VerticalOptions="Center" />
                                         </Border>
                                         <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="6">
                                             <Label Text="{Binding Title}"
                                                    FontFamily="InterRegular" FontSize="18"
-                                                   TextColor="{DynamicResource OnSurface}" />
+                                                   TextColor="{StaticResource OnSurface}" />
                                             <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
                                                 <ProgressBar Grid.Column="0"
                                                              Progress="{Binding Progress}"
-                                                             ProgressColor="{DynamicResource Primary}"
+                                                             ProgressColor="{StaticResource Primary}"
                                                              VerticalOptions="Center" />
                                                 <Label Grid.Column="1" Text="{Binding ProgressText}"
                                                        FontFamily="InterRegular" FontSize="11"
-                                                       TextColor="{DynamicResource OnSurfaceVariant}"
+                                                       TextColor="{StaticResource OnSurfaceVariant}"
                                                        VerticalOptions="Center" />
                                             </Grid>
                                         </VerticalStackLayout>
@@ -214,7 +216,7 @@
 
                 <!-- ===== Start Workout Button ===== -->
                 <Button Text="▶  START WORKOUT"
-                        Style="{DynamicResource PrimaryButton}"
+                        Style="{StaticResource PrimaryButton}"
                         FontFamily="LexendBold" FontSize="16"
                         HeightRequest="56" CornerRadius="8"
                         Command="{Binding StartWorkoutCommand}" />

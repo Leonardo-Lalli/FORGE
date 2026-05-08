@@ -8,14 +8,14 @@
     Title="Settings"
     Shell.NavBarIsVisible="False">
 
-    <Grid RowDefinitions="Auto,*" BackgroundColor="{DynamicResource Surface}">
+    <Grid RowDefinitions="Auto,*" BackgroundColor="{StaticResource Surface}">
 
         <!-- Header -->
         <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" Padding="24,20">
-            <Border Grid.Column="0" BackgroundColor="{DynamicResource SurfaceContainer}"
+            <Border Grid.Column="0" BackgroundColor="{StaticResource SurfaceContainer}"
                     StrokeShape="RoundRectangle 999" WidthRequest="40" HeightRequest="40" Padding="0"
-                    Stroke="{DynamicResource OutlineVariant}" StrokeThickness="0.5">
-                <Label Text="←" FontSize="18" TextColor="{DynamicResource OnSurface}"
+                    Stroke="{StaticResource OutlineVariant}" StrokeThickness="0.5">
+                <Label Text="←" FontSize="18" TextColor="{StaticResource OnSurface}"
                        HorizontalOptions="Center" VerticalOptions="Center">
                     <Label.GestureRecognizers>
                         <TapGestureRecognizer Command="{Binding GoBackCommand}" />
@@ -24,7 +24,7 @@
             </Border>
             <Label Grid.Column="1" Text="Impostazioni"
                    FontFamily="LexendBold" FontSize="18" FontAttributes="Bold"
-                   TextColor="{DynamicResource OnSurface}"
+                   TextColor="{StaticResource OnSurface}"
                    HorizontalOptions="Center" VerticalOptions="Center" />
         </Grid>
 
@@ -34,50 +34,50 @@
                 <!-- Appearance Section -->
                 <Label Text="ASPETTO"
                        FontFamily="InterBold" FontSize="11" FontAttributes="Bold"
-                       TextColor="{DynamicResource TextSecondary}"
+                       TextColor="{StaticResource TextSecondary}"
                        CharacterSpacing="0.8" Margin="0,8,0,0" />
 
                 <!-- Dark Mode Toggle -->
-                <Border BackgroundColor="{DynamicResource SurfaceContainerHigh}"
+                <Border BackgroundColor="{StaticResource SurfaceContainerHigh}"
                         StrokeShape="RoundRectangle 12"
-                        Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1"
+                        Stroke="{StaticResource OutlineVariant}" StrokeThickness="1"
                         Padding="16">
                     <Grid ColumnDefinitions="*,Auto">
                         <VerticalStackLayout Grid.Column="0" VerticalOptions="Center" Spacing="4">
                             <Label Text="Modalità Scura"
                                    FontFamily="LexendBold" FontSize="16" FontAttributes="Bold"
-                                   TextColor="{DynamicResource OnSurface}" />
+                                   TextColor="{StaticResource OnSurface}" />
                             <Label Text="Attiva il tema Cyber-Athletic Elite"
                                    FontFamily="InterRegular" FontSize="13"
-                                   TextColor="{DynamicResource TextSecondary}" />
+                                   TextColor="{StaticResource TextSecondary}" />
                         </VerticalStackLayout>
                         <Switch Grid.Column="1" IsToggled="{Binding IsDarkMode}"
-                                OnColor="{DynamicResource Primary}"
+                                OnColor="{StaticResource Primary}"
                                 VerticalOptions="Center" />
                     </Grid>
                 </Border>
 
                 <!-- Theme Preview -->
-                <Border BackgroundColor="{DynamicResource SurfaceContainerLowest}"
+                <Border BackgroundColor="{StaticResource SurfaceContainerLowest}"
                         StrokeShape="RoundRectangle 12"
-                        Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1"
+                        Stroke="{StaticResource OutlineVariant}" StrokeThickness="1"
                         Padding="20">
                     <VerticalStackLayout Spacing="12" HorizontalOptions="Center">
                         <Label Text="Anteprima Tema Attuale"
                                FontFamily="InterBold" FontSize="11"
-                               TextColor="{DynamicResource TextSecondary}"
+                               TextColor="{StaticResource TextSecondary}"
                                CharacterSpacing="0.8" HorizontalTextAlignment="Center" />
                         <Grid ColumnDefinitions="48,*,48" ColumnSpacing="12">
-                            <BoxView Grid.Column="0" Color="{DynamicResource Primary}"
+                            <BoxView Grid.Column="0" Color="{StaticResource Primary}"
                                      CornerRadius="24" WidthRequest="48" HeightRequest="48" />
                             <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="4">
-                                <BoxView Color="{DynamicResource OnSurface}"
+                                <BoxView Color="{StaticResource OnSurface}"
                                          HeightRequest="12" CornerRadius="6" />
-                                <BoxView Color="{DynamicResource TextSecondary}"
+                                <BoxView Color="{StaticResource TextSecondary}"
                                          HeightRequest="8" CornerRadius="4"
                                          HorizontalOptions="Start" WidthRequest="120" />
                             </VerticalStackLayout>
-                            <BoxView Grid.Column="2" Color="{DynamicResource SecondaryContainer}"
+                            <BoxView Grid.Column="2" Color="{StaticResource SecondaryContainer}"
                                      CornerRadius="24" WidthRequest="48" HeightRequest="48" />
                         </Grid>
                     </VerticalStackLayout>
@@ -86,12 +86,12 @@
                 <!-- Tema Chiaro Preview -->
                 <Label Text="TEMI DISPONIBILI"
                        FontFamily="InterBold" FontSize="11" FontAttributes="Bold"
-                       TextColor="{DynamicResource TextSecondary}"
+                       TextColor="{StaticResource TextSecondary}"
                        CharacterSpacing="0.8" Margin="0,8,0,0" />
 
-                <Border BackgroundColor="{DynamicResource SurfaceContainerHigh}"
+                <Border BackgroundColor="{StaticResource SurfaceContainerHigh}"
                         StrokeShape="RoundRectangle 12"
-                        Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1"
+                        Stroke="{StaticResource OutlineVariant}" StrokeThickness="1"
                         Padding="16">
                     <HorizontalStackLayout Spacing="16">
                         <Border BackgroundColor="#003ec7"
@@ -100,17 +100,17 @@
                                 Stroke="#003ec7" StrokeThickness="2" />
                         <VerticalStackLayout VerticalOptions="Center" Spacing="2">
                             <Label Text="Fitness Core" FontFamily="LexendBold" FontSize="14"
-                                   FontAttributes="Bold" TextColor="{DynamicResource OnSurface}" />
+                                   FontAttributes="Bold" TextColor="{StaticResource OnSurface}" />
                             <Label Text="Tema chiaro — blu professionale"
                                    FontFamily="InterRegular" FontSize="12"
-                                   TextColor="{DynamicResource TextSecondary}" />
+                                   TextColor="{StaticResource TextSecondary}" />
                         </VerticalStackLayout>
                     </HorizontalStackLayout>
                 </Border>
 
-                <Border BackgroundColor="{DynamicResource SurfaceContainerHigh}"
+                <Border BackgroundColor="{StaticResource SurfaceContainerHigh}"
                         StrokeShape="RoundRectangle 12"
-                        Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1"
+                        Stroke="{StaticResource OutlineVariant}" StrokeThickness="1"
                         Padding="16">
                     <HorizontalStackLayout Spacing="16">
                         <Border BackgroundColor="#c3f5ff"
@@ -119,10 +119,10 @@
                                 Stroke="#c3f5ff" StrokeThickness="2" />
                         <VerticalStackLayout VerticalOptions="Center" Spacing="2">
                             <Label Text="Cyber-Athletic Elite" FontFamily="LexendBold" FontSize="14"
-                                   FontAttributes="Bold" TextColor="{DynamicResource OnSurface}" />
+                                   FontAttributes="Bold" TextColor="{StaticResource OnSurface}" />
                             <Label Text="Tema scuro — ciano high-tech"
                                    FontFamily="InterRegular" FontSize="12"
-                                   TextColor="{DynamicResource TextSecondary}" />
+                                   TextColor="{StaticResource TextSecondary}" />
                         </VerticalStackLayout>
                     </HorizontalStackLayout>
                 </Border>

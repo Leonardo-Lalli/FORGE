@@ -1,26 +1,16 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using GymTracker.Mobile.Services;
 
 namespace GymTracker.Mobile.ViewModels;
 
 public partial class SettingsViewModel : BaseViewModel
 {
-    private readonly ThemeService themeService;
-
     [ObservableProperty]
-    private bool isDarkMode;
+    private bool isDarkMode = true;
 
-    public SettingsViewModel(ThemeService themeService)
+    public SettingsViewModel()
     {
-        this.themeService = themeService;
-        IsDarkMode = themeService.IsDarkMode;
         HasData = true;
-    }
-
-    partial void OnIsDarkModeChanged(bool value)
-    {
-        themeService.IsDarkMode = value;
     }
 
     [RelayCommand]

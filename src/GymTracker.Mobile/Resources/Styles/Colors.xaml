@@ -3,6 +3,51 @@
 <ResourceDictionary
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
-    <!-- Colors are loaded from Colors.Dark.xaml / Colors.Light.xaml via App.xaml -->
-    <!-- ThemeService swaps them at runtime. -->
+
+    <!-- Cyber-Athletic Elite Dark Palette -->
+
+    <Color x:Key="Surface">#131313</Color>
+    <Color x:Key="SurfaceDim">#131313</Color>
+    <Color x:Key="SurfaceBright">#3a3939</Color>
+    <Color x:Key="SurfaceContainerLowest">#0e0e0e</Color>
+    <Color x:Key="SurfaceContainerLow">#1c1b1b</Color>
+    <Color x:Key="SurfaceContainer">#201f1f</Color>
+    <Color x:Key="SurfaceContainerHigh">#2a2a2a</Color>
+    <Color x:Key="SurfaceContainerHighest">#353534</Color>
+    <Color x:Key="SurfaceVariant">#353534</Color>
+
+    <Color x:Key="OnSurface">#e5e2e1</Color>
+    <Color x:Key="OnSurfaceVariant">#bac9cc</Color>
+
+    <Color x:Key="Primary">#c3f5ff</Color>
+    <Color x:Key="OnPrimary">#00363d</Color>
+    <Color x:Key="PrimaryContainer">#00e5ff</Color>
+    <Color x:Key="OnPrimaryContainer">#00626e</Color>
+
+    <Color x:Key="Secondary">#ffffff</Color>
+    <Color x:Key="OnSecondary">#283500</Color>
+    <Color x:Key="SecondaryContainer">#c3f400</Color>
+    <Color x:Key="OnSecondaryContainer">#556d00</Color>
+
+    <Color x:Key="Tertiary">#efeceb</Color>
+    <Color x:Key="OnTertiary">#313030</Color>
+    <Color x:Key="TertiaryContainer">#d2d0cf</Color>
+
+    <Color x:Key="Error">#ffb4ab</Color>
+    <Color x:Key="OnError">#690005</Color>
+    <Color x:Key="ErrorContainer">#93000a</Color>
+
+    <Color x:Key="Outline">#849396</Color>
+    <Color x:Key="OutlineVariant">#3b494c</Color>
+
+    <Color x:Key="ElectricBlue">#00daf3</Color>
+    <Color x:Key="LimeGreen">#c3f400</Color>
+    <Color x:Key="AlertRed">#ff3b30</Color>
+    <Color x:Key="CardBackground">#1C1C1E</Color>
+    <Color x:Key="PureBlack">#000000</Color>
+
+    <Color x:Key="PageBackground">#131313</Color>
+    <Color x:Key="TextPrimary">#e5e2e1</Color>
+    <Color x:Key="TextSecondary">#bac9cc</Color>
+
 </ResourceDictionary>

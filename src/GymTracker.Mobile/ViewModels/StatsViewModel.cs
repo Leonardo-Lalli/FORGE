@@ -24,14 +24,14 @@ public partial class StatsViewModel : BaseViewModel
         [ObservableProperty] private ObservableCollection<double> weeklyVolume = new();
         [ObservableProperty] private ObservableCollection<LiftEntry> topLifts = new();
 
-        // Pre-calculated bar heights in pixels (160px container max)
-        public double BarHeight0 => 48;
-        public double BarHeight1 => 80;
-        public double BarHeight2 => 128;
-        public double BarHeight3 => 96;
-        public double BarHeight4 => 144;
-        public double BarHeight5 => 64;
-        public double BarHeight6 => 112;
+        // Pre-calculated bar heights in pixels (200px container max)
+        public double BarHeight0 => 60;
+        public double BarHeight1 => 100;
+        public double BarHeight2 => 160;
+        public double BarHeight3 => 120;
+        public double BarHeight4 => 180;
+        public double BarHeight5 => 80;
+        public double BarHeight6 => 140;
 
         public StatsViewModel()
         {
