@@ -9,9 +9,4 @@ public partial class DashboardPage : ContentPage
         InitializeComponent();
         BindingContext = viewModel;
     }
-
-    private async void OnBellTapped(object? sender, EventArgs e)
-    {
-        await Shell.Current.GoToAsync("notifications");
-    }
 }

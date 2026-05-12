@@ -1,12 +1,10 @@
+using System.Collections.Concurrent;
+
 namespace GymTracker.Mobile.Services;
 
 public class BuildSecrets
 {
-    private readonly Dictionary<string, string> secrets = new(StringComparer.OrdinalIgnoreCase);
-
-    public BuildSecrets()
-    {
-    }
+    private readonly ConcurrentDictionary<string, string> secrets = new(StringComparer.OrdinalIgnoreCase);
 
     public async Task LoadAsync()
     {
@@ -30,9 +28,9 @@ public class BuildSecrets
                 secrets[key] = value;
             }
         }
-        catch (FileNotFoundException)
+        catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine("[BuildSecrets] gymtracker.env not found — running without API keys");
+            System.Diagnostics.Debug.WriteLine($"[BuildSecrets] Failed to load gymtracker.env: {ex.Message}");
         }
     }
 

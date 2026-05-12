@@ -8,13 +8,13 @@
     Title="Notifiche"
     Shell.NavBarIsVisible="False">
 
-    <Grid RowDefinitions="Auto,*" BackgroundColor="{StaticResource Surface}">
+    <Grid RowDefinitions="Auto,*" BackgroundColor="{DynamicResource Surface}">
 
         <!-- Header -->
         <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" Padding="20,16" ColumnSpacing="12">
-            <Border BackgroundColor="{StaticResource SurfaceContainer}"
+            <Border BackgroundColor="{DynamicResource SurfaceContainer}"
                     StrokeShape="RoundRectangle 12" Padding="8" HeightRequest="40" WidthRequest="40">
-                <Label Text="←" FontSize="18" TextColor="{StaticResource OnSurface}"
+                <Label Text="←" FontSize="18" TextColor="{DynamicResource OnSurface}"
                        HorizontalOptions="Center" VerticalOptions="Center">
                     <Label.GestureRecognizers>
                         <TapGestureRecognizer Tapped="OnBackTapped" />
@@ -22,8 +22,8 @@
                 </Label>
             </Border>
             <Label Grid.Column="1" Text="Notifiche"
-                   FontFamily="LexendBold" FontSize="18" FontAttributes="Bold"
-                   TextColor="{StaticResource OnSurface}"
+                   FontFamily="OpenSansSemibold" FontSize="18" FontAttributes="Bold"
+                   TextColor="{DynamicResource OnSurface}"
                    HorizontalOptions="Center" VerticalOptions="Center" />
         </Grid>
 
@@ -32,34 +32,34 @@
             <CollectionView ItemsSource="{Binding Notifications}" SelectionMode="None">
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="vm:NotificationItem">
-                        <Border Style="{StaticResource CardFrame}"
-                                BackgroundColor="{StaticResource SurfaceContainerHigh}"
+                        <Border Style="{DynamicResource CardFrame}"
+                                BackgroundColor="{DynamicResource SurfaceContainerHigh}"
                                 Margin="0,4">
                             <VerticalStackLayout Spacing="10">
                                 <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
                                     <!-- Avatar -->
                                     <Border Grid.Column="0"
-                                            BackgroundColor="{StaticResource PrimaryContainer}"
+                                            BackgroundColor="{DynamicResource PrimaryContainer}"
                                             StrokeShape="RoundRectangle 20"
                                             WidthRequest="44" HeightRequest="44" Padding="0">
                                         <Label Text="{Binding Avatar}"
-                                               FontFamily="LexendBold" FontSize="17"
-                                               TextColor="{StaticResource OnPrimaryContainer}"
+                                               FontFamily="OpenSansSemibold" FontSize="17"
+                                               TextColor="{DynamicResource OnPrimaryContainer}"
                                                HorizontalOptions="Center" VerticalOptions="Center" />
                                     </Border>
                                     <!-- Name + Message -->
                                     <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
                                         <Label Text="{Binding Name}"
-                                               FontFamily="LexendBold" FontSize="14" FontAttributes="Bold"
-                                               TextColor="{StaticResource OnSurface}" />
+                                               FontFamily="OpenSansSemibold" FontSize="14" FontAttributes="Bold"
+                                               TextColor="{DynamicResource OnSurface}" />
                                         <Label Text="{Binding Message}"
-                                               FontFamily="InterRegular" FontSize="12"
-                                               TextColor="{StaticResource TextSecondary}"
+                                               FontFamily="OpenSansRegular" FontSize="12"
+                                               TextColor="{DynamicResource TextSecondary}"
                                                LineBreakMode="TailTruncation" MaxLines="2" />
                                     </VerticalStackLayout>
                                     <Label Grid.Column="2" Text="{Binding Time}"
-                                           FontFamily="InterRegular" FontSize="11"
-                                           TextColor="{StaticResource Outline}"
+                                           FontFamily="OpenSansRegular" FontSize="11"
+                                           TextColor="{DynamicResource Outline}"
                                            VerticalOptions="Start" Margin="0,4,0,0" />
                                 </Grid>
 
@@ -67,16 +67,16 @@
                                 <HorizontalStackLayout Spacing="8"
                                                        IsVisible="{Binding IsFriendRequest}">
                                     <Button Text="ACCETTA"
-                                            FontFamily="InterBold" FontSize="11"
-                                            BackgroundColor="{StaticResource LimeGreen}"
-                                            TextColor="{StaticResource OnSecondary}"
+                                            FontFamily="OpenSansSemibold" FontSize="11"
+                                            BackgroundColor="{DynamicResource LimeGreen}"
+                                            TextColor="{DynamicResource OnSecondary}"
                                             CornerRadius="16" HeightRequest="34" Padding="16,0"
                                             Command="{Binding Source={RelativeSource AncestorType={x:Type vm:NotificationsViewModel}}, Path=AcceptRequestCommand}"
                                             CommandParameter="{Binding .}" />
                                     <Button Text="RIFIUTA"
-                                            FontFamily="InterBold" FontSize="11"
-                                            BackgroundColor="{StaticResource SurfaceContainer}"
-                                            TextColor="{StaticResource TextSecondary}"
+                                            FontFamily="OpenSansSemibold" FontSize="11"
+                                            BackgroundColor="{DynamicResource SurfaceContainer}"
+                                            TextColor="{DynamicResource TextSecondary}"
                                             CornerRadius="16" HeightRequest="34" Padding="16,0"
                                             Command="{Binding Source={RelativeSource AncestorType={x:Type vm:NotificationsViewModel}}, Path=DeclineRequestCommand}"
                                             CommandParameter="{Binding .}" />

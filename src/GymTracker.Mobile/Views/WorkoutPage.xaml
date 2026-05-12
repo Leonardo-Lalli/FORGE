@@ -9,17 +9,17 @@
     Title="Workout"
     Shell.NavBarIsVisible="False">
 
-    <Grid RowDefinitions="Auto,*" BackgroundColor="{StaticResource Surface}">
+    <Grid RowDefinitions="Auto,*" BackgroundColor="{DynamicResource Surface}">
 
         <!-- Title + Bell -->
         <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Padding="20,16,20,8">
             <Label Grid.Column="0" Text="Le tue schede"
-                   FontFamily="LexendBold" FontSize="22" FontAttributes="Bold"
-                   TextColor="{StaticResource OnSurface}" VerticalOptions="Center" />
-            <Border Grid.Column="1" BackgroundColor="{StaticResource SurfaceContainer}"
+                   FontFamily="OpenSansSemibold" FontSize="22" FontAttributes="Bold"
+                   TextColor="{DynamicResource OnSurface}" VerticalOptions="Center" />
+            <Border Grid.Column="1" BackgroundColor="{DynamicResource SurfaceContainer}"
                     StrokeShape="RoundRectangle 12" Padding="8" HeightRequest="40" WidthRequest="40"
                     VerticalOptions="Center">
-                <Label Text="⬤" FontSize="14" TextColor="{StaticResource Primary}"
+                <Label Text="⬤" FontSize="14" TextColor="{DynamicResource Primary}"
                        HorizontalOptions="Center" VerticalOptions="Center">
                     <Label.GestureRecognizers>
                         <TapGestureRecognizer Tapped="OnBellTapped" />
@@ -36,23 +36,23 @@
                 <Label Text="📋" FontSize="56" HorizontalTextAlignment="Center" />
                 <VerticalStackLayout Spacing="6">
                     <Label Text="Nessuna scheda salvata"
-                           FontFamily="LexendBold" FontSize="20" FontAttributes="Bold"
-                           TextColor="{StaticResource OnSurface}"
+                           FontFamily="OpenSansSemibold" FontSize="20" FontAttributes="Bold"
+                           TextColor="{DynamicResource OnSurface}"
                            HorizontalTextAlignment="Center" />
                     <Label Text="Crea una scheda personalizzata o inizia un allenamento libero."
-                           FontFamily="InterRegular" FontSize="14"
-                           TextColor="{StaticResource TextSecondary}"
+                           FontFamily="OpenSansRegular" FontSize="14"
+                           TextColor="{DynamicResource TextSecondary}"
                            HorizontalTextAlignment="Center" MaximumWidthRequest="280" />
                 </VerticalStackLayout>
 
                 <Button Text="CREA NUOVA SCHEDA"
-                        Style="{StaticResource PrimaryButton}"
+                        Style="{DynamicResource PrimaryButton}"
                         HorizontalOptions="Center" WidthRequest="240"
                         HeightRequest="56"
                         Command="{Binding CreateNewPlanCommand}" />
 
                 <Button Text="ALLENAMENTO LIBERO"
-                        Style="{StaticResource SecondaryButton}"
+                        Style="{DynamicResource SecondaryButton}"
                         HorizontalOptions="Center" WidthRequest="240"
                         Command="{Binding StartEmptyWorkoutCommand}" />
             </VerticalStackLayout>
@@ -63,17 +63,17 @@
                     <CollectionView ItemsSource="{Binding SavedPlans}" SelectionMode="None">
                         <CollectionView.ItemTemplate>
                             <DataTemplate x:DataType="models:WorkoutPlan">
-                                <Border Style="{StaticResource CardFrame}"
-                                        BackgroundColor="{StaticResource SurfaceContainerHigh}"
+                                <Border Style="{DynamicResource CardFrame}"
+                                        BackgroundColor="{DynamicResource SurfaceContainerHigh}"
                                         Margin="0,4">
                                     <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto" RowSpacing="6">
                                         <Label Grid.Row="0" Grid.Column="0"
                                                Text="{Binding Name}"
-                                               FontFamily="LexendBold" FontSize="16" FontAttributes="Bold"
-                                               TextColor="{StaticResource OnSurface}" />
+                                               FontFamily="OpenSansSemibold" FontSize="16" FontAttributes="Bold"
+                                               TextColor="{DynamicResource OnSurface}" />
                                         <Label Grid.Row="1" Grid.Column="0"
-                                               FontFamily="InterRegular" FontSize="12"
-                                               TextColor="{StaticResource TextSecondary}">
+                                               FontFamily="OpenSansRegular" FontSize="12"
+                                               TextColor="{DynamicResource TextSecondary}">
                                             <Label.FormattedText>
                                                 <FormattedString>
                                                     <Span Text="{Binding Exercises.Count}" />
@@ -84,11 +84,11 @@
                                             </Label.FormattedText>
                                         </Label>
                                         <Border Grid.Row="0" Grid.RowSpan="2" Grid.Column="1"
-                                                BackgroundColor="{StaticResource LimeGreen}"
+                                                BackgroundColor="{DynamicResource LimeGreen}"
                                                 StrokeShape="RoundRectangle 10" Padding="10,4"
                                                 VerticalOptions="Center">
-                                            <Label Text="INIZIA" FontFamily="InterBold" FontSize="10"
-                                                   TextColor="{StaticResource OnSecondary}" />
+                                            <Label Text="INIZIA" FontFamily="OpenSansSemibold" FontSize="10"
+                                                   TextColor="{DynamicResource OnSecondary}" />
                                         </Border>
                                     </Grid>
                                 </Border>

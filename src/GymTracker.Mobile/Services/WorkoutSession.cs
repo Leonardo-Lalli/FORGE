@@ -2,9 +2,6 @@ namespace GymTracker.Mobile.Services;
 
 public class WorkoutSession
 {
-    private static readonly Lazy<WorkoutSession> lazy = new(() => new WorkoutSession());
-    public static WorkoutSession Instance => lazy.Value;
-
     public bool IsActive { get; private set; }
     public bool IsMinimized { get; private set; }
     public string PlanName { get; private set; } = string.Empty;
@@ -13,8 +10,6 @@ public class WorkoutSession
     public bool IsRestTimerActive { get; private set; }
 
     public event Action? StateChanged;
-
-    private WorkoutSession() { }
 
     public void Start(string planName)
     {

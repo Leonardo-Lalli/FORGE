@@ -23,7 +23,7 @@
                 </Label>
             </Border>
             <Label Grid.Column="1" Text="Impostazioni"
-                   FontFamily="LexendBold" FontSize="18" FontAttributes="Bold"
+                   FontFamily="OpenSansSemibold" FontSize="18" FontAttributes="Bold"
                    TextColor="{DynamicResource OnSurface}"
                    HorizontalOptions="Center" VerticalOptions="Center" />
         </Grid>
@@ -33,7 +33,7 @@
 
                 <!-- Appearance Section -->
                 <Label Text="ASPETTO"
-                       FontFamily="InterBold" FontSize="11" FontAttributes="Bold"
+                       FontFamily="OpenSansSemibold" FontSize="11" FontAttributes="Bold"
                        TextColor="{DynamicResource TextSecondary}"
                        CharacterSpacing="0.8" Margin="0,8,0,0" />
 
@@ -45,10 +45,10 @@
                     <Grid ColumnDefinitions="*,Auto">
                         <VerticalStackLayout Grid.Column="0" VerticalOptions="Center" Spacing="4">
                             <Label Text="Modalità Scura"
-                                   FontFamily="LexendBold" FontSize="16" FontAttributes="Bold"
+                                   FontFamily="OpenSansSemibold" FontSize="16" FontAttributes="Bold"
                                    TextColor="{DynamicResource OnSurface}" />
                             <Label Text="Attiva il tema Cyber-Athletic Elite"
-                                   FontFamily="InterRegular" FontSize="13"
+                                   FontFamily="OpenSansRegular" FontSize="13"
                                    TextColor="{DynamicResource TextSecondary}" />
                         </VerticalStackLayout>
                         <Switch Grid.Column="1" IsToggled="{Binding IsDarkMode}"
@@ -64,7 +64,7 @@
                         Padding="20">
                     <VerticalStackLayout Spacing="12" HorizontalOptions="Center">
                         <Label Text="Anteprima Tema Attuale"
-                               FontFamily="InterBold" FontSize="11"
+                               FontFamily="OpenSansSemibold" FontSize="11"
                                TextColor="{DynamicResource TextSecondary}"
                                CharacterSpacing="0.8" HorizontalTextAlignment="Center" />
                         <Grid ColumnDefinitions="48,*,48" ColumnSpacing="12">
@@ -85,7 +85,7 @@
 
                 <!-- Tema Chiaro Preview -->
                 <Label Text="TEMI DISPONIBILI"
-                       FontFamily="InterBold" FontSize="11" FontAttributes="Bold"
+                       FontFamily="OpenSansSemibold" FontSize="11" FontAttributes="Bold"
                        TextColor="{DynamicResource TextSecondary}"
                        CharacterSpacing="0.8" Margin="0,8,0,0" />
 
@@ -99,10 +99,10 @@
                                 WidthRequest="56" HeightRequest="56" Padding="0"
                                 Stroke="#003ec7" StrokeThickness="2" />
                         <VerticalStackLayout VerticalOptions="Center" Spacing="2">
-                            <Label Text="Fitness Core" FontFamily="LexendBold" FontSize="14"
+                            <Label Text="Fitness Core" FontFamily="OpenSansSemibold" FontSize="14"
                                    FontAttributes="Bold" TextColor="{DynamicResource OnSurface}" />
                             <Label Text="Tema chiaro — blu professionale"
-                                   FontFamily="InterRegular" FontSize="12"
+                                   FontFamily="OpenSansRegular" FontSize="12"
                                    TextColor="{DynamicResource TextSecondary}" />
                         </VerticalStackLayout>
                     </HorizontalStackLayout>
@@ -118,10 +118,10 @@
                                 WidthRequest="56" HeightRequest="56" Padding="0"
                                 Stroke="#c3f5ff" StrokeThickness="2" />
                         <VerticalStackLayout VerticalOptions="Center" Spacing="2">
-                            <Label Text="Cyber-Athletic Elite" FontFamily="LexendBold" FontSize="14"
+                            <Label Text="Cyber-Athletic Elite" FontFamily="OpenSansSemibold" FontSize="14"
                                    FontAttributes="Bold" TextColor="{DynamicResource OnSurface}" />
                             <Label Text="Tema scuro — ciano high-tech"
-                                   FontFamily="InterRegular" FontSize="12"
+                                   FontFamily="OpenSansRegular" FontSize="12"
                                    TextColor="{DynamicResource TextSecondary}" />
                         </VerticalStackLayout>
                     </HorizontalStackLayout>

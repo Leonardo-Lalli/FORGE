@@ -3,6 +3,7 @@ namespace GymTracker.Mobile.Services;
 public class ThemeService
 {
     private const string ThemeKey = "app_theme";
+    private bool isInitialized;
 
     public bool IsDarkMode
     {
@@ -16,33 +17,49 @@ public class ThemeService
 
     public void Initialize()
     {
+        if (isInitialized)
+            return;
+
+        isInitialized = true;
         var dark = Preferences.Get(ThemeKey, 1) == 1;
         if (dark)
-            Apply(); // apply saved preference
-        // else default dark from Colors.xaml is fine
+            return;
+
+        Apply();
     }
 
     public void Apply()
     {
+        if (!MainThread.IsMainThread)
+        {
+            MainThread.BeginInvokeOnMainThread(Apply);
+            return;
+        }
+
         var app = Application.Current;
         if (app == null) return;
 
-        var merged = app.Resources.MergedDictionaries;
-        var darkSource = IsDarkMode
-            ? "Resources/Styles/Colors.xaml"
-            : "Resources/Styles/Colors.Light.xaml";
+        try
+        {
+            var merged = app.Resources.MergedDictionaries;
+            var darkSource = IsDarkMode
+                ? "Resources/Styles/Colors.xaml"
+                : "Resources/Styles/Colors.Light.xaml";
 
-        // Remove existing color dictionaries
-        var toRemove = merged
-            .Where(d => d.Source != null &&
-                   (d.Source.OriginalString.Contains("Colors.xaml") ||
-                    d.Source.OriginalString.Contains("Colors.Light.xaml")))
-            .ToList();
+            var toRemove = merged
+                .Where(d => d.Source != null &&
+                       (d.Source.OriginalString.Contains("Colors.xaml") ||
+                        d.Source.OriginalString.Contains("Colors.Light.xaml")))
+                .ToList();
 
-        foreach (var d in toRemove)
-            merged.Remove(d);
+            foreach (var d in toRemove)
+                merged.Remove(d);
 
-        // Add the correct one
-        merged.Add(new ResourceDictionary { Source = new Uri(darkSource, UriKind.Relative) });
+            merged.Add(new ResourceDictionary { Source = new Uri(darkSource, UriKind.Relative) });
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[ThemeService] Apply failed: {ex.Message}");
+        }
     }
 }

@@ -3,68 +3,73 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:vm="clr-namespace:GymTracker.Mobile.ViewModels"
+    xmlns:converters="clr-namespace:GymTracker.Mobile.Converters"
     x:Class="GymTracker.Mobile.Views.CatalogPage"
     x:DataType="vm:CatalogViewModel"
     Title="Esercizi"
     Shell.NavBarIsVisible="False">
 
-    <Grid RowDefinitions="Auto,*" BackgroundColor="{StaticResource Surface}">
+    <ContentPage.Resources>
+        <converters:InverseBoolConverter x:Key="InverseBool" />
+    </ContentPage.Resources>
+
+    <Grid RowDefinitions="Auto,*" BackgroundColor="{DynamicResource Surface}">
 
         <!-- Search + Title -->
         <VerticalStackLayout Grid.Row="0" Padding="20,16,20,8" Spacing="12">
             <Label Text="Catalogo Esercizi"
-                   FontFamily="LexendBold" FontSize="22" FontAttributes="Bold"
-                   TextColor="{StaticResource OnSurface}" />
+                   FontFamily="OpenSansSemibold" FontSize="22" FontAttributes="Bold"
+                   TextColor="{DynamicResource OnSurface}" />
             <SearchBar Placeholder="Cerca esercizio..."
                        Text="{Binding SearchText}"
                        SearchCommand="{Binding SearchCommand}"
-                       BackgroundColor="{StaticResource SurfaceContainer}"
-                       TextColor="{StaticResource OnSurface}"
-                       PlaceholderColor="{StaticResource Outline}"
-                       CancelButtonColor="{StaticResource Primary}" />
+                       BackgroundColor="{DynamicResource SurfaceContainer}"
+                       TextColor="{DynamicResource OnSurface}"
+                       PlaceholderColor="{DynamicResource Outline}"
+                       CancelButtonColor="{DynamicResource Primary}" />
             <!-- Muscle Group Chips -->
             <FlexLayout Wrap="Wrap" JustifyContent="Start">
-                <Border BackgroundColor="{StaticResource LimeGreen}"
+                <Border BackgroundColor="{DynamicResource LimeGreen}"
                         StrokeShape="RoundRectangle 16" Padding="14,8" Margin="0,0,8,8">
                     <Label Text="Tutti"
-                           FontFamily="InterBold" FontSize="12" FontAttributes="Bold"
-                           TextColor="{StaticResource OnSecondary}" />
+                           FontFamily="OpenSansSemibold" FontSize="12" FontAttributes="Bold"
+                           TextColor="{DynamicResource OnSecondary}" />
                 </Border>
-                <Border BackgroundColor="{StaticResource SurfaceContainer}"
+                <Border BackgroundColor="{DynamicResource SurfaceContainer}"
                         StrokeShape="RoundRectangle 16" Padding="14,8" Margin="0,0,8,8">
                     <Label Text="Petto"
-                           FontFamily="InterBold" FontSize="12" FontAttributes="Bold"
-                           TextColor="{StaticResource TextSecondary}" />
+                           FontFamily="OpenSansSemibold" FontSize="12" FontAttributes="Bold"
+                           TextColor="{DynamicResource TextSecondary}" />
                 </Border>
-                <Border BackgroundColor="{StaticResource SurfaceContainer}"
+                <Border BackgroundColor="{DynamicResource SurfaceContainer}"
                         StrokeShape="RoundRectangle 16" Padding="14,8" Margin="0,0,8,8">
                     <Label Text="Schiena"
-                           FontFamily="InterBold" FontSize="12" FontAttributes="Bold"
-                           TextColor="{StaticResource TextSecondary}" />
+                           FontFamily="OpenSansSemibold" FontSize="12" FontAttributes="Bold"
+                           TextColor="{DynamicResource TextSecondary}" />
                 </Border>
-                <Border BackgroundColor="{StaticResource SurfaceContainer}"
+                <Border BackgroundColor="{DynamicResource SurfaceContainer}"
                         StrokeShape="RoundRectangle 16" Padding="14,8" Margin="0,0,8,8">
                     <Label Text="Spalle"
-                           FontFamily="InterBold" FontSize="12" FontAttributes="Bold"
-                           TextColor="{StaticResource TextSecondary}" />
+                           FontFamily="OpenSansSemibold" FontSize="12" FontAttributes="Bold"
+                           TextColor="{DynamicResource TextSecondary}" />
                 </Border>
-                <Border BackgroundColor="{StaticResource SurfaceContainer}"
+                <Border BackgroundColor="{DynamicResource SurfaceContainer}"
                         StrokeShape="RoundRectangle 16" Padding="14,8" Margin="0,0,8,8">
                     <Label Text="Braccia"
-                           FontFamily="InterBold" FontSize="12" FontAttributes="Bold"
-                           TextColor="{StaticResource TextSecondary}" />
+                           FontFamily="OpenSansSemibold" FontSize="12" FontAttributes="Bold"
+                           TextColor="{DynamicResource TextSecondary}" />
                 </Border>
-                <Border BackgroundColor="{StaticResource SurfaceContainer}"
+                <Border BackgroundColor="{DynamicResource SurfaceContainer}"
                         StrokeShape="RoundRectangle 16" Padding="14,8" Margin="0,0,8,8">
                     <Label Text="Gambe"
-                           FontFamily="InterBold" FontSize="12" FontAttributes="Bold"
-                           TextColor="{StaticResource TextSecondary}" />
+                           FontFamily="OpenSansSemibold" FontSize="12" FontAttributes="Bold"
+                           TextColor="{DynamicResource TextSecondary}" />
                 </Border>
-                <Border BackgroundColor="{StaticResource SurfaceContainer}"
+                <Border BackgroundColor="{DynamicResource SurfaceContainer}"
                         StrokeShape="RoundRectangle 16" Padding="14,8" Margin="0,0,8,8">
                     <Label Text="Addome"
-                           FontFamily="InterBold" FontSize="12" FontAttributes="Bold"
-                           TextColor="{StaticResource TextSecondary}" />
+                           FontFamily="OpenSansSemibold" FontSize="12" FontAttributes="Bold"
+                           TextColor="{DynamicResource TextSecondary}" />
                 </Border>
             </FlexLayout>
         </VerticalStackLayout>
@@ -78,24 +83,24 @@
                                      Spacing="16" Padding="0,40">
                     <Label Text="🔍" FontSize="48" HorizontalTextAlignment="Center" />
                     <Label Text="Cerca un esercizio"
-                           FontFamily="LexendBold" FontSize="18" FontAttributes="Bold"
-                           TextColor="{StaticResource OnSurface}"
+                           FontFamily="OpenSansSemibold" FontSize="18" FontAttributes="Bold"
+                           TextColor="{DynamicResource OnSurface}"
                            HorizontalTextAlignment="Center" />
                     <Label Text="Sfoglia il catalogo di 1300+ esercizi"
-                           FontFamily="InterRegular" FontSize="14"
-                           TextColor="{StaticResource TextSecondary}"
+                           FontFamily="OpenSansRegular" FontSize="14"
+                           TextColor="{DynamicResource TextSecondary}"
                            HorizontalTextAlignment="Center" />
                 </VerticalStackLayout>
 
                 <!-- Example exercises (placeholder, will be CollectionView with API data) -->
                 <VerticalStackLayout Spacing="8"
-                                     IsVisible="{Binding HasError, Converter={x:Null}}">
+                                     IsVisible="{Binding HasError, Converter={DynamicResource InverseBool}}">
                     <!-- Exercise 1 -->
-                    <Border Style="{StaticResource CardFrame}"
-                            BackgroundColor="{StaticResource SurfaceContainerHigh}">
+                    <Border Style="{DynamicResource CardFrame}"
+                            BackgroundColor="{DynamicResource SurfaceContainerHigh}">
                         <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
                             <Border Grid.Column="0"
-                                    BackgroundColor="{StaticResource SurfaceContainer}"
+                                    BackgroundColor="{DynamicResource SurfaceContainer}"
                                     StrokeShape="RoundRectangle 12"
                                     WidthRequest="64" HeightRequest="64" Padding="0">
                                 <Label Text="🏋️" FontSize="28"
@@ -103,35 +108,35 @@
                             </Border>
                             <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="4">
                                 <Label Text="Barbell Bench Press"
-                                       FontFamily="LexendBold" FontSize="15" FontAttributes="Bold"
-                                       TextColor="{StaticResource OnSurface}" />
+                                       FontFamily="OpenSansSemibold" FontSize="15" FontAttributes="Bold"
+                                       TextColor="{DynamicResource OnSurface}" />
                                 <HorizontalStackLayout Spacing="8">
-                                    <Border BackgroundColor="{StaticResource SurfaceContainer}"
+                                    <Border BackgroundColor="{DynamicResource SurfaceContainer}"
                                             StrokeShape="RoundRectangle 8" Padding="8,3">
                                         <Label Text="Petto"
-                                               FontFamily="InterBold" FontSize="10"
-                                               TextColor="{StaticResource Primary}" />
+                                               FontFamily="OpenSansSemibold" FontSize="10"
+                                               TextColor="{DynamicResource Primary}" />
                                     </Border>
-                                    <Border BackgroundColor="{StaticResource SurfaceContainer}"
+                                    <Border BackgroundColor="{DynamicResource SurfaceContainer}"
                                             StrokeShape="RoundRectangle 8" Padding="8,3">
                                         <Label Text="Bilanciere"
-                                               FontFamily="InterBold" FontSize="10"
-                                               TextColor="{StaticResource TextSecondary}" />
+                                               FontFamily="OpenSansSemibold" FontSize="10"
+                                               TextColor="{DynamicResource TextSecondary}" />
                                     </Border>
                                 </HorizontalStackLayout>
                             </VerticalStackLayout>
                             <Label Grid.Column="2" Text="›" FontSize="24"
-                                   TextColor="{StaticResource TextSecondary}"
+                                   TextColor="{DynamicResource TextSecondary}"
                                    VerticalOptions="Center" />
                         </Grid>
                     </Border>
 
                     <!-- Exercise 2 -->
-                    <Border Style="{StaticResource CardFrame}"
-                            BackgroundColor="{StaticResource SurfaceContainerHigh}">
+                    <Border Style="{DynamicResource CardFrame}"
+                            BackgroundColor="{DynamicResource SurfaceContainerHigh}">
                         <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
                             <Border Grid.Column="0"
-                                    BackgroundColor="{StaticResource SurfaceContainer}"
+                                    BackgroundColor="{DynamicResource SurfaceContainer}"
                                     StrokeShape="RoundRectangle 12"
                                     WidthRequest="64" HeightRequest="64" Padding="0">
                                 <Label Text="🏋️" FontSize="28"
@@ -139,35 +144,35 @@
                             </Border>
                             <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="4">
                                 <Label Text="Incline Dumbbell Press"
-                                       FontFamily="LexendBold" FontSize="15" FontAttributes="Bold"
-                                       TextColor="{StaticResource OnSurface}" />
+                                       FontFamily="OpenSansSemibold" FontSize="15" FontAttributes="Bold"
+                                       TextColor="{DynamicResource OnSurface}" />
                                 <HorizontalStackLayout Spacing="8">
-                                    <Border BackgroundColor="{StaticResource SurfaceContainer}"
+                                    <Border BackgroundColor="{DynamicResource SurfaceContainer}"
                                             StrokeShape="RoundRectangle 8" Padding="8,3">
                                         <Label Text="Petto"
-                                               FontFamily="InterBold" FontSize="10"
-                                               TextColor="{StaticResource Primary}" />
+                                               FontFamily="OpenSansSemibold" FontSize="10"
+                                               TextColor="{DynamicResource Primary}" />
                                     </Border>
-                                    <Border BackgroundColor="{StaticResource SurfaceContainer}"
+                                    <Border BackgroundColor="{DynamicResource SurfaceContainer}"
                                             StrokeShape="RoundRectangle 8" Padding="8,3">
                                         <Label Text="Manubri"
-                                               FontFamily="InterBold" FontSize="10"
-                                               TextColor="{StaticResource TextSecondary}" />
+                                               FontFamily="OpenSansSemibold" FontSize="10"
+                                               TextColor="{DynamicResource TextSecondary}" />
                                     </Border>
                                 </HorizontalStackLayout>
                             </VerticalStackLayout>
                             <Label Grid.Column="2" Text="›" FontSize="24"
-                                   TextColor="{StaticResource TextSecondary}"
+                                   TextColor="{DynamicResource TextSecondary}"
                                    VerticalOptions="Center" />
                         </Grid>
                     </Border>
 
                     <!-- Exercise 3 -->
-                    <Border Style="{StaticResource CardFrame}"
-                            BackgroundColor="{StaticResource SurfaceContainerHigh}">
+                    <Border Style="{DynamicResource CardFrame}"
+                            BackgroundColor="{DynamicResource SurfaceContainerHigh}">
                         <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
                             <Border Grid.Column="0"
-                                    BackgroundColor="{StaticResource SurfaceContainer}"
+                                    BackgroundColor="{DynamicResource SurfaceContainer}"
                                     StrokeShape="RoundRectangle 12"
                                     WidthRequest="64" HeightRequest="64" Padding="0">
                                 <Label Text="🏋️" FontSize="28"
@@ -175,25 +180,25 @@
                             </Border>
                             <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="4">
                                 <Label Text="Cable Crossover"
-                                       FontFamily="LexendBold" FontSize="15" FontAttributes="Bold"
-                                       TextColor="{StaticResource OnSurface}" />
+                                       FontFamily="OpenSansSemibold" FontSize="15" FontAttributes="Bold"
+                                       TextColor="{DynamicResource OnSurface}" />
                                 <HorizontalStackLayout Spacing="8">
-                                    <Border BackgroundColor="{StaticResource SurfaceContainer}"
+                                    <Border BackgroundColor="{DynamicResource SurfaceContainer}"
                                             StrokeShape="RoundRectangle 8" Padding="8,3">
                                         <Label Text="Petto"
-                                               FontFamily="InterBold" FontSize="10"
-                                               TextColor="{StaticResource Primary}" />
+                                               FontFamily="OpenSansSemibold" FontSize="10"
+                                               TextColor="{DynamicResource Primary}" />
                                     </Border>
-                                    <Border BackgroundColor="{StaticResource SurfaceContainer}"
+                                    <Border BackgroundColor="{DynamicResource SurfaceContainer}"
                                             StrokeShape="RoundRectangle 8" Padding="8,3">
                                         <Label Text="Cavi"
-                                               FontFamily="InterBold" FontSize="10"
-                                               TextColor="{StaticResource TextSecondary}" />
+                                               FontFamily="OpenSansSemibold" FontSize="10"
+                                               TextColor="{DynamicResource TextSecondary}" />
                                     </Border>
                                 </HorizontalStackLayout>
                             </VerticalStackLayout>
                             <Label Grid.Column="2" Text="›" FontSize="24"
-                                   TextColor="{StaticResource TextSecondary}"
+                                   TextColor="{DynamicResource TextSecondary}"
                                    VerticalOptions="Center" />
                         </Grid>
                     </Border>
@@ -205,8 +210,8 @@
                                      VerticalOptions="Center" Spacing="12" Padding="0,60">
                     <ActivityIndicator IsRunning="{Binding IsBusy}" />
                     <Label Text="Caricamento esercizi..."
-                           FontFamily="InterRegular" FontSize="14"
-                           TextColor="{StaticResource TextSecondary}"
+                           FontFamily="OpenSansRegular" FontSize="14"
+                           TextColor="{DynamicResource TextSecondary}"
                            HorizontalTextAlignment="Center" />
                 </VerticalStackLayout>
 
@@ -214,11 +219,11 @@
                 <VerticalStackLayout IsVisible="{Binding HasError}"
                                      VerticalOptions="Center" Spacing="12" Padding="0,40">
                     <Label Text="{Binding ErrorMessage}"
-                           FontFamily="InterRegular" FontSize="14"
-                           TextColor="{StaticResource AlertRed}"
+                           FontFamily="OpenSansRegular" FontSize="14"
+                           TextColor="{DynamicResource AlertRed}"
                            HorizontalTextAlignment="Center" />
                     <Button Text="RIPROVA"
-                            Style="{StaticResource SecondaryButton}"
+                            Style="{DynamicResource SecondaryButton}"
                             HorizontalOptions="Center"
                             Command="{Binding RefreshCommand}" />
                 </VerticalStackLayout>

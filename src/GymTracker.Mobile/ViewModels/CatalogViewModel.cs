@@ -10,6 +10,7 @@ public partial class CatalogViewModel : BaseViewModel
 
     public CatalogViewModel()
     {
+        HasData = false;
         IsEmptyState = true;
     }
 

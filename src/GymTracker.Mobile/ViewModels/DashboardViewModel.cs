@@ -1,4 +1,5 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 
 namespace GymTracker.Mobile.ViewModels;
 
@@ -21,7 +22,13 @@ public partial class DashboardViewModel : BaseViewModel
 
     public DashboardViewModel()
     {
-        HasData = true;
-        IsEmptyState = false;
+        HasData = false;
+        IsEmptyState = true;
+    }
+
+    [RelayCommand]
+    private async Task OpenNotificationsAsync()
+    {
+        await Shell.Current.GoToAsync("notifications");
     }
 }

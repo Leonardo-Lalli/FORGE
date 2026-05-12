@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 
 namespace GymTracker.Mobile.ViewModels;
 
@@ -41,6 +42,18 @@ public partial class FeedViewModel : BaseViewModel
     {
         HasData = true;
         LoadMockData();
+    }
+
+    [RelayCommand]
+    private async Task OpenSettingsAsync()
+    {
+        await Shell.Current.GoToAsync("settings");
+    }
+
+    [RelayCommand]
+    private async Task OpenProfileAsync()
+    {
+        await Shell.Current.GoToAsync("profile");
     }
 
     private void LoadMockData()

@@ -9,9 +9,4 @@ public partial class StatsPage : ContentPage
         InitializeComponent();
         BindingContext = vm;
     }
-
-    private async void OnSettingsTapped(object? sender, EventArgs e)
-    {
-        await Shell.Current.GoToAsync("settings");
-    }
 }

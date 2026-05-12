@@ -5,145 +5,227 @@
     xmlns:vm="clr-namespace:GymTracker.Mobile.ViewModels"
     x:Class="GymTracker.Mobile.Views.ProfilePage"
     x:DataType="vm:ProfileViewModel"
-    Title="Stats"
+    Title="Profile"
     Shell.NavBarIsVisible="False">
 
-    <Grid RowDefinitions="Auto,*" BackgroundColor="{StaticResource Surface}">
+    <Grid RowDefinitions="Auto,*" BackgroundColor="{DynamicResource Surface}">
 
-        <!-- Title + Period Chips -->
-        <VerticalStackLayout Grid.Row="0" Padding="20,16,20,4" Spacing="10">
-            <Label Text="Progressi" FontFamily="LexendBold" FontSize="22" FontAttributes="Bold"
-                   TextColor="{StaticResource OnSurface}" />
-            <HorizontalStackLayout Spacing="8">
-                <Border BackgroundColor="{StaticResource LimeGreen}" StrokeShape="RoundRectangle 16" Padding="16,8">
-                    <Label Text="Settimana" FontFamily="InterBold" FontSize="12" FontAttributes="Bold"
-                           TextColor="{StaticResource OnSecondary}" />
-                </Border>
-                <Border BackgroundColor="{StaticResource SurfaceContainer}" StrokeShape="RoundRectangle 16" Padding="16,8">
-                    <Label Text="Mese" FontFamily="InterBold" FontSize="12" FontAttributes="Bold"
-                           TextColor="{StaticResource TextSecondary}" />
-                </Border>
-                <Border BackgroundColor="{StaticResource SurfaceContainer}" StrokeShape="RoundRectangle 16" Padding="16,8">
-                    <Label Text="Anno" FontFamily="InterBold" FontSize="12" FontAttributes="Bold"
-                           TextColor="{StaticResource TextSecondary}" />
-                </Border>
-            </HorizontalStackLayout>
-        </VerticalStackLayout>
+        <!-- Header — mockup style -->
+        <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto"
+              Padding="24,16" BackgroundColor="{DynamicResource Surface}">
+            <Border Grid.Column="0" BackgroundColor="{DynamicResource SurfaceContainer}"
+                    StrokeShape="RoundRectangle 999" WidthRequest="40" HeightRequest="40" Padding="0"
+                    Stroke="{DynamicResource OutlineVariant}" StrokeThickness="0.5">
+                <Label Text="←" FontSize="18" TextColor="{DynamicResource OnSurface}"
+                       HorizontalOptions="Center" VerticalOptions="Center">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding GoBackCommand}" />
+                    </Label.GestureRecognizers>
+                </Label>
+            </Border>
+            <Label Grid.Column="1" Text="PROFILE"
+                   FontFamily="OpenSansSemibold" FontSize="18" FontAttributes="Bold"
+                   TextColor="{DynamicResource Primary}"
+                   HorizontalOptions="Center" VerticalOptions="Center"
+                   CharacterSpacing="-1" />
+            <BoxView Grid.Column="2" WidthRequest="40" Color="Transparent" />
+        </Grid>
 
-        <ScrollView Grid.Row="1" Padding="20,0,20,100">
-            <VerticalStackLayout Spacing="16">
+        <ScrollView Grid.Row="1" Padding="24,8,24,100">
+            <VerticalStackLayout Spacing="48">
 
-                <!-- Volume + Workouts -->
-                <Grid ColumnDefinitions="*,12,*" RowDefinitions="Auto">
-                    <Border Grid.Column="0" Style="{StaticResource CardFrame}" BackgroundColor="{StaticResource SurfaceContainerHigh}">
-                        <VerticalStackLayout Spacing="6">
-                            <Label Text="Volume Totale" FontFamily="InterBold" FontSize="11" FontAttributes="Bold"
-                                   TextColor="{StaticResource TextSecondary}" CharacterSpacing="0.8" />
-                            <Label Text="12.4" FontFamily="LexendBold" FontSize="36" FontAttributes="Bold"
-                                   TextColor="{StaticResource OnSurface}" />
-                            <Label Text="t" FontFamily="InterBold" FontSize="14" TextColor="{StaticResource TextSecondary}" />
+                <!-- Profile Hero — centered avatar, name, tier -->
+                <VerticalStackLayout Spacing="16" HorizontalOptions="Center">
+                    <!-- Avatar 128x128 -->
+                    <Border BackgroundColor="{DynamicResource SurfaceContainerHigh}"
+                            StrokeShape="RoundRectangle 64"
+                            Stroke="{DynamicResource Surface}" StrokeThickness="4"
+                            WidthRequest="128" HeightRequest="128" Padding="0"
+                            HorizontalOptions="Center">
+                        <Label Text="MK" FontFamily="OpenSansSemibold" FontSize="40"
+                               TextColor="{DynamicResource OnSurface}"
+                               HorizontalOptions="Center" VerticalOptions="Center" />
+                    </Border>
+
+                    <!-- Name -->
+                    <Label Text="{Binding Username}"
+                           FontFamily="OpenSansSemibold" FontSize="28" FontAttributes="Bold"
+                           TextColor="{DynamicResource OnSurface}"
+                           HorizontalTextAlignment="Center" />
+
+                    <!-- Tier with dot -->
+                    <HorizontalStackLayout Spacing="8" HorizontalOptions="Center">
+                        <Border BackgroundColor="{DynamicResource SecondaryContainer}"
+                                StrokeShape="RoundRectangle 3"
+                                WidthRequest="8" HeightRequest="8" Padding="0"
+                                VerticalOptions="Center" />
+                        <Label Text="{Binding Tier}"
+                               FontFamily="OpenSansRegular" FontSize="18"
+                               TextColor="{DynamicResource OnSurfaceVariant}" />
+                    </HorizontalStackLayout>
+                </VerticalStackLayout>
+
+                <!-- Stats Grid 2x2 -->
+                <Grid ColumnDefinitions="*,16,*" RowDefinitions="Auto,16,Auto">
+                    <!-- Total Workouts -->
+                    <Border Grid.Row="0" Grid.Column="0"
+                            BackgroundColor="{DynamicResource SurfaceContainerLowest}"
+                            StrokeShape="RoundRectangle 12"
+                            Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1"
+                            Padding="20">
+                        <VerticalStackLayout Spacing="4" HorizontalOptions="Center" VerticalOptions="Center">
+                            <Label Text="{Binding TotalWorkouts}"
+                                   FontFamily="OpenSansSemibold" FontSize="40" FontAttributes="Bold"
+                                   TextColor="{DynamicResource Primary}"
+                                   HorizontalTextAlignment="Center" />
+                            <Label Text="TOTAL WORKOUTS"
+                                   FontFamily="OpenSansSemibold" FontSize="11"
+                                   TextColor="{DynamicResource OnSurfaceVariant}"
+                                   CharacterSpacing="1"
+                                   HorizontalTextAlignment="Center" />
                         </VerticalStackLayout>
                     </Border>
-                    <Border Grid.Column="2" Style="{StaticResource CardFrame}" BackgroundColor="{StaticResource SurfaceContainerHigh}">
-                        <VerticalStackLayout Spacing="6">
-                            <Label Text="Allenamenti" FontFamily="InterBold" FontSize="11" FontAttributes="Bold"
-                                   TextColor="{StaticResource TextSecondary}" CharacterSpacing="0.8" />
-                            <Label Text="24" FontFamily="LexendBold" FontSize="36" FontAttributes="Bold"
-                                   TextColor="{StaticResource OnSurface}" />
-                            <Label Text="questa settimana" FontFamily="InterBold" FontSize="14"
-                                   TextColor="{StaticResource TextSecondary}" />
+
+                    <!-- Energy -->
+                    <Border Grid.Row="0" Grid.Column="2"
+                            BackgroundColor="{DynamicResource SurfaceContainerLowest}"
+                            StrokeShape="RoundRectangle 12"
+                            Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1"
+                            Padding="20">
+                        <VerticalStackLayout Spacing="4" HorizontalOptions="Center" VerticalOptions="Center">
+                            <Label Text="{Binding EnergyKcal}"
+                                   FontFamily="OpenSansSemibold" FontSize="40" FontAttributes="Bold"
+                                   TextColor="{DynamicResource SecondaryContainer}"
+                                   HorizontalTextAlignment="Center" />
+                            <Label Text="ENERGY (KCAL)"
+                                   FontFamily="OpenSansSemibold" FontSize="11"
+                                   TextColor="{DynamicResource OnSurfaceVariant}"
+                                   CharacterSpacing="1"
+                                   HorizontalTextAlignment="Center" />
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <!-- Streak -->
+                    <Border Grid.Row="2" Grid.Column="0"
+                            BackgroundColor="{DynamicResource SurfaceContainerLowest}"
+                            StrokeShape="RoundRectangle 12"
+                            Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1"
+                            Padding="20">
+                        <VerticalStackLayout Spacing="4" HorizontalOptions="Center" VerticalOptions="Center">
+                            <Label Text="{Binding StreakDays}"
+                                   FontFamily="OpenSansSemibold" FontSize="40" FontAttributes="Bold"
+                                   TextColor="{DynamicResource Primary}"
+                                   HorizontalTextAlignment="Center" />
+                            <Label Text="{Binding StreakLabel}"
+                                   FontFamily="OpenSansSemibold" FontSize="11"
+                                   TextColor="{DynamicResource OnSurfaceVariant}"
+                                   CharacterSpacing="1"
+                                   HorizontalTextAlignment="Center" />
                         </VerticalStackLayout>
                     </Border>
                 </Grid>
 
-                <!-- Key Exercise -->
-                <Border Style="{StaticResource CardFrame}" BackgroundColor="{StaticResource SurfaceContainerHigh}">
-                    <VerticalStackLayout Spacing="8">
-                        <Grid ColumnDefinitions="*,Auto">
-                            <Label Grid.Column="0" Text="Esercizio Chiave: Panca Piana" FontFamily="InterBold" FontSize="11"
-                                   FontAttributes="Bold" TextColor="{StaticResource TextSecondary}" CharacterSpacing="0.8" />
-                            <Label Grid.Column="1" Text="ℹ️" FontSize="14" />
-                        </Grid>
-                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8">
-                            <Label Grid.Column="0" Text="115" FontFamily="LexendBold" FontSize="48" FontAttributes="Bold"
-                                   TextColor="{StaticResource OnSurface}" />
-                            <VerticalStackLayout Grid.Column="1" VerticalOptions="End" Spacing="2" Margin="0,0,0,8">
-                                <Label Text="kg" FontFamily="InterRegular" FontSize="16"
-                                       TextColor="{StaticResource TextSecondary}" />
-                                <Label Text="trending_up  +5%" FontSize="14" TextColor="{StaticResource LimeGreen}" />
-                            </VerticalStackLayout>
-                        </Grid>
-                    </VerticalStackLayout>
-                </Border>
-
-                <!-- Chart -->
-                <Border Style="{StaticResource CardFrame}" BackgroundColor="{StaticResource SurfaceContainerHigh}">
-                    <VerticalStackLayout Spacing="12">
-                        <Label Text="Andamento Peso: Panca Piana" FontFamily="InterBold" FontSize="11" FontAttributes="Bold"
-                               TextColor="{StaticResource TextSecondary}" CharacterSpacing="0.8" />
-                        <Border BackgroundColor="{StaticResource SurfaceContainer}" StrokeShape="RoundRectangle 8"
-                                HeightRequest="120" Padding="12">
-                            <VerticalStackLayout VerticalOptions="End" Spacing="0">
-                                <Grid ColumnDefinitions="*,*,*,*,*" HeightRequest="80">
-                                    <Border Grid.Column="0" BackgroundColor="{StaticResource Primary}"
-                                            StrokeShape="RoundRectangle 3 3 0 0" HeightRequest="40" WidthRequest="16"
-                                            HorizontalOptions="Center" VerticalOptions="End" />
-                                    <Border Grid.Column="1" BackgroundColor="{StaticResource Primary}"
-                                            StrokeShape="RoundRectangle 3 3 0 0" HeightRequest="55" WidthRequest="16"
-                                            HorizontalOptions="Center" VerticalOptions="End" />
-                                    <Border Grid.Column="2" BackgroundColor="{StaticResource Primary}"
-                                            StrokeShape="RoundRectangle 3 3 0 0" HeightRequest="50" WidthRequest="16"
-                                            HorizontalOptions="Center" VerticalOptions="End" />
-                                    <Border Grid.Column="3" BackgroundColor="{StaticResource Primary}"
-                                            StrokeShape="RoundRectangle 3 3 0 0" HeightRequest="65" WidthRequest="16"
-                                            HorizontalOptions="Center" VerticalOptions="End" />
-                                    <Border Grid.Column="4" BackgroundColor="{StaticResource LimeGreen}"
-                                            StrokeShape="RoundRectangle 3 3 0 0" HeightRequest="72" WidthRequest="16"
-                                            HorizontalOptions="Center" VerticalOptions="End" />
-                                </Grid>
-                                <Grid ColumnDefinitions="*,*,*,*,*">
-                                    <Label Grid.Column="0" Text="01 Set" FontFamily="InterRegular" FontSize="9"
-                                           TextColor="{StaticResource TextSecondary}" HorizontalTextAlignment="Center" />
-                                    <Label Grid.Column="1" Text="07 Set" FontFamily="InterRegular" FontSize="9"
-                                           TextColor="{StaticResource TextSecondary}" HorizontalTextAlignment="Center" />
-                                    <Label Grid.Column="2" Text="14 Set" FontFamily="InterRegular" FontSize="9"
-                                           TextColor="{StaticResource TextSecondary}" HorizontalTextAlignment="Center" />
-                                    <Label Grid.Column="3" Text="21 Set" FontFamily="InterRegular" FontSize="9"
-                                           TextColor="{StaticResource TextSecondary}" HorizontalTextAlignment="Center" />
-                                    <Label Grid.Column="4" Text="Oggi" FontFamily="InterBold" FontSize="9"
-                                           TextColor="{StaticResource LimeGreen}" HorizontalTextAlignment="Center" />
-                                </Grid>
-                            </VerticalStackLayout>
-                        </Border>
-                    </VerticalStackLayout>
-                </Border>
-
-                <Label Text="TRAGUARDI RECENTI" FontFamily="InterBold" FontSize="11" FontAttributes="Bold"
-                       TextColor="{StaticResource TextSecondary}" CharacterSpacing="0.8" Margin="0,4,0,0" />
-
-                <Border Style="{StaticResource CardFrame}" BackgroundColor="{StaticResource SurfaceContainerHigh}">
-                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
-                        <Label Grid.Column="0" Text="🏆" FontSize="28" VerticalOptions="Center" />
-                        <VerticalStackLayout Grid.Column="1" Spacing="4">
-                            <Label Text="Record Personale" FontFamily="LexendBold" FontSize="14" FontAttributes="Bold"
-                                   TextColor="{StaticResource OnSurface}" />
-                            <Label Text="Hai superato i 110kg su Panca Piana." FontFamily="InterRegular" FontSize="13"
-                                   TextColor="{StaticResource TextSecondary}" />
-                        </VerticalStackLayout>
+                <!-- Recent Forges -->
+                <VerticalStackLayout Spacing="16">
+                    <Grid ColumnDefinitions="*,Auto" Padding="0,0,0,8">
+                        <Label Grid.Column="0" Text="Recent Forges"
+                               FontFamily="OpenSansSemibold" FontSize="20" FontAttributes="Bold"
+                               TextColor="{DynamicResource OnSurface}" />
+                        <Label Grid.Column="1" Text="View All"
+                               FontFamily="OpenSansSemibold" FontSize="12"
+                               TextColor="{DynamicResource Primary}" VerticalOptions="Center" />
                     </Grid>
-                </Border>
 
-                <Border Style="{StaticResource CardFrame}" BackgroundColor="{StaticResource SurfaceContainerHigh}">
-                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
-                        <Label Grid.Column="0" Text="🔥" FontSize="28" VerticalOptions="Center" />
-                        <VerticalStackLayout Grid.Column="1" Spacing="4">
-                            <Label Text="Costanza" FontFamily="LexendBold" FontSize="14" FontAttributes="Bold"
-                                   TextColor="{StaticResource OnSurface}" />
-                            <Label Text="4 allenamenti completati questa settimana." FontFamily="InterRegular" FontSize="13"
-                                   TextColor="{StaticResource TextSecondary}" />
-                        </VerticalStackLayout>
-                    </Grid>
-                </Border>
+                    <VerticalStackLayout Spacing="16"
+                        BindableLayout.ItemsSource="{Binding RecentWorkouts}">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate x:DataType="vm:ProfileWorkout">
+                                <Border BackgroundColor="{DynamicResource SurfaceContainerLowest}"
+                                        StrokeShape="RoundRectangle 12"
+                                        Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1"
+                                        Padding="20">
+                                    <Grid ColumnDefinitions="4,16,*" RowDefinitions="Auto,Auto,Auto,Auto">
+                                        <!-- Colored left border -->
+                                        <Border Grid.Column="0" Grid.RowSpan="4"
+                                                BackgroundColor="{Binding BorderColor}"
+                                                StrokeShape="RoundRectangle 2"
+                                                WidthRequest="4" VerticalOptions="Fill" />
+
+                                        <!-- Title + Category -->
+                                        <Grid Grid.Column="2" Grid.Row="0"
+                                              ColumnDefinitions="*,Auto">
+                                            <VerticalStackLayout>
+                                                <Label Text="{Binding Title}"
+                                                       FontFamily="OpenSansSemibold" FontSize="20" FontAttributes="Bold"
+                                                       TextColor="{DynamicResource OnSurface}" />
+                                                <Label Text="{Binding Date}"
+                                                       FontFamily="OpenSansRegular" FontSize="16"
+                                                       TextColor="{DynamicResource OnSurfaceVariant}" />
+                                            </VerticalStackLayout>
+                                            <Border Grid.Column="1"
+                                                    BackgroundColor="{DynamicResource ErrorContainer}"
+                                                    StrokeShape="RoundRectangle 12" Padding="12,6"
+                                                    VerticalOptions="Start">
+                                                <Label Text="{Binding Category}"
+                                                       FontFamily="OpenSansSemibold" FontSize="11"
+                                                       TextColor="{DynamicResource OnErrorContainer}"
+                                                       CharacterSpacing="0.6" />
+                                            </Border>
+                                        </Grid>
+
+                                        <!-- Stats chips -->
+                                        <FlexLayout Grid.Column="2" Grid.Row="1"
+                                                    Wrap="Wrap" Margin="0,12">
+                                            <Border BackgroundColor="{DynamicResource SurfaceContainer}"
+                                                    StrokeShape="RoundRectangle 8" Padding="12,8" Margin="0,0,8,8">
+                                                <HorizontalStackLayout Spacing="6">
+                                                    <Label Text="⏱" FontSize="14" VerticalOptions="Center" />
+                                                    <Label Text="{Binding Duration}"
+                                                           FontFamily="OpenSansSemibold" FontSize="14"
+                                                           TextColor="{DynamicResource OnSurface}" />
+                                                </HorizontalStackLayout>
+                                            </Border>
+                                            <Border BackgroundColor="{DynamicResource SurfaceContainer}"
+                                                    StrokeShape="RoundRectangle 8" Padding="12,8" Margin="0,0,8,8">
+                                                <HorizontalStackLayout Spacing="6">
+                                                    <Label Text="♥" FontSize="14" VerticalOptions="Center" />
+                                                    <Label Text="{Binding HeartRate}"
+                                                           FontFamily="OpenSansSemibold" FontSize="14"
+                                                           TextColor="{DynamicResource OnSurface}" />
+                                                </HorizontalStackLayout>
+                                            </Border>
+                                            <Border BackgroundColor="{DynamicResource SurfaceContainer}"
+                                                    StrokeShape="RoundRectangle 8" Padding="12,8" Margin="0,0,8,8">
+                                                <HorizontalStackLayout Spacing="6">
+                                                    <Label Text="🏋" FontSize="14" VerticalOptions="Center" />
+                                                    <Label Text="{Binding Volume}"
+                                                           FontFamily="OpenSansSemibold" FontSize="14"
+                                                           TextColor="{DynamicResource OnSurface}" />
+                                                </HorizontalStackLayout>
+                                            </Border>
+                                        </FlexLayout>
+
+                                        <!-- Description -->
+                                        <BoxView Grid.Column="2" Grid.Row="2"
+                                                 HeightRequest="0.5"
+                                                 Color="{DynamicResource OutlineVariant}"
+                                                 Margin="0,8" />
+                                        <VerticalStackLayout Grid.Column="2" Grid.Row="3" Spacing="6" Margin="0,8,0,0">
+                                            <Label Text="PROTOCOL OUTLINE"
+                                                   FontFamily="OpenSansSemibold" FontSize="11"
+                                                   TextColor="{DynamicResource OnSurfaceVariant}"
+                                                   CharacterSpacing="0.6" />
+                                            <Label Text="{Binding Description}"
+                                                   FontFamily="OpenSansRegular" FontSize="16"
+                                                   TextColor="{DynamicResource OnSurface}"
+                                                   LineBreakMode="WordWrap" />
+                                        </VerticalStackLayout>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
 
             </VerticalStackLayout>
         </ScrollView>

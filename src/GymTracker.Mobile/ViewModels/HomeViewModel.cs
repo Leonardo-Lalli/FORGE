@@ -69,4 +69,16 @@ public partial class HomeViewModel : BaseViewModel
     {
         await Shell.Current.GoToAsync("notifications");
     }
+
+    [RelayCommand]
+    private async Task OpenSettingsAsync()
+    {
+        await Shell.Current.GoToAsync("settings");
+    }
+
+    [RelayCommand]
+    private async Task OpenProfileAsync()
+    {
+        await Shell.Current.GoToAsync("profile");
+    }
 }

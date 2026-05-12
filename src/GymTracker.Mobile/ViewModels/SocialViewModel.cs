@@ -12,6 +12,7 @@ public partial class SocialViewModel : BaseViewModel
 
     public SocialViewModel()
     {
+        HasData = false;
         IsEmptyState = true;
     }
 }

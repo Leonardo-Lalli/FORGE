@@ -10,6 +10,7 @@ namespace GymTracker.Mobile.ViewModels;
 [QueryProperty(nameof(PlanId), "planId")]
 public partial class ActiveWorkoutViewModel : BaseViewModel
 {
+    private readonly WorkoutSession workoutSession;
     private CancellationTokenSource? restCts;
     private CancellationTokenSource? elapsedCts;
     private int restSecondsRemaining;
@@ -31,6 +32,11 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
     [ObservableProperty] private bool isTimerRunning;
     [ObservableProperty] private bool isCreating; // true = modalità creazione scheda
 
+    public ActiveWorkoutViewModel(WorkoutSession workoutSession)
+    {
+        this.workoutSession = workoutSession;
+    }
+
     partial void OnModeChanged(string value)
     {
         PlanName = value switch { "free" => "Allenamento Libero", "create" => "Nuova Scheda", _ => "Scheda Salvata" };
@@ -42,7 +48,7 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
         if (!IsCreating)
         {
             IsTimerRunning = true;
-            WorkoutSession.Instance.Start(PlanName);
+            workoutSession.Start(PlanName);
             _ = RunElapsedTimerAsync();
         }
     }
@@ -58,7 +64,7 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
         IsCreating = false;
         IsTimerRunning = true;
         workoutStartTime = DateTime.Now;
-        WorkoutSession.Instance.Start(PlanName);
+        workoutSession.Start(PlanName);
         _ = RunElapsedTimerAsync();
         ShowNotification("Allenamento iniziato! Forza!");
     }
@@ -66,7 +72,7 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
     [RelayCommand]
     private void MinimizeWorkout()
     {
-        WorkoutSession.Instance.Minimize();
+        workoutSession.Minimize();
     }
 
     [RelayCommand]
@@ -145,7 +151,7 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
         RestTimerLabel = $"pausa {ex.ExerciseName}";
         RestTimerProgress = 1.0;
         RefreshRestTimerUI();
-        WorkoutSession.Instance.UpdateRestTimer(true, RestTimerText);
+        workoutSession.UpdateRestTimer(true, RestTimerText);
         RunTimerAsync(token);
     }
 
@@ -159,7 +165,7 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
         RestTimerLabel = "pausa automatica";
         RestTimerProgress = 1.0;
         RefreshRestTimerUI();
-        WorkoutSession.Instance.UpdateRestTimer(true, RestTimerText);
+        workoutSession.UpdateRestTimer(true, RestTimerText);
         RunTimerAsync(token);
     }
 
@@ -175,14 +181,14 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
                     restSecondsRemaining--;
                     RestTimerProgress = (double)restSecondsRemaining / RestDuration;
                     RefreshRestTimerUI();
-                    WorkoutSession.Instance.UpdateRestTimer(true, RestTimerText);
+                    workoutSession.UpdateRestTimer(true, RestTimerText);
                     if (restSecondsRemaining is <= 5 and > 0)
                         HapticFeedback.Default.Perform(HapticFeedbackType.Click);
                 }
                 if (!token.IsCancellationRequested)
                 {
                     IsRestTimerActive = false;
-                    WorkoutSession.Instance.UpdateRestTimer(false, "");
+                    workoutSession.UpdateRestTimer(false, "");
                     ShowNotification("⏰ Pausa finita! Tempo di spingere!");
                     HapticFeedback.Default.Perform(HapticFeedbackType.LongPress);
                 }
@@ -227,7 +233,7 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
         PlanStore.SavePlan(plan);
 
         ShowNotification($"Scheda \"{PlanName}\" salvata!");
-        WorkoutSession.Instance.End();
+        workoutSession.End();
         await Shell.Current.GoToAsync("..");
     }
 
@@ -236,7 +242,7 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
     {
         elapsedCts?.Cancel();
         ShowNotification($"Allenamento completato! {TotalSetsCompleted} serie, {Exercises.Count} esercizi.");
-        WorkoutSession.Instance.End();
+        workoutSession.End();
         await Shell.Current.GoToAsync("..");
     }
 
@@ -253,7 +259,7 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
             {
                 var e = DateTime.Now - workoutStartTime;
                 ElapsedTime = $"{(int)e.TotalHours:D2}:{e.Minutes:D2}:{e.Seconds:D2}";
-                WorkoutSession.Instance.UpdateElapsed(ElapsedTime);
+                workoutSession.UpdateElapsed(ElapsedTime);
                 await Task.Delay(1000, token);
             }
         }
