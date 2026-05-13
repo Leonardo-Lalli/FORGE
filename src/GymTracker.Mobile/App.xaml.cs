@@ -17,15 +17,34 @@ public partial class App : Application
     protected override Window CreateWindow(IActivationState? activationState)
     {
         themeService.Initialize();
-        _ = InitializeAsync();
-        return new Window(Handler?.MauiContext?.Services.GetService<Views.LoginPage>()
-            ?? throw new InvalidOperationException("LoginPage non risolta"));
+        var window = new Window(new AppShell());
+        window.Created += async (_, _) => await OnWindowCreatedAsync();
+        return window;
     }
 
-    private async Task InitializeAsync()
+    private async Task OnWindowCreatedAsync()
     {
-        await buildSecrets.LoadAsync();
-        var pb = Handler?.MauiContext?.Services.GetService<PocketBaseService>();
-        pb?.Initialize();
+        try
+        {
+            await buildSecrets.LoadAsync();
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[App] BuildSecrets failed: {ex.Message}");
+        }
+
+        if (Handler?.MauiContext?.Services.GetService<PocketBaseService>() is { } pb)
+        {
+            pb.Initialize();
+
+            var loggedIn = await pb.TryAutoLoginAsync();
+            if (!loggedIn)
+            {
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    await Shell.Current.GoToAsync("login");
+                });
+            }
+        }
     }
 }
