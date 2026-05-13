@@ -58,10 +58,7 @@ public partial class HomeViewModel : BaseViewModel
     [RelayCommand]
     private async Task StartWorkoutAsync()
     {
-        await Shell.Current.GoToAsync("activeWorkout", new Dictionary<string, object>
-        {
-            ["mode"] = "free"
-        });
+        await Shell.Current.GoToAsync("startSession");
     }
 
     [RelayCommand]

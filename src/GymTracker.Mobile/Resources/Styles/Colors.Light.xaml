@@ -40,7 +40,7 @@
     <Color x:Key="Outline">#737688</Color>
     <Color x:Key="OutlineVariant">#c3c5d9</Color>
 
-    <Color x:Key="ElectricBlue">#0052ff</Color>
+    <Color x:Key="ElectricBlue">#1a62ff</Color>
     <Color x:Key="LimeGreen">#076e00</Color>
     <Color x:Key="AlertRed">#ba1a1a</Color>
     <Color x:Key="CardBackground">#ffffff</Color>

@@ -5,12 +5,12 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:views="clr-namespace:GymTracker.Mobile.Views"
     Shell.FlyoutBehavior="Disabled"
-    Shell.BackgroundColor="#131313"
-    Shell.ForegroundColor="#e5e2e1"
-    Shell.TabBarBackgroundColor="#1c1b1b"
-    Shell.TabBarForegroundColor="#c3f5ff"
-    Shell.TabBarUnselectedColor="#849396"
-    Shell.TabBarTitleColor="#c3f5ff">
+    Shell.BackgroundColor="{DynamicResource Surface}"
+    Shell.ForegroundColor="{DynamicResource OnSurface}"
+    Shell.TabBarBackgroundColor="{DynamicResource SurfaceContainerLow}"
+    Shell.TabBarForegroundColor="{DynamicResource Primary}"
+    Shell.TabBarUnselectedColor="{DynamicResource Outline}"
+    Shell.TabBarTitleColor="{DynamicResource Primary}">
 
     <TabBar>
         <ShellContent

@@ -7,6 +7,7 @@ namespace GymTracker.Mobile.ViewModels;
 public partial class SettingsViewModel : BaseViewModel
 {
     private readonly ThemeService themeService;
+    private bool suppressChange;
 
     [ObservableProperty]
     private bool isDarkMode;
@@ -14,12 +15,15 @@ public partial class SettingsViewModel : BaseViewModel
     public SettingsViewModel(ThemeService themeService)
     {
         this.themeService = themeService;
+        suppressChange = true;
         IsDarkMode = themeService.IsDarkMode;
+        suppressChange = false;
         HasData = true;
     }
 
     partial void OnIsDarkModeChanged(bool value)
     {
+        if (suppressChange) return;
         themeService.IsDarkMode = value;
     }
 

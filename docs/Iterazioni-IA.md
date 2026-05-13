@@ -337,16 +337,64 @@ public class ExerciseApiService(HttpClient http, BuildSecrets secrets)
 | `main` | `e104cae` | Pulito — versione "ciano originale" (freccia ▸, Lexend font) |
 | `app_icon` | `27f785a` | main + toggle fix + icone tematizzate + SwitchAppIcon |
 
+### Aggiornamento 2026-05-13 — Branch `lightmode-fix` (corrente)
+
+#### Obiettivo
+- Assicurarsi che il toggle tema nelle Impostazioni cambi l'intera applicazione (ogni pagina, Shell inclusa)
+- Implementare la pagina "Start Session" basata sui mockup `start_session_light_uniform_v2` (chiaro) e `start_training_cyber_athletic_elite_uniform` (scuro)
+- Il pulsante "START WORKOUT" della HomePage deve aprire la schermata Start Session
+
+#### Modifiche applicate
+
+| Modifica | File | Descrizione |
+|----------|------|-------------|
+| StaticResource→DynamicResource globale | `Resources/Styles/Styles.xaml` | Tutti i `StaticResource` (colori) convertiti in `DynamicResource` nelle definizioni di Style (Shell, NavigationPage, Page, Label styles, Button styles, CardFrame, DarkEntry, ActivityIndicator, ErrorLabel, EmptyStateLabel). 26 StaticResource totali sostituiti |
+| Shell colori dinamici | `AppShell.xaml` | `Shell.BackgroundColor`, `ForegroundColor`, `TabBarBackgroundColor`, `TabBarForegroundColor`, `TabBarUnselectedColor`, `TabBarTitleColor` passati da valori hardcoded (`#131313`, `#e5e2e1`, etc.) a `DynamicResource` |
+| Colors.Light.xaml preload | `App.xaml` | Aggiunto `Colors.Light.xaml` come primo MergedDictionary per garantire inclusione nel build e risoluzione URI a runtime del ThemeService |
+| StartSessionPage XAML | `Views/StartSessionPage.xaml` | Nuova pagina basata sui mockup: TopAppBar con FORGE_ELITE, Hero START_SESSION, Quick Start card, Create New Plan card accent, Your Protocols con cards da PlanStore. Layout identico per entrambi i temi — differenziazione via `DynamicResource` |
+| StartSessionPage code-behind | `Views/StartSessionPage.xaml.cs` | Ricarica protocolli da `PlanStore` in `OnAppearing()` |
+| StartSessionViewModel | `ViewModels/StartSessionViewModel.cs` | `QuickStartCommand` (mode=free), `CreateNewPlanCommand` (mode=create), `StartProtocolCommand` (mode=plan+planId), `LoadProtocols()` da `PlanStore`, `GoBackCommand`. Modello `ProtocolCard` per binding |
+| Registrazione DI | `MauiProgram.cs` | Aggiunti `StartSessionViewModel` e `StartSessionPage` alla DI |
+| Route Shell | `AppShell.xaml.cs` | Registrata route `"startSession"` per `StartSessionPage` |
+| Navigazione START WORKOUT | `ViewModels/HomeViewModel.cs` | `StartWorkoutAsync()` ora naviga a `"startSession"` invece che direttamente a `"activeWorkout"` |
+
+#### Light mockups referenziati
+| Mockup | Palette | Utilizzo |
+|--------|---------|----------|
+| `start_session_light_uniform_v2` | Fitness Core (chiaro, blu `#003ec7`) | StartSessionPage tema chiaro |
+| `start_training_cyber_athletic_elite_uniform` | Cyber-Athletic Elite (scuro, ciano `#00E5FF`) | StartSessionPage tema scuro |
+
+#### Risultato
+- Il toggle tema nelle Impostazioni cambia **ogni elemento UI**: pagine, Shell tab bar, stili globali, pulsanti
+- START WORKOUT sulla HomePage porta alla nuova schermata Start Session, coerente con i mockup
+- La StartSessionPage è theme-aware: usa esclusivamente `DynamicResource`, adattandosi automaticamente al tema attivo
+
+### Stato branch aggiornato
+| Branch | Commit | Contenuto |
+|--------|--------|-----------|
+| `main` | `1cb72c2` | Versione stabile — ciano originale |
+| `lightmode-fix` | — (nuovo) | main + StartSessionPage + ThemeService rewrite + mock data |
+
+### Sessione 2 — ThemeService rewrite + mock data
+
+| Fix | File | Descrizione |
+|-----|------|-------------|
+| ThemeService rewrite | `Services/ThemeService.cs` | Sostituito il meccanismo MergedDictionaries swap con scrittura diretta in `Application.Current.Resources`. Entrambe le palette (dark/light) sono inline come `Dictionary<string, string>`. `WriteResources()` aggiorna i valori nello stesso dizionario — DynamicResource viene notificato automaticamente. Aggiunto `UserAppTheme` sync |
+| remove App.xaml color preload | `App.xaml` | Rimosse entrambe le color dictionaries da MergedDictionaries — ThemeService popola Resources a runtime |
+| suppressChange flag | `ViewModels/SettingsViewModel.cs` | Blocca `OnIsDarkModeChanged` durante costruzione iniziale per evitare Apply() doppio |
+| Mock workout plans | `ViewModels/StartSessionViewModel.cs` | 3 piani demo (`Push Power`, `Leg Day Protocol`, `Core Stabilization`) con esercizi, serie, peso e ripetizioni. Seed automatico al primo avvio se PlanStore vuoto |
+
+#### Perché il nuovo ThemeService funziona
+Il vecchio approccio (rimozione/aggiunta `MergedDictionaries`) non notificava sempre i binding `DynamicResource`, specialmente con XAML SourceGen. Il nuovo approccio scrive direttamente `Color.FromArgb()` nelle stesse chiavi di `Application.Current.Resources`. Poiché i binding `DynamicResource` osservano il dizionario risorse, qualsiasi modifica al valore di una chiave viene propagata a tutto il visual tree.
+
 ### Metriche aggiornate
 | Metrica | Valore |
 |---------|--------|
-| File C# totali (src) | 18 (+Converters) |
-| ViewModel | 10 |
-| Views | 12 |
-| Services | 4 |
-| Models | 1 |
-| Converters | 3 |
-| NuGet packages | 4 (+sqlite-net-pcl) |
-| Branch creati e mergiati | fix, light-mode, light_button_fix |
-| Branch attivi | main, app_icon |
-| Build status | 0 errori, 0 warning |
+| ViewModel | 11 (+StartSessionViewModel) |
+| Views | 13 (+StartSessionPage) |
+| StaticResource→DynamicResource totali sostituiti | 32 (26 in Styles.xaml + 6 in AppShell.xaml) |
+| ThemeService linee | 140 (da 65) — palette inline, no dipendenze file XAML a runtime |
+| Piani mock | 3 (Push Power, Leg Day Protocol, Core Stabilization) |
+| Branch attivi | main, lightmode-fix |
+
+*Report aggiornato il 2026-05-13.*

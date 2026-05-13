@@ -35,6 +35,7 @@ public static class MauiProgram
         builder.Services.AddTransient<SocialViewModel>();
         builder.Services.AddTransient<ProfileViewModel>();
         builder.Services.AddTransient<NotificationsViewModel>();
+        builder.Services.AddTransient<StartSessionViewModel>();
 
         // Pages
         builder.Services.AddTransient<HomePage>();
@@ -48,6 +49,7 @@ public static class MauiProgram
         builder.Services.AddTransient<ProfilePage>();
         builder.Services.AddTransient<NotificationsPage>();
         builder.Services.AddTransient<SettingsPage>();
+        builder.Services.AddTransient<StartSessionPage>();
 
 #if DEBUG
         builder.Logging.AddDebug();
