@@ -279,3 +279,74 @@ public class ExerciseApiService(HttpClient http, BuildSecrets secrets)
 ---
 
 *Report generato il 2026-05-07 da audit automatico. Basato su git log (30 commit) e analisi statica del codice.*
+
+---
+
+## Aggiornamento 2026-05-13 — Fix applicati (branch `fix` → `light-mode` → `light_button_fix` → `app_icon`)
+
+### Sessione 1 — Fix strutturali (`fix`)
+| Fix | File | Descrizione |
+|-----|------|-------------|
+| BuildSecrets.LoadAsync() chiamato all'avvio | `App.xaml.cs` | Iniettato `BuildSecrets` e chiamato `LoadAsync()` in `CreateWindow()` |
+| GOOGLE_BOOKS_API_KEY rimossa | `.env`, `.env.example`, `gymtracker.env` | Rimosso leftover da BookScout |
+| sqlite-net-pcl aggiunto | `.csproj` | NuGet `sqlite-net-pcl` 1.9.172 |
+| Converters creati | `Converters/` | `BoolToVisibilityConverter`, `InverseBoolConverter`, `DateTimeFormatConverter` |
+| StaticResource→DynamicResource | `DashboardPage.xaml`, `CatalogPage.xaml` | Supporto cambio tema runtime |
+| TapGestureRecognizer→Command | `HomePage`, `DashboardPage`, `FeedPage`, `StatsPage` | Code-behind puliti, comandi in ViewModel |
+| ViewModel state consistency | `DashboardViewModel`, `SocialViewModel`, `CatalogViewModel` | `HasData`/`IsEmptyState` coerenti |
+| WorkoutSession refactoring | `WorkoutSession.cs`, `ActiveWorkoutViewModel.cs` | Da `Lazy<T>` statico a DI injection |
+| Converter={x:Null} fix | `CatalogPage.xaml` | Sostituito con `InverseBoolConverter` |
+
+### Sessione 2 — ThemeService ottimizzato (`fix`)
+| Fix | File | Descrizione |
+|-----|------|-------------|
+| Initialize no-op su dark | `ThemeService.cs` | Flag `isInitialized`, se dark default non chiama `Apply()` |
+| BuildSecrets robusto | `BuildSecrets.cs` | `catch(Exception)`, `ConcurrentDictionary` |
+
+### Sessione 3 — Profilo mockup e prevenzione crash (`light-mode`)
+| Fix | File | Descrizione |
+|-----|------|-------------|
+| Profilo avatar "EL" cliccabile | `HomePage.xaml`, `FeedPage.xaml`, `StatsPage.xaml` | Avatar con `OpenProfileCommand`, route `"profile"` in `AppShell.xaml.cs` |
+| ProfilePage riscritta | `ProfilePage.xaml`, `ProfileViewModel.cs` | Basata su mockup `profilo_elite_nero_opaco` / `profilo_elite_chiaro` |
+| StaticResource→DynamicResource TUTTE le pagine | `ProfilePage`, `ActiveWorkoutPage`, `NotificationsPage`, `SocialPage`, `WorkoutPage` | 116 StaticResource totali sostituiti |
+| ThemeService.Apply() sicuro | `ThemeService.cs` | `MainThread.IsMainThread` check, `try-catch(Exception)` |
+
+### Sessione 4 — Fix toggle tema (`light_button_fix`)
+| Fix | File | Descrizione |
+|-----|------|-------------|
+| Colors.Light.xaml preload | `App.xaml` | Aggiunto come primo merged dictionary (bassa priorità) per garantire inclusione nel build e risoluzione URI a runtime |
+| suppressChange flag | `SettingsViewModel.cs` | Blocca `OnIsDarkModeChanged` durante costruzione iniziale |
+
+### Sessione 5 — Main color fix
+| Fix | File | Descrizione |
+|-----|------|-------------|
+| START WORKOUT button azure | `HomePage.xaml` | BackgroundColor `Primary` (ciano #c3f5ff) come bordi Squad Activity |
+| StatsPage incrementi azure | `StatsPage.xaml` | Tutti ▲ e trend text da `LimeGreen` a `Primary` |
+
+### Sessione 6 — Icone tematizzate (`app_icon`)
+| Fix | File | Descrizione |
+|-----|------|-------------|
+| Icone Android mipmap | `Platforms/Android/Resources/mipmap-hdpi/` | `ic_launcher_dark.png` e `ic_launcher_light.png` da `Assets/AppLogo` |
+| Activity-alias manifest | `AndroidManifest.xml` | 2 alias (`MainActivityDark`/`MainActivityLight`) con icone dedicate e `MainLauncher` sui filtri intent |
+| MainActivity no MainLauncher | `MainActivity.cs` | Rimosso `MainLauncher = true` |
+| SwitchAppIcon() | `ThemeService.cs` | `PackageManager.SetComponentEnabledSetting` al cambio tema, `#if ANDROID` condizionale |
+
+### Stato attuale branch
+| Branch | Commit | Contenuto |
+|--------|--------|-----------|
+| `main` | `e104cae` | Pulito — versione "ciano originale" (freccia ▸, Lexend font) |
+| `app_icon` | `27f785a` | main + toggle fix + icone tematizzate + SwitchAppIcon |
+
+### Metriche aggiornate
+| Metrica | Valore |
+|---------|--------|
+| File C# totali (src) | 18 (+Converters) |
+| ViewModel | 10 |
+| Views | 12 |
+| Services | 4 |
+| Models | 1 |
+| Converters | 3 |
+| NuGet packages | 4 (+sqlite-net-pcl) |
+| Branch creati e mergiati | fix, light-mode, light_button_fix |
+| Branch attivi | main, app_icon |
+| Build status | 0 errori, 0 warning |

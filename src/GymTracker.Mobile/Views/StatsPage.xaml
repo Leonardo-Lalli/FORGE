@@ -198,7 +198,7 @@
                         <Border BackgroundColor="{DynamicResource SurfaceVariant}"
                                 Opacity="0.3" StrokeShape="RoundRectangle 8"
                                 HeightRequest="192" Padding="12">
-                            <BoxView Color="{DynamicResource Primary}" Opacity="0.6"
+                            <BoxView Color="{DynamicResource ElectricBlue}" Opacity="0.6"
                                      CornerRadius="4" VerticalOptions="End"
                                      HeightRequest="80" />
                         </Border>

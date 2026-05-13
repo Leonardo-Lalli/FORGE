@@ -59,7 +59,7 @@
                                 <DataTemplate x:DataType="vm:SquadMember">
                                     <VerticalStackLayout Spacing="8" WidthRequest="72">
                                         <Border StrokeShape="RoundRectangle 999"
-                                                Stroke="{DynamicResource Primary}"
+                                                Stroke="{DynamicResource ElectricBlue}"
                                                 StrokeThickness="2" Padding="2"
                                                 WidthRequest="64" HeightRequest="64"
                                                 BackgroundColor="{DynamicResource PrimaryContainer}">
@@ -163,7 +163,7 @@
                                    FontAttributes="Bold" TextColor="{DynamicResource OnSurface}"
                                    Margin="0,4,0,0" />
                             <ProgressBar Progress="{Binding HydrationProgress}"
-                                         ProgressColor="{DynamicResource Primary}"
+                                                              ProgressColor="{DynamicResource ElectricBlue}"
                                          Margin="0,10,0,0" />
                         </VerticalStackLayout>
                     </Border>
@@ -205,7 +205,7 @@
                                             <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
                                                 <ProgressBar Grid.Column="0"
                                                              Progress="{Binding Progress}"
-                                                             ProgressColor="{DynamicResource Primary}"
+                                                                                  ProgressColor="{DynamicResource ElectricBlue}"
                                                              VerticalOptions="Center" />
                                                 <Label Grid.Column="1" Text="{Binding ProgressText}"
                                                        FontFamily="OpenSansRegular" FontSize="11"
@@ -222,8 +222,10 @@
 
                 <!-- ===== Start Workout Button ===== -->
                 <Button Text="▶  START WORKOUT"
-                        Style="{DynamicResource PrimaryButton}"
+                        BackgroundColor="{DynamicResource ElectricBlue}"
+                        TextColor="{DynamicResource OnPrimary}"
                         FontFamily="OpenSansSemibold" FontSize="16"
+                        FontAttributes="Bold"
                         HeightRequest="56" CornerRadius="8"
                         Command="{Binding StartWorkoutCommand}" />
 
