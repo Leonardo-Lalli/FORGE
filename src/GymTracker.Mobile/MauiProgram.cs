@@ -22,6 +22,11 @@ public static class MauiProgram
         builder.Services.AddSingleton<BuildSecrets>();
         builder.Services.AddSingleton<ThemeService>();
         builder.Services.AddSingleton<WorkoutSession>();
+        builder.Services.AddSingleton(sp =>
+        {
+            var http = new HttpClient();
+            return new PocketBaseService(http, sp.GetRequiredService<BuildSecrets>());
+        });
 
         // ViewModels
         builder.Services.AddTransient<HomeViewModel>();
@@ -36,6 +41,7 @@ public static class MauiProgram
         builder.Services.AddTransient<ProfileViewModel>();
         builder.Services.AddTransient<NotificationsViewModel>();
         builder.Services.AddTransient<StartSessionViewModel>();
+        builder.Services.AddTransient<LoginViewModel>();
 
         // Pages
         builder.Services.AddTransient<HomePage>();
@@ -50,6 +56,7 @@ public static class MauiProgram
         builder.Services.AddTransient<NotificationsPage>();
         builder.Services.AddTransient<SettingsPage>();
         builder.Services.AddTransient<StartSessionPage>();
+        builder.Services.AddTransient<LoginPage>();
 
 #if DEBUG
         builder.Logging.AddDebug();

@@ -397,4 +397,44 @@ Il vecchio approccio (rimozione/aggiunta `MergedDictionaries`) non notificava se
 | Piani mock | 3 (Push Power, Leg Day Protocol, Core Stabilization) |
 | Branch attivi | main, lightmode-fix |
 
+### Aggiornamento 2026-05-13 — Branch `mockup` (PocketBase)
+
+`lightmode-fix` mergiato in `main` e cancellato. Nuovo branch `mockup`.
+
+#### Obiettivo
+Sostituire Firebase con PocketBase self-hosted per auth, dati social e persistenza remota. Primo step: autenticazione utente e profilo da PocketBase.
+
+#### Modifiche
+
+| Modifica | File | Descrizione |
+|----------|------|-------------|
+| PocketBaseService | `Services/PocketBaseService.cs` | `LoginAsync()`, `RegisterAsync()`, `Logout()`, `RefreshUserAsync()`, `TryAutoLoginAsync()`, `GetListAsync<T>()`, `CreateRecordAsync<T>()`. Token salvato in memoria, credenziali in `Preferences` per auto-login |
+| PocketBase DTO | `Models/Dto/PocketBaseDto.cs` | `PocketBaseAuthResponse`, `PocketBaseUserRecord`, `PocketBaseListResponse<T>` |
+| LoginPage | `Views/LoginPage.xaml` | Login/Register con email, password, nome. Toggle modalità login/registrazione. Stati: loading, error, success |
+| LoginViewModel | `ViewModels/LoginViewModel.cs` | `LoginCommand`, `RegisterCommand`, `ToggleModeCommand`. Auto-login all'avvio |
+| App.xaml.cs auth flow | `App.xaml.cs` | `CreateWindow()` avvia con `AppShell`, poi in background carica secrets, inizializza PocketBase, tenta auto-login. Se fallisce → mostra `LoginPage` via `Windows[0].Page` |
+| App.xaml converters | `App.xaml` | Registrati globalmente `InverseBoolConverter` e `BoolToVisibilityConverter` |
+| ProfileViewModel real data | `ViewModels/ProfileViewModel.cs` | Iniettato `PocketBaseService`. Mostra `Username`, `Bio`, `AvatarInitials` da `pb.CurrentUser`. Fallback a dati mock se offline |
+| ProfilePage avatar/bio | `Views/ProfilePage.xaml` | Avatar mostra iniziali utente (`AvatarInitials`), bio visibile sotto il tier |
+| MauiProgram registrazioni | `MauiProgram.cs` | PocketBaseService con HttpClient, LoginViewModel, LoginPage |
+| .env PocketBase URL | `.env` | Aggiunto `POCKETBASE_URL=http://192.168.1.23:8080` |
+
+#### Collezioni PocketBase remote
+| Collezione | Stato | Campi |
+|-----------|-------|-------|
+| `users` | Built-in | email, password, name, bio, avatar |
+| `excercise` | Vuota, accessibile | Da popolare con esercizi |
+| `logged_workouts` | Vuota, accessibile | Da popolare con allenamenti |
+| `social_graph` | Vuota, accessibile | Da popolare con amicizie |
+
+### Metriche aggiornate
+| Metrica | Valore |
+|---------|--------|
+| ViewModel | 13 (+LoginViewModel) |
+| Views | 14 (+LoginPage) |
+| Services | 5 (+PocketBaseService) |
+| DTO | 1 (+PocketBaseDto) |
+| Branch attivo | mockup |
+| Build status | 0 errori, 0 warning |
+
 *Report aggiornato il 2026-05-13.*

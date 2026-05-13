@@ -42,7 +42,7 @@
                             Stroke="{DynamicResource Surface}" StrokeThickness="4"
                             WidthRequest="128" HeightRequest="128" Padding="0"
                             HorizontalOptions="Center">
-                        <Label Text="MK" FontFamily="OpenSansSemibold" FontSize="40"
+                        <Label Text="{Binding AvatarInitials}" FontFamily="OpenSansSemibold" FontSize="40"
                                TextColor="{DynamicResource OnSurface}"
                                HorizontalOptions="Center" VerticalOptions="Center" />
                     </Border>
@@ -63,6 +63,12 @@
                                FontFamily="OpenSansRegular" FontSize="18"
                                TextColor="{DynamicResource OnSurfaceVariant}" />
                     </HorizontalStackLayout>
+
+                    <!-- Bio -->
+                    <Label Text="{Binding Bio}"
+                           FontFamily="OpenSansRegular" FontSize="14"
+                           TextColor="{DynamicResource TextSecondary}"
+                           HorizontalTextAlignment="Center" />
                 </VerticalStackLayout>
 
                 <!-- Stats Grid 2x2 -->
