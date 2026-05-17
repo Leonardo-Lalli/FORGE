@@ -727,13 +727,31 @@ L'utente salvava un allenamento (presente su PocketBase) ma non lo vedeva nella 
 | Stats filter buttons feedback | `StatsPage.xaml` | DataTrigger sui bottoni WEEK/MONTH/3M/YEAR/ALL cambia colore quando selezionato |
 | ProfilePage bindings fix | `ProfilePage.xaml` | Sostituiti `Category`, `HeartRate`, `Description` (inesistenti) con `Exercises` |
 
-### PocketBase: verifiche necessarie
-1. Collection `logged_workouts` deve esistere con campo `user` (tipo `relation` → `users`)
-2. API Rule List/Search: `@request.auth.id != ""`
-3. Se dopo il fix ancora non funziona, controllare i log di debug filtrando `[PB MyWorkouts]` per vedere cosa restituisce PocketBase
+### PocketBase: API Rules richieste per collection `logged_workouts`
+1. **List/Search**: `@request.auth.id != ""`
+2. **View**: `@request.auth.id != ""`
+3. **Update**: `@request.auth.id != ""` (necessaria per i like)
+4. Campo `user` deve essere tipo `relation` → `users`
 
 ### Metriche aggiornate
 | Metrica | Valore |
 |---------|--------|
-| Build status | 0 errori, 107 warning (tutti MVVMTK0045 pre-esistenti) |
+| Build status | 0 errori |
 | Branch attivo | mockup |
+
+---
+
+## Aggiornamento 2026-05-17 sera — Ritocchi estetici e fix like
+
+### Fix applicati
+
+| Fix | Descrizione |
+|-----|-------------|
+| Grafico volume a settimane | Ogni barra = 1 settimana, label `dd/MM`, divisori mese (`MAG`, `GIU`) in Primary bold, range 4 mesi |
+| Tasto elimina scheda | ✕ rossa su ogni protocol card in StartSession |
+| Calendario con pallini | Sopra Top Lifts, giorni mese con pallino Primary se allenamento, oggi LimeGreen |
+| Dashboard card random plan | Card "Today" mostra piano salvato random, tappabile → apre allenamento con esercizi/pesi/reps |
+| Rimossa Hydration | Sostituita dalla card piano random a larghezza piena |
+| Cuori Feed colorati | DataTrigger: LimeGreen se liked, OnSurfaceVariant se no. Già tappabili |
+| Like usa JsonDocument | `LikeWorkoutAsync`/`UnlikeWorkoutAsync` leggono `liked_by`/`likes` via `JsonDocument` invece di `ReadFromJsonAsync<LoggedWorkoutRecord>` (evita `JsonException` da `exercise_data` array) |
+| Profilo tap InputTransparent | `InputTransparent="True"` su Label header per far passare il tap al Border con `OpenProfileCommand` |
