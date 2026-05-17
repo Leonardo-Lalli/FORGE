@@ -192,7 +192,15 @@
                                 <DataTemplate x:DataType="vm:LabelEntry">
                                     <Label Text="{Binding Text}" FontFamily="Lexend" FontSize="9"
                                            TextColor="{DynamicResource TextSecondary}"
-                                           HorizontalTextAlignment="Center" VerticalOptions="Center" />
+                                           HorizontalTextAlignment="Center" VerticalOptions="Center">
+                                        <Label.Triggers>
+                                            <DataTrigger TargetType="Label" Binding="{Binding IsMonthLabel}" Value="True">
+                                                <Setter Property="FontAttributes" Value="Bold" />
+                                                <Setter Property="FontSize" Value="8" />
+                                                <Setter Property="TextColor" Value="{DynamicResource Primary}" />
+                                            </DataTrigger>
+                                        </Label.Triggers>
+                                    </Label>
                                 </DataTemplate>
                             </BindableLayout.ItemTemplate>
                         </Grid>
