@@ -137,4 +137,11 @@ public partial class StartSessionViewModel : BaseViewModel
     {
         await Shell.Current.GoToAsync("..");
     }
+
+    [RelayCommand]
+    private void DeleteProtocol(ProtocolCard protocol)
+    {
+        PlanStore.DeletePlan(protocol.Id);
+        LoadProtocols();
+    }
 }

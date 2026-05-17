@@ -140,9 +140,13 @@
                                                    FontFamily="OpenSansSemibold" FontSize="18" FontAttributes="Bold"
                                                    TextColor="{DynamicResource OnSurface}"
                                                    VerticalOptions="Start" />
-                                            <Label Grid.Column="1" Text="🏋" FontSize="20"
-                                                   TextColor="{DynamicResource OutlineVariant}"
-                                                   VerticalOptions="Start" />
+                                            <Label Grid.Column="1" Text="✕" FontSize="16"
+                                                   TextColor="{DynamicResource AlertRed}"
+                                                   VerticalOptions="Start" Padding="8,0,0,0">
+                                                <Label.GestureRecognizers>
+                                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:StartSessionViewModel}}, Path=DeleteProtocolCommand}" CommandParameter="{Binding .}" />
+                                                </Label.GestureRecognizers>
+                                            </Label>
                                         </Grid>
                                         <HorizontalStackLayout Grid.Row="1" Spacing="16" VerticalOptions="End">
                                             <HorizontalStackLayout Spacing="4">
