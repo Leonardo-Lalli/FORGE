@@ -23,7 +23,7 @@ public partial class HomeViewModel : BaseViewModel
     private readonly PocketBaseService pb;
 
     [ObservableProperty] private string streakCount = "0";
-    [ObservableProperty] private string streakLabel = "Day streak";
+    [ObservableProperty] private string streakLabel = "Week streak";
     [ObservableProperty] private string streakDescription = "Start your first workout today!";
     [ObservableProperty] private string nextWorkout = "Create a plan";
     [ObservableProperty] private string workoutDuration = "Tap to start";
@@ -98,7 +98,7 @@ public partial class HomeViewModel : BaseViewModel
         {
             if (!pb.IsLoggedIn) return;
             var workouts = await pb.GetMyWorkoutsAsync(365);
-            if (workouts.Count == 0) return;
+            if (workouts.Count == 0) { StreakCount = "0"; return; }
 
             var dates = workouts
                 .Select(w => { DateTime.TryParse(w.Date, out var d); return d; })
@@ -108,20 +108,29 @@ public partial class HomeViewModel : BaseViewModel
                 .OrderByDescending(d => d)
                 .ToList();
 
-            int streak = 0;
-            var today = DateTime.Now.Date;
-            var check = today;
+            if (dates.Count == 0) { StreakCount = "0"; return; }
 
-            foreach (var d in dates)
+            var mostRecent = dates.First();
+            var daysSinceLastWorkout = (DateTime.Now.Date - mostRecent).Days;
+            if (daysSinceLastWorkout > 7) { StreakCount = "0"; return; }
+
+            var weekStart = mostRecent.AddDays(-(int)mostRecent.DayOfWeek + 1);
+            if (mostRecent.DayOfWeek == DayOfWeek.Sunday)
+                weekStart = mostRecent.AddDays(-6);
+
+            int streak = 0;
+            while (true)
             {
-                if (d == check) { streak++; check = check.AddDays(-1); }
-                else if (d < check) break;
+                var weekEnd = weekStart.AddDays(6);
+                if (!dates.Any(d => d >= weekStart && d <= weekEnd)) break;
+                streak++;
+                weekStart = weekStart.AddDays(-7);
             }
 
             StreakCount = streak.ToString();
-            StreakLabel = streak == 1 ? "Day streak" : "Days streak";
+            StreakLabel = streak == 1 ? "Week streak" : "Weeks streak";
             StreakDescription = streak > 0
-                ? $"You trained {streak} day{(streak > 1 ? "s" : "")} in a row. Keep going!"
+                ? $"You trained {streak} week{(streak > 1 ? "s" : "")} in a row. Keep going!"
                 : "Start your first workout today!";
         }
         catch { }

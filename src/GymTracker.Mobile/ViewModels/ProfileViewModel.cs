@@ -35,7 +35,7 @@ public partial class ProfileViewModel : BaseViewModel
     [ObservableProperty] private string editBio = string.Empty;
     [ObservableProperty] private string totalWorkouts = "0";
     [ObservableProperty] private string streakDays = "0";
-    [ObservableProperty] private string streakLabel = "Day Streak";
+    [ObservableProperty] private string streakLabel = "Week Streak";
     [ObservableProperty] private string totalVolume = "0";
     [ObservableProperty] private string totalLikesReceived = "0";
     [ObservableProperty] private string workoutLoadError = string.Empty;
@@ -164,7 +164,7 @@ public partial class ProfileViewModel : BaseViewModel
         try
         {
             var workouts = await pb.GetMyWorkoutsAsync(365);
-            if (workouts.Count == 0) { StreakDays = "0"; StreakLabel = "Day Streak"; return; }
+            if (workouts.Count == 0) { StreakDays = "0"; StreakLabel = "Week Streak"; return; }
 
             var dates = workouts
                 .Select(w => { DateTime.TryParse(w.Date, out var d); return d; })
@@ -174,23 +174,27 @@ public partial class ProfileViewModel : BaseViewModel
                 .OrderByDescending(d => d)
                 .ToList();
 
-            int streak = 0;
-            var today = DateTime.Now.Date;
-            var check = today;
+            if (dates.Count == 0) { StreakDays = "0"; StreakLabel = "Week Streak"; return; }
 
-            foreach (var d in dates)
+            var mostRecent = dates.First();
+            var daysSinceLastWorkout = (DateTime.Now.Date - mostRecent).Days;
+            if (daysSinceLastWorkout > 7) { StreakDays = "0"; StreakLabel = "Week Streak"; return; }
+
+            var weekStart = mostRecent.AddDays(-(int)mostRecent.DayOfWeek + 1);
+            if (mostRecent.DayOfWeek == DayOfWeek.Sunday)
+                weekStart = mostRecent.AddDays(-6);
+
+            int streak = 0;
+            while (true)
             {
-                if (d == check)
-                {
-                    streak++;
-                    check = check.AddDays(-1);
-                }
-                else if (d < check)
-                    break;
+                var weekEnd = weekStart.AddDays(6);
+                if (!dates.Any(d => d >= weekStart && d <= weekEnd)) break;
+                streak++;
+                weekStart = weekStart.AddDays(-7);
             }
 
             StreakDays = streak.ToString();
-            StreakLabel = streak == 1 ? "Day Streak" : "Day Streak";
+            StreakLabel = streak == 1 ? "Week Streak" : "Weeks Streak";
         }
         catch
         {
