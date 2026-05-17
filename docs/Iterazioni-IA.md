@@ -685,6 +685,21 @@ Ricostruita interamente basandosi su `allenamento_attivo_minimal_bianco` e `alle
 | Branch attivo | mockup |
 | Build status | 0 errori |
 
+---
+
+## Aggiornamento 2026-05-17 — Feature: profilo foto, squad stories, top lifts, piani salvati
+
+### Fix applicati
+
+| Fix | File | Descrizione |
+|-----|------|-------------|
+| Top Lifts case-insensitive | `StatsViewModel.cs` | `JsonSerializerOptions { PropertyNameCaseInsensitive = true }` per deserializzare `exercise_data` da PocketBase (chiavi lowercase) |
+| Piani salvati: caricamento esercizi | `ActiveWorkoutViewModel.cs` | `OnPlanIdChanged` e `LoadPlanAsync()` caricano il piano da `PlanStore` con tutti gli esercizi, serie, pesi e reps. Set clonati per non modificare l'originale |
+| Squad stories clickable | `HomeViewModel.cs`, `HomePage.xaml` | Squad tappabili → Feed. `HasWorkout` (visibile solo se amico ha allenamenti). `HasAvatar`, `AvatarUrl`, `UserId` |
+| Foto profilo nel Feed | `FeedViewModel.cs`, `FeedPage.xaml`, `PocketBaseDto.cs` | `FeedPost` e `UserSearchResult` con `AvatarUrl`/`HasAvatar`. Avatar da PocketBase con fallback iniziali |
+| Avatar in GetFollowedWorkouts | `PocketBaseService.cs` | Popola `AvatarUrl` nei `LoggedWorkoutRecord` |
+| Feed search avatar | `FeedViewModel.cs` | `SearchUsersAsync` include `AvatarUrl` dai `PocketBaseUserRecord` |
+
 *Report aggiornato il 2026-05-17.*
 
 ---

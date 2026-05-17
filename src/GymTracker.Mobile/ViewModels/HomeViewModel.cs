@@ -11,7 +11,11 @@ public partial class SquadMember : ObservableObject
 {
     public string Name { get; set; } = string.Empty;
     public string Initial { get; set; } = string.Empty;
-    public bool IsActive { get; set; }
+    public string UserId { get; set; } = string.Empty;
+    public string AvatarUrl { get; set; } = string.Empty;
+    [ObservableProperty] private bool isActive;
+    [ObservableProperty] private bool hasWorkout;
+    [ObservableProperty] private bool hasAvatar;
 }
 
 public partial class HomeViewModel : BaseViewModel
@@ -83,26 +87,61 @@ public partial class HomeViewModel : BaseViewModel
             if (!pb.IsLoggedIn) return;
             var followingIds = await pb.GetFollowingUserIdsAsync();
             Squad.Clear();
-            var names = new List<string>();
+            if (followingIds.Count == 0) return;
+
+            var members = new List<(string id, string name, string avatarUrl)>();
             foreach (var id in followingIds.Take(4))
             {
                 try
                 {
                     var users = await pb.SearchUsersAsync(id);
                     var u = users.FirstOrDefault(x => x.Id == id);
-                    names.Add(u?.Name ?? id[..2].ToUpper());
+                    var name = u?.Name ?? id[..2].ToUpper();
+                    var avatarUrl = "";
+                    if (u != null && !string.IsNullOrWhiteSpace(u.Avatar))
+                        avatarUrl = pb.GetFileUrl(u.CollectionId, u.Id, u.Avatar);
+                    members.Add((id, name, avatarUrl));
                 }
-                catch { names.Add(id[..2].ToUpper()); }
+                catch { members.Add((id, id[..2].ToUpper(), "")); }
             }
 
-            for (int i = 0; i < names.Count; i++)
+            // Check which members have workouts
+            try
             {
-                Squad.Add(new SquadMember
+                var allWorkouts = await pb.GetMyWorkoutsAsync(100);
+                var _ = allWorkouts; // keep reference to avoid issues
+                var followedWorkouts = await pb.GetFollowedWorkoutsAsync();
+                var activeUserIds = followedWorkouts.Select(w => w.User).Distinct().ToHashSet();
+
+                for (int i = 0; i < members.Count; i++)
                 {
-                    Name = names[i],
-                    Initial = names[i].Length >= 1 ? names[i][..1].ToUpper() : "?",
-                    IsActive = i < 2
-                });
+                    Squad.Add(new SquadMember
+                    {
+                        Name = members[i].name,
+                        UserId = members[i].id,
+                        Initial = members[i].name.Length >= 1 ? members[i].name[..1].ToUpper() : "?",
+                        AvatarUrl = members[i].avatarUrl,
+                        HasAvatar = !string.IsNullOrWhiteSpace(members[i].avatarUrl),
+                        IsActive = i < 2,
+                        HasWorkout = activeUserIds.Contains(members[i].id)
+                    });
+                }
+            }
+            catch
+            {
+                for (int i = 0; i < members.Count; i++)
+                {
+                    Squad.Add(new SquadMember
+                    {
+                        Name = members[i].name,
+                        UserId = members[i].id,
+                        Initial = members[i].name.Length >= 1 ? members[i].name[..1].ToUpper() : "?",
+                        AvatarUrl = members[i].avatarUrl,
+                        HasAvatar = !string.IsNullOrWhiteSpace(members[i].avatarUrl),
+                        IsActive = i < 2,
+                        HasWorkout = false
+                    });
+                }
             }
         }
         catch { }
@@ -118,5 +157,5 @@ public partial class HomeViewModel : BaseViewModel
     private async Task OpenSettingsAsync() => await Shell.Current.GoToAsync("settings");
 
     [RelayCommand]
-    private async Task OpenProfileAsync() => await Shell.Current.GoToAsync("profile");
+    private async Task OpenFeedAsync() => await Shell.Current.GoToAsync("//feed");
 }

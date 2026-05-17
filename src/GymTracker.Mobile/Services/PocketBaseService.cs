@@ -567,7 +567,12 @@ public class PocketBaseService
                         if (userRes.IsSuccessStatusCode)
                         {
                             var userRecord = await userRes.Content.ReadFromJsonAsync<PocketBaseUserRecord>(JsonOptions);
-                            if (userRecord != null) r.UserName = userRecord.Name;
+                            if (userRecord != null)
+                            {
+                                r.UserName = userRecord.Name;
+                                if (!string.IsNullOrWhiteSpace(userRecord.Avatar))
+                                    r.AvatarUrl = GetFileUrl(userRecord.CollectionId, userRecord.Id, userRecord.Avatar);
+                            }
                         }
                     }
                     catch { }

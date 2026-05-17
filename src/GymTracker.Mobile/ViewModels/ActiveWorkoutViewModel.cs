@@ -119,12 +119,46 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
         HasData = true;
         workoutStartTime = DateTime.Now;
 
+        if (!string.IsNullOrWhiteSpace(PlanId))
+            _ = LoadPlanAsync();
+
         if (!IsCreating)
         {
             IsTimerRunning = true;
             workoutSession.Start(PlanName);
             _ = RunElapsedTimerAsync();
         }
+    }
+
+    partial void OnPlanIdChanged(string value)
+    {
+        if (!string.IsNullOrWhiteSpace(value) && Mode == "plan")
+            _ = LoadPlanAsync();
+    }
+
+    private Task LoadPlanAsync()
+    {
+        var plan = PlanStore.LoadPlans().FirstOrDefault(p => p.Id == PlanId);
+        if (plan == null) return Task.CompletedTask;
+
+        PlanName = plan.Name;
+        PlanNameInput = plan.Name;
+        RestDuration = plan.RestSeconds;
+
+        Exercises.Clear();
+        foreach (var ex in plan.Exercises)
+        {
+            ex.Order = Exercises.Count + 1;
+            // Clone sets to avoid modifying the saved plan
+            var clonedSets = new ObservableCollection<ExerciseSet>();
+            foreach (var s in ex.Sets)
+                clonedSets.Add(new ExerciseSet { SetNumber = s.SetNumber, WeightKg = s.WeightKg, Reps = s.Reps, IsCompleted = false });
+            ex.Sets = clonedSets;
+            ex.IsCompleted = false;
+            Exercises.Add(ex);
+        }
+
+        return Task.CompletedTask;
     }
 
     partial void OnNotificationMessageChanged(string value)

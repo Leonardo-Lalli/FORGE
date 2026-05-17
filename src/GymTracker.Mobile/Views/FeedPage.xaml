@@ -83,13 +83,19 @@
                                     StrokeShape="RoundRectangle 12"
                                     Stroke="{DynamicResource OutlineVariant}" StrokeThickness="0.5"
                                     Padding="14">
-                                <Grid ColumnDefinitions="36,*,Auto" ColumnSpacing="10">
-                                    <Border Grid.Column="0" BackgroundColor="{DynamicResource PrimaryContainer}"
-                                            StrokeShape="RoundRectangle 999" WidthRequest="36" HeightRequest="36" Padding="0">
-                                        <Label Text="{Binding Initial}" FontFamily="SpaceGrotesk" FontSize="14" FontAttributes="Bold"
-                                               TextColor="{DynamicResource Primary}"
-                                               HorizontalOptions="Center" VerticalOptions="Center" />
-                                    </Border>
+                                    <Grid ColumnDefinitions="36,*,Auto" ColumnSpacing="10">
+                                        <Border Grid.Column="0" BackgroundColor="{DynamicResource PrimaryContainer}"
+                                                StrokeShape="RoundRectangle 999" WidthRequest="36" HeightRequest="36" Padding="0">
+                                            <Grid>
+                                                <Image Source="{Binding AvatarUrl}" Aspect="AspectFill"
+                                                       WidthRequest="36" HeightRequest="36"
+                                                       IsVisible="{Binding HasAvatar}" />
+                                                <Label Text="{Binding Initial}" FontFamily="SpaceGrotesk" FontSize="14" FontAttributes="Bold"
+                                                       TextColor="{DynamicResource Primary}"
+                                                       HorizontalOptions="Center" VerticalOptions="Center"
+                                                       IsVisible="{Binding HasAvatar, Converter={StaticResource InverseBoolConverter}}" />
+                                            </Grid>
+                                        </Border>
                                     <Label Grid.Column="1" Text="{Binding Name}" FontFamily="SpaceGrotesk" FontSize="15"
                                            TextColor="{DynamicResource OnSurface}" VerticalOptions="Center" />
                                     <Border Grid.Column="2" BackgroundColor="{DynamicResource Primary}"
@@ -134,10 +140,16 @@
                                                 WidthRequest="40" HeightRequest="40" Padding="0"
                                                 BackgroundColor="{DynamicResource PrimaryContainer}"
                                                 Stroke="{DynamicResource Surface}" StrokeThickness="2">
-                                            <Label Text="{Binding Initial}"
-                                                   FontFamily="SpaceGrotesk" FontSize="16"
-                                                   TextColor="{DynamicResource Primary}"
-                                                   HorizontalOptions="Center" VerticalOptions="Center" />
+                                            <Grid>
+                                                <Image Source="{Binding AvatarUrl}" Aspect="AspectFill"
+                                                       WidthRequest="40" HeightRequest="40"
+                                                       IsVisible="{Binding HasAvatar}" />
+                                                <Label Text="{Binding Initial}"
+                                                       FontFamily="SpaceGrotesk" FontSize="16"
+                                                       TextColor="{DynamicResource Primary}"
+                                                       HorizontalOptions="Center" VerticalOptions="Center"
+                                                       IsVisible="{Binding HasAvatar, Converter={StaticResource InverseBoolConverter}}" />
+                                            </Grid>
                                         </Border>
                                         <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="1">
                                             <Label Text="{Binding UserName}"

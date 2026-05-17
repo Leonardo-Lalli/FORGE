@@ -164,6 +164,7 @@ public partial class StatsViewModel : BaseViewModel
     private void BuildTopLifts(List<Models.Dto.LoggedWorkoutRecord> workouts)
     {
         TopLifts.Clear();
+        var jsonOpts = new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true };
 
         var exerciseStats = new Dictionary<string, double>();
         foreach (var w in workouts)
@@ -171,11 +172,12 @@ public partial class StatsViewModel : BaseViewModel
             if (string.IsNullOrWhiteSpace(w.ExerciseData)) continue;
             try
             {
-                var data = System.Text.Json.JsonSerializer.Deserialize<List<JsonExercise>>(w.ExerciseData);
+                var data = System.Text.Json.JsonSerializer.Deserialize<List<JsonExercise>>(w.ExerciseData, jsonOpts);
                 if (data == null) continue;
                 foreach (var ex in data)
                 {
                     var maxKg = ex.Sets?.Max(s => s.WeightKg) ?? 0;
+                    if (maxKg <= 0) continue;
                     if (exerciseStats.ContainsKey(ex.Name))
                         exerciseStats[ex.Name] = Math.Max(exerciseStats[ex.Name], maxKg);
                     else
@@ -185,7 +187,7 @@ public partial class StatsViewModel : BaseViewModel
             catch { }
         }
 
-        var top = exerciseStats.OrderByDescending(kv => kv.Value).Take(5).ToList();
+        var top = exerciseStats.Where(kv => kv.Value > 0).OrderByDescending(kv => kv.Value).Take(5).ToList();
 
         foreach (var kv in top)
         {

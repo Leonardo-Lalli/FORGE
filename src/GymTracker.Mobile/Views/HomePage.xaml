@@ -49,34 +49,63 @@
 
                 <!-- ===== Squad Activity ===== -->
                 <VerticalStackLayout Spacing="16">
-                    <Label Text="Squad Activity"
-                           FontFamily="OpenSansSemibold" FontSize="24" FontAttributes="Bold"
-                           TextColor="{DynamicResource OnSurface}" />
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Grid.Column="0" Text="Squad Activity"
+                               FontFamily="OpenSansSemibold" FontSize="24" FontAttributes="Bold"
+                               TextColor="{DynamicResource OnSurface}" />
+                        <Label Grid.Column="1" Text="Feed →" FontFamily="Lexend" FontSize="12"
+                               TextColor="{DynamicResource Primary}" VerticalOptions="Center">
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding OpenFeedCommand}" />
+                            </Label.GestureRecognizers>
+                        </Label>
+                    </Grid>
                     <ScrollView Orientation="Horizontal" HorizontalScrollBarVisibility="Never">
                         <HorizontalStackLayout Spacing="16"
                             BindableLayout.ItemsSource="{Binding Squad}">
                             <BindableLayout.ItemTemplate>
                                 <DataTemplate x:DataType="vm:SquadMember">
-                                    <VerticalStackLayout Spacing="8" WidthRequest="72">
+                                    <VerticalStackLayout Spacing="8" WidthRequest="72"
+                                        IsVisible="{Binding HasWorkout}">
+                                        <Border StrokeShape="RoundRectangle 999"
+                                                Stroke="{DynamicResource ElectricBlue}"
+                                                StrokeThickness="{Binding IsActive}"
+                                                Padding="2"
+                                                WidthRequest="64" HeightRequest="64"
+                                                BackgroundColor="{DynamicResource PrimaryContainer}">
+                                            <Border.GestureRecognizers>
+                                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:HomeViewModel}}, Path=OpenFeedCommand}" />
+                                            </Border.GestureRecognizers>
+                                            <Grid>
+                                                <Image Source="{Binding AvatarUrl}" Aspect="AspectFill"
+                                                       WidthRequest="60" HeightRequest="60"
+                                                       IsVisible="{Binding AvatarUrl, Converter={StaticResource IsNotNullOrEmptyConverter}}" />
                                         <Border StrokeShape="RoundRectangle 999"
                                                 Stroke="{DynamicResource ElectricBlue}"
                                                 StrokeThickness="2" Padding="2"
                                                 WidthRequest="64" HeightRequest="64"
                                                 BackgroundColor="{DynamicResource PrimaryContainer}">
-                                            <Border StrokeShape="RoundRectangle 999"
-                                                    Stroke="{DynamicResource Surface}"
-                                                    StrokeThickness="2" Padding="0"
-                                                    BackgroundColor="{DynamicResource SurfaceVariant}">
+                                            <Border.GestureRecognizers>
+                                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:HomeViewModel}}, Path=OpenFeedCommand}" />
+                                            </Border.GestureRecognizers>
+                                            <Grid>
+                                                <Image Source="{Binding AvatarUrl}" Aspect="AspectFill"
+                                                       WidthRequest="60" HeightRequest="60"
+                                                       IsVisible="{Binding HasAvatar}" />
                                                 <Label Text="{Binding Initial}"
                                                        FontFamily="OpenSansSemibold" FontSize="22"
                                                        TextColor="{DynamicResource OnSurface}"
-                                                       HorizontalOptions="Center" VerticalOptions="Center" />
-                                            </Border>
+                                                       HorizontalOptions="Center" VerticalOptions="Center"
+                                                       IsVisible="{Binding HasAvatar, Converter={StaticResource InverseBoolConverter}}" />
+                                            </Grid>
+                                        </Border>
+                                            </Grid>
                                         </Border>
                                         <Label Text="{Binding Name}"
                                                FontFamily="OpenSansRegular" FontSize="11"
                                                TextColor="{DynamicResource OnSurfaceVariant}"
-                                               HorizontalTextAlignment="Center" />
+                                               HorizontalTextAlignment="Center"
+                                               LineBreakMode="TailTruncation" />
                                     </VerticalStackLayout>
                                 </DataTemplate>
                             </BindableLayout.ItemTemplate>

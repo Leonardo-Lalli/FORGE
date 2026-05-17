@@ -21,7 +21,9 @@ public partial class FeedPost : ObservableObject
     public int Likes { get; set; }
 
     [ObservableProperty] private bool isLiked;
-    [ObservableProperty] private string heartIcon = "♡";
+    [ObservableProperty] private string heartIcon = "\u2661";
+    [ObservableProperty] private string avatarUrl = string.Empty;
+    [ObservableProperty] private bool hasAvatar;
 }
 
 public partial class UserSearchResult : ObservableObject
@@ -29,9 +31,11 @@ public partial class UserSearchResult : ObservableObject
     public string UserId { get; set; } = string.Empty;
     public string Name { get; set; } = string.Empty;
     public string Initial { get; set; } = string.Empty;
+    public string AvatarUrl { get; set; } = string.Empty;
 
     [ObservableProperty] private bool isFollowing;
     [ObservableProperty] private string followLabel = "Follow";
+    [ObservableProperty] private bool hasAvatar;
 }
 
 public partial class FeedViewModel : BaseViewModel
@@ -111,7 +115,9 @@ public partial class FeedViewModel : BaseViewModel
                     Duration = $"{w.Duration} min",
                     Likes = w.Likes,
                     IsLiked = likedBy.Contains(pb.CurrentUser?.Id ?? ""),
-                    HeartIcon = likedBy.Contains(pb.CurrentUser?.Id ?? "") ? "♥" : "♡"
+                    HeartIcon = likedBy.Contains(pb.CurrentUser?.Id ?? "") ? "\u2665" : "\u2661",
+                    AvatarUrl = w.AvatarUrl ?? "",
+                    HasAvatar = !string.IsNullOrWhiteSpace(w.AvatarUrl)
                 });
             }
             HasFeed = Posts.Count > 0;
@@ -148,7 +154,9 @@ public partial class FeedViewModel : BaseViewModel
                     Name = user.Name,
                     Initial = (user.Name.Length > 0 ? user.Name[..1].ToUpper() : "?"),
                     IsFollowing = isFollowing,
-                    FollowLabel = isFollowing ? "Following" : "Follow"
+                    FollowLabel = isFollowing ? "Following" : "Follow",
+                    AvatarUrl = string.IsNullOrWhiteSpace(user.Avatar) ? "" : pb.GetFileUrl(user.CollectionId, user.Id, user.Avatar),
+                    HasAvatar = !string.IsNullOrWhiteSpace(user.Avatar)
                 });
             }
             HasSearchResults = SearchResults.Count > 0;

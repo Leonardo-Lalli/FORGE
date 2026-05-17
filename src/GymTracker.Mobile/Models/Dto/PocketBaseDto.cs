@@ -117,4 +117,7 @@ public class LoggedWorkoutRecord
 
     [JsonPropertyName("user_name")]
     public string UserName { get; set; } = string.Empty;
+
+    [JsonIgnore]
+    public string AvatarUrl { get; set; } = string.Empty;
 }
