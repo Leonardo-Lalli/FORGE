@@ -57,7 +57,7 @@
                         <Border.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding ChangeAvatarCommand}" />
                         </Border.GestureRecognizers>
-                        <Image Source="{Binding AvatarUrl}" Aspect="AspectFill"
+                        <Image Source="{Binding AvatarSource}" Aspect="AspectFill"
                                 WidthRequest="128" HeightRequest="128"
                                 IsVisible="{Binding HasAvatar}" />
                         <Label Text="{Binding AvatarInitials}"
@@ -301,7 +301,7 @@
                         StrokeShape="RoundRectangle 48" WidthRequest="96" HeightRequest="96" Padding="0"
                         Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1"
                         HorizontalOptions="Center">
-                    <Image Source="{Binding AvatarUrl}" Aspect="AspectFill"
+                    <Image Source="{Binding AvatarSource}" Aspect="AspectFill"
                            WidthRequest="96" HeightRequest="96"
                            IsVisible="{Binding HasAvatar}" />
                     <Label Text="{Binding AvatarInitials}" FontFamily="SpaceGrotesk" FontSize="32" FontAttributes="Bold"

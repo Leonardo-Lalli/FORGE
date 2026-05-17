@@ -72,6 +72,7 @@ public partial class FeedViewModel : BaseViewModel
     [ObservableProperty] private bool hasSearchResults;
     [ObservableProperty] private string userInitials = "GT";
     [ObservableProperty] private string userAvatarUrl = string.Empty;
+    [ObservableProperty] private ImageSource? userAvatarSource;
     [ObservableProperty] private bool hasUserAvatar;
 
     public FeedViewModel(PocketBaseService pb)
@@ -225,9 +226,10 @@ public partial class FeedViewModel : BaseViewModel
             if (!string.IsNullOrWhiteSpace(u.Avatar))
             {
                 UserAvatarUrl = pb.GetFileUrl(u.CollectionId, u.Id, u.Avatar);
+                UserAvatarSource = ImageSource.FromUri(new Uri(UserAvatarUrl));
                 HasUserAvatar = true;
             }
-            else HasUserAvatar = false;
+            else { UserAvatarSource = null; HasUserAvatar = false; }
         }
     }
 }

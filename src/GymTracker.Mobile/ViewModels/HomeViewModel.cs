@@ -32,6 +32,7 @@ public partial class HomeViewModel : BaseViewModel
     [ObservableProperty] private ObservableCollection<SquadMember> squad = new();
     [ObservableProperty] private string userInitials = "GT";
     [ObservableProperty] private string userAvatarUrl = string.Empty;
+    [ObservableProperty] private ImageSource? userAvatarSource;
     [ObservableProperty] private bool hasUserAvatar;
 
     public HomeViewModel(PocketBaseService pb)
@@ -63,9 +64,10 @@ public partial class HomeViewModel : BaseViewModel
             if (!string.IsNullOrWhiteSpace(u.Avatar))
             {
                 UserAvatarUrl = pb.GetFileUrl(u.CollectionId, u.Id, u.Avatar);
+                UserAvatarSource = ImageSource.FromUri(new Uri(UserAvatarUrl));
                 HasUserAvatar = true;
             }
-            else HasUserAvatar = false;
+            else { UserAvatarSource = null; HasUserAvatar = false; }
         }
     }
 

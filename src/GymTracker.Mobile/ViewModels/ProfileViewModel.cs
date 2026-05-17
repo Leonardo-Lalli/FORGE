@@ -27,6 +27,7 @@ public partial class ProfileViewModel : BaseViewModel
     [ObservableProperty] private string bio = string.Empty;
     [ObservableProperty] private string avatarInitials = "??";
     [ObservableProperty] private string avatarUrl = string.Empty;
+    [ObservableProperty] private ImageSource? avatarSource;
     [ObservableProperty] private bool hasAvatar;
     [ObservableProperty] private bool isLoggedIn;
     [ObservableProperty] private bool isEditing;
@@ -73,12 +74,14 @@ public partial class ProfileViewModel : BaseViewModel
             if (!string.IsNullOrWhiteSpace(user.Avatar))
             {
                 AvatarUrl = pb.GetFileUrl(user.CollectionId, user.Id, user.Avatar);
+                AvatarSource = ImageSource.FromUri(new Uri(AvatarUrl));
                 HasAvatar = true;
                 System.Diagnostics.Debug.WriteLine($"[Profile] AvatarUrl={AvatarUrl}");
             }
             else
             {
                 System.Diagnostics.Debug.WriteLine($"[Profile] No avatar field on user record");
+                AvatarSource = null;
                 HasAvatar = false;
             }
 
@@ -266,6 +269,7 @@ public partial class ProfileViewModel : BaseViewModel
                 if (user != null && !string.IsNullOrWhiteSpace(user.Avatar))
                 {
                     AvatarUrl = pb.GetFileUrl(user.CollectionId, user.Id, user.Avatar);
+                    AvatarSource = ImageSource.FromUri(new Uri(AvatarUrl));
                     HasAvatar = true;
                     System.Diagnostics.Debug.WriteLine($"[Profile] New AvatarUrl={AvatarUrl}");
                 }

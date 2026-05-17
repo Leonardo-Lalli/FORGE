@@ -21,7 +21,7 @@
                 <Border.GestureRecognizers>
                     <TapGestureRecognizer Command="{Binding OpenProfileCommand}" />
                 </Border.GestureRecognizers>
-                <Image Source="{Binding UserAvatarUrl}" Aspect="AspectFill"
+                <Image Source="{Binding UserAvatarSource}" Aspect="AspectFill"
                        WidthRequest="40" HeightRequest="40"
                        IsVisible="{Binding HasUserAvatar}" />
                 <Label Text="{Binding UserInitials}" FontFamily="OpenSansSemibold" FontSize="14"
