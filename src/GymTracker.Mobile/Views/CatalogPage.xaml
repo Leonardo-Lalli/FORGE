@@ -94,7 +94,7 @@
 
                 <!-- Example exercises (placeholder, will be CollectionView with API data) -->
                 <VerticalStackLayout Spacing="8"
-                                     IsVisible="{Binding HasError, Converter={DynamicResource InverseBool}}">
+                                     IsVisible="{Binding HasError, Converter={StaticResource InverseBool}}">
                     <!-- Exercise 1 -->
                     <Border Style="{DynamicResource CardFrame}"
                             BackgroundColor="{DynamicResource SurfaceContainerHigh}">

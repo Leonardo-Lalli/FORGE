@@ -28,7 +28,6 @@ public partial class FriendRequestsViewModel : BaseViewModel
     [ObservableProperty] private ObservableCollection<FriendRequestItem> requests = new();
     [ObservableProperty] private ObservableCollection<LikeNotificationItem> likeNotifications = new();
     [ObservableProperty] private bool isEmpty;
-    [ObservableProperty] private bool isBusy;
     [ObservableProperty] private bool hasLikeNotifications;
     [ObservableProperty] private bool hasRequests;
 
@@ -40,7 +39,7 @@ public partial class FriendRequestsViewModel : BaseViewModel
     [RelayCommand]
     private async Task LoadRequestsAsync()
     {
-        IsBusy = true;
+        SetLoading();
         try
         {
             var pending = await pb.GetPendingRequestsAsync();
@@ -71,12 +70,12 @@ public partial class FriendRequestsViewModel : BaseViewModel
             HasData = !IsEmpty;
             HasRequests = Requests.Count > 0;
             HasLikeNotifications = LikeNotifications.Count > 0;
+            SetSuccess(HasData);
         }
         catch
         {
-            ErrorMessage = "Errore nel caricamento richieste.";
+            SetError("Errore nel caricamento richieste.");
         }
-        finally { IsBusy = false; }
     }
 
     [RelayCommand]

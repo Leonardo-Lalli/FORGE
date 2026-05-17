@@ -1,6 +1,5 @@
 ﻿using GymTracker.Mobile.Services;
 using GymTracker.Mobile.Views;
-using GymTracker.Mobile.ViewModels;
 
 namespace GymTracker.Mobile;
 

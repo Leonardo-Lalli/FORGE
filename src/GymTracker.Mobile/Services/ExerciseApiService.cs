@@ -209,33 +209,4 @@ public class ExerciseApiService
             return new();
         }
     }
-
-    private async Task CacheExerciseAsync(ExerciseDbDto exercise)
-    {
-        if (pb == null || !pb.IsLoggedIn) return;
-        if (pbCacheCheck.Contains(exercise.Id)) return;
-
-        try
-        {
-            pbCacheCheck.Add(exercise.Id);
-
-            var img = exercise.Images.FirstOrDefault() ?? "";
-            var imageUrl = img.StartsWith("http") ? img : $"https://{img}";
-
-            var payload = new Dictionary<string, object?>
-            {
-                ["name"] = exercise.Name,
-                ["bodyPart"] = exercise.PrimaryMuscles.FirstOrDefault() ?? "",
-                ["equipment"] = exercise.Equipment ?? "",
-                ["instructions"] = exercise.Instructions ?? new List<string>(),
-                ["imageUrl"] = imageUrl,
-                ["category"] = exercise.Category ?? "",
-                ["level"] = exercise.Level ?? "",
-                ["force"] = exercise.Force ?? "",
-                ["mechanic"] = exercise.Mechanic ?? ""
-            };
-            await pb.CreateRecordAsync("excercise", payload);
-        }
-        catch { }
-    }
 }
