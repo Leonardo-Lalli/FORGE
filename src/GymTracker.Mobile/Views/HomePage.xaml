@@ -73,19 +73,6 @@
                                         IsVisible="{Binding HasWorkout}">
                                         <Border StrokeShape="RoundRectangle 999"
                                                 Stroke="{DynamicResource ElectricBlue}"
-                                                StrokeThickness="{Binding IsActive}"
-                                                Padding="2"
-                                                WidthRequest="64" HeightRequest="64"
-                                                BackgroundColor="{DynamicResource PrimaryContainer}">
-                                            <Border.GestureRecognizers>
-                                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:HomeViewModel}}, Path=OpenFeedCommand}" />
-                                            </Border.GestureRecognizers>
-                                            <Grid>
-                                                <Image Source="{Binding AvatarUrl}" Aspect="AspectFill"
-                                                       WidthRequest="60" HeightRequest="60"
-                                                       IsVisible="{Binding AvatarUrl, Converter={StaticResource IsNotNullOrEmptyConverter}}" />
-                                        <Border StrokeShape="RoundRectangle 999"
-                                                Stroke="{DynamicResource ElectricBlue}"
                                                 StrokeThickness="2" Padding="2"
                                                 WidthRequest="64" HeightRequest="64"
                                                 BackgroundColor="{DynamicResource PrimaryContainer}">
@@ -93,7 +80,7 @@
                                                 <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:HomeViewModel}}, Path=OpenFeedCommand}" />
                                             </Border.GestureRecognizers>
                                             <Grid>
-                                                <Image Source="{Binding AvatarUrl}" Aspect="AspectFill"
+                                                <Image Source="{Binding AvatarSource}" Aspect="AspectFill"
                                                        WidthRequest="60" HeightRequest="60"
                                                        IsVisible="{Binding HasAvatar}" />
                                                 <Label Text="{Binding Initial}"
@@ -101,8 +88,6 @@
                                                        TextColor="{DynamicResource OnSurface}"
                                                        HorizontalOptions="Center" VerticalOptions="Center"
                                                        IsVisible="{Binding HasAvatar, Converter={StaticResource InverseBoolConverter}}" />
-                                            </Grid>
-                                        </Border>
                                             </Grid>
                                         </Border>
                                         <Label Text="{Binding Name}"

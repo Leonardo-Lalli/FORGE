@@ -91,7 +91,7 @@
                                         <Border Grid.Column="0" BackgroundColor="{DynamicResource PrimaryContainer}"
                                                 StrokeShape="RoundRectangle 999" WidthRequest="36" HeightRequest="36" Padding="0">
                                             <Grid>
-                                                <Image Source="{Binding AvatarUrl}" Aspect="AspectFill"
+                                                <Image Source="{Binding AvatarSource}" Aspect="AspectFill"
                                                        WidthRequest="36" HeightRequest="36"
                                                        IsVisible="{Binding HasAvatar}" />
                                                 <Label Text="{Binding Initial}" FontFamily="SpaceGrotesk" FontSize="14" FontAttributes="Bold"
@@ -145,7 +145,7 @@
                                                 BackgroundColor="{DynamicResource PrimaryContainer}"
                                                 Stroke="{DynamicResource Surface}" StrokeThickness="2">
                                             <Grid>
-                                                <Image Source="{Binding AvatarUrl}" Aspect="AspectFill"
+                                                <Image Source="{Binding AvatarSource}" Aspect="AspectFill"
                                                        WidthRequest="40" HeightRequest="40"
                                                        IsVisible="{Binding HasAvatar}" />
                                                 <Label Text="{Binding Initial}"

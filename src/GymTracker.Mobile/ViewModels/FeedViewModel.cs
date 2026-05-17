@@ -22,6 +22,7 @@ public partial class FeedPost : ObservableObject
     [ObservableProperty] private bool isLiked;
     [ObservableProperty] private string heartIcon = "\u2661";
     [ObservableProperty] private string avatarUrl = string.Empty;
+    [ObservableProperty] private ImageSource? avatarSource;
     [ObservableProperty] private bool hasAvatar;
 }
 
@@ -34,6 +35,7 @@ public partial class UserSearchResult : ObservableObject
 
     [ObservableProperty] private bool isFollowing;
     [ObservableProperty] private string followLabel = "Follow";
+    [ObservableProperty] private ImageSource? avatarSource;
     [ObservableProperty] private bool hasAvatar;
 }
 
@@ -121,6 +123,8 @@ public partial class FeedViewModel : BaseViewModel
                     IsLiked = likedBy.Contains(pb.CurrentUser?.Id ?? ""),
                     HeartIcon = likedBy.Contains(pb.CurrentUser?.Id ?? "") ? "\u2665" : "\u2661",
                     AvatarUrl = w.AvatarUrl ?? "",
+                    AvatarSource = !string.IsNullOrWhiteSpace(w.AvatarUrl)
+                        ? ImageSource.FromUri(new Uri(w.AvatarUrl)) : null,
                     HasAvatar = !string.IsNullOrWhiteSpace(w.AvatarUrl)
                 });
             }
@@ -152,6 +156,7 @@ public partial class FeedViewModel : BaseViewModel
                 if (user.Id == pb.CurrentUser?.Id) continue;
                 System.Diagnostics.Debug.WriteLine($"[FeedSearch] user={user.Name} id={user.Id}");
                 var isFollowing = followingIds.Contains(user.Id);
+                var avatarUrl = string.IsNullOrWhiteSpace(user.Avatar) ? "" : pb.GetFileUrl(user.CollectionId, user.Id, user.Avatar);
                 SearchResults.Add(new UserSearchResult
                 {
                     UserId = user.Id,
@@ -159,7 +164,9 @@ public partial class FeedViewModel : BaseViewModel
                     Initial = (user.Name.Length > 0 ? user.Name[..1].ToUpper() : "?"),
                     IsFollowing = isFollowing,
                     FollowLabel = isFollowing ? "Following" : "Follow",
-                    AvatarUrl = string.IsNullOrWhiteSpace(user.Avatar) ? "" : pb.GetFileUrl(user.CollectionId, user.Id, user.Avatar),
+                    AvatarUrl = avatarUrl,
+                    AvatarSource = !string.IsNullOrWhiteSpace(avatarUrl)
+                        ? ImageSource.FromUri(new Uri(avatarUrl)) : null,
                     HasAvatar = !string.IsNullOrWhiteSpace(user.Avatar)
                 });
             }

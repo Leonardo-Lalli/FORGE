@@ -13,6 +13,7 @@ public partial class SquadMember : ObservableObject
     public string Initial { get; set; } = string.Empty;
     public string UserId { get; set; } = string.Empty;
     public string AvatarUrl { get; set; } = string.Empty;
+    [ObservableProperty] private ImageSource? avatarSource;
     [ObservableProperty] private bool isActive;
     [ObservableProperty] private bool hasWorkout;
     [ObservableProperty] private bool hasAvatar;
@@ -177,6 +178,8 @@ public partial class HomeViewModel : BaseViewModel
                         UserId = members[i].id,
                         Initial = members[i].name.Length >= 1 ? members[i].name[..1].ToUpper() : "?",
                         AvatarUrl = members[i].avatarUrl,
+                        AvatarSource = !string.IsNullOrWhiteSpace(members[i].avatarUrl)
+                            ? ImageSource.FromUri(new Uri(members[i].avatarUrl)) : null,
                         HasAvatar = !string.IsNullOrWhiteSpace(members[i].avatarUrl),
                         IsActive = i < 2,
                         HasWorkout = activeUserIds.Contains(members[i].id)
@@ -193,6 +196,8 @@ public partial class HomeViewModel : BaseViewModel
                         UserId = members[i].id,
                         Initial = members[i].name.Length >= 1 ? members[i].name[..1].ToUpper() : "?",
                         AvatarUrl = members[i].avatarUrl,
+                        AvatarSource = !string.IsNullOrWhiteSpace(members[i].avatarUrl)
+                            ? ImageSource.FromUri(new Uri(members[i].avatarUrl)) : null,
                         HasAvatar = !string.IsNullOrWhiteSpace(members[i].avatarUrl),
                         IsActive = i < 2,
                         HasWorkout = false
