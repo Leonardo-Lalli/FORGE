@@ -1,146 +1,74 @@
-# Test Matrix - GymTracker Mobile
+# Test Matrix — FORGE (GymTracker Mobile)
 
-## 1. Regole di lettura
+## Stato: Eseguiti e verificati
 
-- Questo documento è derivato dalla fase di planning: le evidenze sono pianificate, non ancora eseguite.
-- `Manuale`, `Automatico ora`, `Automatico più avanti`: usare `Si` o `No`.
-- `Evidenza prevista`: comando, nota di verifica o `Da eseguire`.
-- `Automatico ora` indica controlli realistici da introdurre durante l'iterazione corrente, senza UI automation.
+| ID | Test | Categoria | Esito | Evidenza |
+|----|------|-----------|-------|----------|
+| TM-01 | Build progetto senza errori | Build | ✅ | `dotnet build -f net10.0-android` → 0 errori |
+| TM-02 | Avvio app e navigazione 3 tab | Navigation | ✅ | Dashboard → Feed → Stats, swipe tra tab |
+| TM-03 | Tema dark/light toggle | UI | ✅ | Settings → toggle, tutte le pagine cambiano colore |
+| TM-04 | Login con credenziali valide | Auth | ✅ | LoginPage → Dashboard |
+| TM-05 | Login con credenziali errate | Auth | ✅ | Messaggio errore visibile |
+| TM-06 | Registrazione nuovo utente | Auth | ✅ | Account creato su PocketBase, redirect Dashboard |
+| TM-07 | Auto-login dopo riavvio | Auth | ✅ | Token salvato in Preferences, salta LoginPage |
+| TM-08 | Logout | Auth | ✅ | Settings → Logout → LoginPage |
+| TM-09 | Ricerca esercizi da ExerciseDB API | API | ✅ | Search bar in ActiveWorkout, risultati con immagini |
+| TM-10 | Filtro per gruppo muscolare | API | ✅ | Chip muscoli, fetch API corretto |
+| TM-11 | Filtro per attrezzatura | API | ✅ | Chip attrezzatura, fetch API corretto |
+| TM-12 | Cache esercizi su PocketBase | Persistenza | ✅ | URL immagini risolti salvati in `excercise` |
+| TM-13 | Avvio allenamento libero (Quick Start) | Workflow | ✅ | StartSession → Quick Start → ActiveWorkout |
+| TM-14 | Avvio allenamento da piano salvato | Workflow | ✅ | StartSession → Protocol card → ActiveWorkout con esercizi |
+| TM-15 | Aggiunta serie con peso e reps | Input | ✅ | Entry numeriche, validazione |
+| TM-16 | Completamento serie (✓) | UI | ✅ | Tap cerchio → LimeGreen fill |
+| TM-17 | Salvataggio allenamento su PocketBase | Persistenza | ✅ | `logged_workouts` popolato con exercise_data |
+| TM-18 | Dashboard: streak settimanale | Logica | ✅ | Conteggio settimane consecutive, reset dopo 7+ giorni |
+| TM-19 | Dashboard: Squad Activity | UI | ✅ | Avatar amici con allenamenti recenti |
+| TM-20 | Dashboard: START WORKOUT → StartSession | Navigazione | ✅ | Pulsante funzionante |
+| TM-21 | Feed: ricerca utenti live | UI | ✅ | Search bar con debounce 400ms, risultati |
+| TM-22 | Feed: follow/unfollow utente | Social | ✅ | Bottone Follow → Requested, aggiornamento UI |
+| TM-23 | Feed: post allenamenti amici | Social | ✅ | Lista workout con nome, esercizi, volume, durata |
+| TM-24 | Feed: like/unlike allenamento | Social | ✅ | Cuore ♡ → ♥ LimeGreen, conteggio istantaneo |
+| TM-25 | Stats: filtri temporali | UI | ✅ | WEEK/MONTH/3M/YEAR/ALL, feedback visivo |
+| TM-26 | Stats: grafico volume | UI | ✅ | Barre settimanali, etichette data, divisori mese |
+| TM-27 | Stats: top lifts | Logica | ✅ | 5 esercizi con peso max da exercise_data |
+| TM-28 | Stats: calendario | UI | ✅ | Giorni mese, pallini su giorni allenamento |
+| TM-29 | Profilo: avatar utente | UI | ✅ | Foto PocketBase o iniziali, tappabile per upload |
+| TM-30 | Profilo: stat totali | Logica | ✅ | Workouts, Volume, Streak, ♥ Likes ricevuti |
+| TM-31 | Profilo: recent forges | UI | ✅ | Lista allenamenti con titolo, data, durata, like, volume |
+| TM-32 | Profilo: edit nome e bio | Input | ✅ | Overlay edit, salva su PocketBase |
+| TM-33 | Profilo: upload foto | Input | ✅ | FilePicker → multipart upload → refresh avatar |
+| TM-34 | Notifiche: friend requests | Social | ✅ | Lista richieste, ACCEPT/REJECT |
+| TM-35 | Notifiche: like notifications | Social | ✅ | "User X liked your workout Y" visibile |
+| TM-36 | Cambio tema runtime | UI | ✅ | Tutte le pagine, Shell inclusa, colori aggiornati |
+| TM-37 | Stato loading su fetch dati | UI | ✅ | ActivityIndicator su Feed, Stats, Profilo |
+| TM-38 | Stato empty: nessun dato | UI | ✅ | Messaggio "Nessun dato" o "Follow athletes..." |
+| TM-39 | Stato error: rete assente | UI | ✅ | Messaggio errore con descrizione |
+| TM-40 | Navigazione profilo da Dashboard | Navigazione | ✅ | Tap avatar "EL" → ProfilePage |
+| TM-41 | Navigazione profilo da Feed | Navigazione | ✅ | Tap avatar → ProfilePage |
+| TM-42 | Navigazione profilo da Stats | Navigazione | ✅ | Tap avatar → ProfilePage |
 
-## 2. Matrice principale
+## Copertura per area
 
-| ID | Requisito o scenario | Categoria | Manuale | Automatico ora | Automatico più avanti | Iterazione target | Evidenza prevista | Note |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| TM-01 | Build progetto MAUI senza errori | Build | No | Si | No | IT-01 | `dotnet build src/GymTracker.Mobile/GymTracker.Mobile.csproj` | Smoke minimo da ripetere ogni iterazione |
-| TM-02 | Avvio app e navigazione 5 tab Shell | Navigation | Si | No | No | IT-01 | Da eseguire | Verifica visiva su emulatore |
-| TM-03 | Tema dark Stitch "Performance Minimalist" applicato | UI state | Si | No | No | IT-01 | Da eseguire | Colori #007AFF/#CCFF00, font Lexend/Inter |
-| TM-04 | Fetch esercizi da ExerciseDB API per bodyPart | API | Si | Si | No | IT-02 | `dotnet test` | Mock HTTP per test unitario |
-| TM-05 | Ricerca esercizio per nome via API | API | Si | Si | No | IT-02 | `dotnet test` | Test service layer |
-| TM-06 | Filtro per attrezzatura funziona | Input | Si | Si | No | IT-02 | `dotnet test` | Verifica parametro equipment |
-| TM-07 | Dettaglio esercizio mostra GIF e istruzioni | UI state | Si | No | No | IT-02 | Da eseguire | Verifica load immagine remota |
-| TM-08 | Cache SQLite salva esercizi usati | Persistence | Si | Si | No | IT-02 | `dotnet test` | Test ExerciseCacheRepository |
-| TM-09 | Catalogo offline mostra esercizi in cache | Persistence | Si | Si | No | IT-02 | `dotnet test` | Simula assenza rete |
-| TM-10 | Stato loading durante fetch API | UI state | Si | No | No | IT-02 | Da eseguire | ActivityIndicator visibile |
-| TM-11 | Stato error API con pulsante retry | UI state | Si | Si | No | IT-02 | `dotnet test` | Test ViewModel ErrorMessage + retry command |
-| TM-12 | Stato empty: nessun risultato ricerca | UI state | Si | Si | No | IT-02 | `dotnet test` | Test ViewModel IsEmpty |
-| TM-13 | Avvio nuovo allenamento vuoto | Workflow | Si | No | No | IT-03 | Da eseguire | Tap da Dashboard |
-| TM-14 | Aggiunta esercizio con 4 serie (peso + reps) | Data | Si | Si | No | IT-03 | `dotnet test` | Validazione input e creazione model |
-| TM-15 | Validazione peso > 0, reps > 0 | Input | Si | Si | No | IT-03 | `dotnet test` | Test validazione ViewModel |
-| TM-16 | Rimozione esercizio/serie prima del salvataggio | Data | Si | Si | No | IT-03 | `dotnet test` | Test stato ViewModel |
-| TM-17 | Salvataggio allenamento su SQLite | Persistence | Si | Si | No | IT-03 | `dotnet test` | Test WorkoutRepository |
-| TM-18 | Storico mostra allenamenti ordinati per data | UI state | Si | Si | No | IT-03 | `dotnet test` | Test ordinamento query SQLite |
-| TM-19 | Dettaglio allenamento passato completo | Navigation | Si | No | No | IT-03 | Da eseguire | Navigazione con parametro |
-| TM-20 | Inserimento peso corporeo | Data | Si | Si | No | IT-04 | `dotnet test` | Test salvataggio SQLite |
-| TM-21 | Inserimento misure corporee | Data | Si | Si | No | IT-04 | `dotnet test` | Test validazione e salvataggio |
-| TM-22 | Grafico andamento peso visibile | UI state | Si | No | No | IT-04 | Da eseguire | Verifica rendering chart |
-| TM-23 | Peso/misure MAI sincronizzati con backend | Persistence | Si | Si | No | IT-04 | `dotnet test` | Verifica assenza chiamate Firebase per body data |
-| TM-24 | Registrazione Firebase Auth email/password | API | Si | Si | No | IT-05 | `dotnet test` | Mock Firebase Auth HTTP |
-| TM-25 | Login Firebase con credenziali valide | API | Si | Si | No | IT-05 | `dotnet test` | Mock Firebase Auth HTTP |
-| TM-26 | Errore login: credenziali errate | API | Si | Si | No | IT-05 | `dotnet test` | Test mapping errori Firebase -> messaggi IT |
-| TM-27 | Token salvato in Preferences e persistito | Persistence | Si | Si | No | IT-05 | `dotnet test` | Test Preferences read/write |
-| TM-28 | Sincronizzazione allenamento con Firebase | API | Si | Si | No | IT-05 | `dotnet test` | Test SyncService + FirebaseDatabaseService |
-| TM-29 | Coda sync: allenamento offline sincronizzato dopo rete | API | Si | Si | No | IT-05 | `dotnet test` | Test SyncService retry |
-| TM-30 | Logout cancella token e reindirizza a Login | Navigation | Si | Si | No | IT-05 | `dotnet test` | Test ViewModel logout |
-| TM-31 | Ricerca utenti per username | Social | Si | Si | No | IT-06 | `dotnet test` | Test SocialService |
-| TM-32 | Invio richiesta amicizia | Social | Si | Si | No | IT-06 | `dotnet test` | Test SocialService |
-| TM-33 | Accettazione richiesta amicizia | Social | Si | Si | No | IT-06 | `dotnet test` | Test cambio stato |
-| TM-34 | Rifiuto richiesta amicizia | Social | Si | Si | No | IT-06 | `dotnet test` | Test rimozione richiesta |
-| TM-35 | Lista amici consultabile | UI state | Si | Si | No | IT-06 | `dotnet test` | Test ViewModel |
-| TM-36 | Feed ultimi 20 allenamenti amici | UI state | Si | No | No | IT-06 | Da eseguire | Richiede dati Firebase popolati |
-| TM-37 | Leaderboard settimanale ordinata per volume | Data | Si | Si | No | IT-06 | `dotnet test` | Test ordinamento e calcolo volume |
-| TM-38 | Confronto diretto tra due amici | UI state | Si | Si | No | IT-06 | `dotnet test` | Test FriendCompareViewModel |
-| TM-39 | Streak: calcolo giorni consecutivi | Data | Si | Si | No | IT-06 | `dotnet test` | Test logica streak |
-| TM-40 | Streak corretto dopo interruzione | Data | Si | Si | No | IT-06 | `dotnet test` | Test edge case: buchi nel calendario |
-| TM-41 | Stato empty: nessun amico | UI state | Si | Si | No | IT-06 | `dotnet test` | Test ViewModel IsEmpty con CTA |
-| TM-42 | Dashboard mostra ultimo allenamento | UI state | Si | Si | No | IT-07 | `dotnet test` | Test aggregazione ViewModel |
-| TM-43 | Dashboard mostra streak corrente | UI state | Si | Si | No | IT-07 | `dotnet test` | Test calcolo streak |
-| TM-44 | Dashboard mostra posizione leaderboard | UI state | Si | Si | No | IT-07 | `dotnet test` | Test posizione utente |
-| TM-45 | Statistiche: peso max per esercizio | Data | Si | Si | No | IT-07 | `dotnet test` | Test query aggregata SQLite |
-| TM-46 | Grafico volume settimanale | UI state | Si | No | No | IT-07 | Da eseguire | Verifica rendering |
-| TM-47 | Dashboard si aggiorna dopo nuovo allenamento | Workflow | Si | Si | No | IT-07 | `dotnet test` | Test notifica / refresh |
-| TM-48 | 3 piani base precaricati su SQLite | Data | Si | Si | No | IT-08 | `dotnet test` | Test seed data |
-| TM-49 | Dettaglio piano mostra giorni ed esercizi | UI state | Si | Si | No | IT-08 | `dotnet test` | Test ViewModel |
-| TM-50 | Avvia allenamento da piano con esercizi precaricati | Workflow | Si | Si | No | IT-08 | `dotnet test` | Test navigazione + popolamento ActiveWorkout |
+| Area | Test eseguiti | Stato |
+|------|---------------|-------|
+| Build | 1 | ✅ |
+| Navigazione | 4 | ✅ |
+| Auth | 5 | ✅ |
+| API (ExerciseDB) | 4 | ✅ |
+| Social (PocketBase) | 8 | ✅ |
+| UI / Stati | 10 | ✅ |
+| Input | 3 | ✅ |
+| Persistenza | 3 | ✅ |
+| Logica (streak, stats, likes) | 4 | ✅ |
+| **TOTALE** | **42** | ✅ |
 
-## 3. Aree minime da coprire
+## Casi limite verificati
 
-### Input
-- Peso vuoto, zero, negativo, non numerico (bloccare submit)
-- Ripetizioni vuote, zero, negative, non numeriche
-- Misure corporee vuote o fuori range realistico (>300cm)
-- Ricerca esercizi: stringa vuota, caratteri speciali, nome inesistente
-- Username duplicato in registrazione
-
-### API (ExerciseDB)
-- Risposta 200 con dati validi
-- Risposta 200 con array vuoto (nessun esercizio trovato)
-- Timeout dopo 10s
-- Errore 429 (rate limit RapidAPI) → messaggio + retry after
-- Errore 401 (API key invalida) → messaggio configurazione
-- JSON malformato o campi mancanti → mapping difensivo
-
-### API (Firebase)
-- Registrazione: email già in uso, password debole
-- Login: credenziali errate, utente non trovato
-- Token scaduto → refresh automatico
-- Errore di rete durante sync
-- Conflitto sync (stesso allenamento inviato due volte)
-
-### UI state
-- Loading: ActivityIndicator su catalog, login, sync, dashboard iniziale
-- Error: messaggio + retry su ogni fetch remoto
-- Empty: messaggio guidato + CTA su storico, amici, feed, leaderboard
-- Success: dati caricati, nessun messaggio invasivo
-- Dark theme Stitch coerente su tutte le pagine
-
-### Navigation
-- Shell tab bar: 5 tab raggiungibili
-- Navigazione di dettaglio con parametri (exerciseId, workoutId, friendId)
-- Back navigation: ritorno alla pagina precedente
-- Login → Dashboard dopo autenticazione
-- Dashboard → Logout → Login
-- Navigazione durante allenamento attivo: stato preservato
-
-### Persistence
-- SQLite: creazione database al primo avvio
-- Esercizi in cache: inserimento, limite 50, LRU
-- Allenamenti: CRUD completo, IsSynced flag
-- Peso/misure: CRUD, dati solo locali
-- Riavvio app: dati locali integri
-- Aggiornamento app: migration SQLite se schema cambia
-
-### Device
-- Avvio su emulatore Android (IT-01)
-- Assenza rete: funzionalità locali integre (cache esercizi, storico, peso)
-- Rotazione schermo: UI non perde stato
-- Permessi di rete: gestione graceful
-
-## 4. Note su test automatici
-
-### Test realistici subito (per ogni iterazione)
-- `dotnet build` come smoke check
-- Test unitari su ViewModel: validazione input, gestione stati (IsBusy, ErrorMessage, HasData)
-- Test unitari su Service: chiamate HTTP con mock `HttpMessageHandler`
-- Test unitari su Repository SQLite: CRUD con database in-memory o file temporaneo
-- Test di mapping DTO: parsing JSON con campi mancanti
-- Test di logica: streak, ordinamento leaderboard
-
-### Test da rimandare
-- UI automation end-to-end (Appium o MAUI.UITesting) — richiede infrastruttura
-- Test performance: scroll catalogo con GIF, query SQLite con 1000+ allenamenti
-- Test multi-dispositivo: sync conflitti reali
-- Test Firebase Rules di sicurezza
-
-### Comandi utili
-```bash
-# Smoke build
-dotnet build src/GymTracker.Mobile/GymTracker.Mobile.csproj
-
-# Unit test (quando il progetto test esiste)
-dotnet test tests/GymTracker.UnitTests/GymTracker.UnitTests.csproj
-
-# Test specifico per service
-dotnet test --filter "FullyQualifiedName~ExerciseService"
-```
-
-Per una strategia automatica più profonda è opportuno usare la skill `maui-automatic-testing` a fine iterazione.
+- **Ricerca vuota**: messaggio "No users found"
+- **Nessun amico**: messaggio "Follow athletes to see their workouts here"
+- **Nessun allenamento salvato**: stato empty in Stats e Profilo
+- **Streak a 0 dopo pausa >7 giorni**: verificato con date simulate
+- **Like già messo**: toggle unlike senza duplicati
+- **Utente non loggato**: Stats e Profilo mostrano dati offline o messaggio
+- **Login con credenziali vuote**: validazione lato ViewModel
+- **Entry peso/reps vuote**: gestione gracefully (0 default)

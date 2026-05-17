@@ -1,24 +1,20 @@
-[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/kjGBNOdE)
+# FORGE — Il tuo diario di allenamento sociale
+
 <div align="center">
 
-# GymTracker Mobile
-
-Il diario di allenamento che trasforma la palestra in una sfida con i tuoi amici.
+**Trasforma ogni ripetizione in progresso. Sfida i tuoi amici. Supera i tuoi limiti.**
 
 [![.NET MAUI](https://img.shields.io/badge/.NET%20MAUI-Android--first-512BD4?logo=dotnet&logoColor=white)](https://learn.microsoft.com/dotnet/maui/)
-[![Firebase](https://img.shields.io/badge/Firebase-Auth%20%7C%20Database-007AFF?logo=firebase&logoColor=white)](https://firebase.google.com/)
-[![ExerciseDB](https://img.shields.io/badge/ExerciseDB-1300+%20esercizi-22C55E)](https://rapidapi.com/justin-WFnsXH_t6/api/exercisedb)
-[![Stitch UI](https://img.shields.io/badge/UI-Stitch%20Iron%20Rank-7C3AED)](https://stitch.google.com/)
-[![Workflow](https://img.shields.io/badge/workflow-Man--in--the--Loop-0F766E)](docs/method/man-in-the-loop.md)
-[![Docs](https://img.shields.io/badge/docs-spec%20%7C%20plan%20%7C%20architecture%20%7C%20tests-2563EB)](docs/)
+[![PocketBase](https://img.shields.io/badge/PocketBase-Backend-000000?logo=pocketbase)](https://pocketbase.io/)
+[![ExerciseDB](https://img.shields.io/badge/ExerciseDB-1300%2B%20esercizi-22C55E)](https://rapidapi.com/justin-WFnsXH_t6/api/exercisedb)
+[![MVVM](https://img.shields.io/badge/Architecture-MVVM%20%7C%20CommunityToolkit-7C3AED)](https://learn.microsoft.com/dotnet/communitytoolkit/mvvm/)
 
 [Panoramica](#panoramica) ·
-[Perché GymTracker](#perché-gymtracker) ·
-[Funzionalità](#funzionalità) ·
+[Perché FORGE](#perché-forge) ·
+[Come funziona](#come-funziona) ·
 [Architettura](#architettura) ·
-[Skill e Workflow](#skill-e-workflow) ·
-[Quick Start](#quick-start) ·
-[Documenti](#documenti)
+[Installazione e Build](#installazione-e-build) ·
+[Documentazione](#documentazione)
 
 </div>
 
@@ -26,185 +22,246 @@ Il diario di allenamento che trasforma la palestra in una sfida con i tuoi amici
 
 ## Panoramica
 
-**GymTracker Mobile** è un'app `.NET MAUI` Android-first pensata per chi si allena in palestra e vuole:
+**FORGE** è un'app `.NET MAUI` Android-first per chi si allena in palestra e vuole:
 
-- Esplorare un catalogo di **1300+ esercizi** con GIF animate, filtrati per gruppo muscolare e attrezzatura.
-- Registrare allenamenti con serie, ripetizioni e peso in pochi secondi.
-- Tracciare peso corporeo e misure (petto, vita, braccia, gambe) con grafici di progresso.
-- Competere con gli amici tramite **leaderboard**, **streak settimanali** e **confronto diretto** delle statistiche.
+- 🏋️ Esplorare un catalogo di **1300+ esercizi** con immagini e istruzioni, filtrati per gruppo muscolare e attrezzatura
+- 📊 Registrare allenamenti completi con serie, ripetizioni e peso in pochi secondi
+- 🔥 Competere con gli amici tramite **feed allenamenti**, **like** e **streak settimanali**
+- 📈 Visualizzare statistiche di progresso con grafici e top lifts
+- 🎨 Godersi un'interfaccia curata con tema chiaro/scuro e font Google Fonts (Inter, Lexend, Space Grotesk)
 
-L'app usa **ExerciseDB API** come fonte primaria di esercizi, **Firebase** per autenticazione e funzionalità social, e **SQLite** per l'uso offline. L'interfaccia segue il Design System **"Performance Minimalist"** del progetto Stitch **"Iron Rank Fitness Social"** (dark mode, Electric Blue `#007AFF`, Lime Green `#CCFF00`).
+L'app usa **ExerciseDB API** (RapidAPI) per il catalogo esercizi e **PocketBase** self-hosted per autenticazione, dati social e persistenza remota.
 
-## Perché GymTracker
+---
 
-Andare in palestra senza tracciare i progressi è come guidare senza cruscotto: vai avanti, ma non sai se stai migliorando.
+## Perché FORGE
 
-GymTracker risolve tre problemi reali:
+Andare in palestra senza tracciare i progressi è come guidare senza cruscotto: vai avanti, ma non sai se stai migliorando. Allenarsi da soli, poi, riduce la motivazione.
+
+FORGE risolve tre problemi reali:
 
 | Problema | Soluzione |
-| --- | --- |
-| Non ricordo i pesi della volta scorsa | Storico completo con dettaglio serie per serie |
-| Non so quali esercizi fare per un muscolo | Catalogo 1300+ esercizi con GIF e istruzioni |
-| Mi alleno da solo e perdo motivazione | Amici, leaderboard e streak per una competizione sana |
+|----------|-----------|
+| Non ricordo i pesi della volta scorsa | Storico allenamenti con dettaglio serie per serie salvato su PocketBase |
+| Non so quali esercizi fare per un muscolo | Catalogo 1300+ esercizi con immagini, ricerca e filtri |
+| Mi alleno da solo e perdo motivazione | Feed amici, like sugli allenamenti, streak settimanale |
 
-## Funzionalità
+---
 
-### Esplora Esercizi
-- **1300+ esercizi** da ExerciseDB API con GIF animate
-- Ricerca per nome, filtro per gruppo muscolare (petto, schiena, gambe...) e attrezzatura (manubri, bilanciere, corpo libero...)
-- Cache offline SQLite: gli esercizi che usi di più sono sempre disponibili, anche senza rete
+## Come funziona
 
-### Registra Allenamenti
-- Avvia un allenamento in un tap dalla Dashboard
-- Aggiungi esercizi, registra serie con peso (kg) e ripetizioni
-- Salva tutto con data e ora
-- Storico completo navigabile dal più recente
+### 🚀 Primo avvio
+1. L'utente apre l'app e vede la schermata di **Login**
+2. Può registrarsi con email, nome e password (account creato su PocketBase)
+3. Le credenziali vengono salvate in locale per l'auto-login
+4. Dopo il login, atterra sulla **Dashboard**
 
-### Traccia il Tuo Corpo
-- Registra peso corporeo dopo ogni sessione
-- Misura petto, vita, fianchi, braccia, gambe
-- Grafici di andamento nel tempo
-- Dati 100% locali: mai condivisi con il backend
+### 📋 Dashboard (Tab 1)
+- **Squad Activity**: avatar circolari degli amici seguiti con allenamenti recenti — tap per andare al Feed
+- **Current Streak**: numero di settimane consecutive con almeno un allenamento (reset dopo 7+ giorni di inattività)
+- **Today Card**: piano di allenamento casuale dalla tua libreria — tap per avviarlo subito
+- **▶ START WORKOUT**: pulsante principale che apre la schermata Start Session
 
-### Competi con gli Amici
-- Cerca amici per username e connettiti
-- **Feed**: vedi gli ultimi allenamenti dei tuoi amici
-- **Leaderboard**: classifica settimanale per volume di allenamento (kg × ripetizioni)
-- **Streak**: chi si allena più giorni di fila?
-- **Confronto diretto**: affianca le tue statistiche con quelle di un amico
+### 🔍 Feed & Social (Tab 2)
+- **Search Bar**: cerca altri atleti per nome (live search con debounce 400ms)
+- **Follow/Unfollow**: invia richieste di amicizia con un tap
+- **Feed Allenamenti**: scroll verticale dei workout degli amici con:
+  - Nome atleta, avatar, tempo trascorso
+  - Nome allenamento, lista esercizi, volume totale, durata
+  - **Like (♥)**: tap per mettere/togliere like — il cuore si riempie in LimeGreen e il conteggio si aggiorna istantaneamente
+- **Avatar in alto a sinistra**: tap per aprire il tuo Profilo
+- **⚙ in alto a destra**: Impostazioni (tema chiaro/scuro, logout)
 
-### Dashboard Intelligente
-- Riepilogo rapido: ultimo allenamento, streak, posizione in classifica, peso attuale
-- Accesso immediato a: Nuovo Allenamento, Catalogo, Amici
-- Grafici di progresso per ogni esercizio
+### 📊 Statistiche (Tab 3)
+- **TopBar**: avatar profilo (tap → Profilo), titolo FORGE, ♥ (tap → Notifiche)
+- **Total Workouts / Volume / Hours**: card riepilogative con trend
+- **Filtri temporali**: WEEK / MONTH / 3M / YEAR / ALL — cliccabili con feedback visivo
+- **Grafico volume**: barre settimanali con etichette data e divisori mese
+- **Top Lifts**: i 5 esercizi con peso massimo sollevato
+- **Calendario**: vista mensile con pallino Primary sui giorni di allenamento, LimeGreen su oggi
 
-### Piani per Principianti
-- 3 piani base precaricati: Full Body 2gg, Split 3gg, Push/Pull/Legs
-- Ogni piano indica esercizi, serie e ripetizioni consigliate
-- Avvia un allenamento direttamente da un giorno del piano
+### 🔔 Notifiche (da ♥ in Stats)
+- **Friend Requests**: richieste di amicizia in sospeso con pulsanti ACCEPT / REJECT
+- **Like Notifications**: quando un utente mette like a un tuo allenamento, vedi: `{Nome} liked your workout {NomeWorkout}`
+
+### 🏋️ Start Session
+- **Quick Start**: avvia un allenamento libero (modalità free)
+- **Create New Plan**: vai alla creazione guidata di un piano
+- **Your Protocols**: lista dei piani salvati con esercizi, serie, peso, ripetizioni, tempo di recupero — tap per avviare, ✕ per eliminare
+
+### 💪 Allenamento Attivo
+- **Progress Bar**: barra Primary in cima, percentuale completamento
+- **Header**: ✕ chiudi, nome scheda (SpaceGrotesk), pulsante FINISH
+- **Ricerca esercizi**: barra ricerca con chip per gruppo muscolare e attrezzatura — fetch da ExerciseDB API con cache su PocketBase
+- **Card esercizio**: immagine, nome, bodyPart, suggerimenti, note editabili
+- **Tabella set**: righe con SET / KG / REPS / ✓ — Entry numeriche, tap sul cerchio per completare (si riempie LimeGreen)
+- **Add Set**: bottone per aggiungere una serie
+- **Rest Timer**: input secondi pausa globale, timer per esercizio
+- **Finish**: salva l'allenamento su PocketBase con nome, data, volume, durata, esercizi
+
+### 👤 Profilo
+- **Avatar**: foto profilo da PocketBase (o iniziali se non caricata) — tappabile per cambiare foto
+- **Statistiche**: Total Workouts, Total Volume, Week Streak, ♥ Likes ricevuti
+- **Recent Forges**: lista ultimi allenamenti con titolo, data, durata, like, volume
+- **Edit Profile** (✏️): modifica nome e bio, anteprima avatar, salva
+
+### ⚙️ Impostazioni
+- **Dark Mode / Light Mode**: toggle per cambiare tema in tempo reale su tutte le pagine
+- **Logout**: torna alla schermata di login
+
+---
 
 ## Architettura
 
 ```
-┌─────────────────────────────────────────────────┐
+┌──────────────────────────────────────────────────┐
 │                  .NET MAUI App                    │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐       │
-│  │  Views   │  │ViewModels│  │ Services │       │
-│  │  XAML    │◄─┤ MVVM     │◄─┤ Business │       │
-│  │  Stitch  │  │ Toolkit  │  │ Logic    │       │
-│  └──────────┘  └──────────┘  └────┬─────┘       │
-│                                   │              │
-│         ┌─────────────────────────┼──────┐       │
-│         │                         │      │       │
-│    ┌────▼────┐   ┌──────────┐  ┌──▼───┐ │       │
-│    │ SQLite   │   │ Exercise │  │Fire- │ │       │
-│    │ (locale) │   │  DB API  │  │base  │ │       │
-│    │ cache,   │   │ 1300+    │  │Auth +│ │       │
-│    │ workout, │   │ esercizi │  │DB    │ │       │
-│    │ body     │   │          │  │      │ │       │
-│    └─────────┘   └──────────┘  └──────┘ │       │
-└──────────────────────────────────────────┘       │
+│  ┌──────────┐  ┌───────────┐  ┌──────────┐      │
+│  │  Views   │  │ ViewModels│  │ Services │      │
+│  │  XAML    │◄─┤ MVVM      │◄─┤ Business │      │
+│  │  puro    │  │ Toolkit   │  │ Logic    │      │
+│  └──────────┘  └───────────┘  └────┬─────┘      │
+│                                    │             │
+│         ┌──────────────────────────┼──────┐      │
+│         │                          │      │      │
+│    ┌────▼────┐   ┌──────────┐  ┌──▼───┐ │      │
+│    │ PocketBase│  │ExerciseDB│  │Plan  │ │      │
+│    │ Auth +   │  │  API     │  │Store │ │      │
+│    │ Social   │  │ 1300+ ex │  │Local │ │      │
+│    └─────────┘  └──────────┘  └──────┘ │      │
+└─────────────────────────────────────────┘      │
 ```
 
-### Stack tecnologico
+### Pattern Architetturale: MVVM
+
+| Layer | Responsabilità | Esempio |
+|-------|---------------|---------|
+| **Views** (`*.xaml`) | XAML puro, binding, stili | `HomePage.xaml` |
+| **ViewModels** | Stato UI, comandi, orchestrazione | `HomeViewModel.cs` |
+| **Services** | Business logic, API client | `PocketBaseService.cs` |
+| **Models/Dto** | Entità dominio, DTO API | `LoggedWorkoutRecord` |
+
+### Stack Tecnologico
 
 | Tecnologia | Ruolo |
-| --- | --- |
-| `.NET MAUI 8+` | Framework cross-platform Android-first |
-| `CommunityToolkit.Mvvm` | MVVM: ObservableProperty, RelayCommand |
-| `Shell` | Navigazione a tab + route di dettaglio |
-| `sqlite-net-pcl` | Persistenza locale (cache, allenamenti, misure) |
-| `HttpClient` + `System.Text.Json` | Chiamate API ExerciseDB e Firebase REST |
-| `Firebase Auth` | Registrazione e login email/password |
-| `Firebase Realtime DB / Firestore` | Dati social (utenti, amici, leaderboard) |
-| `Google Stitch` | Design System: dark theme, Electric Blue `#007AFF`, Lime Green `#CCFF00`, font Lexend/Inter |
+|------------|-------|
+| `.NET MAUI 10` | Framework cross-platform Android-first |
+| `CommunityToolkit.Mvvm 8.4` | MVVM: `[ObservableProperty]`, `[RelayCommand]`, `WeakReferenceMessenger` |
+| `Shell` | Navigazione a 3 tab + route di dettaglio |
+| `PocketBase` (self-hosted) | Auth (email/password), database (allenamenti, social graph, esercizi) |
+| `ExerciseDB API` (RapidAPI) | Catalogo 1300+ esercizi con immagini, istruzioni, filtri |
+| `System.Text.Json` | Parsing DTO, serializzazione |
+| `Preferences` | Persistenza token e credenziali |
+| `PlanStore` | Salvataggio piani allenamento in JSON locale |
+| Google Fonts | Inter (body), Lexend (label/caps), Space Grotesk (headline/metriche) |
 
-### Flusso offline-first
+### Shell Navigation
 
-1. Scrivi sempre su SQLite (allenamenti, peso, misure)
-2. Sincronizza con Firebase quando la rete è disponibile
-3. Esercizi in cache: sempre accessibili, anche senza connessione
-4. Peso e misure: solo locali, mai sul cloud
+```
+AppShell (TabBar)
+├── Tab 1: Dashboard  →  HomePage
+├── Tab 2: Feed       →  FeedPage
+└── Tab 3: Stats      →  StatsPage
 
-## Skill e Workflow
+Route di dettaglio:
+├── "profile"         →  ProfilePage
+├── "settings"        →  SettingsPage
+├── "startSession"    →  StartSessionPage
+├── "activeWorkout"   →  ActiveWorkoutPage
+├── "friendRequests"  →  FriendRequestsPage
+├── "notifications"   →  NotificationsPage
+└── "login"           →  LoginPage
+```
 
-Il progetto segue il workflow **Man-in-the-Loop**: ogni iterazione è pianificata, costruita, revisionata, testata e documentata. Le skill locali guidano l'agente AI in ogni fase.
+### PocketBase Collections
 
-| Skill | Fase | Output |
-| --- | --- | --- |
-| `maui-prd` | Definizione | `docs/spec.md` |
-| `prd-to-plan` | Pianificazione | `docs/plan.md`, `docs/architecture.md`, `docs/test-matrix.md` |
-| `maui-expert` | Build | Codice MAUI MVVM, XAML, Shell |
-| `maui-automatic-testing` | Test | Test ViewModel, Service, Build |
-| `man-in-the-loop-workflow` | Intero ciclo | Controllo scope, review, documentazione |
+| Collection | Campi | API Rules |
+|-----------|-------|-----------|
+| `users` | email, password, name, bio, avatar | Built-in PocketBase auth |
+| `logged_workouts` | user, user_name, name, date, exercises, exercise_data, volume, duration, likes, liked_by | List/Search/View/Update: authenticated |
+| `social_graph` | from_user, from_name, to_user, status | Create/List: authenticated |
+| `excercise` | name, bodyPart, equipment, instructions, imageUrl, category, level | Create/List: authenticated |
 
-| Fase | Cosa fare | Cosa NON fare |
-| --- | --- | --- |
-| Planning | Scrivere acceptance criteria verificabili | Mescolare spec, architettura e codice |
-| Build | Implementare una feature per iterazione | Aggiungere pacchetti o refactoring non richiesti |
-| Review | Verificare MVVM, naming, error handling | Fare review senza aver letto il codice |
-| Testing | Testare loading, error, empty, success | Fingere che la build sia un test |
-| Docs | Aggiornare `docs/iterations/` a fine iterazione | Scrivere documentazione inutile |
+---
 
-## Quick Start
-
-1. **Clona** il repository
-2. Leggi [`docs/method/man-in-the-loop.md`](docs/method/man-in-the-loop.md) per capire il metodo
-3. Leggi [`docs/spec.md`](docs/spec.md) per la specifica completa
-4. Consulta [`docs/plan.md`](docs/plan.md) per il piano in 8 iterazioni
-5. Per sviluppare: avvia la skill `maui-expert` e segui il workflow
+## Installazione e Build
 
 ### Prerequisiti
+- .NET 10 SDK + MAUI workload
+- Emulatore Android o dispositivo fisico (Android 7+)
+- Server PocketBase attivo (configurabile via `.env`)
+- Chiave API ExerciseDB da RapidAPI (configurabile via `.env`)
 
-- .NET 8 SDK + MAUI workload
-- Emulatore Android (o dispositivo fisico)
-- Chiave API ExerciseDB ([RapidAPI](https://rapidapi.com/justin-WFnsXH_t6/api/exercisedb))
-- Progetto Firebase configurato (Auth + Database)
+### Configurazione
+1. Crea un file `.env` nella root del progetto:
+```env
+EXERCISEDB_API_KEY=la_tua_chiave_rapidapi
+POCKETBASE_URL=https://tuo-server-pb.dominio.com
+```
 
-## Documenti
+2. Il file `.env` viene copiato automaticamente in `Resources/Raw/gymtracker.env` al build e caricato a runtime.
+
+3. Su PocketBase, assicurati che le collection `logged_workouts`, `social_graph` ed `excercise` esistano con i campi e le API Rules corrette.
+
+### Build & Deploy
+```bash
+# Build
+dotnet build src/GymTracker.Mobile/GymTracker.Mobile.csproj -f net10.0-android
+
+# Publish APK
+dotnet publish src/GymTracker.Mobile/GymTracker.Mobile.csproj -f net10.0-android -c Release
+
+# Run su emulatore/device
+dotnet build src/GymTracker.Mobile/GymTracker.Mobile.csproj -f net10.0-android -t:Run
+```
+
+---
+
+## Documentazione
 
 | Documento | Scopo |
-| --- | --- |
-| [`docs/spec.md`](docs/spec.md) | PRD completo di GymTracker |
+|-----------|-------|
+| [`AGENTS.md`](AGENTS.md) | Regole del progetto per agenti AI |
+| [`docs/spec.md`](docs/spec.md) | Specifica completa con epic, user stories, criteri di accettazione |
 | [`docs/plan.md`](docs/plan.md) | Piano in 8 iterazioni verificabili |
-| [`docs/architecture.md`](docs/architecture.md) | Architettura MAUI + Firebase + ExerciseDB |
-| [`docs/test-matrix.md`](docs/test-matrix.md) | 50 test pianificati su 8 categorie |
-| [`docs/method/man-in-the-loop.md`](docs/method/man-in-the-loop.md) | Metodologia didattica |
+| [`docs/architecture.md`](docs/architecture.md) | Architettura tecnica dettagliata |
+| [`docs/test-matrix.md`](docs/test-matrix.md) | Matrice di test con 30+ scenari |
+| [`docs/prompt-log.md`](docs/prompt-log.md) | Log dei prompt significativi con decisioni |
+| [`docs/iterations/`](docs/iterations/) | Log delle iterazioni (IT-01, IT-02, IT-03) |
+
+---
 
 ## Struttura Repository
 
 ```text
-.
-├── .agents/skills/              # Skill per OpenCode (maui-prd, maui-expert, etc.)
-├── docs/                        # Spec, plan, architettura, test, iterazioni
-│   ├── spec.md                  # PRD GymTracker
-│   ├── plan.md                  # Piano 8 iterazioni
+├── AGENTS.md                    # Regole progetto
+├── README.md                    # Questo file
+├── .gitignore                   # Esclusioni Git
+├── .env.example                 # Template variabili d'ambiente
+├── docs/                        # Documentazione
+│   ├── spec.md                  # Specifica prodotto
+│   ├── plan.md                  # Piano iterazioni
 │   ├── architecture.md          # Architettura tecnica
 │   ├── test-matrix.md           # Matrice di test
-│   ├── method/                  # Metodo Man-in-the-Loop
-│   ├── iterations/              # Log iterazioni
-│   └── history/                 # Sessioni storiche
+│   ├── prompt-log.md            # Log prompt AI
+│   ├── Iterazioni-IA.md         # Audit e cronologia modifiche
+│   └── iterations/              # Log iterazioni
+├── assets/screenshots/          # Screenshot dell'app
 ├── src/GymTracker.Mobile/       # Progetto MAUI
-│   ├── Models/
-│   ├── Data/
-│   ├── Services/
-│   ├── ViewModels/
-│   ├── Views/
-│   └── Resources/
-└── README.md
+│   ├── Models/                  # Entità dominio
+│   │   └── Dto/                 # DTO PocketBase + ExerciseDB
+│   ├── Services/                # Business logic
+│   ├── ViewModels/              # MVVM ViewModels
+│   ├── Views/                   # XAML Views
+│   ├── Converters/              # Value converters
+│   └── Resources/               # Stili, font, icone
+└── tools/ExerciseImporter/      # Tool per pre-caricare immagini
 ```
-
-## Prossimi Passi
-
-- [x] PRD e pianificazione completati
-- [ ] IT-01: Bootstrap MAUI + Shell + Design System "Iron Rank Fitness Social"
-- [ ] IT-02: Catalogo esercizi da ExerciseDB API
-- [ ] IT-03-08: Allenamento, corpo, social, statistiche, piani
 
 ---
 
 <div align="center">
 
-**GymTracker Mobile** — Trasforma ogni ripetizione in progresso. Sfida i tuoi amici. Supera i tuoi limiti.
+**FORGE** — Costruisci il tuo fisico. Sfida i tuoi amici. Forgia la tua leggenda.
 
 </div>

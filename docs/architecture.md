@@ -1,394 +1,222 @@
-# Architettura - GymTracker Mobile
+# Architettura — FORGE (GymTracker Mobile)
 
 ## 1. Obiettivo architetturale
 
 Costruire una app `.NET MAUI` Android-first per il tracking degli allenamenti che integri tre fonti dati con responsabilità chiare:
 
-- **ExerciseDB API** (RapidAPI): catalogo esercizi remoto;
-- **Firebase** (Auth + Realtime Database/Firestore): autenticazione e dati social;
-- **SQLite** (locale): cache esercizi, allenamenti, peso/misure, piani, profilo.
+- **ExerciseDB API** (RapidAPI): catalogo esercizi remoto con 1300+ esercizi;
+- **PocketBase** (self-hosted): autenticazione, database, file storage e dati social;
+- **Preferences / PlanStore**: credenziali, token e piani di allenamento locali.
 
-L'architettura deve supportare l'uso offline per la registrazione allenamenti (con esercizi in cache) e la sincronizzazione asincrona con Firebase quando la rete torna disponibile. Il design dell'interfaccia segue il Design System "Performance Minimalist" del progetto Stitch "Iron Rank Fitness Social" (`5765971046385640743`): dark mode, Electric Blue `#007AFF`, Lime Green `#CCFF00`, font Lexend/Inter.
+L'architettura supporta l'uso online per la registrazione allenamenti e la sincronizzazione immediata con PocketBase. Il design dell'interfaccia segue i mockup Stitch con tema scuro "Cyber-Athletic Elite" (ciano #00E5FF) e chiaro "Fitness Core" (blu #003ec7), font Inter / Lexend / Space Grotesk.
 
-## 2. Struttura del repository e del progetto
-
-### Cartelle principali
+## 2. Struttura del repository
 
 ```
 src/GymTracker.Mobile/
 ├── App.xaml / App.xaml.cs
 ├── AppShell.xaml / AppShell.xaml.cs
 ├── MauiProgram.cs                  # DI composition root
+├── Messages/                       # WeakReferenceMessenger
+│   └── WorkoutSavedMessage.cs
 ├── Models/                         # Entità dominio e DTO
-│   ├── Exercise.cs
-│   ├── Workout.cs
-│   ├── WorkoutExercise.cs
-│   ├── ExerciseSet.cs
-│   ├── BodyWeight.cs
-│   ├── BodyMeasurement.cs
-│   ├── User.cs
-│   ├── FriendRequest.cs
-│   ├── LeaderboardEntry.cs
-│   ├── WorkoutPlan.cs
-│   ├── PlanDay.cs
-│   └── Dto/                        # DTO per API esterne
-│       ├── ExerciseDbDto.cs
-│       ├── FirebaseWorkoutDto.cs
-│       └── FirebaseUserDto.cs
-├── Data/                           # Accesso dati locale
-│   ├── DatabaseService.cs          # SQLiteAsyncConnection singleton
-│   ├── ExerciseCacheRepository.cs
-│   ├── WorkoutRepository.cs
-│   ├── BodyRepository.cs
-│   ├── UserRepository.cs
-│   └── WorkoutPlanRepository.cs
-├── Services/                       # Business logic e API client
-│   ├── ExerciseApiService.cs       # HTTP client ExerciseDB
-│   ├── ExerciseCacheService.cs     # Logica cache esercizi
-│   ├── ExerciseService.cs          # Orchestratore API + cache
-│   ├── FirebaseAuthService.cs      # Auth Firebase REST
-│   ├── FirebaseDatabaseService.cs  # CRUD Firebase Realtime DB
-│   ├── SyncService.cs              # Coda sincronizzazione offline
-│   ├── SocialService.cs            # Logica amici/competizione
-│   └── ConnectivityService.cs      # Monitor connessione
+│   ├── WorkoutPlan.cs              # WorkoutPlan, WorkoutExercise, ExerciseSet
+│   └── Dto/
+│       ├── PocketBaseDto.cs        # PocketBaseAuthResponse, UserRecord, LoggedWorkoutRecord, SocialGraphRecord
+│       └── ExerciseDbDto.cs        # DTO per ExerciseDB API
+├── Services/
+│   ├── PocketBaseService.cs        # Auth, CRUD, social, file, like notifications
+│   ├── ExerciseApiService.cs       # HTTP ExerciseDB, cache PocketBase, resolve URL immagini
+│   ├── ThemeService.cs             # Palette dark/light inline, Apply(), WriteResources()
+│   ├── BuildSecrets.cs             # .env → Dictionary, ConcurrentDictionary
+│   ├── WorkoutSession.cs           # Sessione allenamento attivo
+│   └── PlanStore.cs                # CRUD piani su Preferences (JSON)
 ├── ViewModels/
-│   ├── BaseViewModel.cs
-│   ├── LoginViewModel.cs
-│   ├── RegisterViewModel.cs
-│   ├── DashboardViewModel.cs
-│   ├── CatalogViewModel.cs
-│   ├── ExerciseDetailViewModel.cs
-│   ├── ActiveWorkoutViewModel.cs
-│   ├── WorkoutHistoryViewModel.cs
-│   ├── WorkoutDetailViewModel.cs
-│   ├── BodyViewModel.cs
-│   ├── StatsViewModel.cs
-│   ├── SocialViewModel.cs
-│   ├── FriendFeedViewModel.cs
-│   ├── LeaderboardViewModel.cs
-│   ├── FriendCompareViewModel.cs
-│   ├── PlansViewModel.cs
-│   └── PlanDetailViewModel.cs
+│   ├── BaseViewModel.cs            # IsBusy, ErrorMessage, HasData, IsEmptyState
+│   ├── HomeViewModel.cs            # Dashboard: streak, squad, open profile/feed/settings
+│   ├── FeedViewModel.cs            # Feed: search users, follow, feed posts, like
+│   ├── StatsViewModel.cs           # Statistiche: top lifts, bar chart, calendar, like notifications
+│   ├── ProfileViewModel.cs         # Profilo: avatar, stats, recent forges, edit
+│   ├── ActiveWorkoutViewModel.cs   # Allenamento: ricerca, esercizi, set, salvataggio
+│   ├── StartSessionViewModel.cs    # Quick Start, Create Plan, Your Protocols
+│   ├── LoginViewModel.cs           # Login, Register, auto-login
+│   ├── FriendRequestsViewModel.cs  # Friend requests + like notifications
+│   ├── SettingsViewModel.cs        # Toggle tema, logout
+│   ├── NotificationsViewModel.cs   # (stub)
+│   ├── SocialViewModel.cs          # (stub)
+│   ├── DashboardViewModel.cs       # (stub)
+│   ├── CatalogViewModel.cs         # (stub)
+│   └── WorkoutViewModel.cs         # (stub)
 ├── Views/
-│   ├── LoginPage.xaml
-│   ├── RegisterPage.xaml
-│   ├── DashboardPage.xaml
-│   ├── CatalogPage.xaml
-│   ├── ExerciseDetailPage.xaml
-│   ├── NewWorkoutPage.xaml
-│   ├── ActiveWorkoutPage.xaml
-│   ├── WorkoutHistoryPage.xaml
-│   ├── WorkoutDetailPage.xaml
-│   ├── BodyTrackingPage.xaml
-│   ├── StatsPage.xaml
-│   ├── FriendsPage.xaml
-│   ├── FriendSearchPage.xaml
-│   ├── FriendFeedPage.xaml
-│   ├── LeaderboardPage.xaml
-│   ├── FriendComparePage.xaml
-│   ├── PlansPage.xaml
-│   └── PlanDetailPage.xaml
+│   ├── HomePage.xaml(.cs)          # Dashboard
+│   ├── FeedPage.xaml(.cs)          # Feed & search
+│   ├── StatsPage.xaml(.cs)         # Statistiche
+│   ├── ProfilePage.xaml(.cs)       # Profilo utente
+│   ├── ActiveWorkoutPage.xaml(.cs) # Allenamento attivo
+│   ├── StartSessionPage.xaml(.cs)  # Start Session
+│   ├── LoginPage.xaml(.cs)         # Login/Register
+│   ├── FriendRequestsPage.xaml(.cs)# Notifiche
+│   ├── SettingsPage.xaml(.cs)      # Impostazioni
+│   ├── NotificationsPage.xaml(.cs) # (stub)
+│   ├── SocialPage.xaml(.cs)        # (stub)
+│   ├── DashboardPage.xaml(.cs)     # (stub)
+│   ├── CatalogPage.xaml(.cs)       # (stub)
+│   └── WorkoutPage.xaml(.cs)       # (stub)
 ├── Converters/
-│   ├── BoolToVisibilityConverter.cs
 │   ├── InverseBoolConverter.cs
+│   ├── BoolToVisibilityConverter.cs
 │   └── DateTimeFormatConverter.cs
-├── Resources/
-│   ├── Styles/
-│   │   ├── Colors.xaml
-│   │   └── Styles.xaml
-│   ├── Fonts/
-│   └── Images/
-└── Platforms/Android/
-    ├── AndroidManifest.xml
-    └── MainApplication.cs
+└── Resources/
+    ├── Styles/Styles.xaml          # Stili globali
+    ├── Fonts/                      # Inter, Lexend, Space Grotesk, OpenSans
+    ├── AppIcon/                    # appicon.png
+    ├── Images/
+    └── Raw/                        # gymtracker.env (da .env al build)
 ```
-
-### Responsabilità per area
-
-- `Views/`: XAML puro, binding, stili. Zero logica di business.
-- `ViewModels/`: stato UI (IsBusy, ErrorMessage, HasData, IsEmpty), comandi, orchestrazione servizi.
-- `Services/`: logica di business, chiamate API, caching, sincronizzazione.
-- `Data/`: accesso SQLite, repository pattern leggero.
-- `Models/`: entità dominio e DTO separati. I DTO vivono in `Models/Dto/`.
-- `Converters/`: value converters per binding XAML.
-- `Resources/`: stili, colori, font del Design System Stitch.
 
 ## 3. Pattern applicativi
 
-- **MVVM**: `CommunityToolkit.Mvvm` con `[ObservableProperty]` e `[RelayCommand]`.
-- **Shell Navigation**: tab bar principale + route di dettaglio.
-- **Dependency Injection**: `MauiProgram.cs` come composition root, servizi singleton, ViewModel transient.
-- **Repository pattern**: leggero, senza astrazioni generiche eccessive.
-- **Offline-first**: scrittura sempre su SQLite, sincronizzazione Firebase asincrona.
-- **XAML**: compiled bindings con `x:DataType` dove possibile.
+- **MVVM**: `CommunityToolkit.Mvvm` con `[ObservableProperty]` e `[RelayCommand]`
+- **Shell Navigation**: TabBar (Dashboard, Feed, Stats) + 7 route di dettaglio
+- **Dependency Injection**: `MauiProgram.cs` come composition root, servizi singleton, ViewModel/Page transient
+- **Messaging**: `WeakReferenceMessenger` per refresh post-salvataggio (`WorkoutSavedMessage`)
+- **XAML**: compiled bindings con `x:DataType` su tutte le pagine
 
-## 4. Componenti principali
-
-### Views
-
-| Pagina | Tab | Descrizione |
-| --- | --- | --- |
-| `LoginPage` / `RegisterPage` | Fuori Shell | Autenticazione iniziale |
-| `DashboardPage` | Tab 1 | Riepilogo rapido, accesso funzioni |
-| `CatalogPage` | Tab 2 | Catalogo esercizi con ricerca e filtri |
-| `ActiveWorkoutPage` | Tab 3 | Allenamento in corso o storico |
-| `FriendsPage` | Tab 4 | Social: amici, feed, leaderboard |
-| `ProfilePage` | Tab 5 | Profilo, logout, impostazioni |
-| `ExerciseDetailPage` | Detail | Dettaglio esercizio con GIF |
-| `WorkoutDetailPage` | Detail | Dettaglio allenamento passato |
-| `BodyTrackingPage` | Detail | Peso e misure |
-| `StatsPage` | Detail | Statistiche complete |
-| `LeaderboardPage` | Detail | Classifica settimanale |
-| `FriendComparePage` | Detail | Confronto diretto |
-| `PlansPage` / `PlanDetailPage` | Detail | Piani allenamento |
-
-### ViewModels
-
-Ogni ViewModel eredita da `BaseViewModel` che espone:
-
-- `[ObservableProperty] bool isBusy`
-- `[ObservableProperty] string errorMessage`
-- `[ObservableProperty] bool hasData`
-- `[ObservableProperty] bool isEmpty`
-- `[ObservableProperty] bool hasError`
-
-Esempi chiave:
-
-- `DashboardViewModel`: aggrega dati da SQLite (ultimo allenamento, peso, streak) e Firebase (posizione leaderboard).
-- `CatalogViewModel`: orchestra `ExerciseService` (API + cache), gestisce ricerca testuale e filtri.
-- `ActiveWorkoutViewModel`: stato mutabile dell'allenamento in corso, aggiunta/rimozione esercizi e serie.
-- `SocialViewModel`: ricerca utenti, invio/gestione richieste, lista amici.
-- `LeaderboardViewModel`: query Firebase ordinata per volume, refresh.
-- `SyncService`: coda interna di allenamenti da sincronizzare, osservabile per UI status (sync pending, syncing, synced, error).
-
-### Services
-
-| Servizio | Responsabilità |
-| --- | --- |
-| `ExerciseApiService` | HTTP client ExerciseDB (RapidAPI header, endpoint bodyPart/name/equipment) |
-| `ExerciseCacheService` | Salva/recupera da SQLite gli esercizi usati (max 50) |
-| `ExerciseService` | Orchestratore: chiama API, salva in cache, restituisce al VM |
-| `FirebaseAuthService` | REST API Firebase Auth: signUp, signIn, refresh token |
-| `FirebaseDatabaseService` | CRUD su Realtime Database/Firestore per allenamenti, utenti, richieste |
-| `SyncService` | Coda di sincronizzazione: invia allenamenti locali a Firebase, retry, stato |
-| `SocialService` | Logica amici: ricerca, richieste, feed, leaderboard |
-| `ConnectivityService` | Wrapper `IConnectivity` MAUI per monitorare stato rete |
-
-### Models e DTO
-
-I modelli di dominio sono separati dai DTO di integrazione:
-
-```csharp
-// Modelli dominio
-public class Exercise { string Id, Name, BodyPart, Equipment, Target, GifUrl, List<string> Instructions; }
-public class Workout { string Id, DateTime Date, TimeSpan? Duration, List<WorkoutExercise> Exercises; }
-public class WorkoutExercise { string ExerciseId, string ExerciseName, List<ExerciseSet> Sets; }
-public class ExerciseSet { int SetNumber; double WeightKg; int Reps; }
-public class BodyWeight { string Id, DateTime Date; double WeightKg; }
-public class BodyMeasurement { string Id, DateTime Date; double ChestCm, WaistCm, HipsCm, ArmsCm, LegsCm; }
-public class User { string FirebaseUid, Username, Email; }
-public class FriendRequest { string Id, SenderId, ReceiverId, Status, DateTime Timestamp; }
-```
-
-```csharp
-// DTO ExerciseDB
-public class ExerciseDbDto { string id, name, bodyPart, equipment, target, gifUrl, List<string> instructions; }
-```
-
-I DTO Firebase dipendono dalla scelta Realtime Database vs Firestore (TBD in IT-05).
-
-## 5. Navigazione
-
-### Route Shell
+## 4. Navigazione Shell
 
 ```xml
-<Shell>
-  <TabBar>
-    <ShellContent Route="dashboard" Title="Home" ContentTemplate="{DataTemplate views:DashboardPage}" />
-    <ShellContent Route="catalog" Title="Esercizi" ContentTemplate="{DataTemplate views:CatalogPage}" />
-    <ShellContent Route="workout" Title="Allenamento" ContentTemplate="{DataTemplate views:ActiveWorkoutPage}" />
-    <ShellContent Route="social" Title="Amici" ContentTemplate="{DataTemplate views:FriendsPage}" />
-    <ShellContent Route="profile" Title="Profilo" ContentTemplate="{DataTemplate views:ProfilePage}" />
-  </TabBar>
-</Shell>
-
-<!-- Route di dettaglio registrate in AppShell.cs -->
-Routing.RegisterRoute("exerciseDetail", typeof(ExerciseDetailPage));
-Routing.RegisterRoute("workoutDetail", typeof(WorkoutDetailPage));
-Routing.RegisterRoute("bodyTracking", typeof(BodyTrackingPage));
-Routing.RegisterRoute("stats", typeof(StatsPage));
-Routing.RegisterRoute("leaderboard", typeof(LeaderboardPage));
-Routing.RegisterRoute("friendCompare", typeof(FriendComparePage));
-Routing.RegisterRoute("plans", typeof(PlansPage));
-Routing.RegisterRoute("planDetail", typeof(PlanDetailPage));
+<TabBar>
+    <ShellContent Route="dashboard" ContentTemplate="{DataTemplate views:HomePage}" />
+    <ShellContent Route="feed"       ContentTemplate="{DataTemplate views:FeedPage}" />
+    <ShellContent Route="stats"      ContentTemplate="{DataTemplate views:StatsPage}" />
+</TabBar>
 ```
-
-### Parametri di navigazione
-
-- `ExerciseDetailPage`: `exerciseId` (obbligatorio)
-- `WorkoutDetailPage`: `workoutId` (obbligatorio)
-- `FriendComparePage`: `friendId`, `friendName`
-- `PlanDetailPage`: `planId`
-
-La navigazione verso `LoginPage` / `RegisterPage` avviene fuori Shell (prima del `Shell.Current.GoToAsync`). Dopo login, `App.Current.MainPage = new AppShell()`.
-
-## 6. Stato della UI
-
-### Loading
-
-- `ActivityIndicator` durante fetch API (catalogo, login, sync).
-- Shimmer/skeleton placeholder per caricamento iniziale Dashboard (IT-07).
-- Loading non bloccante per sync in background.
-
-### Error
-
-- Messaggio errore + pulsante "Riprova" su tutte le pagine con fetch remoto.
-- Errori API ExerciseDB: messaggio specifico ("Impossibile caricare gli esercizi. Controlla la connessione.").
-- Errori Firebase Auth: messaggi Firebase tradotti in italiano.
-- Errori di sync mostrati come badge/piccolo avviso, non bloccanti.
-
-### Empty
-
-- Catalogo senza risultati: "Nessun esercizio trovato. Prova un'altra ricerca."
-- Storico vuoto: "Nessun allenamento registrato. Inizia il tuo primo allenamento!" con pulsante CTA.
-- Nessun amico: stato vuoto con CTA "Cerca amici".
-- Feed amici vuoto (amici presenti ma senza allenamenti recenti).
-
-### Success
-
-- Dati caricati correttamente mostrati senza messaggi di conferma invasivi.
-- Salvataggio allenamento: breve toast / snackbar di conferma.
-- Sync completato: badge verde o assenza di badge errore.
-
-## 7. Dati e integrazioni
-
-### ExerciseDB API (RapidAPI)
-
-```
-Base URL: https://exercisedb.p.rapidapi.com
-Headers: X-RapidAPI-Key, X-RapidAPI-Host
-```
-
-| Endpoint | Uso |
-| --- | --- |
-| `GET /exercises/bodyPart/{part}` | Esercizi per gruppo muscolare |
-| `GET /exercises/bodyPartList` | Lista gruppi muscolari disponibili |
-| `GET /exercises/name/{name}` | Ricerca per nome |
-| `GET /exercises/equipment/{type}` | Filtro per attrezzatura |
-| `GET /exercises/exercise/{id}` | Dettaglio esercizio singolo |
-
-Il servizio `ExerciseApiService` è l'unico punto di contatto con l'API. Gestisce timeout (10s), retry (1 tentativo), e mapping DTO -> `Exercise`.
-
-### Firebase
-
-**Autenticazione**: Firebase Auth REST API per email/password.
-
-- `POST https://identitytoolkit.googleapis.com/v1/accounts:signUp`
-- `POST https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword`
-
-Il token ID viene salvato in `Preferences` e usato per autenticare le richieste al database.
-
-**Database**: Realtime Database o Firestore (TBD in IT-05).
-
-Struttura prevista (Firestore):
-
-```
-/users/{uid}              # profilo utente: username, email
-/friendRequests/{id}      # richieste: from, to, status, timestamp
-/friendships/{uid}        # subcollection: friendUids
-/workouts/{uid}           # subcollection: allenamenti condivisi
-```
-
-La struttura esatta sarà definita in IT-05 dopo la scelta Realtime DB vs Firestore.
-
-### Persistenza locale (SQLite)
-
-Tabelle SQLite (`sqlite-net-pcl`):
-
-| Tabella | Campi chiave | Note |
-| --- | --- | --- |
-| `ExerciseCache` | Id, Name, BodyPart, Equipment, GifUrl, LastUsed | Max 50 righe, LRU |
-| `Workout` | Id, Date, Duration, Notes, IsSynced | IsSynced per coda sync |
-| `WorkoutExercise` | Id, WorkoutId, ExerciseId, ExerciseName | FK a Workout |
-| `ExerciseSet` | Id, WorkoutExerciseId, SetNumber, WeightKg, Reps | FK a WorkoutExercise |
-| `BodyWeight` | Id, Date, WeightKg | Dati sensibili, solo locale |
-| `BodyMeasurement` | Id, Date, ChestCm, WaistCm, HipsCm, ArmsCm, LegsCm | Dati sensibili, solo locale |
-| `User` | FirebaseUid, Username, Email | Cache profilo locale |
-| `WorkoutPlan` | Id, Name, Description | Piani precaricati |
-| `PlanDay` | Id, PlanId, DayName, Order | FK a WorkoutPlan |
-| `PlanExercise` | Id, PlanDayId, ExerciseName, Sets, MinReps, MaxReps | FK a PlanDay |
-
-Una sola `SQLiteAsyncConnection` condivisa, inizializzata da `DatabaseService` (singleton).
-
-### Flusso offline-first
-
-1. L'utente apre il catalogo: `ExerciseService` prova API → se fallisce, carica da `ExerciseCache`.
-2. L'utente avvia allenamento: esercizi presi da catalogo (API o cache).
-3. Salvataggio: scrittura SQLite con `IsSynced = false`.
-4. `SyncService` ascolta `IConnectivity`: quando rete disponibile, itera workout con `IsSynced = false` e li invia a Firebase.
-5. Dopo sync riuscito: `IsSynced = true`.
-6. Peso e misure: solo SQLite, mai sincronizzati.
-
-## 8. Dependency injection e composition root
 
 ```csharp
-// MauiProgram.cs
-builder.Services.AddSingleton<DatabaseService>();
-builder.Services.AddSingleton<IConnectivity>(Connectivity.Current);
-
-// HTTP client ExerciseDB
-builder.Services.AddHttpClient<ExerciseApiService>(client =>
-{
-    client.BaseAddress = new Uri("https://exercisedb.p.rapidapi.com");
-    client.DefaultRequestHeaders.Add("X-RapidAPI-Key", apiKey);
-    client.DefaultRequestHeaders.Add("X-RapidAPI-Host", "exercisedb.p.rapidapi.com");
-});
-
-// Firebase
-builder.Services.AddSingleton<FirebaseAuthService>();
-builder.Services.AddSingleton<FirebaseDatabaseService>();
-
-// Services
-builder.Services.AddSingleton<ExerciseCacheService>();
-builder.Services.AddSingleton<ExerciseService>();
-builder.Services.AddSingleton<SyncService>();
-builder.Services.AddSingleton<SocialService>();
-
-// Repositories
-builder.Services.AddSingleton<ExerciseCacheRepository>();
-builder.Services.AddSingleton<WorkoutRepository>();
-builder.Services.AddSingleton<BodyRepository>();
-builder.Services.AddSingleton<UserRepository>();
-builder.Services.AddSingleton<WorkoutPlanRepository>();
-
-// ViewModels (transient)
-builder.Services.AddTransient<DashboardViewModel>();
-builder.Services.AddTransient<CatalogViewModel>();
-builder.Services.AddTransient<ActiveWorkoutViewModel>();
-// ... tutti i ViewModel
-
-// Pages (transient)
-builder.Services.AddTransient<DashboardPage>();
-builder.Services.AddTransient<CatalogPage>();
-// ... tutte le Pages
+// Route di dettaglio
+Routing.RegisterRoute("activeWorkout", typeof(ActiveWorkoutPage));
+Routing.RegisterRoute("notifications", typeof(NotificationsPage));
+Routing.RegisterRoute("settings", typeof(SettingsPage));
+Routing.RegisterRoute("profile", typeof(ProfilePage));
+Routing.RegisterRoute("startSession", typeof(StartSessionPage));
+Routing.RegisterRoute("login", typeof(LoginPage));
+Routing.RegisterRoute("friendRequests", typeof(FriendRequestsPage));
 ```
 
-I ViewModel ricevono i servizi via costruttore. I comandi usano `[RelayCommand]` con `async Task`.
+## 5. PocketBase Service
 
-## 9. Error handling e logging
+### Metodi principali
 
-- Le eccezioni di rete (`HttpRequestException`, `TaskCanceledException`) sono intercettate nei servizi API e tradotte in stati `ErrorMessage` nei ViewModel.
-- Le eccezioni di parsing (`JsonException`) sono intercettate nel mapping DTO e generano stato di errore con messaggio "Dati non disponibili. Riprova più tardi."
-- Gli errori SQLite sono loggati e propagati come `ErrorMessage` generico.
-- Firebase Auth errori: mappatura dei codici Firebase (`EMAIL_EXISTS`, `INVALID_PASSWORD`, etc.) a messaggi in italiano.
-- Logging via `ILogger<T>` standard di .NET, senza telemetria esterna.
-- La chiave API ExerciseDB e le chiavi Firebase NON sono versionate: gestite via file di configurazione escluso da git (es. `appsettings.local.json` o `Constants.cs` escluso).
+| Metodo | Descrizione |
+|--------|-------------|
+| `LoginAsync(email, password)` | Auth PocketBase, salva token e user |
+| `RegisterAsync(email, password, name)` | Crea account + auth |
+| `TryAutoLoginAsync()` | Login con credenziali salvate in Preferences |
+| `Logout()` | Cancella token e credenziali |
+| `RefreshUserAsync()` | Ricarica record utente (per avatar dopo upload) |
+| `UpdateUserAsync(name, bio)` | PATCH nome e bio |
+| `UploadAvatarAsync(stream, filename)` | Multipart PATCH file avatar |
+| `GetFileUrl(collectionId, recordId, filename)` | URL con token per file PocketBase |
+| `GetMyWorkoutsAsync(limit)` | Lista allenamenti utente (JsonDocument parsing) |
+| `GetFollowedWorkoutsAsync()` | Allenamenti degli amici seguiti + avatar |
+| `SaveWorkoutPlanAsync(name, date, volume, duration, exercises)` | Salva allenamento |
+| `LikeWorkoutAsync(workoutId)` | GET liked_by → aggiungi userId → PATCH |
+| `UnlikeWorkoutAsync(workoutId)` | GET liked_by → rimuovi userId → PATCH |
+| `SearchUsersAsync(query)` | Ricerca utenti per nome |
+| `SendFollowRequestAsync(targetUserId)` | Crea social_graph record |
+| `AcceptFollowRequestAsync(recordId)` | PATCH status = "accepted" |
+| `RejectFollowRequestAsync(recordId)` | PATCH status = "rejected" |
+| `GetPendingRequestsAsync()` | Richieste in sospeso (to_user = current) |
+| `GetFollowingUserIdsAsync()` | Lista ID utenti seguiti |
+| `GetLikeNotificationsAsync()` | Chi ha messo like a quali workout |
 
-## 10. Decisioni aperte e TBD
+### Collezioni PocketBase
 
-- **TBD**: Realtime Database vs Firestore — scelta da fare in IT-05 dopo valutazione:
-  - Realtime DB: più semplice, query limitate, buono per leaderboard semplici.
-  - Firestore: query più potenti, subcollection, meglio per feed e confronti.
-- **TBD**: Libreria grafici — Microcharts (leggera, open source) vs LiveChartsCore (più potente, MAUI support). Da valutare in IT-04.
-- **TBD**: Strategia esatta di sync conflitti — per MVP, last-write-wins basato su timestamp. Se emergono conflitti reali, valutare merge in IT-05.
-- **TBD**: Nome progetto nel file system — `src/GymTracker.Mobile/` è proposto. Confermare in IT-01.
+| Collection | Campi | API Rules |
+|-----------|-------|-----------|
+| `users` (built-in) | email, password, name, bio, avatar | Auth PocketBase |
+| `logged_workouts` | user, user_name, name, date, exercises (json), exercise_data (json), volume (num), duration (num), likes (num), liked_by (json) | List/Search/View/Update: `@request.auth.id != ""` |
+| `social_graph` | from_user, from_name, to_user, status | Create/List: `@request.auth.id != ""` |
+| `excercise` | name, bodyPart, equipment, instructions (json), imageUrl (url), category, level, force, mechanic | Create/List: `@request.auth.id != ""` |
+
+## 6. Theme Service
+
+```csharp
+public class ThemeService
+{
+    private readonly Dictionary<string, string> darkPalette;
+    private readonly Dictionary<string, string> lightPalette;
+
+    public void Apply(bool isDark)
+    {
+        var palette = isDark ? darkPalette : lightPalette;
+        foreach (var (key, hex) in palette)
+            Application.Current.Resources[key] = Color.FromArgb(hex);
+        Application.Current.UserAppTheme = isDark ? AppTheme.Dark : AppTheme.Light;
+    }
+}
+```
+
+- I colori sono definiti inline come `Dictionary<string, string>` (no dipendenze file XAML a runtime)
+- `WriteResources()` aggiorna i valori nello stesso dizionario → `DynamicResource` si aggiorna automaticamente
+- `UserAppTheme` sync per status bar Android
+
+## 7. Build Secrets
+
+```
+.env (root) → MSBuild Copy → Resources/Raw/gymtracker.env → FileSystem.OpenAppPackageFileAsync → Dictionary
+```
+
+- `ConcurrentDictionary<string, string>` per thread safety
+- `catch (Exception)` generico per robustezza
+- `.gitignore` esclude `.env` e `**/Resources/Raw/*.env`
+- `.env.example` fornito come template senza valori reali
+
+## 8. Flusso auto-login
+
+```
+App.CreateWindow()
+  ├── ThemeService.Initialize()
+  ├── Mostra LoginPage
+  └── window.Created → InitializeAsync()
+        ├── BuildSecrets.LoadAsync()
+        ├── PocketBaseService.Initialize()
+        └── ExerciseApiService.Initialize()
+
+LoginViewModel costruttore:
+  └── Task.Run → TryAutoLoginAsync()
+        └── Se successo: window.Page = new AppShell()
+```
+
+## 9. Display Models (classi interne ai ViewModel)
+
+| Classe | ViewModel | Campi |
+|--------|-----------|-------|
+| `SquadMember` | HomeViewModel | Name, Initial, AvatarSource, HasWorkout, HasAvatar |
+| `FeedPost` | FeedViewModel | WorkoutId, UserName, Initial, TimeAgo, Title, ExercisesList, Volume, Duration, Likes, IsLiked, HeartIcon, AvatarSource, HasAvatar |
+| `UserSearchResult` | FeedViewModel | UserId, Name, Initial, IsFollowing, FollowLabel, AvatarSource, HasAvatar |
+| `LiftEntry` | StatsViewModel | Name, Label, Weight |
+| `LikeNotification` | StatsViewModel | WorkoutName, LikeCount, Date |
+| `CalendarDay` | StatsViewModel | Day, HasWorkout, IsToday |
+| `ProfileWorkout` | ProfileViewModel | Title, Date, Duration, Volume, Likes, BorderColor |
+| `FriendRequestItem` | FriendRequestsViewModel | RequestId, FromUserId, FromName |
+| `LikeNotificationItem` | FriendRequestsViewModel | LikerName, WorkoutName |
+| `ProtocolCard` | StartSessionViewModel | Id, Name, ExerciseCount, Duration, HasExercises |
+| `ExerciseSearchResult` | ActiveWorkoutViewModel | Id, Name, BodyPart, Equipment, ImageUrl |
+
+## 10. Flusso dati tipico (START WORKOUT)
+
+```
+1. HomePage: tap "▶ START WORKOUT"
+2. Shell.GoToAsync("startSession")
+3. StartSessionPage: tap piano salvato o Quick Start
+4. Shell.GoToAsync("activeWorkout", { mode, planId })
+5. ActiveWorkoutPage: cerca esercizi da ExerciseDB API
+6. Aggiungi esercizio → aggiungi set (kg, reps)
+7. Tap ✓ per completare set (LimeGreen fill)
+8. Tap FINISH → ActiveWorkoutViewModel.SaveWorkoutAsync()
+9. PocketBaseService.SaveWorkoutPlanAsync() → POST logged_workouts
+10. WeakReferenceMessenger.Send(WorkoutSavedMessage)
+11. HomeViewModel/StatsViewModel/ProfileViewModel ricevono messaggio
+12. Refresh automatico: LoadAsync() in tutti i ViewModel
+```
