@@ -594,14 +594,12 @@ public class PocketBaseService
             var getRes = await http.SendAsync(getReq);
             if (!getRes.IsSuccessStatusCode)
             {
-                System.Diagnostics.Debug.WriteLine($"[PB Like] GET fail {getRes.StatusCode}: {await getRes.Content.ReadAsStringAsync()}");
+                System.Diagnostics.Debug.WriteLine($"[PB Like] GET fail {getRes.StatusCode}");
                 return (false, "Impossibile leggere il workout. Verifica API Rule 'View' su PocketBase.");
             }
 
-            var record = await getRes.Content.ReadFromJsonAsync<LoggedWorkoutRecord>(JsonOptions);
-            if (record == null) return (false, "Workout non trovato.");
-
-            var likedBy = record.LikedBy ?? new List<string>();
+            var body = await getRes.Content.ReadAsStringAsync();
+            var (likedBy, likes) = ParseLikesFromResponse(body);
             if (likedBy.Contains(currentUser.Id))
                 return (true, string.Empty);
 
@@ -620,6 +618,7 @@ public class PocketBaseService
                 System.Diagnostics.Debug.WriteLine($"[PB Like] PATCH fail {response.StatusCode}: {errBody[..Math.Min(errBody.Length, 200)]}");
                 return (false, "Like non riuscito. Verifica API Rule 'Update' su PocketBase.");
             }
+            System.Diagnostics.Debug.WriteLine($"[PB Like] OK, likes={likedBy.Count}");
             return (true, string.Empty);
         }
         catch (Exception ex) { return (false, ex.Message); }
@@ -636,10 +635,8 @@ public class PocketBaseService
             var getRes = await http.SendAsync(getReq);
             if (!getRes.IsSuccessStatusCode) return (false, "Workout non trovato.");
 
-            var record = await getRes.Content.ReadFromJsonAsync<LoggedWorkoutRecord>(JsonOptions);
-            if (record == null) return (false, "Workout non trovato.");
-
-            var likedBy = record.LikedBy ?? new List<string>();
+            var body = await getRes.Content.ReadAsStringAsync();
+            var (likedBy, likes) = ParseLikesFromResponse(body);
             likedBy.Remove(currentUser.Id);
             var payload = new { liked_by = likedBy, likes = likedBy.Count };
             var json = JsonSerializer.Serialize(payload, JsonOptions);
@@ -652,6 +649,25 @@ public class PocketBaseService
             return response.IsSuccessStatusCode ? (true, string.Empty) : (false, "Errore unlike.");
         }
         catch (Exception ex) { return (false, ex.Message); }
+    }
+
+    private static (List<string> LikedBy, int Likes) ParseLikesFromResponse(string body)
+    {
+        var likedBy = new List<string>();
+        var likes = 0;
+        try
+        {
+            using var doc = JsonDocument.Parse(body);
+            if (doc.RootElement.TryGetProperty("liked_by", out var arr) && arr.ValueKind == JsonValueKind.Array)
+            {
+                foreach (var el in arr.EnumerateArray())
+                    likedBy.Add(el.GetString() ?? "");
+            }
+            if (doc.RootElement.TryGetProperty("likes", out var l) && l.TryGetInt32(out var lv))
+                likes = lv;
+        }
+        catch { }
+        return (likedBy, likes);
     }
 
     public async Task<string?> GetCachedExerciseImageAsync(string exerciseName)

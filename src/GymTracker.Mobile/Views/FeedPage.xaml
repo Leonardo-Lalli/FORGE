@@ -21,7 +21,7 @@
                     <TapGestureRecognizer Command="{Binding OpenProfileCommand}" />
                 </Border.GestureRecognizers>
                 <Label Text="EL" FontFamily="OpenSansSemibold" FontSize="14"
-                       TextColor="{DynamicResource Primary}"
+                       TextColor="{DynamicResource Primary}" InputTransparent="True"
                        HorizontalOptions="Center" VerticalOptions="Center" />
             </Border>
             <Label Grid.Column="1" Text="FORGE ELITE"
