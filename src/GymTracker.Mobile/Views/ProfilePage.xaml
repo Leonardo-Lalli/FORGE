@@ -57,15 +57,9 @@
                         <Border.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding ChangeAvatarCommand}" />
                         </Border.GestureRecognizers>
-                        <Image Aspect="AspectFill"
+                        <Image Source="{Binding AvatarUrl}" Aspect="AspectFill"
                                 WidthRequest="128" HeightRequest="128"
-                                IsVisible="{Binding HasAvatar}">
-                            <Image.Source>
-                                <UriImageSource Uri="{Binding AvatarUrl}"
-                                                CacheValidity="0"
-                                                CachingEnabled="False" />
-                            </Image.Source>
-                        </Image>
+                                IsVisible="{Binding HasAvatar}" />
                         <Label Text="{Binding AvatarInitials}"
                                FontFamily="OpenSansSemibold" FontSize="40"
                                TextColor="{DynamicResource OnSurface}"
