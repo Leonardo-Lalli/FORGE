@@ -5,143 +5,220 @@
     xmlns:vm="clr-namespace:GymTracker.Mobile.ViewModels"
     x:Class="GymTracker.Mobile.Views.LoginPage"
     x:DataType="vm:LoginViewModel"
-    Title="FORGE_ELITE"
+    Title="FORGE."
     Shell.NavBarIsVisible="False">
 
-    <Grid BackgroundColor="{DynamicResource Surface}" Padding="32">
+    <Grid BackgroundColor="{DynamicResource Surface}">
 
-        <VerticalStackLayout Spacing="24" VerticalOptions="Center" MaximumWidthRequest="400">
+        <!-- Decorative background blobs -->
+        <Ellipse Fill="{DynamicResource Primary}" Opacity="0.08"
+                 WidthRequest="300" HeightRequest="300"
+                 HorizontalOptions="End" VerticalOptions="Start"
+                 TranslationX="80" TranslationY="-60" />
+        <Ellipse Fill="{DynamicResource Primary}" Opacity="0.05"
+                 WidthRequest="200" HeightRequest="200"
+                 HorizontalOptions="Start" VerticalOptions="End"
+                 TranslationX="-40" TranslationY="40" />
 
-            <!-- Logo / Title -->
-            <VerticalStackLayout Spacing="4" HorizontalOptions="Center">
-                <Border BackgroundColor="{DynamicResource Primary}"
-                        StrokeShape="RoundRectangle 24"
-                        WidthRequest="72" HeightRequest="72" Padding="0"
-                        HorizontalOptions="Center">
-                    <Label Text="FE" FontFamily="OpenSansSemibold" FontSize="28" FontAttributes="Bold"
-                           TextColor="{DynamicResource OnPrimary}"
-                           HorizontalOptions="Center" VerticalOptions="Center" />
-                </Border>
-                <Label Text="FORGE_ELITE"
-                       FontFamily="OpenSansSemibold" FontSize="24" FontAttributes="Bold"
-                       TextColor="{DynamicResource OnSurface}"
-                       HorizontalTextAlignment="Center"
-                       CharacterSpacing="-1"
-                       Margin="0,16,0,0" />
-                <Label Text="{Binding IsRegistering, StringFormat='Track your #progress with the squad'}"
-                       FontFamily="OpenSansRegular" FontSize="14"
-                       TextColor="{DynamicResource OnSurfaceVariant}"
-                       HorizontalTextAlignment="Center" />
-            </VerticalStackLayout>
+        <!-- Main Content -->
+        <ScrollView Padding="32,60,32,32">
+            <VerticalStackLayout Spacing="32" MaximumWidthRequest="400" HorizontalOptions="Center">
 
-            <!-- Error Message -->
-            <Border IsVisible="{Binding HasError}"
-                    BackgroundColor="{DynamicResource ErrorContainer}"
-                    StrokeShape="RoundRectangle 8"
-                    Padding="12" Stroke="{DynamicResource Error}" StrokeThickness="1">
-                <Label Text="{Binding ErrorMessage}"
-                       FontFamily="OpenSansRegular" FontSize="13"
-                       TextColor="{DynamicResource OnErrorContainer}" />
-            </Border>
-
-            <!-- Register: Name field -->
-            <VerticalStackLayout IsVisible="{Binding IsRegistering}" Spacing="16">
-                <Border BackgroundColor="{DynamicResource SurfaceContainer}"
-                        StrokeShape="RoundRectangle 12"
-                        Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1"
-                        Padding="14,4">
-                    <Entry Placeholder="Name"
-                           Text="{Binding Name}"
-                           FontFamily="OpenSansRegular" FontSize="16"
+                <!-- Logo -->
+                <VerticalStackLayout Spacing="4" HorizontalOptions="Center">
+                    <Border BackgroundColor="{DynamicResource Primary}"
+                            StrokeShape="RoundRectangle 20"
+                            WidthRequest="64" HeightRequest="64" Padding="0"
+                            HorizontalOptions="Center">
+                        <Label Text="FE" FontFamily="OpenSansSemibold" FontSize="26" FontAttributes="Bold"
+                               TextColor="{DynamicResource OnPrimary}"
+                               HorizontalOptions="Center" VerticalOptions="Center" />
+                    </Border>
+                    <Label Text="FORGE."
+                           FontFamily="OpenSansSemibold" FontSize="32" FontAttributes="Bold"
                            TextColor="{DynamicResource OnSurface}"
-                           PlaceholderColor="{DynamicResource Outline}"
-                           BackgroundColor="Transparent" />
+                           HorizontalTextAlignment="Center"
+                           CharacterSpacing="-1.5"
+                           Margin="0,12,0,0" />
+                    <Label Text="ELITE TERMINAL"
+                           FontFamily="OpenSansSemibold" FontSize="11"
+                           TextColor="{DynamicResource Primary}"
+                           CharacterSpacing="4"
+                           HorizontalTextAlignment="Center" />
+                </VerticalStackLayout>
+
+                <!-- Heading -->
+                <VerticalStackLayout Spacing="4" HorizontalOptions="Center">
+                    <Label Text="System Access"
+                           FontFamily="OpenSansSemibold" FontSize="22" FontAttributes="Bold"
+                           TextColor="{DynamicResource OnSurface}"
+                           HorizontalTextAlignment="Center" />
+                    <Label Text="Authenticate to access your training protocols"
+                           FontFamily="OpenSansRegular" FontSize="13"
+                           TextColor="{DynamicResource OnSurfaceVariant}"
+                           HorizontalTextAlignment="Center"
+                           IsVisible="{Binding IsRegistering, Converter={StaticResource InverseBoolConverter}}" />
+                    <Label Text="Create your elite identity"
+                           FontFamily="OpenSansRegular" FontSize="13"
+                           TextColor="{DynamicResource OnSurfaceVariant}"
+                           HorizontalTextAlignment="Center"
+                           IsVisible="{Binding IsRegistering}" />
+                </VerticalStackLayout>
+
+                <!-- Error -->
+                <Border IsVisible="{Binding HasError}"
+                        BackgroundColor="{DynamicResource ErrorContainer}"
+                        StrokeShape="RoundRectangle 8"
+                        Padding="14" Stroke="{DynamicResource Error}" StrokeThickness="1">
+                    <Label Text="{Binding ErrorMessage}"
+                           FontFamily="OpenSansRegular" FontSize="13"
+                           TextColor="{DynamicResource OnErrorContainer}" />
                 </Border>
+
+                <!-- Register: Name -->
+                <Border BackgroundColor="{DynamicResource SurfaceContainer}"
+                        StrokeShape="RoundRectangle 14"
+                        Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1"
+                        Padding="16,0"
+                        IsVisible="{Binding IsRegistering}">
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12" VerticalOptions="Center">
+                        <Label Grid.Column="0" Text="👤" FontSize="18" VerticalOptions="Center"
+                               TextColor="{DynamicResource OnSurfaceVariant}" />
+                        <Entry Grid.Column="1" Placeholder="Athlete Name"
+                               Text="{Binding Name}"
+                               FontFamily="OpenSansRegular" FontSize="16"
+                               TextColor="{DynamicResource OnSurface}"
+                               PlaceholderColor="{DynamicResource Outline}"
+                               BackgroundColor="Transparent"
+                               VerticalOptions="Center" />
+                    </Grid>
+                </Border>
+
+                <!-- Email -->
+                <Border BackgroundColor="{DynamicResource SurfaceContainer}"
+                        StrokeShape="RoundRectangle 14"
+                        Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1"
+                        Padding="16,0">
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12" VerticalOptions="Center">
+                        <Label Grid.Column="0" Text="✉" FontSize="18" VerticalOptions="Center"
+                               TextColor="{DynamicResource OnSurfaceVariant}" />
+                        <Entry Grid.Column="1" Placeholder="Email"
+                               Text="{Binding Email}"
+                               Keyboard="Email"
+                               FontFamily="OpenSansRegular" FontSize="16"
+                               TextColor="{DynamicResource OnSurface}"
+                               PlaceholderColor="{DynamicResource Outline}"
+                               BackgroundColor="Transparent"
+                               VerticalOptions="Center" />
+                    </Grid>
+                </Border>
+
+                <!-- Password -->
+                <Border BackgroundColor="{DynamicResource SurfaceContainer}"
+                        StrokeShape="RoundRectangle 14"
+                        Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1"
+                        Padding="16,0">
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12" VerticalOptions="Center">
+                        <Label Grid.Column="0" Text="🔒" FontSize="18" VerticalOptions="Center"
+                               TextColor="{DynamicResource OnSurfaceVariant}" />
+                        <Entry Grid.Column="1" Placeholder="Password"
+                               Text="{Binding Password}"
+                               IsPassword="True"
+                               FontFamily="OpenSansRegular" FontSize="16"
+                               TextColor="{DynamicResource OnSurface}"
+                               PlaceholderColor="{DynamicResource Outline}"
+                               BackgroundColor="Transparent"
+                               VerticalOptions="Center" />
+                    </Grid>
+                </Border>
+
+                <!-- Register: Confirm Password -->
+                <Border BackgroundColor="{DynamicResource SurfaceContainer}"
+                        StrokeShape="RoundRectangle 14"
+                        Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1"
+                        Padding="16,0"
+                        IsVisible="{Binding IsRegistering}">
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12" VerticalOptions="Center">
+                        <Label Grid.Column="0" Text="🔒" FontSize="18" VerticalOptions="Center"
+                               TextColor="{DynamicResource OnSurfaceVariant}" />
+                        <Entry Grid.Column="1" Placeholder="Confirm Password"
+                               Text="{Binding PasswordConfirm}"
+                               IsPassword="True"
+                               FontFamily="OpenSansRegular" FontSize="16"
+                               TextColor="{DynamicResource OnSurface}"
+                               PlaceholderColor="{DynamicResource Outline}"
+                               BackgroundColor="Transparent"
+                               VerticalOptions="Center" />
+                    </Grid>
+                </Border>
+
+                <!-- Auth Button -->
+                <Button Text="ENTRA"
+                        IsVisible="{Binding IsRegistering, Converter={StaticResource InverseBoolConverter}}"
+                        BackgroundColor="{DynamicResource Primary}"
+                        TextColor="{DynamicResource OnPrimary}"
+                        FontFamily="OpenSansSemibold" FontSize="18" FontAttributes="Bold"
+                        HeightRequest="54" CornerRadius="14"
+                        CharacterSpacing="2"
+                        Command="{Binding LoginCommand}" />
+
+                <Button Text="CREATE IDENTITY"
+                        IsVisible="{Binding IsRegistering}"
+                        BackgroundColor="{DynamicResource Primary}"
+                        TextColor="{DynamicResource OnPrimary}"
+                        FontFamily="OpenSansSemibold" FontSize="18" FontAttributes="Bold"
+                        HeightRequest="54" CornerRadius="14"
+                        CharacterSpacing="2"
+                        Command="{Binding RegisterCommand}" />
+
+                <!-- Loading -->
+                <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}"
+                                   HorizontalOptions="Center" Color="{DynamicResource Primary}" />
+
+                <!-- Toggle Login/Register -->
+                <HorizontalStackLayout Spacing="4" HorizontalOptions="Center"
+                                       IsVisible="{Binding IsRegistering, Converter={StaticResource InverseBoolConverter}}">
+                    <Label Text="New to Forge?"
+                           FontFamily="OpenSansRegular" FontSize="14"
+                           TextColor="{DynamicResource OnSurfaceVariant}" VerticalOptions="Center" />
+                    <Label Text="Create identity"
+                           FontFamily="OpenSansSemibold" FontSize="14"
+                           TextColor="{DynamicResource Primary}" VerticalOptions="Center">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding ToggleModeCommand}" />
+                        </Label.GestureRecognizers>
+                    </Label>
+                </HorizontalStackLayout>
+
+                <HorizontalStackLayout Spacing="4" HorizontalOptions="Center"
+                                       IsVisible="{Binding IsRegistering}">
+                    <Label Text="Already registered?"
+                           FontFamily="OpenSansRegular" FontSize="14"
+                           TextColor="{DynamicResource OnSurfaceVariant}" VerticalOptions="Center" />
+                    <Label Text="Sign in"
+                           FontFamily="OpenSansSemibold" FontSize="14"
+                           TextColor="{DynamicResource Primary}" VerticalOptions="Center">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding ToggleModeCommand}" />
+                        </Label.GestureRecognizers>
+                    </Label>
+                </HorizontalStackLayout>
+
+                <!-- Footer links -->
+                <Grid ColumnDefinitions="Auto,*,Auto" HorizontalOptions="Center" Margin="0,20,0,0">
+                    <Label Grid.Column="0" Text="Protocols"
+                           FontFamily="OpenSansRegular" FontSize="12"
+                           TextColor="{DynamicResource TextSecondary}" />
+                    <Label Grid.Column="1" Text="·" FontSize="12"
+                           TextColor="{DynamicResource TextSecondary}"
+                           HorizontalTextAlignment="Center" Margin="12,0" />
+                    <Label Grid.Column="2" Text="Directives"
+                           FontFamily="OpenSansRegular" FontSize="12"
+                           TextColor="{DynamicResource TextSecondary}" />
+                </Grid>
+
             </VerticalStackLayout>
-
-            <!-- Email -->
-            <Border BackgroundColor="{DynamicResource SurfaceContainer}"
-                    StrokeShape="RoundRectangle 12"
-                    Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1"
-                    Padding="14,4">
-                <Entry Placeholder="Email"
-                       Text="{Binding Email}"
-                       Keyboard="Email"
-                       FontFamily="OpenSansRegular" FontSize="16"
-                       TextColor="{DynamicResource OnSurface}"
-                       PlaceholderColor="{DynamicResource Outline}"
-                       BackgroundColor="Transparent" />
-            </Border>
-
-            <!-- Password -->
-            <Border BackgroundColor="{DynamicResource SurfaceContainer}"
-                    StrokeShape="RoundRectangle 12"
-                    Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1"
-                    Padding="14,4">
-                <Entry Placeholder="Password"
-                       Text="{Binding Password}"
-                       IsPassword="True"
-                       FontFamily="OpenSansRegular" FontSize="16"
-                       TextColor="{DynamicResource OnSurface}"
-                       PlaceholderColor="{DynamicResource Outline}"
-                       BackgroundColor="Transparent" />
-            </Border>
-
-            <!-- Register: Confirm Password -->
-            <Border IsVisible="{Binding IsRegistering}"
-                    BackgroundColor="{DynamicResource SurfaceContainer}"
-                    StrokeShape="RoundRectangle 12"
-                    Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1"
-                    Padding="14,4">
-                <Entry Placeholder="Confirm Password"
-                       Text="{Binding PasswordConfirm}"
-                       IsPassword="True"
-                       FontFamily="OpenSansRegular" FontSize="16"
-                       TextColor="{DynamicResource OnSurface}"
-                       PlaceholderColor="{DynamicResource Outline}"
-                       BackgroundColor="Transparent" />
-            </Border>
-
-            <!-- Login/Register Button -->
-            <Button Text="{Binding IsRegistering, StringFormat='REGISTER'}"
-                    IsVisible="{Binding IsRegistering}"
-                    BackgroundColor="{DynamicResource Primary}"
-                    TextColor="{DynamicResource OnPrimary}"
-                    FontFamily="OpenSansSemibold" FontSize="16" FontAttributes="Bold"
-                    HeightRequest="52" CornerRadius="12"
-                    Command="{Binding RegisterCommand}" />
-
-            <Button Text="LOGIN"
-                    IsVisible="{Binding IsRegistering, Converter={StaticResource InverseBoolConverter}}"
-                    BackgroundColor="{DynamicResource Primary}"
-                    TextColor="{DynamicResource OnPrimary}"
-                    FontFamily="OpenSansSemibold" FontSize="16" FontAttributes="Bold"
-                    HeightRequest="52" CornerRadius="12"
-                    Command="{Binding LoginCommand}" />
-
-            <!-- Loading -->
-            <ActivityIndicator IsRunning="{Binding IsBusy}"
-                               IsVisible="{Binding IsBusy}"
-                               HorizontalOptions="Center"
-                               Color="{DynamicResource Primary}" />
-
-            <!-- Toggle Mode -->
-            <HorizontalStackLayout Spacing="4" HorizontalOptions="Center">
-                <Label Text="{Binding IsRegistering, StringFormat='Have an account?'}"
-                       FontFamily="OpenSansRegular" FontSize="13"
-                       TextColor="{DynamicResource OnSurfaceVariant}"
-                       VerticalOptions="Center" />
-                <Label Text="{Binding IsRegistering, StringFormat='Log in'}"
-                       FontFamily="OpenSansSemibold" FontSize="13"
-                       TextColor="{DynamicResource Primary}"
-                       VerticalOptions="Center">
-                    <Label.GestureRecognizers>
-                        <TapGestureRecognizer Command="{Binding ToggleModeCommand}" />
-                    </Label.GestureRecognizers>
-                </Label>
-            </HorizontalStackLayout>
-
-        </VerticalStackLayout>
+        </ScrollView>
     </Grid>
 
 </ContentPage>

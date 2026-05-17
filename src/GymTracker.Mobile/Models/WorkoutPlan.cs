@@ -1,3 +1,6 @@
+using System.Collections.ObjectModel;
+using CommunityToolkit.Mvvm.ComponentModel;
+
 namespace GymTracker.Mobile.Models;
 
 public class WorkoutPlan
@@ -17,16 +20,22 @@ public class WorkoutExercise
     public string ExerciseName { get; set; } = string.Empty;
     public string BodyPart { get; set; } = string.Empty;
     public string Equipment { get; set; } = string.Empty;
+    public string ImageUrl { get; set; } = string.Empty;
+    public string GifUrl { get; set; } = string.Empty;
+    public string Notes { get; set; } = string.Empty;
+    public List<string> Instructions { get; set; } = new();
     public int Order { get; set; }
-    public List<ExerciseSet> Sets { get; set; } = new();
+    public int RestSeconds { get; set; }
+    public ObservableCollection<ExerciseSet> Sets { get; set; } = new();
     public bool IsCompleted { get; set; }
 }
 
-public class ExerciseSet
+public partial class ExerciseSet : ObservableObject
 {
     public string Id { get; set; } = Guid.NewGuid().ToString();
     public int SetNumber { get; set; }
-    public double WeightKg { get; set; }
-    public int Reps { get; set; }
-    public bool IsCompleted { get; set; }
+
+    [ObservableProperty] private double weightKg;
+    [ObservableProperty] private int reps;
+    [ObservableProperty] private bool isCompleted;
 }

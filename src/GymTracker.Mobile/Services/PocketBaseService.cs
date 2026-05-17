@@ -18,10 +18,15 @@ public class PocketBaseService
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase
     };
 
-    private bool initialized;
-
     public bool IsLoggedIn => !string.IsNullOrWhiteSpace(token);
     public PocketBaseUserRecord? CurrentUser => currentUser;
+    public string? Token => token;
+
+    public string GetFileUrl(string collectionId, string recordId, string fileName)
+    {
+        var baseUrl = secrets.Get("POCKETBASE_URL")?.TrimEnd('/') ?? "";
+        return $"{baseUrl}/api/files/{collectionId}/{recordId}/{fileName}?token={token}";
+    }
 
     public PocketBaseService(HttpClient http, BuildSecrets secrets)
     {
@@ -31,16 +36,10 @@ public class PocketBaseService
 
     private void EnsureInitialized()
     {
-        if (initialized) return;
-        initialized = true;
-        var baseUrl = secrets.Get("POCKETBASE_URL");
-        if (!string.IsNullOrWhiteSpace(baseUrl))
-            http.BaseAddress = new Uri(baseUrl.TrimEnd('/') + "/api/");
     }
 
     public void Initialize()
     {
-        EnsureInitialized();
     }
 
     public async Task<(bool Success, string Error)> LoginAsync(string email, string password)
@@ -149,6 +148,74 @@ public class PocketBaseService
         }
     }
 
+    public async Task<(bool Success, string Error)> UpdateUserAsync(string? name = null, string? bio = null)
+    {
+        EnsureInitialized();
+        if (currentUser == null || string.IsNullOrWhiteSpace(token))
+            return (false, "Non autenticato.");
+
+        try
+        {
+            var payload = new Dictionary<string, object?>();
+            if (name != null) payload["name"] = name;
+            if (bio != null) payload["bio"] = bio;
+
+            var json = JsonSerializer.Serialize(payload, JsonOptions);
+            var request = new HttpRequestMessage(HttpMethod.Patch,
+                $"collections/users/records/{currentUser.Id}")
+            {
+                Content = new StringContent(json, Encoding.UTF8, "application/json")
+            };
+            request.Headers.Authorization =
+                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+            var response = await http.SendAsync(request);
+            if (!response.IsSuccessStatusCode)
+            {
+                var body = await response.Content.ReadAsStringAsync();
+                return (false, ParseErrorMessage(body));
+            }
+
+            currentUser = await response.Content.ReadFromJsonAsync<PocketBaseUserRecord>(JsonOptions);
+            return (true, string.Empty);
+        }
+        catch (Exception ex)
+        {
+            return (false, ex.Message);
+        }
+    }
+
+    public async Task<bool> UploadAvatarAsync(Stream fileStream, string fileName)
+    {
+        if (currentUser == null || string.IsNullOrWhiteSpace(token))
+            return false;
+
+        try
+        {
+            using var content = new MultipartFormDataContent();
+            var streamContent = new StreamContent(fileStream);
+            streamContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(
+                fileName.EndsWith(".png") ? "image/png" : "image/jpeg");
+            content.Add(streamContent, "avatar", fileName);
+
+            var request = new HttpRequestMessage(HttpMethod.Patch,
+                $"collections/users/records/{currentUser.Id}")
+            {
+                Content = content
+            };
+            request.Headers.Authorization =
+                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+            var response = await http.SendAsync(request);
+            if (!response.IsSuccessStatusCode)
+                return false;
+
+            currentUser = await response.Content.ReadFromJsonAsync<PocketBaseUserRecord>(JsonOptions);
+            return true;
+        }
+        catch { return false; }
+    }
+
     public async Task<(bool Success, string Error)> GetListAsync<T>(string collection, string? filter = null)
     {
         EnsureInitialized();
@@ -222,6 +289,239 @@ public class PocketBaseService
     {
         Preferences.Set("pb_email", email);
         Preferences.Set("pb_password", password);
+    }
+
+    public async Task<List<PocketBaseUserRecord>> SearchUsersAsync(string query)
+    {
+        if (!IsLoggedIn) return new();
+        try
+        {
+            var url = $"collections/users/records?search={Uri.EscapeDataString(query)}&perPage=20";
+            var request = new HttpRequestMessage(HttpMethod.Get, url);
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            var response = await http.SendAsync(request);
+            if (!response.IsSuccessStatusCode)
+            {
+                System.Diagnostics.Debug.WriteLine($"[PB Search] status={response.StatusCode} body={await response.Content.ReadAsStringAsync()}");
+                return new();
+            }
+            var list = await response.Content.ReadFromJsonAsync<PocketBaseListResponse<PocketBaseUserRecord>>(JsonOptions);
+            return list?.Items ?? new();
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[PB Search] ex={ex.Message}");
+            return new();
+        }
+    }
+
+    public async Task<bool> SendFollowRequestAsync(string targetUserId)
+    {
+        if (!IsLoggedIn || currentUser == null) return false;
+        try
+        {
+            var payload = new
+            {
+                from_user = currentUser.Id,
+                from_name = currentUser.Name,
+                to_user = targetUserId,
+                status = "pending"
+            };
+            var (success, _) = await CreateRecordAsync("social_graph", payload);
+            return success;
+        }
+        catch { return false; }
+    }
+
+    public async Task<List<SocialGraphRecord>> GetPendingRequestsAsync()
+    {
+        if (!IsLoggedIn || currentUser == null) return new();
+        try
+        {
+            var filter = $"to_user=\"{currentUser.Id}\"&&status=\"pending\"";
+            var url = $"collections/social_graph/records?filter={Uri.EscapeDataString(filter)}&perPage=50";
+            var request = new HttpRequestMessage(HttpMethod.Get, url);
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            var response = await http.SendAsync(request);
+            if (!response.IsSuccessStatusCode) return new();
+            var list = await response.Content.ReadFromJsonAsync<PocketBaseListResponse<SocialGraphRecord>>(JsonOptions);
+            return list?.Items ?? new();
+        }
+        catch { return new(); }
+    }
+
+    public async Task<bool> AcceptFollowRequestAsync(string recordId)
+    {
+        if (!IsLoggedIn) return false;
+        try
+        {
+            var payload = new { status = "accepted" };
+            var json = JsonSerializer.Serialize(payload, JsonOptions);
+            var request = new HttpRequestMessage(HttpMethod.Patch, $"collections/social_graph/records/{recordId}")
+            {
+                Content = new StringContent(json, Encoding.UTF8, "application/json")
+            };
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            var response = await http.SendAsync(request);
+            return response.IsSuccessStatusCode;
+        }
+        catch { return false; }
+    }
+
+    public async Task<bool> RejectFollowRequestAsync(string recordId)
+    {
+        if (!IsLoggedIn) return false;
+        try
+        {
+            var payload = new { status = "rejected" };
+            var json = JsonSerializer.Serialize(payload, JsonOptions);
+            var request = new HttpRequestMessage(HttpMethod.Patch, $"collections/social_graph/records/{recordId}")
+            {
+                Content = new StringContent(json, Encoding.UTF8, "application/json")
+            };
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            var response = await http.SendAsync(request);
+            return response.IsSuccessStatusCode;
+        }
+        catch { return false; }
+    }
+
+    public async Task<List<string>> GetFollowingUserIdsAsync()
+    {
+        if (!IsLoggedIn || currentUser == null) return new();
+        try
+        {
+            var filter = $"from_user=\"{currentUser.Id}\"&&status=\"accepted\"";
+            var url = $"collections/social_graph/records?filter={Uri.EscapeDataString(filter)}&perPage=200";
+            var request = new HttpRequestMessage(HttpMethod.Get, url);
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            var response = await http.SendAsync(request);
+            if (!response.IsSuccessStatusCode) return new();
+            var list = await response.Content.ReadFromJsonAsync<PocketBaseListResponse<SocialGraphRecord>>(JsonOptions);
+            return list?.Items.Select(r => r.ToUser).ToList() ?? new();
+        }
+        catch { return new(); }
+    }
+
+    public async Task<List<LoggedWorkoutRecord>> GetMyWorkoutsAsync(int limit = 10)
+    {
+        if (!IsLoggedIn || currentUser == null) return new();
+        try
+        {
+            var filter = $"user=\"{currentUser.Id}\"";
+            var url = $"collections/logged_workouts/records?filter={Uri.EscapeDataString(filter)}&perPage={limit}&sort=-created";
+            var request = new HttpRequestMessage(HttpMethod.Get, url);
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            var response = await http.SendAsync(request);
+            if (!response.IsSuccessStatusCode) return new();
+            var list = await response.Content.ReadFromJsonAsync<PocketBaseListResponse<LoggedWorkoutRecord>>(JsonOptions);
+            return list?.Items ?? new();
+        }
+        catch { return new(); }
+    }
+
+    public async Task<List<LoggedWorkoutRecord>> GetFollowedWorkoutsAsync()
+    {
+        if (!IsLoggedIn || currentUser == null) return new();
+        try
+        {
+            var followingIds = await GetFollowingUserIdsAsync();
+            if (followingIds.Count == 0) return new();
+
+            var filterParts = followingIds.Select(id => $"user=\"{id}\"").ToList();
+            var filter = string.Join("||", filterParts);
+            var url = $"collections/logged_workouts/records?filter={Uri.EscapeDataString(filter)}&perPage=30&sort=-created";
+            var request = new HttpRequestMessage(HttpMethod.Get, url);
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            var response = await http.SendAsync(request);
+            if (!response.IsSuccessStatusCode) return new();
+
+            var list = await response.Content.ReadFromJsonAsync<PocketBaseListResponse<LoggedWorkoutRecord>>(JsonOptions);
+            var records = list?.Items ?? new();
+
+            foreach (var r in records)
+            {
+                var user = followingIds.Contains(r.User) ? r.User : "";
+                if (!string.IsNullOrWhiteSpace(user))
+                {
+                    try
+                    {
+                        var userReq = new HttpRequestMessage(HttpMethod.Get, $"collections/users/records/{user}");
+                        userReq.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                        var userRes = await http.SendAsync(userReq);
+                        if (userRes.IsSuccessStatusCode)
+                        {
+                            var userRecord = await userRes.Content.ReadFromJsonAsync<PocketBaseUserRecord>(JsonOptions);
+                            if (userRecord != null) r.UserName = userRecord.Name;
+                        }
+                    }
+                    catch { }
+                }
+            }
+            return records;
+        }
+        catch { return new(); }
+    }
+
+    public async Task<(bool Success, string Error)> LikeWorkoutAsync(string workoutId)
+    {
+        if (!IsLoggedIn || currentUser == null) return (false, "Non autenticato.");
+
+        try
+        {
+            var getReq = new HttpRequestMessage(HttpMethod.Get, $"collections/logged_workouts/records/{workoutId}");
+            getReq.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            var getRes = await http.SendAsync(getReq);
+            if (!getRes.IsSuccessStatusCode) return (false, "Workout non trovato.");
+
+            var record = await getRes.Content.ReadFromJsonAsync<LoggedWorkoutRecord>(JsonOptions);
+            if (record == null) return (false, "Workout non trovato.");
+
+            var likedBy = record.LikedBy ?? new List<string>();
+            if (likedBy.Contains(currentUser.Id))
+                return (true, string.Empty);
+
+            likedBy.Add(currentUser.Id);
+            var payload = new { liked_by = likedBy, likes = likedBy.Count };
+            var json = JsonSerializer.Serialize(payload, JsonOptions);
+            var request = new HttpRequestMessage(HttpMethod.Patch, $"collections/logged_workouts/records/{workoutId}")
+            {
+                Content = new StringContent(json, Encoding.UTF8, "application/json")
+            };
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            var response = await http.SendAsync(request);
+            return response.IsSuccessStatusCode ? (true, string.Empty) : (false, "Errore like.");
+        }
+        catch (Exception ex) { return (false, ex.Message); }
+    }
+
+    public async Task<(bool Success, string Error)> UnlikeWorkoutAsync(string workoutId)
+    {
+        if (!IsLoggedIn || currentUser == null) return (false, "Non autenticato.");
+
+        try
+        {
+            var getReq = new HttpRequestMessage(HttpMethod.Get, $"collections/logged_workouts/records/{workoutId}");
+            getReq.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            var getRes = await http.SendAsync(getReq);
+            if (!getRes.IsSuccessStatusCode) return (false, "Workout non trovato.");
+
+            var record = await getRes.Content.ReadFromJsonAsync<LoggedWorkoutRecord>(JsonOptions);
+            if (record == null) return (false, "Workout non trovato.");
+
+            var likedBy = record.LikedBy ?? new List<string>();
+            likedBy.Remove(currentUser.Id);
+            var payload = new { liked_by = likedBy, likes = likedBy.Count };
+            var json = JsonSerializer.Serialize(payload, JsonOptions);
+            var request = new HttpRequestMessage(HttpMethod.Patch, $"collections/logged_workouts/records/{workoutId}")
+            {
+                Content = new StringContent(json, Encoding.UTF8, "application/json")
+            };
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            var response = await http.SendAsync(request);
+            return response.IsSuccessStatusCode ? (true, string.Empty) : (false, "Errore unlike.");
+        }
+        catch (Exception ex) { return (false, ex.Message); }
     }
 
     private static string ParseErrorMessage(string body)

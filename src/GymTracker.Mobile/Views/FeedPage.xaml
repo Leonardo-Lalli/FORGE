@@ -8,12 +8,11 @@
     Title="Feed"
     Shell.NavBarIsVisible="False">
 
-    <Grid RowDefinitions="Auto,*" BackgroundColor="{DynamicResource Surface}">
+    <Grid RowDefinitions="Auto,Auto,*" BackgroundColor="{DynamicResource Surface}">
 
-        <!-- TopBar — feed elite nero opaco mockup -->
+        <!-- TopBar -->
         <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto"
               Padding="24,16" BackgroundColor="{DynamicResource Surface}">
-            <!-- Left: Profile Elite avatar -->
             <Border Grid.Column="0" StrokeShape="RoundRectangle 999"
                     WidthRequest="40" HeightRequest="40" Padding="0"
                     BackgroundColor="{DynamicResource SurfaceContainerHigh}"
@@ -25,13 +24,11 @@
                        TextColor="{DynamicResource Primary}"
                        HorizontalOptions="Center" VerticalOptions="Center" />
             </Border>
-            <!-- Center: FORGE ELITE title -->
             <Label Grid.Column="1" Text="FORGE ELITE"
                    FontFamily="OpenSansSemibold" FontSize="20" FontAttributes="Bold"
                    TextColor="{DynamicResource Primary}"
                    HorizontalOptions="Center" VerticalOptions="Center"
                    CharacterSpacing="-1" />
-            <!-- Right: Settings -->
             <Border Grid.Column="2" BackgroundColor="{DynamicResource SurfaceContainer}"
                     StrokeShape="RoundRectangle 999" WidthRequest="40" HeightRequest="40" Padding="0"
                     Stroke="{DynamicResource OutlineVariant}" StrokeThickness="0.5">
@@ -44,160 +41,168 @@
             </Border>
         </Grid>
 
-        <!-- Feed Scroll -->
-        <ScrollView Grid.Row="1" Padding="24,16,24,100">
-            <VerticalStackLayout Spacing="32"
-                BindableLayout.ItemsSource="{Binding Posts}">
-                <BindableLayout.ItemTemplate>
-                    <DataTemplate x:DataType="vm:FeedPost">
+        <!-- Search Bar -->
+        <Border Grid.Row="1" Margin="24,0,24,8" BackgroundColor="{DynamicResource SurfaceContainer}"
+                StrokeShape="RoundRectangle 12"
+                Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1" Padding="12,4">
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                <Entry Grid.Column="0" Placeholder="Search athletes..."
+                       Text="{Binding SearchQuery}" FontFamily="Inter" FontSize="14"
+                       TextColor="{DynamicResource OnSurface}"
+                       PlaceholderColor="{DynamicResource Outline}"
+                       BackgroundColor="Transparent"
+                       ReturnType="Search"
+                       ReturnCommand="{Binding SearchUsersCommand}" />
+                <Border Grid.Column="1" BackgroundColor="{DynamicResource Primary}"
+                        StrokeShape="RoundRectangle 8" Padding="10,6">
+                    <Label Text="SEARCH" FontFamily="Lexend" FontSize="10" FontAttributes="Bold"
+                           TextColor="{DynamicResource OnPrimary}" VerticalOptions="Center">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding SearchUsersCommand}" />
+                        </Label.GestureRecognizers>
+                    </Label>
+                </Border>
+            </Grid>
+        </Border>
 
-                        <!-- Feed Card -->
-                        <Border BackgroundColor="{DynamicResource SurfaceContainerLowest}"
-                                StrokeShape="RoundRectangle 16"
-                                Stroke="{DynamicResource OutlineVariant}" StrokeThickness="0.5"
-                                Padding="24">
-                            <VerticalStackLayout Spacing="16">
+        <!-- Content -->
+        <ScrollView Grid.Row="2" Padding="24,0,24,100">
+            <VerticalStackLayout Spacing="16">
 
-                                <!-- Header row -->
-                                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
-                                    <Border Grid.Column="0" StrokeShape="RoundRectangle 999"
-                                            WidthRequest="48" HeightRequest="48" Padding="0"
-                                            BackgroundColor="{DynamicResource PrimaryContainer}"
-                                            Stroke="{DynamicResource Surface}" StrokeThickness="2">
-                                        <Label Text="{Binding Initial}"
-                                               FontFamily="OpenSansSemibold" FontSize="20"
-                                               TextColor="{DynamicResource OnPrimaryContainer}"
+                <!-- Search Results -->
+                <ActivityIndicator IsRunning="{Binding IsSearching}" IsVisible="{Binding IsSearching}"
+                                   HorizontalOptions="Center" Color="{DynamicResource Primary}" />
+                <Label Text="No users found" IsVisible="{Binding HasSearchResults, Converter={StaticResource InverseBoolConverter}}"
+                       FontFamily="Inter" FontSize="13" TextColor="{DynamicResource TextSecondary}"
+                       HorizontalOptions="Center" />
+
+                <VerticalStackLayout Spacing="8" BindableLayout.ItemsSource="{Binding SearchResults}">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate x:DataType="vm:UserSearchResult">
+                            <Border BackgroundColor="{DynamicResource SurfaceContainerLowest}"
+                                    StrokeShape="RoundRectangle 12"
+                                    Stroke="{DynamicResource OutlineVariant}" StrokeThickness="0.5"
+                                    Padding="14">
+                                <Grid ColumnDefinitions="36,*,Auto" ColumnSpacing="10">
+                                    <Border Grid.Column="0" BackgroundColor="{DynamicResource PrimaryContainer}"
+                                            StrokeShape="RoundRectangle 999" WidthRequest="36" HeightRequest="36" Padding="0">
+                                        <Label Text="{Binding Initial}" FontFamily="SpaceGrotesk" FontSize="14" FontAttributes="Bold"
+                                               TextColor="{DynamicResource Primary}"
                                                HorizontalOptions="Center" VerticalOptions="Center" />
                                     </Border>
-                                    <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
-                                        <Label Text="{Binding UserName}"
-                                               FontFamily="OpenSansRegular" FontSize="18" FontAttributes="Bold"
-                                               TextColor="{DynamicResource OnSurface}" />
-                                        <Label Text="{Binding TimeAgo}"
-                                               FontFamily="OpenSansSemibold" FontSize="12" FontAttributes="Bold"
-                                               TextColor="{DynamicResource Outline}"
-                                               CharacterSpacing="0.6" />
-                                    </VerticalStackLayout>
+                                    <Label Grid.Column="1" Text="{Binding Name}" FontFamily="SpaceGrotesk" FontSize="15"
+                                           TextColor="{DynamicResource OnSurface}" VerticalOptions="Center" />
                                     <Border Grid.Column="2" BackgroundColor="{DynamicResource Primary}"
-                                            Opacity="0.20" StrokeShape="RoundRectangle 999"
-                                            Padding="12,4" VerticalOptions="Start">
-                                        <Label Text="{Binding Category}"
-                                               FontFamily="OpenSansSemibold" FontSize="12" FontAttributes="Bold"
-                                               TextColor="{DynamicResource Primary}"
-                                               CharacterSpacing="0.6" />
+                                            StrokeShape="RoundRectangle 8" Padding="12,6" HeightRequest="32"
+                                            IsVisible="{Binding IsFollowing, Converter={StaticResource InverseBoolConverter}}">
+                                        <Label Text="{Binding FollowLabel}" FontFamily="Lexend" FontSize="10" FontAttributes="Bold"
+                                               TextColor="{DynamicResource OnPrimary}" VerticalOptions="Center">
+                                            <Label.GestureRecognizers>
+                                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:FeedViewModel}}, Path=FollowUserCommand}" CommandParameter="{Binding .}" />
+                                            </Label.GestureRecognizers>
+                                        </Label>
                                     </Border>
+                                    <Label Grid.Column="2" Text="Following" FontFamily="Lexend" FontSize="10"
+                                           TextColor="{DynamicResource TextSecondary}" VerticalOptions="Center"
+                                           IsVisible="{Binding IsFollowing}" />
                                 </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </VerticalStackLayout>
 
-                                <!-- Title -->
-                                <Label Text="{Binding Title}"
-                                       FontFamily="OpenSansSemibold" FontSize="24" FontAttributes="Bold"
-                                       TextColor="{DynamicResource Primary}" />
+                <!-- Feed label -->
+                <Label Text="FOLLOWING" FontFamily="Lexend" FontSize="10" FontAttributes="Bold"
+                       TextColor="{DynamicResource TextSecondary}" CharacterSpacing="1.5"
+                       IsVisible="{Binding HasFeed}" Margin="0,8,0,0" />
 
-                                <!-- 3-column data -->
-                                <Grid ColumnDefinitions="*,8,*,8,*" IsVisible="{Binding HasImage}">
-                                    <VerticalStackLayout Grid.Column="0" Spacing="2">
-                                        <Label Text="{Binding DataCol1Label}"
-                                               FontFamily="OpenSansSemibold" FontSize="12" FontAttributes="Bold"
-                                               TextColor="{DynamicResource Outline}" CharacterSpacing="0.6" />
-                                        <Label Text="{Binding DataCol1Value}"
-                                               FontFamily="OpenSansSemibold" FontSize="18"
-                                               TextColor="{DynamicResource OnSurface}" />
-                                    </VerticalStackLayout>
-                                    <BoxView Grid.Column="1" Color="{DynamicResource OutlineVariant}"
-                                             Opacity="0.3" WidthRequest="1" />
-                                    <VerticalStackLayout Grid.Column="2" Spacing="2">
-                                        <Label Text="{Binding DataCol2Label}"
-                                               FontFamily="OpenSansSemibold" FontSize="12" FontAttributes="Bold"
-                                               TextColor="{DynamicResource Outline}" CharacterSpacing="0.6" />
-                                        <Label Text="{Binding DataCol2Value}"
-                                               FontFamily="OpenSansSemibold" FontSize="18"
-                                               TextColor="{DynamicResource OnSurface}" />
-                                    </VerticalStackLayout>
-                                    <BoxView Grid.Column="3" Color="{DynamicResource OutlineVariant}"
-                                             Opacity="0.3" WidthRequest="1" />
-                                    <VerticalStackLayout Grid.Column="4" Spacing="2">
-                                        <Label Text="{Binding DataCol3Label}"
-                                               FontFamily="OpenSansSemibold" FontSize="12" FontAttributes="Bold"
-                                               TextColor="{DynamicResource Outline}" CharacterSpacing="0.6" />
-                                        <Label Text="{Binding DataCol3Value}"
-                                               FontFamily="OpenSansSemibold" FontSize="18"
-                                               TextColor="{DynamicResource OnSurface}" />
-                                    </VerticalStackLayout>
-                                </Grid>
+                <!-- Loading -->
+                <ActivityIndicator IsRunning="{Binding IsFeedBusy}" IsVisible="{Binding IsFeedBusy}"
+                                   HorizontalOptions="Center" Color="{DynamicResource Primary}" />
 
-                                <!-- Description (for non-image posts) -->
-                                <Label Text="{Binding Description}"
-                                       FontFamily="OpenSansRegular" FontSize="16"
-                                       TextColor="{DynamicResource OnSurfaceVariant}"
-                                       IsVisible="{Binding HasDataCards}" />
-
-                                <!-- 2-column volume/max cards -->
-                                <Grid ColumnDefinitions="*,16,*" IsVisible="{Binding HasDataCards}">
-                                    <Border Grid.Column="0" BackgroundColor="{DynamicResource SurfaceContainer}"
-                                            StrokeShape="RoundRectangle 12" Padding="16">
-                                        <VerticalStackLayout Spacing="4">
-                                            <Label Text="{Binding Card1Label}"
-                                                   FontFamily="OpenSansSemibold" FontSize="12" FontAttributes="Bold"
-                                                   TextColor="{DynamicResource Outline}" CharacterSpacing="0.6" />
-                                            <Label Text="{Binding Card1Value}"
-                                                   FontFamily="OpenSansSemibold" FontSize="24" FontAttributes="Bold"
-                                                   TextColor="{DynamicResource Primary}" />
+                <!-- Feed Posts -->
+                <VerticalStackLayout Spacing="20" BindableLayout.ItemsSource="{Binding Posts}">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate x:DataType="vm:FeedPost">
+                            <Border BackgroundColor="{DynamicResource SurfaceContainerLowest}"
+                                    StrokeShape="RoundRectangle 16"
+                                    Stroke="{DynamicResource OutlineVariant}" StrokeThickness="0.5"
+                                    Padding="20">
+                                <VerticalStackLayout Spacing="12">
+                                    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
+                                        <Border Grid.Column="0" StrokeShape="RoundRectangle 999"
+                                                WidthRequest="40" HeightRequest="40" Padding="0"
+                                                BackgroundColor="{DynamicResource PrimaryContainer}"
+                                                Stroke="{DynamicResource Surface}" StrokeThickness="2">
+                                            <Label Text="{Binding Initial}"
+                                                   FontFamily="SpaceGrotesk" FontSize="16"
+                                                   TextColor="{DynamicResource Primary}"
+                                                   HorizontalOptions="Center" VerticalOptions="Center" />
+                                        </Border>
+                                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="1">
+                                            <Label Text="{Binding UserName}"
+                                                   FontFamily="SpaceGrotesk" FontSize="15" FontAttributes="Bold"
+                                                   TextColor="{DynamicResource OnSurface}" />
+                                            <Label Text="{Binding TimeAgo}"
+                                                   FontFamily="Inter" FontSize="11"
+                                                   TextColor="{DynamicResource TextSecondary}" />
                                         </VerticalStackLayout>
-                                    </Border>
-                                    <Border Grid.Column="2" BackgroundColor="{DynamicResource SurfaceContainer}"
-                                            StrokeShape="RoundRectangle 12" Padding="16">
-                                        <VerticalStackLayout Spacing="4">
-                                            <Label Text="{Binding Card2Label}"
-                                                   FontFamily="OpenSansSemibold" FontSize="12" FontAttributes="Bold"
-                                                   TextColor="{DynamicResource Outline}" CharacterSpacing="0.6" />
-                                            <Label Text="{Binding Card2Value}"
-                                                   FontFamily="OpenSansSemibold" FontSize="24" FontAttributes="Bold"
+                                        <Border Grid.Column="2" BackgroundColor="{DynamicResource Primary}"
+                                                Opacity="0.15" StrokeShape="RoundRectangle 999"
+                                                Padding="10,4" VerticalOptions="Start">
+                                            <Label Text="{Binding Duration}"
+                                                   FontFamily="Lexend" FontSize="10" FontAttributes="Bold"
                                                    TextColor="{DynamicResource Primary}" />
-                                        </VerticalStackLayout>
-                                    </Border>
-                                </Grid>
+                                        </Border>
+                                    </Grid>
 
-                                <!-- Image placeholder -->
-                                <Border IsVisible="{Binding HasImage}"
-                                        StrokeShape="RoundRectangle 12"
-                                        HeightRequest="192" Padding="0"
-                                        BackgroundColor="{DynamicResource SurfaceVariant}"
-                                        Stroke="{DynamicResource OutlineVariant}" StrokeThickness="0.5">
-                                    <Label Text="Workout Route"
-                                           FontFamily="OpenSansRegular" FontSize="14"
-                                           TextColor="{DynamicResource OnSurfaceVariant}"
-                                           HorizontalOptions="Center" VerticalOptions="Center" />
-                                </Border>
+                                    <Label Text="{Binding Title}" FontFamily="SpaceGrotesk" FontSize="20" FontAttributes="Bold"
+                                           TextColor="{DynamicResource Primary}" />
 
-                                <!-- Interaction bar -->
-                                <Grid ColumnDefinitions="Auto,Auto,*,Auto" ColumnSpacing="24"
-                                      Padding="0,12,0,0">
-                                    <Border Grid.Column="0" StrokeThickness="0" BackgroundColor="Transparent"
-                                            Padding="0">
-                                        <HorizontalStackLayout Spacing="8">
-                                            <Label Text="♥" FontSize="16" TextColor="{DynamicResource OnSurfaceVariant}" />
-                                            <Label Text="{Binding Likes}" FontFamily="OpenSansSemibold" FontSize="16"
-                                                   TextColor="{DynamicResource OnSurface}" VerticalOptions="Center" />
-                                        </HorizontalStackLayout>
-                                    </Border>
-                                    <Border Grid.Column="1" StrokeThickness="0" BackgroundColor="Transparent"
-                                            Padding="0">
-                                        <HorizontalStackLayout Spacing="8">
-                                            <Label Text="💬" FontSize="16" TextColor="{DynamicResource OnSurfaceVariant}" />
-                                            <Label Text="{Binding Comments}" FontFamily="OpenSansSemibold" FontSize="16"
-                                                   TextColor="{DynamicResource OnSurface}" VerticalOptions="Center" />
-                                        </HorizontalStackLayout>
-                                    </Border>
-                                </Grid>
+                                    <Label Text="{Binding ExercisesList}" FontFamily="Inter" FontSize="13"
+                                           TextColor="{DynamicResource OnSurfaceVariant}" LineBreakMode="TailTruncation"
+                                           MaxLines="2" />
 
-                            </VerticalStackLayout>
-                        </Border>
+                                    <Grid ColumnDefinitions="*,12,*">
+                                        <Border Grid.Column="0" BackgroundColor="{DynamicResource SurfaceContainer}"
+                                                StrokeShape="RoundRectangle 10" Padding="12">
+                                            <VerticalStackLayout Spacing="2">
+                                                <Label Text="VOLUME" FontFamily="Lexend" FontSize="9" FontAttributes="Bold"
+                                                       TextColor="{DynamicResource TextSecondary}" CharacterSpacing="0.8" />
+                                                <Label Text="{Binding Volume}" FontFamily="SpaceGrotesk" FontSize="18" FontAttributes="Bold"
+                                                       TextColor="{DynamicResource OnSurface}" />
+                                            </VerticalStackLayout>
+                                        </Border>
+                                    </Grid>
 
-                    </DataTemplate>
-                </BindableLayout.ItemTemplate>
+                                    <Grid ColumnDefinitions="Auto,Auto,*,Auto" ColumnSpacing="20" Padding="0,6,0,0">
+                                        <Border Grid.Column="0" StrokeThickness="0" BackgroundColor="Transparent" Padding="0">
+                                            <HorizontalStackLayout Spacing="6">
+                                                <Label Text="{Binding HeartIcon}" FontSize="20"
+                                                       TextColor="{DynamicResource LimeGreen}"
+                                                       VerticalOptions="Center">
+                                                    <Label.GestureRecognizers>
+                                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:FeedViewModel}}, Path=LikeWorkoutCommand}" CommandParameter="{Binding .}" />
+                                                    </Label.GestureRecognizers>
+                                                </Label>
+                                                <Label Text="{Binding Likes}" FontFamily="Lexend" FontSize="14"
+                                                       TextColor="{DynamicResource OnSurfaceVariant}" VerticalOptions="Center" />
+                                            </HorizontalStackLayout>
+                                        </Border>
+                                    </Grid>
+                                </VerticalStackLayout>
+                            </Border>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </VerticalStackLayout>
+
+                <!-- Empty State -->
+                <Label Text="Follow athletes to see their workouts here"
+                       FontFamily="Inter" FontSize="14" TextColor="{DynamicResource TextSecondary}"
+                       HorizontalOptions="Center" Margin="0,40"
+                       IsVisible="{Binding HasFeed, Converter={StaticResource InverseBoolConverter}}" />
+
             </VerticalStackLayout>
         </ScrollView>
-
     </Grid>
-
 </ContentPage>

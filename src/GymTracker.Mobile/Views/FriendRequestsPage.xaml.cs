@@ -2,9 +2,9 @@ using GymTracker.Mobile.ViewModels;
 
 namespace GymTracker.Mobile.Views;
 
-public partial class FeedPage : ContentPage
+public partial class FriendRequestsPage : ContentPage
 {
-    public FeedPage(FeedViewModel vm)
+    public FriendRequestsPage(FriendRequestsViewModel vm)
     {
         InitializeComponent();
         BindingContext = vm;
@@ -13,7 +13,7 @@ public partial class FeedPage : ContentPage
     protected override async void OnAppearing()
     {
         base.OnAppearing();
-        if (BindingContext is FeedViewModel vm)
-            await vm.LoadFeedCommand.ExecuteAsync(null);
+        if (BindingContext is FriendRequestsViewModel vm)
+            await vm.LoadRequestsCommand.ExecuteAsync(null);
     }
 }

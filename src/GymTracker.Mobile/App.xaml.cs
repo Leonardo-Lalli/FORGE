@@ -1,4 +1,6 @@
 ﻿using GymTracker.Mobile.Services;
+using GymTracker.Mobile.Views;
+using GymTracker.Mobile.ViewModels;
 
 namespace GymTracker.Mobile;
 
@@ -6,45 +8,33 @@ public partial class App : Application
 {
     private readonly ThemeService themeService;
     private readonly BuildSecrets buildSecrets;
+    private readonly IServiceProvider services;
 
-    public App(ThemeService themeService, BuildSecrets buildSecrets)
+    public App(ThemeService themeService, BuildSecrets buildSecrets, IServiceProvider services)
     {
         InitializeComponent();
         this.themeService = themeService;
         this.buildSecrets = buildSecrets;
+        this.services = services;
     }
 
     protected override Window CreateWindow(IActivationState? activationState)
     {
         themeService.Initialize();
-        var window = new Window(new AppShell());
-        window.Created += async (_, _) => await OnWindowCreatedAsync();
+        var loginPage = services.GetRequiredService<LoginPage>();
+        var window = new Window(loginPage);
+        window.Created += async (_, _) => await InitializeAsync();
         return window;
     }
 
-    private async Task OnWindowCreatedAsync()
+    private async Task InitializeAsync()
     {
-        try
-        {
-            await buildSecrets.LoadAsync();
-        }
-        catch (Exception ex)
-        {
-            System.Diagnostics.Debug.WriteLine($"[App] BuildSecrets failed: {ex.Message}");
-        }
+        try { await buildSecrets.LoadAsync(); }
+        catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[App] Secrets failed: {ex.Message}"); }
 
-        if (Handler?.MauiContext?.Services.GetService<PocketBaseService>() is { } pb)
-        {
-            pb.Initialize();
+        var pb = services.GetRequiredService<PocketBaseService>();
+        pb.Initialize();
 
-            var loggedIn = await pb.TryAutoLoginAsync();
-            if (!loggedIn)
-            {
-                MainThread.BeginInvokeOnMainThread(async () =>
-                {
-                    await Shell.Current.GoToAsync("login");
-                });
-            }
-        }
+        services.GetRequiredService<ExerciseApiService>().Initialize();
     }
 }

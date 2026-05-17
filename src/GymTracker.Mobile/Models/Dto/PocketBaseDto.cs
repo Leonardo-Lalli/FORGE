@@ -58,3 +58,63 @@ public class PocketBaseListResponse<T>
     [JsonPropertyName("totalPages")]
     public int TotalPages { get; set; }
 }
+
+public class SocialGraphRecord
+{
+    [JsonPropertyName("id")]
+    public string Id { get; set; } = string.Empty;
+
+    [JsonPropertyName("from_user")]
+    public string FromUser { get; set; } = string.Empty;
+
+    [JsonPropertyName("from_name")]
+    public string FromName { get; set; } = string.Empty;
+
+    [JsonPropertyName("to_user")]
+    public string ToUser { get; set; } = string.Empty;
+
+    [JsonPropertyName("status")]
+    public string Status { get; set; } = "pending";
+
+    [JsonPropertyName("created")]
+    public string Created { get; set; } = string.Empty;
+}
+
+public class LoggedWorkoutRecord
+{
+    [JsonPropertyName("id")]
+    public string Id { get; set; } = string.Empty;
+
+    [JsonPropertyName("user")]
+    public string User { get; set; } = string.Empty;
+
+    [JsonPropertyName("name")]
+    public string Name { get; set; } = string.Empty;
+
+    [JsonPropertyName("date")]
+    public string Date { get; set; } = string.Empty;
+
+    [JsonPropertyName("exercises")]
+    public List<string> Exercises { get; set; } = new();
+
+    [JsonPropertyName("volume")]
+    public double Volume { get; set; }
+
+    [JsonPropertyName("duration")]
+    public int Duration { get; set; }
+
+    [JsonPropertyName("notes")]
+    public string Notes { get; set; } = string.Empty;
+
+    [JsonPropertyName("exercise_data")]
+    public string ExerciseData { get; set; } = string.Empty;
+
+    [JsonPropertyName("likes")]
+    public int Likes { get; set; }
+
+    [JsonPropertyName("liked_by")]
+    public List<string> LikedBy { get; set; } = new();
+
+    [JsonPropertyName("user_name")]
+    public string UserName { get; set; } = string.Empty;
+}

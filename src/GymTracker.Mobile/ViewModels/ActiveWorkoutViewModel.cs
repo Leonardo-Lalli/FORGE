@@ -11,6 +11,8 @@ namespace GymTracker.Mobile.ViewModels;
 public partial class ActiveWorkoutViewModel : BaseViewModel
 {
     private readonly WorkoutSession workoutSession;
+    private readonly ExerciseApiService exerciseApi;
+    private readonly PocketBaseService pb;
     private CancellationTokenSource? restCts;
     private CancellationTokenSource? elapsedCts;
     private int restSecondsRemaining;
@@ -20,7 +22,15 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
     [ObservableProperty] private string planId = string.Empty;
     [ObservableProperty] private string planName = "Nuovo Allenamento";
     [ObservableProperty] private ObservableCollection<WorkoutExercise> exercises = new();
+    [ObservableProperty] private bool hasExercises;
     [ObservableProperty] private int restDuration = 90;
+
+    partial void OnRestDurationChanged(int value)
+    {
+        if (value < 5) restDuration = 5;
+        if (value > 600) restDuration = 600;
+        RestTimerLabel = $"pausa {value}s";
+    }
     [ObservableProperty] private bool isRestTimerActive;
     [ObservableProperty] private string restTimerText = "90s";
     [ObservableProperty] private double restTimerProgress = 1.0;
@@ -30,11 +40,71 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
     [ObservableProperty] private string restTimerLabel = "pausa";
     [ObservableProperty] private bool isNotificationVisible;
     [ObservableProperty] private bool isTimerRunning;
-    [ObservableProperty] private bool isCreating; // true = modalità creazione scheda
+    [ObservableProperty] private bool isCreating;
 
-    public ActiveWorkoutViewModel(WorkoutSession workoutSession)
+    [ObservableProperty] private bool isSearchVisible;
+    [ObservableProperty] private string searchQuery = string.Empty;
+    [ObservableProperty] private bool isSearchingApi;
+    [ObservableProperty] private string searchError = string.Empty;
+    [ObservableProperty] private ObservableCollection<ExerciseSearchResult> searchResults = new();
+    private CancellationTokenSource? searchCts;
+
+    [ObservableProperty] private WorkoutExercise? selectedExercise;
+    [ObservableProperty] private bool isExerciseDetailVisible;
+    [ObservableProperty] private string planNameInput = string.Empty;
+    [ObservableProperty] private double progressPercent = 37.5;
+    [ObservableProperty] private string workoutNotes = string.Empty;
+    [ObservableProperty] private ObservableCollection<FilterChip> muscleFilters = new();
+    [ObservableProperty] private ObservableCollection<FilterChip> equipmentFilters = new();
+
+    partial void OnSearchQueryChanged(string value)
+    {
+        searchCts?.Cancel();
+        if (value.Length >= 2)
+        {
+            searchCts = new CancellationTokenSource();
+            var token = searchCts.Token;
+            _ = Task.Run(async () =>
+            {
+                await Task.Delay(400, token);
+                if (!token.IsCancellationRequested)
+                    MainThread.BeginInvokeOnMainThread(() => _ = SearchExercisesAsync());
+            }, token);
+        }
+    }
+
+    public ActiveWorkoutViewModel(WorkoutSession workoutSession, ExerciseApiService exerciseApi, PocketBaseService pb)
     {
         this.workoutSession = workoutSession;
+        this.exerciseApi = exerciseApi;
+        this.pb = pb;
+
+        Exercises.CollectionChanged += (_, _) => HasExercises = Exercises.Count > 0;
+
+        MuscleFilters = new ObservableCollection<FilterChip>
+        {
+            new() { Label = "Tutti", Value = "all", IsSelected = true },
+            new() { Label = "Petto", Value = "chest" },
+            new() { Label = "Schiena", Value = "back" },
+            new() { Label = "Spalle", Value = "shoulders" },
+            new() { Label = "Bicipiti", Value = "biceps" },
+            new() { Label = "Tricipiti", Value = "triceps" },
+            new() { Label = "Addominali", Value = "abdominals" },
+            new() { Label = "Quadricipiti", Value = "quadriceps" },
+            new() { Label = "Femorali", Value = "hamstrings" },
+            new() { Label = "Glutei", Value = "glutes" }
+        };
+
+        EquipmentFilters = new ObservableCollection<FilterChip>
+        {
+            new() { Label = "Tutti", Value = "all", IsSelected = true },
+            new() { Label = "Bilanciere", Value = "barbell" },
+            new() { Label = "Manubri", Value = "dumbbell" },
+            new() { Label = "Cavi", Value = "cable" },
+            new() { Label = "Macchinari", Value = "machine" },
+            new() { Label = "Corpo libero", Value = "body only" },
+            new() { Label = "Kettlebell", Value = "kettlebells" }
+        };
     }
 
     partial void OnModeChanged(string value)
@@ -61,6 +131,8 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
     [RelayCommand]
     private void StartWorkout()
     {
+        if (!string.IsNullOrWhiteSpace(PlanNameInput))
+            PlanName = PlanNameInput;
         IsCreating = false;
         IsTimerRunning = true;
         workoutStartTime = DateTime.Now;
@@ -78,12 +150,147 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
     [RelayCommand]
     private void AddExercise()
     {
+        IsSearchVisible = true;
+        SearchQuery = string.Empty;
+        SearchResults.Clear();
+        SearchError = string.Empty;
+    }
+
+    [RelayCommand]
+    private void CloseSearch()
+    {
+        IsSearchVisible = false;
+    }
+
+    [RelayCommand]
+    private async Task SelectMuscleFilterAsync(FilterChip chip)
+    {
+        foreach (var m in MuscleFilters) m.IsSelected = false;
+        chip.IsSelected = true;
+        SearchError = string.Empty;
+
+        if (chip.Value == "all") { SearchQuery = ""; return; }
+
+        IsSearchingApi = true;
+        try
+        {
+            var results = await exerciseApi.GetByMuscleAsync(chip.Value);
+            SearchResults.Clear();
+            foreach (var r in results.Take(10))
+            {
+                var img = r.Images.FirstOrDefault() ?? "";
+                SearchResults.Add(new ExerciseSearchResult
+                {
+                    Id = r.Id, Name = r.Name,
+                    BodyPart = r.PrimaryMuscles.FirstOrDefault() ?? "",
+                    Equipment = r.Equipment,
+                    ImageUrl = img.StartsWith("http") ? img : $"https://{img}"
+                });
+            }
+        }
+        catch { SearchError = "API non raggiungibile."; }
+        finally { IsSearchingApi = false; }
+    }
+
+    [RelayCommand]
+    private void SelectEquipmentFilter(FilterChip chip)
+    {
+        foreach (var e in EquipmentFilters) e.IsSelected = false;
+        chip.IsSelected = true;
+        // Filter client-side by equipment
+        SearchError = "";
+    }
+
+    [RelayCommand]
+    private async Task SearchExercisesAsync()
+    {
+        if (string.IsNullOrWhiteSpace(SearchQuery) || SearchQuery.Length < 2)
+        {
+            SearchError = "Digita almeno 2 caratteri.";
+            return;
+        }
+
+        SearchError = string.Empty;
+        IsSearchingApi = true;
+        try
+        {
+            var results = await exerciseApi.SearchByNameAsync(SearchQuery);
+            SearchResults.Clear();
+            if (results.Count == 0)
+            {
+                SearchError = "Nessun esercizio trovato. Prova un altro nome.";
+            }
+            else
+            {
+                foreach (var r in results.Take(10))
+                {
+                    var img = r.Images.FirstOrDefault() ?? "";
+                    SearchResults.Add(new ExerciseSearchResult
+                    {
+                        Id = r.Id,
+                        Name = r.Name,
+                        BodyPart = r.PrimaryMuscles.FirstOrDefault() ?? string.Empty,
+                        Equipment = r.Equipment,
+                        ImageUrl = img.StartsWith("http") ? img : $"https://{img}"
+                    });
+                }
+            }
+        }
+        catch (HttpRequestException)
+        {
+            SearchError = "API non raggiungibile. Controlla la connessione.";
+            SearchResults.Clear();
+        }
+        catch (Exception ex)
+        {
+            SearchError = $"Errore: {ex.Message}";
+            SearchResults.Clear();
+        }
+        finally
+        {
+            IsSearchingApi = false;
+        }
+    }
+
+    [RelayCommand]
+    private async Task SelectExerciseAsync(ExerciseSearchResult result)
+    {
+        var full = await exerciseApi.GetExerciseByIdAsync(result.Id);
+        var imageUrl = "";
+        var gifUrl = "";
+        var instructions = new List<string>();
+
+        if (full != null)
+        {
+            if (full.Images.Count > 0)
+            {
+                var img = full.Images[0];
+                imageUrl = img.StartsWith("http") ? img : $"https://{img}";
+                System.Diagnostics.Debug.WriteLine($"[SelectExercise] raw={img} resolved={imageUrl}");
+            }
+            gifUrl = imageUrl;
+            instructions = full.Instructions;
+        }
+
+        if (string.IsNullOrWhiteSpace(imageUrl))
+            imageUrl = result.ImageUrl;
+
+        System.Diagnostics.Debug.WriteLine($"[SelectExercise] final ImageUrl={imageUrl}");
+
         Exercises.Add(new WorkoutExercise
         {
-            ExerciseName = $"Esercizio {Exercises.Count + 1}",
-            BodyPart = "Seleziona",
+            ExerciseId = result.Id,
+            ExerciseName = result.Name,
+            BodyPart = result.BodyPart,
+            Equipment = result.Equipment,
+            ImageUrl = imageUrl,
+            GifUrl = gifUrl,
+            Instructions = instructions,
             Order = Exercises.Count + 1
         });
+        IsSearchVisible = false;
+        SearchQuery = string.Empty;
+        SearchResults.Clear();
     }
 
     [RelayCommand]
@@ -138,7 +345,12 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
     private void Renumber() { for (int i = 0; i < Exercises.Count; i++) Exercises[i].Order = i + 1; }
 
     [RelayCommand]
-    private void ReplaceExercise(WorkoutExercise ex) => ShowNotification($"Sostituisci {ex.ExerciseName} — seleziona dal catalogo");
+    private void ReplaceExercise(WorkoutExercise ex)
+    {
+        Exercises.Remove(ex);
+        for (int i = 0; i < Exercises.Count; i++) Exercises[i].Order = i + 1;
+        AddExercise();
+    }
 
     [RelayCommand]
     private void StartExerciseRestTimer(WorkoutExercise ex)
@@ -209,9 +421,24 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
     }
 
     [RelayCommand]
+    private void OpenExerciseDetail(WorkoutExercise ex)
+    {
+        SelectedExercise = ex;
+        IsExerciseDetailVisible = true;
+    }
+
+    [RelayCommand]
+    private void CloseExerciseDetail()
+    {
+        IsExerciseDetailVisible = false;
+        SelectedExercise = null;
+    }
+
+    [RelayCommand]
     private async Task SaveWorkoutPlanAsync()
     {
-        if (string.IsNullOrWhiteSpace(PlanName))
+        var name = string.IsNullOrWhiteSpace(PlanNameInput) ? PlanName : PlanNameInput;
+        if (string.IsNullOrWhiteSpace(name))
         {
             ShowNotification("Dai un nome alla scheda prima di salvarla.");
             return;
@@ -222,9 +449,11 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
             return;
         }
 
+        PlanName = name;
+
         var plan = new WorkoutPlan
         {
-            Name = PlanName,
+            Name = name,
             RestSeconds = RestDuration,
             Exercises = Exercises.ToList(),
             CreatedAt = DateTime.Now,
@@ -232,7 +461,50 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
         };
         PlanStore.SavePlan(plan);
 
-        ShowNotification($"Scheda \"{PlanName}\" salvata!");
+        if (pb.IsLoggedIn)
+        {
+            try
+            {
+                var exerciseData = Exercises.Select(e => new
+                {
+                    name = e.ExerciseName,
+                    bodyPart = e.BodyPart,
+                    equipment = e.Equipment,
+                    notes = e.Notes,
+                    restSeconds = e.RestSeconds,
+                    sets = e.Sets.Select(s => new
+                    {
+                        setNumber = s.SetNumber,
+                        weightKg = s.WeightKg,
+                        reps = s.Reps,
+                        isCompleted = s.IsCompleted
+                    }).ToList()
+                }).ToList();
+
+                var volume = Exercises.Sum(e => e.Sets.Sum(s => s.WeightKg * s.Reps));
+                var duration = (int)(DateTime.Now - workoutStartTime).TotalMinutes;
+
+                var payload = new
+                {
+                    user = pb.CurrentUser!.Id,
+                    user_name = pb.CurrentUser.Name,
+                    name = name,
+                    date = DateTime.UtcNow.ToString("o"),
+                    notes = WorkoutNotes,
+                    exercises = Exercises.Select(e => e.ExerciseName).ToList(),
+                    exercise_data = System.Text.Json.JsonSerializer.Serialize(exerciseData),
+                    volume = volume,
+                    duration = duration
+                };
+                await pb.CreateRecordAsync("logged_workouts", payload);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[SaveWorkout] PB error: {ex.Message}");
+            }
+        }
+
+        ShowNotification($"Scheda \"{name}\" salvata!");
         workoutSession.End();
         await Shell.Current.GoToAsync("..");
     }
@@ -265,4 +537,21 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
         }
         catch (TaskCanceledException) { }
     }
+}
+
+public partial class FilterChip : ObservableObject
+{
+    public string Label { get; set; } = string.Empty;
+    public string Value { get; set; } = string.Empty;
+
+    [ObservableProperty] private bool isSelected;
+}
+
+public class ExerciseSearchResult
+{
+    public string Id { get; set; } = string.Empty;
+    public string Name { get; set; } = string.Empty;
+    public string BodyPart { get; set; } = string.Empty;
+    public string Equipment { get; set; } = string.Empty;
+    public string ImageUrl { get; set; } = string.Empty;
 }

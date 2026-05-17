@@ -9,4 +9,11 @@ public partial class StatsPage : ContentPage
         InitializeComponent();
         BindingContext = vm;
     }
+
+    protected override async void OnAppearing()
+    {
+        base.OnAppearing();
+        if (BindingContext is StatsViewModel vm)
+            await vm.LoadCommand.ExecuteAsync(null);
+    }
 }

@@ -31,14 +31,14 @@
                    TextColor="{DynamicResource Primary}"
                    HorizontalOptions="Center" VerticalOptions="Center"
                    CharacterSpacing="-1" />
-            <!-- Right: Settings -->
+            <!-- Right: Friend Requests -->
             <Border Grid.Column="2" BackgroundColor="{DynamicResource SurfaceContainer}"
                     StrokeShape="RoundRectangle 999" WidthRequest="40" HeightRequest="40" Padding="0"
                     Stroke="{DynamicResource OutlineVariant}" StrokeThickness="0.5">
-                <Label Text="⚙" FontSize="16" TextColor="{DynamicResource OnSurfaceVariant}"
+                <Label Text="♥" FontSize="20" TextColor="{DynamicResource Primary}"
                        HorizontalOptions="Center" VerticalOptions="Center">
                     <Label.GestureRecognizers>
-                        <TapGestureRecognizer Command="{Binding OpenSettingsCommand}" />
+                        <TapGestureRecognizer Command="{Binding OpenFriendRequestsCommand}" />
                     </Label.GestureRecognizers>
                 </Label>
             </Border>
@@ -47,7 +47,7 @@
         <!-- Content -->
         <ScrollView Grid.Row="1" Padding="24,16,24,100">
             <VerticalStackLayout Spacing="32">
-                
+
                 <!-- Header -->
                 <VerticalStackLayout Spacing="8">
                     <Label Text="Analytics"
@@ -58,214 +58,94 @@
                            TextColor="{DynamicResource OnSurfaceVariant}" />
                 </VerticalStackLayout>
 
-                <!-- 2x2 Summary Tiles -->
-                <Grid ColumnDefinitions="*,16,*" RowDefinitions="Auto,16,Auto">
-                    
-                    <!-- Total Hours -->
+                <!-- Time Filters -->
+                <ScrollView Orientation="Horizontal" HorizontalScrollBarVisibility="Never">
+                    <HorizontalStackLayout Spacing="8">
+                        <Button Text="WEEK" Command="{Binding SetFilterCommand}" CommandParameter="week"
+                                FontFamily="Lexend" FontSize="10" FontAttributes="Bold"
+                                BackgroundColor="{DynamicResource Primary}" TextColor="{DynamicResource OnPrimary}"
+                                HeightRequest="32" CornerRadius="16" Padding="16,0" />
+                        <Button Text="MONTH" Command="{Binding SetFilterCommand}" CommandParameter="month"
+                                FontFamily="Lexend" FontSize="10" FontAttributes="Bold"
+                                BackgroundColor="{DynamicResource SurfaceContainer}" TextColor="{DynamicResource OnSurfaceVariant}"
+                                HeightRequest="32" CornerRadius="16" Padding="16,0" />
+                        <Button Text="3 MONTHS" Command="{Binding SetFilterCommand}" CommandParameter="3months"
+                                FontFamily="Lexend" FontSize="10" FontAttributes="Bold"
+                                BackgroundColor="{DynamicResource SurfaceContainer}" TextColor="{DynamicResource OnSurfaceVariant}"
+                                HeightRequest="32" CornerRadius="16" Padding="16,0" />
+                        <Button Text="1 YEAR" Command="{Binding SetFilterCommand}" CommandParameter="year"
+                                FontFamily="Lexend" FontSize="10" FontAttributes="Bold"
+                                BackgroundColor="{DynamicResource SurfaceContainer}" TextColor="{DynamicResource OnSurfaceVariant}"
+                                HeightRequest="32" CornerRadius="16" Padding="16,0" />
+                        <Button Text="ALL" Command="{Binding SetFilterCommand}" CommandParameter="all"
+                                FontFamily="Lexend" FontSize="10" FontAttributes="Bold"
+                                BackgroundColor="{DynamicResource SurfaceContainer}" TextColor="{DynamicResource OnSurfaceVariant}"
+                                HeightRequest="32" CornerRadius="16" Padding="16,0" />
+                    </HorizontalStackLayout>
+                </ScrollView>
+
+                <!-- 3 Summary Tiles -->
+                <Grid ColumnDefinitions="*,12,*" RowDefinitions="Auto,12,Auto">
                     <Border Grid.Row="0" Grid.Column="0"
                             BackgroundColor="{DynamicResource SurfaceContainerLowest}"
                             StrokeShape="RoundRectangle 12"
-                            Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1"
-                            Padding="20">
-                        <VerticalStackLayout Spacing="12">
-                            <Grid ColumnDefinitions="*,Auto">
-                                <Label Grid.Column="0" Text="TOTAL HOURS"
-                                       FontFamily="OpenSansSemibold" FontSize="12" FontAttributes="Bold"
-                                       TextColor="{DynamicResource OnSurfaceVariant}" CharacterSpacing="0.6" />
-                                <Label Grid.Column="1" Text="◉" FontSize="14"
-                                       TextColor="{DynamicResource Primary}" />
-                            </Grid>
-                            <Label Text="{Binding TotalHours}"
-                                   FontFamily="OpenSansSemibold" FontSize="48" FontAttributes="Bold"
-                                   TextColor="{DynamicResource OnSurface}"
-                                   CharacterSpacing="-2" LineHeight="1" />
-                            <HorizontalStackLayout Spacing="4">
-                                <Label Text="▲" FontSize="12" TextColor="{DynamicResource LimeGreen}" />
-                                <Label Text="{Binding TotalHoursTrend}"
-                                       FontFamily="OpenSansSemibold" FontSize="12" FontAttributes="Bold"
-                                       TextColor="{DynamicResource LimeGreen}" CharacterSpacing="0.6" />
-                            </HorizontalStackLayout>
+                            Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1" Padding="20">
+                        <VerticalStackLayout Spacing="8">
+                            <Label Text="GYM TIME" FontFamily="Lexend" FontSize="10" FontAttributes="Bold"
+                                   TextColor="{DynamicResource TextSecondary}" CharacterSpacing="0.8" />
+                            <Label Text="{Binding TotalHours}" FontFamily="SpaceGrotesk" FontSize="36" FontAttributes="Bold"
+                                   TextColor="{DynamicResource OnSurface}" />
                         </VerticalStackLayout>
                     </Border>
-
-                    <!-- Calories -->
                     <Border Grid.Row="0" Grid.Column="2"
                             BackgroundColor="{DynamicResource SurfaceContainerLowest}"
                             StrokeShape="RoundRectangle 12"
-                            Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1"
-                            Padding="20">
-                        <VerticalStackLayout Spacing="12">
-                            <Grid ColumnDefinitions="*,Auto">
-                                <Label Grid.Column="0" Text="CALORIES"
-                                       FontFamily="OpenSansSemibold" FontSize="12" FontAttributes="Bold"
-                                       TextColor="{DynamicResource OnSurfaceVariant}" CharacterSpacing="0.6" />
-                                <Label Grid.Column="1" Text="✦" FontSize="14"
-                                       TextColor="{DynamicResource Tertiary}" />
-                            </Grid>
-                            <Label Text="{Binding Calories}"
-                                   FontFamily="OpenSansSemibold" FontSize="48" FontAttributes="Bold"
-                                   TextColor="{DynamicResource OnSurface}"
-                                   CharacterSpacing="-2" LineHeight="1" />
-                            <HorizontalStackLayout Spacing="4">
-                                <Label Text="▲" FontSize="12" TextColor="{DynamicResource LimeGreen}" />
-                                <Label Text="{Binding CaloriesTrend}"
-                                       FontFamily="OpenSansSemibold" FontSize="12" FontAttributes="Bold"
-                                       TextColor="{DynamicResource LimeGreen}" CharacterSpacing="0.6" />
-                            </HorizontalStackLayout>
+                            Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1" Padding="20">
+                        <VerticalStackLayout Spacing="8">
+                            <Label Text="VOLUME" FontFamily="Lexend" FontSize="10" FontAttributes="Bold"
+                                   TextColor="{DynamicResource TextSecondary}" CharacterSpacing="0.8" />
+                            <Label Text="{Binding TotalVolume}" FontFamily="SpaceGrotesk" FontSize="36" FontAttributes="Bold"
+                                   TextColor="{DynamicResource LimeGreen}" />
                         </VerticalStackLayout>
                     </Border>
-
-                    <!-- Workouts -->
                     <Border Grid.Row="2" Grid.Column="0"
                             BackgroundColor="{DynamicResource SurfaceContainerLowest}"
                             StrokeShape="RoundRectangle 12"
-                            Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1"
-                            Padding="20">
-                        <VerticalStackLayout Spacing="12">
-                            <Grid ColumnDefinitions="*,Auto">
-                                <Label Grid.Column="0" Text="WORKOUTS"
-                                       FontFamily="OpenSansSemibold" FontSize="12" FontAttributes="Bold"
-                                       TextColor="{DynamicResource OnSurfaceVariant}" CharacterSpacing="0.6" />
-                                <Label Grid.Column="1" Text="◉" FontSize="14"
-                                       TextColor="{DynamicResource Primary}" />
-                            </Grid>
-                            <Label Text="{Binding Workouts}"
-                                   FontFamily="OpenSansSemibold" FontSize="48" FontAttributes="Bold"
-                                   TextColor="{DynamicResource OnSurface}"
-                                   CharacterSpacing="-2" LineHeight="1" />
-                            <Label Text="{Binding WorkoutsTrend}"
-                                   FontFamily="OpenSansSemibold" FontSize="12" FontAttributes="Bold"
-                                   TextColor="{DynamicResource OnSurfaceVariant}" CharacterSpacing="0.6" />
+                            Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1" Padding="20">
+                        <VerticalStackLayout Spacing="8">
+                            <Label Text="WORKOUTS" FontFamily="Lexend" FontSize="10" FontAttributes="Bold"
+                                   TextColor="{DynamicResource TextSecondary}" CharacterSpacing="0.8" />
+                            <Label Text="{Binding Workouts}" FontFamily="SpaceGrotesk" FontSize="36" FontAttributes="Bold"
+                                   TextColor="{DynamicResource Primary}" />
                         </VerticalStackLayout>
                     </Border>
-
-                    <!-- New PRs -->
-                    <Border Grid.Row="2" Grid.Column="2"
-                            BackgroundColor="{DynamicResource SurfaceContainerLowest}"
-                            StrokeShape="RoundRectangle 12"
-                            Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1"
-                            Padding="20">
-                        <VerticalStackLayout Spacing="12">
-                            <Grid ColumnDefinitions="*,Auto">
-                                <Label Grid.Column="0" Text="NEW PRs"
-                                       FontFamily="OpenSansSemibold" FontSize="12" FontAttributes="Bold"
-                                       TextColor="{DynamicResource OnSurfaceVariant}" CharacterSpacing="0.6" />
-                                <Label Grid.Column="1" Text="◆" FontSize="14"
-                                       TextColor="{DynamicResource LimeGreen}" />
-                            </Grid>
-                            <Label Text="{Binding NewPRs}"
-                                   FontFamily="OpenSansSemibold" FontSize="48" FontAttributes="Bold"
-                                   TextColor="{DynamicResource OnSurface}"
-                                   CharacterSpacing="-2" LineHeight="1" />
-                            <HorizontalStackLayout Spacing="4">
-                                <Label Text="▲" FontSize="12" TextColor="{DynamicResource LimeGreen}" />
-                                <Label Text="{Binding NewPRsTrend}"
-                                       FontFamily="OpenSansSemibold" FontSize="12" FontAttributes="Bold"
-                                       TextColor="{DynamicResource LimeGreen}" CharacterSpacing="0.6" />
-                            </HorizontalStackLayout>
-                        </VerticalStackLayout>
-                    </Border>
-
                 </Grid>
 
-                <!-- Muscle Mass Gain -->
+                <!-- Volume Over Time Chart -->
                 <Border BackgroundColor="{DynamicResource SurfaceContainerLowest}"
                         StrokeShape="RoundRectangle 12"
-                        Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1"
-                        Padding="24">
-                    <VerticalStackLayout Spacing="16">
-                        <Grid ColumnDefinitions="*,Auto">
-                            <VerticalStackLayout Grid.Column="0" Spacing="4">
-                                <Label Text="Muscle Mass Gain"
-                                       FontFamily="OpenSansSemibold" FontSize="24" FontAttributes="Bold"
-                                       TextColor="{DynamicResource OnSurface}" />
-                                <Label Text="Estimated lean mass trend"
-                                       FontFamily="OpenSansRegular" FontSize="16"
-                                       TextColor="{DynamicResource OnSurfaceVariant}" />
-                            </VerticalStackLayout>
-                            <Border Grid.Column="1" BackgroundColor="{DynamicResource LimeGreen}"
-                                    Opacity="0.20" StrokeShape="RoundRectangle 999"
-                                    Padding="12,4" VerticalOptions="Start">
-                                <HorizontalStackLayout Spacing="4">
-                                    <Label Text="▲" FontSize="12" TextColor="{DynamicResource LimeGreen}" />
-                                    <Label Text="{Binding MuscleGain}"
-                                           FontFamily="OpenSansSemibold" FontSize="12" FontAttributes="Bold"
-                                           TextColor="{DynamicResource LimeGreen}" />
-                                </HorizontalStackLayout>
-                            </Border>
+                        Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1" Padding="20">
+                    <VerticalStackLayout Spacing="12">
+                        <Label Text="Volume Over Time" FontFamily="SpaceGrotesk" FontSize="18" FontAttributes="Bold"
+                               TextColor="{DynamicResource OnSurface}" />
+                        <Grid HeightRequest="160" ColumnSpacing="2" VerticalOptions="End"
+                              BindableLayout.ItemsSource="{Binding BarHeights}">
+                            <BindableLayout.ItemTemplate>
+                                <DataTemplate x:DataType="vm:BarEntry">
+                                    <BoxView Color="{DynamicResource Primary}" CornerRadius="3,3,0,0"
+                                             VerticalOptions="End"
+                                             HeightRequest="{Binding Height}" Opacity="0.8" />
+                                </DataTemplate>
+                            </BindableLayout.ItemTemplate>
                         </Grid>
-                        <!-- Chart area -->
-                        <Border BackgroundColor="{DynamicResource SurfaceVariant}"
-                                Opacity="0.3" StrokeShape="RoundRectangle 8"
-                                HeightRequest="192" Padding="12">
-                            <BoxView Color="{DynamicResource ElectricBlue}" Opacity="0.6"
-                                     CornerRadius="4" VerticalOptions="End"
-                                     HeightRequest="80" />
-                        </Border>
-                        <Grid ColumnDefinitions="*,*,*,*,*,*">
-                            <Label Grid.Column="0" Text="Jan" FontFamily="OpenSansRegular" FontSize="11"
-                                   TextColor="{DynamicResource OnSurfaceVariant}" HorizontalTextAlignment="Center" />
-                            <Label Grid.Column="1" Text="Feb" FontFamily="OpenSansRegular" FontSize="11"
-                                   TextColor="{DynamicResource OnSurfaceVariant}" HorizontalTextAlignment="Center" />
-                            <Label Grid.Column="2" Text="Mar" FontFamily="OpenSansRegular" FontSize="11"
-                                   TextColor="{DynamicResource OnSurfaceVariant}" HorizontalTextAlignment="Center" />
-                            <Label Grid.Column="3" Text="Apr" FontFamily="OpenSansRegular" FontSize="11"
-                                   TextColor="{DynamicResource OnSurfaceVariant}" HorizontalTextAlignment="Center" />
-                            <Label Grid.Column="4" Text="May" FontFamily="OpenSansRegular" FontSize="11"
-                                   TextColor="{DynamicResource OnSurfaceVariant}" HorizontalTextAlignment="Center" />
-                            <Label Grid.Column="5" Text="Jun" FontFamily="OpenSansRegular" FontSize="11"
-                                   TextColor="{DynamicResource OnSurfaceVariant}" HorizontalTextAlignment="Center" />
-                        </Grid>
-                    </VerticalStackLayout>
-                </Border>
-
-                <!-- Weekly Volume -->
-                <Border BackgroundColor="{DynamicResource SurfaceContainerLowest}"
-                        StrokeShape="RoundRectangle 12"
-                        Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1"
-                        Padding="24">
-                    <VerticalStackLayout Spacing="16">
-                        <Grid ColumnDefinitions="*,Auto">
-                            <Label Grid.Column="0" Text="Weekly Volume"
-                                   FontFamily="OpenSansSemibold" FontSize="24" FontAttributes="Bold"
-                                   TextColor="{DynamicResource OnSurface}" />
-                            <Label Grid.Column="1" Text="Tonnes"
-                                   FontFamily="OpenSansSemibold" FontSize="12" FontAttributes="Bold"
-                                   TextColor="{DynamicResource OnSurfaceVariant}" CharacterSpacing="0.6" />
-                        </Grid>
-                        <!-- Bar chart -->
-                        <Grid HeightRequest="200" ColumnDefinitions="*,*,*,*,*,*,*" ColumnSpacing="4"
-                              VerticalOptions="End">
-                            <BoxView Grid.Column="0" Color="{DynamicResource Primary}" CornerRadius="3,3,0,0"
-                                     VerticalOptions="End" HeightRequest="{Binding BarHeight0}" Opacity="0.3" />
-                            <BoxView Grid.Column="1" Color="{DynamicResource Primary}" CornerRadius="3,3,0,0"
-                                     VerticalOptions="End" HeightRequest="{Binding BarHeight1}" Opacity="0.4" />
-                            <BoxView Grid.Column="2" Color="{DynamicResource Primary}" CornerRadius="3,3,0,0"
-                                     VerticalOptions="End" HeightRequest="{Binding BarHeight2}" Opacity="0.6" />
-                            <BoxView Grid.Column="3" Color="{DynamicResource Primary}" CornerRadius="3,3,0,0"
-                                     VerticalOptions="End" HeightRequest="{Binding BarHeight3}" Opacity="0.8" />
-                            <BoxView Grid.Column="4" Color="{DynamicResource Primary}" CornerRadius="3,3,0,0"
-                                     VerticalOptions="End" HeightRequest="{Binding BarHeight4}" />
-                            <BoxView Grid.Column="5" Color="{DynamicResource Primary}" CornerRadius="3,3,0,0"
-                                     VerticalOptions="End" HeightRequest="{Binding BarHeight5}" Opacity="0.5" />
-                            <BoxView Grid.Column="6" Color="{DynamicResource Primary}" CornerRadius="3,3,0,0"
-                                     VerticalOptions="End" HeightRequest="{Binding BarHeight6}" Opacity="0.3" />
-                        </Grid>
-                        <Grid ColumnDefinitions="*,*,*,*,*,*,*">
-                            <Label Grid.Column="0" Text="M" FontFamily="OpenSansRegular" FontSize="11"
-                                   TextColor="{DynamicResource OnSurfaceVariant}" HorizontalTextAlignment="Center" />
-                            <Label Grid.Column="1" Text="T" FontFamily="OpenSansRegular" FontSize="11"
-                                   TextColor="{DynamicResource OnSurfaceVariant}" HorizontalTextAlignment="Center" />
-                            <Label Grid.Column="2" Text="W" FontFamily="OpenSansRegular" FontSize="11"
-                                   TextColor="{DynamicResource OnSurfaceVariant}" HorizontalTextAlignment="Center" />
-                            <Label Grid.Column="3" Text="T" FontFamily="OpenSansRegular" FontSize="11"
-                                   TextColor="{DynamicResource OnSurfaceVariant}" HorizontalTextAlignment="Center" />
-                            <Label Grid.Column="4" Text="F" FontFamily="OpenSansRegular" FontSize="11"
-                                   TextColor="{DynamicResource OnSurfaceVariant}" HorizontalTextAlignment="Center" />
-                            <Label Grid.Column="5" Text="S" FontFamily="OpenSansRegular" FontSize="11"
-                                   TextColor="{DynamicResource OnSurfaceVariant}" HorizontalTextAlignment="Center" />
-                            <Label Grid.Column="6" Text="S" FontFamily="OpenSansRegular" FontSize="11"
-                                   TextColor="{DynamicResource OnSurfaceVariant}" HorizontalTextAlignment="Center" />
+                        <Grid BindableLayout.ItemsSource="{Binding BarLabels}" ColumnSpacing="2">
+                            <BindableLayout.ItemTemplate>
+                                <DataTemplate x:DataType="vm:LabelEntry">
+                                    <Label Text="{Binding Text}" FontFamily="Lexend" FontSize="9"
+                                           TextColor="{DynamicResource TextSecondary}"
+                                           HorizontalTextAlignment="Center" VerticalOptions="Center" />
+                                </DataTemplate>
+                            </BindableLayout.ItemTemplate>
                         </Grid>
                     </VerticalStackLayout>
                 </Border>
@@ -273,18 +153,15 @@
                 <!-- Top Lifts -->
                 <Border BackgroundColor="{DynamicResource SurfaceContainerLowest}"
                         StrokeShape="RoundRectangle 12"
-                        Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1"
-                        Padding="24">
+                        Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1" Padding="20">
                     <VerticalStackLayout Spacing="12">
-                        <Label Text="Top Lifts"
-                               FontFamily="OpenSansSemibold" FontSize="24" FontAttributes="Bold"
+                        <Label Text="Top Lifts" FontFamily="SpaceGrotesk" FontSize="18" FontAttributes="Bold"
                                TextColor="{DynamicResource OnSurface}" />
                         <VerticalStackLayout Spacing="0"
                             BindableLayout.ItemsSource="{Binding TopLifts}">
                             <BindableLayout.ItemTemplate>
                                 <DataTemplate x:DataType="vm:LiftEntry">
-                                    <Grid ColumnDefinitions="Auto,*,Auto" Padding="0,12"
-                                          ColumnSpacing="12">
+                                    <Grid ColumnDefinitions="Auto,*,Auto" Padding="0,12" ColumnSpacing="12">
                                         <Border Grid.Column="0" BackgroundColor="{DynamicResource Primary}"
                                                 Opacity="0.10" StrokeShape="RoundRectangle 999"
                                                 WidthRequest="40" HeightRequest="40" Padding="0">
@@ -292,17 +169,14 @@
                                                    HorizontalOptions="Center" VerticalOptions="Center" />
                                         </Border>
                                         <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="1">
-                                            <Label Text="{Binding Name}"
-                                                   FontFamily="OpenSansSemibold" FontSize="18"
+                                            <Label Text="{Binding Name}" FontFamily="SpaceGrotesk" FontSize="18"
                                                    TextColor="{DynamicResource OnSurface}" />
-                                            <Label Text="{Binding Label}"
-                                                   FontFamily="OpenSansSemibold" FontSize="12" FontAttributes="Bold"
-                                                   TextColor="{DynamicResource OnSurfaceVariant}" CharacterSpacing="0.6" />
+                                            <Label Text="{Binding Label}" FontFamily="Lexend" FontSize="10" FontAttributes="Bold"
+                                                   TextColor="{DynamicResource TextSecondary}" CharacterSpacing="0.6" />
                                         </VerticalStackLayout>
                                         <Label Grid.Column="2" Text="{Binding Weight}"
-                                               FontFamily="OpenSansSemibold" FontSize="24" FontAttributes="Bold"
-                                               TextColor="{DynamicResource OnSurface}"
-                                               VerticalOptions="Center" />
+                                               FontFamily="SpaceGrotesk" FontSize="24" FontAttributes="Bold"
+                                               TextColor="{DynamicResource OnSurface}" VerticalOptions="Center" />
                                     </Grid>
                                 </DataTemplate>
                             </BindableLayout.ItemTemplate>

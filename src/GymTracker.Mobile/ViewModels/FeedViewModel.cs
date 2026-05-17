@@ -1,94 +1,200 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using GymTracker.Mobile.Models.Dto;
+using GymTracker.Mobile.Services;
 
 namespace GymTracker.Mobile.ViewModels;
 
 public partial class FeedPost : ObservableObject
 {
+    public string WorkoutId { get; set; } = string.Empty;
     public string UserName { get; set; } = string.Empty;
     public string Initial { get; set; } = string.Empty;
     public string TimeAgo { get; set; } = string.Empty;
-    public string Category { get; set; } = string.Empty;
     public string Title { get; set; } = string.Empty;
-    public string Description { get; set; } = string.Empty;
-    public string ImageUrl { get; set; } = string.Empty;
-    public bool HasImage { get; set; }
+    public string ExercisesList { get; set; } = string.Empty;
+    public string Volume { get; set; } = string.Empty;
+    public string Duration { get; set; } = string.Empty;
     public int Likes { get; set; }
-    public int Comments { get; set; }
 
-    // Workout data (3 columns)
-    public string DataCol1Label { get; set; } = string.Empty;
-    public string DataCol1Value { get; set; } = string.Empty;
-    public string DataCol2Label { get; set; } = string.Empty;
-    public string DataCol2Value { get; set; } = string.Empty;
-    public string DataCol3Label { get; set; } = string.Empty;
-    public string DataCol3Value { get; set; } = string.Empty;
+    [ObservableProperty] private bool isLiked;
+    [ObservableProperty] private string heartIcon = "♡";
+}
 
-    // Volume/Max cards (2-column)
-    public string Card1Label { get; set; } = string.Empty;
-    public string Card1Value { get; set; } = string.Empty;
-    public string Card2Label { get; set; } = string.Empty;
-    public string Card2Value { get; set; } = string.Empty;
-    public bool HasDataCards { get; set; }
+public partial class UserSearchResult : ObservableObject
+{
+    public string UserId { get; set; } = string.Empty;
+    public string Name { get; set; } = string.Empty;
+    public string Initial { get; set; } = string.Empty;
+
+    [ObservableProperty] private bool isFollowing;
+    [ObservableProperty] private string followLabel = "Follow";
 }
 
 public partial class FeedViewModel : BaseViewModel
 {
-    [ObservableProperty]
-    private ObservableCollection<FeedPost> posts = new();
+    private readonly PocketBaseService pb;
 
-    public FeedViewModel()
+    [ObservableProperty] private ObservableCollection<FeedPost> posts = new();
+    [ObservableProperty] private ObservableCollection<UserSearchResult> searchResults = new();
+    [ObservableProperty] private string searchQuery = string.Empty;
+
+    partial void OnSearchQueryChanged(string value)
     {
-        HasData = true;
-        LoadMockData();
+        if (value.Length >= 2)
+            _ = SearchUsersAsyncDebounced(value);
     }
 
-    [RelayCommand]
-    private async Task OpenSettingsAsync()
-    {
-        await Shell.Current.GoToAsync("settings");
-    }
+    private CancellationTokenSource? searchCts;
 
-    [RelayCommand]
-    private async Task OpenProfileAsync()
+    private async Task SearchUsersAsyncDebounced(string query)
     {
-        await Shell.Current.GoToAsync("profile");
-    }
-
-    private void LoadMockData()
-    {
-        Posts = new ObservableCollection<FeedPost>
+        searchCts?.Cancel();
+        searchCts = new CancellationTokenSource();
+        var token = searchCts.Token;
+        try
         {
-            new()
-            {
-                UserName = "Sarah Jenkins",
-                Initial = "S",
-                TimeAgo = "2 hours ago",
-                Category = "High Intensity",
-                Title = "Morning Threshold Run",
-                DataCol1Label = "DURATION", DataCol1Value = "45:20",
-                DataCol2Label = "DISTANCE", DataCol2Value = "8.5 km",
-                DataCol3Label = "AVG HR", DataCol3Value = "168 bpm",
-                ImageUrl = "https://lh3.googleusercontent.com/aida-public/AB6AXuB84c2IsvVc90jKf1NcTI1hMYgA4n2vdKEbfnukZPe9HENk8D86shNk1BuptkU6jnyKpRqojw703Ia9Rk4u9oPpFXCFpZ_vuJOMPGhkUgPD5R92ySZ77dvx7jVlx-lVmpdJnXBqQmRGc6S0qPQtNwS5mm7HriDt7O7M3jK4MsIgE8ZR5pdUYEjfla34_udWoFA0a0jsXtYWUpeTZJkbO6zH77raAIuG8wy55bKlFd4WqfMgaSP3G-trwpPOMSKQdryCQR44kJlDlCw",
-                HasImage = true,
-                Likes = 24, Comments = 5,
-                HasDataCards = false
-            },
-            new()
-            {
-                UserName = "Marcus Chen",
-                Initial = "M",
-                TimeAgo = "5 hours ago",
-                Category = "Strength",
-                Title = "Heavy Deadlift Session",
-                Description = "Finally hit the 400lb club. Felt solid off the floor.",
-                Card1Label = "VOLUME", Card1Value = "8,500 lbs",
-                Card2Label = "MAX EFFORT", Card2Value = "405 lbs",
-                HasDataCards = true,
-                HasImage = false,
-                Likes = 42, Comments = 12
-            }
-        };
+            await Task.Delay(400, token);
+            if (!token.IsCancellationRequested)
+                MainThread.BeginInvokeOnMainThread(() => _ = SearchUsersAsync());
+        }
+        catch (TaskCanceledException) { }
     }
+    [ObservableProperty] private bool isSearching;
+    [ObservableProperty] private bool isFeedBusy;
+    [ObservableProperty] private bool hasFeed;
+    [ObservableProperty] private bool hasSearchResults;
+
+    public FeedViewModel(PocketBaseService pb)
+    {
+        this.pb = pb;
+    }
+
+    [RelayCommand]
+    private async Task LoadFeedAsync()
+    {
+        if (!pb.IsLoggedIn) return;
+        IsFeedBusy = true;
+        try
+        {
+            var workouts = await pb.GetFollowedWorkoutsAsync();
+            Posts.Clear();
+            foreach (var w in workouts)
+            {
+                var likedBy = w.LikedBy ?? new();
+                var timeAgo = "";
+                if (DateTime.TryParse(w.Date, out var dt))
+                {
+                    var span = DateTime.UtcNow - dt.ToUniversalTime();
+                    timeAgo = span.TotalHours < 1 ? $"{span.Minutes}m ago"
+                        : span.TotalDays < 1 ? $"{span.Hours}h ago"
+                        : $"{span.Days}d ago";
+                }
+
+                Posts.Add(new FeedPost
+                {
+                    WorkoutId = w.Id,
+                    UserName = w.UserName,
+                    Initial = (w.UserName.Length > 0 ? w.UserName[..1].ToUpper() : "?"),
+                    TimeAgo = timeAgo,
+                    Title = w.Name,
+                    ExercisesList = string.Join(", ", w.Exercises ?? new()),
+                    Volume = $"{w.Volume:0.#} kg",
+                    Duration = $"{w.Duration} min",
+                    Likes = w.Likes,
+                    IsLiked = likedBy.Contains(pb.CurrentUser?.Id ?? ""),
+                    HeartIcon = likedBy.Contains(pb.CurrentUser?.Id ?? "") ? "♥" : "♡"
+                });
+            }
+            HasFeed = Posts.Count > 0;
+            HasData = true;
+        }
+        catch
+        {
+            ErrorMessage = "Errore caricamento feed.";
+        }
+        finally { IsFeedBusy = false; }
+    }
+
+    [RelayCommand]
+    private async Task SearchUsersAsync()
+    {
+        if (string.IsNullOrWhiteSpace(SearchQuery) || SearchQuery.Length < 2) return;
+        if (!pb.IsLoggedIn) return;
+
+        IsSearching = true;
+        try
+        {
+            var followingIds = await pb.GetFollowingUserIdsAsync();
+            var results = await pb.SearchUsersAsync(SearchQuery);
+            System.Diagnostics.Debug.WriteLine($"[FeedSearch] query='{SearchQuery}' results={results.Count}");
+            SearchResults.Clear();
+            foreach (var user in results)
+            {
+                if (user.Id == pb.CurrentUser?.Id) continue;
+                System.Diagnostics.Debug.WriteLine($"[FeedSearch] user={user.Name} id={user.Id}");
+                var isFollowing = followingIds.Contains(user.Id);
+                SearchResults.Add(new UserSearchResult
+                {
+                    UserId = user.Id,
+                    Name = user.Name,
+                    Initial = (user.Name.Length > 0 ? user.Name[..1].ToUpper() : "?"),
+                    IsFollowing = isFollowing,
+                    FollowLabel = isFollowing ? "Following" : "Follow"
+                });
+            }
+            HasSearchResults = SearchResults.Count > 0;
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[FeedSearch] ex={ex.Message}");
+            ErrorMessage = "Errore ricerca utenti.";
+        }
+        finally { IsSearching = false; }
+    }
+
+    [RelayCommand]
+    private async Task FollowUserAsync(UserSearchResult user)
+    {
+        if (user.IsFollowing) return;
+        var ok = await pb.SendFollowRequestAsync(user.UserId);
+        if (ok)
+        {
+            user.FollowLabel = "Requested";
+            user.IsFollowing = true;
+        }
+    }
+
+    [RelayCommand]
+    private async Task LikeWorkoutAsync(FeedPost post)
+    {
+        if (!pb.IsLoggedIn) return;
+        if (post.IsLiked)
+        {
+            var (ok, _) = await pb.UnlikeWorkoutAsync(post.WorkoutId);
+            if (ok)
+            {
+                post.IsLiked = false;
+                post.HeartIcon = "♡";
+                post.Likes = Math.Max(0, post.Likes - 1);
+            }
+        }
+        else
+        {
+            var (ok, _) = await pb.LikeWorkoutAsync(post.WorkoutId);
+            if (ok)
+            {
+                post.IsLiked = true;
+                post.HeartIcon = "♥";
+                post.Likes++;
+            }
+        }
+    }
+
+    [RelayCommand]
+    private async Task OpenSettingsAsync() => await Shell.Current.GoToAsync("settings");
+
+    [RelayCommand]
+    private async Task OpenProfileAsync() => await Shell.Current.GoToAsync("profile");
 }

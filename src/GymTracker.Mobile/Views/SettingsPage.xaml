@@ -57,75 +57,19 @@
                     </Grid>
                 </Border>
 
-                <!-- Theme Preview -->
-                <Border BackgroundColor="{DynamicResource SurfaceContainerLowest}"
-                        StrokeShape="RoundRectangle 12"
-                        Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1"
-                        Padding="20">
-                    <VerticalStackLayout Spacing="12" HorizontalOptions="Center">
-                        <Label Text="Anteprima Tema Attuale"
-                               FontFamily="OpenSansSemibold" FontSize="11"
-                               TextColor="{DynamicResource TextSecondary}"
-                               CharacterSpacing="0.8" HorizontalTextAlignment="Center" />
-                        <Grid ColumnDefinitions="48,*,48" ColumnSpacing="12">
-                            <BoxView Grid.Column="0" Color="{DynamicResource Primary}"
-                                     CornerRadius="24" WidthRequest="48" HeightRequest="48" />
-                            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="4">
-                                <BoxView Color="{DynamicResource OnSurface}"
-                                         HeightRequest="12" CornerRadius="6" />
-                                <BoxView Color="{DynamicResource TextSecondary}"
-                                         HeightRequest="8" CornerRadius="4"
-                                         HorizontalOptions="Start" WidthRequest="120" />
-                            </VerticalStackLayout>
-                            <BoxView Grid.Column="2" Color="{DynamicResource SecondaryContainer}"
-                                     CornerRadius="24" WidthRequest="48" HeightRequest="48" />
-                        </Grid>
-                    </VerticalStackLayout>
-                </Border>
-
-                <!-- Tema Chiaro Preview -->
-                <Label Text="TEMI DISPONIBILI"
+                <!-- Account Section -->
+                <Label Text="ACCOUNT"
                        FontFamily="OpenSansSemibold" FontSize="11" FontAttributes="Bold"
                        TextColor="{DynamicResource TextSecondary}"
                        CharacterSpacing="0.8" Margin="0,8,0,0" />
 
-                <Border BackgroundColor="{DynamicResource SurfaceContainerHigh}"
-                        StrokeShape="RoundRectangle 12"
-                        Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1"
-                        Padding="16">
-                    <HorizontalStackLayout Spacing="16">
-                        <Border BackgroundColor="#003ec7"
-                                StrokeShape="RoundRectangle 16"
-                                WidthRequest="56" HeightRequest="56" Padding="0"
-                                Stroke="#003ec7" StrokeThickness="2" />
-                        <VerticalStackLayout VerticalOptions="Center" Spacing="2">
-                            <Label Text="Fitness Core" FontFamily="OpenSansSemibold" FontSize="14"
-                                   FontAttributes="Bold" TextColor="{DynamicResource OnSurface}" />
-                            <Label Text="Tema chiaro — blu professionale"
-                                   FontFamily="OpenSansRegular" FontSize="12"
-                                   TextColor="{DynamicResource TextSecondary}" />
-                        </VerticalStackLayout>
-                    </HorizontalStackLayout>
-                </Border>
-
-                <Border BackgroundColor="{DynamicResource SurfaceContainerHigh}"
-                        StrokeShape="RoundRectangle 12"
-                        Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1"
-                        Padding="16">
-                    <HorizontalStackLayout Spacing="16">
-                        <Border BackgroundColor="#c3f5ff"
-                                StrokeShape="RoundRectangle 16"
-                                WidthRequest="56" HeightRequest="56" Padding="0"
-                                Stroke="#c3f5ff" StrokeThickness="2" />
-                        <VerticalStackLayout VerticalOptions="Center" Spacing="2">
-                            <Label Text="Cyber-Athletic Elite" FontFamily="OpenSansSemibold" FontSize="14"
-                                   FontAttributes="Bold" TextColor="{DynamicResource OnSurface}" />
-                            <Label Text="Tema scuro — ciano high-tech"
-                                   FontFamily="OpenSansRegular" FontSize="12"
-                                   TextColor="{DynamicResource TextSecondary}" />
-                        </VerticalStackLayout>
-                    </HorizontalStackLayout>
-                </Border>
+                <!-- Logout Button -->
+                <Button Text="LOGOUT"
+                        BackgroundColor="{DynamicResource Error}"
+                        TextColor="{DynamicResource OnError}"
+                        FontFamily="OpenSansSemibold" FontSize="16" FontAttributes="Bold"
+                        HeightRequest="52" CornerRadius="12"
+                        Command="{Binding LogoutCommand}" />
 
             </VerticalStackLayout>
         </ScrollView>

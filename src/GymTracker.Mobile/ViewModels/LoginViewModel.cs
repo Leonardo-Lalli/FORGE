@@ -23,6 +23,7 @@ public partial class LoginViewModel : BaseViewModel
 
     private async Task TryAutoLoginAsync()
     {
+        await Task.Delay(1000);
         var success = await pb.TryAutoLoginAsync();
         if (success)
         {

@@ -437,4 +437,196 @@ Sostituire Firebase con PocketBase self-hosted per auth, dati social e persisten
 | Branch attivo | mockup |
 | Build status | 0 errori, 0 warning |
 
-*Report aggiornato il 2026-05-13.*
+### Aggiornamento 2026-05-13 — Branch `mockup` (fix LoginPage, immagini esercizi, filtri, icone)
+
+#### Fix LoginPage
+| Fix | Descrizione |
+|-----|-------------|
+| Entry tappabili su tutta l'area | Sostituito `HorizontalStackLayout` con `Grid` per i campi — il tocco sull'intero spazio del bordo attiva la tastiera |
+| Riga bianca Entry rimossa | Handler Android: `BackgroundTintList = Color.Transparent` per rimuovere la sottolineatura predefinita |
+| Rimossi bottoni Google/Apple | Eliminata sezione "OR AUTHENTICATE VIA" con social login |
+| Design mockup | LoginPage ridisegnata su mockup `login_cyber_athletic_elite_nero_opaco_v4` e `login_fitness_core_light` |
+
+#### Immagini e numeri esercizi
+| Fix | Descrizione |
+|-----|-------------|
+| Numero ordine sempre visibile | Overlay `Label` sul `Border` immagine — se l'immagine non carica, il numero rimane visibile |
+| Filtri muscolo/attrezzo | Chip orizzontali per 10 gruppi muscolari + 7 attrezzature nella ricerca. `SelectMuscleFilter` chiama API direttamente |
+
+#### Icone app tematizzate
+| Fix | Descrizione |
+|-----|-------------|
+| Icone PNG copiate | Da `Assets/App_Icon/` a `Platforms/Android/Resources/mipmap-hdpi/` |
+| Activity-alias rimossi | Causavano crash `ClassNotFoundException` — ripristinato `MainLauncher=true` sull'attività principale. Feature icone tematizzate rimandata |
+
+#### PocketBase & API ExerciseDB
+| Fix | Descrizione |
+|-----|-------------|
+| ExerciseApiService rewrite | Host corretto `exercise-db-fitness-workout-gym.p.rapidapi.com`. Carica ID da `/exercises`, dettaglio da `/exercise/{id}`. Cache locale degli ID |
+| ExerciseDbDto aggiornato | Campi: `primaryMuscles`, `secondaryMuscles`, `equipment`, `instructions`, `images`, `level`, `category` |
+| PocketBase save workout | `SaveWorkoutPlanAsync` invia a `logged_workouts` con nome, data, volume, durata, esercizi |
+
+### Metriche aggiornate
+| Metrica | Valore |
+|---------|--------|
+| ViewModel | 13 |
+| Views | 14 (+LoginPage, StartSessionPage) |
+| Services | 6 (+PocketBaseService, ExerciseApiService, BuildSecrets, ThemeService, WorkoutSession, PlanStore) |
+| DTO | 2 (+PocketBaseDto, ExerciseDbDto) |
+| Models | 1 (+ImageUrl, GifUrl, Instructions su WorkoutExercise) |
+| Branch attivo | mockup |
+| Build status | 0 errori, 0 warning |
+
+### PocketBase HTTPS proxato
+| Modifica | Descrizione |
+|----------|-------------|
+| Nuovo URL | `https://pocketbase.server-casa-leo.duckdns.org` via Nginx Proxy Manager + Let's Encrypt |
+| `usesCleartextTraffic` rimosso | Non più necessario — il traffico è HTTPS nativo |
+| `.env` aggiornato | `POCKETBASE_URL=https://pocketbase.server-casa-leo.duckdns.org` |
+| Test OK | Auth, health check, collections tutte raggiungibili via HTTPS |
+
+### Stato implementazione mockup
+| Mockup | Schermata | Stato |
+|--------|-----------|-------|
+| `login_cyber_athletic_elite_nero_opaco_v4` | Login (scuro) | ✅ Implementata |
+| `login_fitness_core_light` | Login (chiaro) | ✅ Implementata |
+| `start_session_light_uniform_v2` | Start Session (chiaro) | ✅ StartSessionPage |
+| `start_training_cyber_athletic_elite_uniform` | Start Session (scuro) | ✅ StartSessionPage |
+| `profilo_elite_chiaro` | Profilo (chiaro) | ✅ ProfilePage |
+| `profilo_elite_nero_opaco` | Profilo (scuro) | ✅ ProfilePage |
+| `dashboard_elite_achievements_minimal_layout` | Dashboard | ⚠️ HomePage con alcuni elementi |
+| `dashboard_minimale_con_storie` | Dashboard | ⚠️ Non implementata |
+| `allenamento_attivo_minimal_bianco` | Allenamento (chiaro) | ✅ Ricostruita da mockup |
+| `allenamento_attivo_nero_opaco_minimal_v2` | Allenamento (scuro) | ✅ Ricostruita da mockup |
+| `feed_elite_nero_opaco` | Feed | ⚠️ FeedPage esistente, non allineata |
+| `social_feed_scuro` | Social | ⚠️ SocialPage esistente |
+| `statistiche_avanzate_chiaro` | Statistiche (chiaro) | ⚠️ StatsPage esistente |
+| `statistiche_avanzate_nero_opaco` | Statistiche (scuro) | ⚠️ StatsPage esistente |
+| `cyber_athletic_elite` | Design system scuro | ✅ Palette colori |
+| `fitness_core` | Design system chiaro | ✅ Palette colori |
+
+### Aggiornamento 2026-05-13 — Font mockup e redesign allenamento
+
+#### Font Google Fonts
+| Font | File | Peso | Utilizzo mockup |
+|------|------|------|-----------------|
+| Inter | `Inter-Variable.ttf` | 876 KB | Body text, descrizioni, placeholder |
+| Lexend | `Lexend-Variable.ttf` | 175 KB | Label, caps, pulsanti, chip |
+| Space Grotesk | `SpaceGrotesk-Variable.ttf` | 136 KB | Headline, metriche, nomi esercizi |
+
+Registrati in `MauiProgram.cs` come alias `Inter`, `Lexend`, `SpaceGrotesk`. Mantenuti anche `OpenSansRegular` e `OpenSansSemibold` per compatibilità.
+
+#### Styles.xaml — famiglie font mockup
+| Stile | Font precedente | Font attuale |
+|-------|----------------|-------------|
+| `DisplayMetric`, `H1Bold`, `H2Bold` | OpenSansSemibold | **SpaceGrotesk** |
+| `BodyLg`, `BodyMd` | OpenSansRegular | **Inter** |
+| `LabelCaps` | OpenSansSemibold | **Lexend** |
+
+#### ActiveWorkoutPage — redesign da mockup
+Ricostruita interamente basandosi su `allenamento_attivo_minimal_bianco` e `allenamento_attivo_nero_opaco_minimal_v2`:
+
+| Elemento | Descrizione |
+|----------|-------------|
+| Progress bar | Barra sottile Primary in cima alla pagina |
+| Header | ✕ close + nome scheda editabile (SpaceGrotesk) + FINISH button |
+| Card esercizio | Header con immagine + nome + bodyPart (SpaceGrotesk) + controlli ▲▼✕ |
+| Tip box | Sfondo PrimaryContainer a bassa opacità, testo Inter |
+| Tabella set | Header SET / PREV / KG / REPS / ✓ (Lexend caps). Righe con Entry editabili per peso e reps, cerchio checkmark |
+| Add Set | Bordo dashed stile mockup, label Lexend |
+| Font mockup | Inter per body, SpaceGrotesk per nomi/metriche, Lexend per label/pulsanti |
+
+#### Fix LoginPage
+| Fix | Descrizione |
+|-----|-------------|
+| Entry click su tutta l'area | Grid al posto di HorizontalStackLayout |
+| Riga bianca Entry rimossa | Handler Android `BackgroundTintList = Color.Transparent` |
+| Social login rimossi | Eliminata sezione Google/Apple e divider |
+| Testo toggle corretto | "Don't have an account? Register" / "Already registered? Sign in" |
+
+#### PocketBase HTTPS
+| Modifica | Descrizione |
+|----------|-------------|
+| URL | `https://pocketbase.server-casa-leo.duckdns.org` via Nginx Proxy Manager + Let's Encrypt |
+| `usesCleartextTraffic` | Rimosso da AndroidManifest — HTTPS nativo |
+| Test | Auth, health check OK via HTTPS |
+
+### Metriche aggiornate
+| Metrica | Valore |
+|---------|--------|
+| ViewModel | 13 |
+| Views | 14 (+LoginPage, StartSessionPage) |
+| Services | 6 (+ExerciseApiService, PocketBaseService, BuildSecrets, ThemeService, WorkoutSession, PlanStore) |
+| DTO | 2 (+PocketBaseDto, ExerciseDbDto) |
+| Fonts | 5 (OpenSans Regular+Semibold, Inter Variable, Lexend Variable, SpaceGrotesk Variable) |
+| Branch attivo | mockup |
+| Build status | 0 errori, 0 warning |
+
+### Aggiornamento 2026-05-15 — Fix crash Android, cache PocketBase, note esercizi, immagini
+
+#### Fix crash `JavaProxyThrowable`
+| Problema | Causa | Fix |
+|----------|-------|-----|
+| `HttpClient.BaseAddress` dopo prima richiesta | Race condition: `LoginViewModel.TryAutoLoginAsync()` chiamava `LoginAsync()` prima che `App.InitializeAsync` settasse `BaseAddress` su PocketBase. La prima richiesta falliva ma "avviava" l'HttpClient, poi `Set BaseAddress` crashava | `BaseAddress` impostato direttamente nel costruttore `HttpClient` in `MauiProgram.cs`: `new HttpClient { BaseAddress = new Uri("https://pocketbase.server-casa-leo.duckdns.org/api/") }`. `EnsureInitialized` e `Initialize` diventati no-op |
+| `CollectionView` annidate | Inner `CollectionView` (sets) dentro outer (exercises) causava crash su Android | Sostituito con `BindableLayout` su `VerticalStackLayout` |
+| `Entry Mode=TwoWay` su `double`/`int` | Binding non riusciva a convertire valori vuoti | Sostituito con `Label` read-only + pulsanti `−`/`+` ai lati per peso e reps |
+
+#### Note per esercizio
+| Modifica | File | Descrizione |
+|----------|------|-------------|
+| `Notes` property | `Models/WorkoutPlan.cs` | Aggiunto campo `Notes` a `WorkoutExercise` |
+| Note UI | `Views/ActiveWorkoutPage.xaml` | Blocco blu (`PrimaryContainer`) sotto nome esercizio con `Entry` editabile per note |
+| Note salvate | Salvataggio locale PocketBase | `Notes` incluse nel payload salvato |
+
+#### Immagini esercizi — URL resolution
+| Problema | Fix |
+|----------|-----|
+| Short URL (`acesse.dev`, `encr.pw`) DNS-bloccati da ISP | `ResolveImageUrlAsync()` segue redirect HTTP (302) e ottiene URL diretto dell'immagine |
+| `redirectHttp` | `HttpClient` con `AllowAutoRedirect = true`, User-Agent Mozilla, timeout 5s |
+| Cache PocketBase | URL risolto salvato nel campo `imageUrl` della collection `excercise` |
+| Ricerche successive | URL diretto usato senza bisogno di re-risolvere |
+
+#### Profilo utente
+| Modifica | Descrizione |
+|----------|-------------|
+| Edit overlay | ✏️ apre form con nome, bio, avatar preview |
+| Save | `PocketBaseService.UpdateUserAsync()` → `PATCH /api/collections/users/records/{id}` |
+| Login persistente | App parte con LoginPage, auto-login dopo 1s, salta login se già autenticato |
+
+#### Exercise caching su PocketBase
+| Modifica | Descrizione |
+|----------|-------------|
+| `CacheExerciseAsync` | Salva nome, bodyPart, equipment, instructions, imageUrl, category, level, force, mechanic su `excercise` |
+| `pbCacheCheck` | `HashSet<string>` evita duplicati in sessione |
+| Fetch parallelo | `Task.WhenAll` per dettagli esercizi — 10x più veloce |
+
+#### Stato implementazione mockup aggiornato
+| Mockup | Schermata | Stato |
+|--------|-----------|-------|
+| `login_cyber_athletic_elite_nero_opaco_v4` | Login (scuro) | ✅ |
+| `login_fitness_core_light` | Login (chiaro) | ✅ |
+| `start_session_light_uniform_v2` | Start Session (chiaro) | ✅ |
+| `start_training_cyber_athletic_elite_uniform` | Start Session (scuro) | ✅ |
+| `profilo_elite_chiaro` | Profilo (chiaro) | ✅ |
+| `profilo_elite_nero_opaco` | Profilo (scuro) | ✅ |
+| `allenamento_attivo_minimal_bianco` | Allenamento (chiaro) | ✅ |
+| `allenamento_attivo_nero_opaco_minimal_v2` | Allenamento (scuro) | ✅ |
+| `dashboard_elite_achievements_minimal_layout` | Dashboard | ⚠️ HomePage parziale |
+| `dashboard_minimale_con_storie` | Dashboard | ❌ |
+| `feed_elite_nero_opaco` | Feed | ⚠️ FeedPage esistente |
+| `social_feed_scuro` | Social | ⚠️ SocialPage esistente |
+| `statistiche_avanzate_chiaro` | Statistiche (chiaro) | ⚠️ StatsPage esistente |
+| `statistiche_avanzate_nero_opaco` | Statistiche (scuro) | ⚠️ StatsPage esistente |
+
+### Metriche aggiornate
+| Metrica | Valore |
+|---------|--------|
+| ViewModel | 13 |
+| Views | 14 |
+| Services | 6 |
+| DTO | 2 |
+| Fonts | 5 (Inter, Lexend, SpaceGrotesk, OpenSans Regular+Semibold) |
+| Branch attivo | mockup |
+| Build status | 0 errori, 0 warning |
+
+*Report aggiornato il 2026-05-15.*

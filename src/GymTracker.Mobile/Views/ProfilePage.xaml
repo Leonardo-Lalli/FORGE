@@ -29,6 +29,18 @@
                    HorizontalOptions="Center" VerticalOptions="Center"
                    CharacterSpacing="-1" />
             <BoxView Grid.Column="2" WidthRequest="40" Color="Transparent" />
+            <!-- Edit pencil -->
+            <Border Grid.Column="2" BackgroundColor="{DynamicResource SurfaceContainer}"
+                    StrokeShape="RoundRectangle 999" WidthRequest="40" HeightRequest="40" Padding="0"
+                    Stroke="{DynamicResource OutlineVariant}" StrokeThickness="0.5"
+                    IsVisible="{Binding IsLoggedIn}">
+                <Label Text="✏" FontSize="18" TextColor="{DynamicResource OnSurfaceVariant}"
+                       HorizontalOptions="Center" VerticalOptions="Center">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding EditProfileCommand}" />
+                    </Label.GestureRecognizers>
+                </Label>
+            </Border>
         </Grid>
 
         <ScrollView Grid.Row="1" Padding="24,8,24,100">
@@ -36,15 +48,29 @@
 
                 <!-- Profile Hero — centered avatar, name, tier -->
                 <VerticalStackLayout Spacing="16" HorizontalOptions="Center">
-                    <!-- Avatar 128x128 -->
+                    <!-- Avatar — image from PocketBase, fallback to initials -->
                     <Border BackgroundColor="{DynamicResource SurfaceContainerHigh}"
                             StrokeShape="RoundRectangle 64"
                             Stroke="{DynamicResource Surface}" StrokeThickness="4"
                             WidthRequest="128" HeightRequest="128" Padding="0"
                             HorizontalOptions="Center">
-                        <Label Text="{Binding AvatarInitials}" FontFamily="OpenSansSemibold" FontSize="40"
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding ChangeAvatarCommand}" />
+                        </Border.GestureRecognizers>
+                        <Image Aspect="AspectFill"
+                                WidthRequest="128" HeightRequest="128"
+                                IsVisible="{Binding HasAvatar}">
+                            <Image.Source>
+                                <UriImageSource Uri="{Binding AvatarUrl}"
+                                                CacheValidity="0"
+                                                CachingEnabled="False" />
+                            </Image.Source>
+                        </Image>
+                        <Label Text="{Binding AvatarInitials}"
+                               FontFamily="OpenSansSemibold" FontSize="40"
                                TextColor="{DynamicResource OnSurface}"
-                               HorizontalOptions="Center" VerticalOptions="Center" />
+                               HorizontalOptions="Center" VerticalOptions="Center"
+                               IsVisible="{Binding HasAvatar, Converter={StaticResource InverseBoolConverter}}" />
                     </Border>
 
                     <!-- Name -->
@@ -92,18 +118,18 @@
                         </VerticalStackLayout>
                     </Border>
 
-                    <!-- Energy -->
+                    <!-- Total Volume -->
                     <Border Grid.Row="0" Grid.Column="2"
                             BackgroundColor="{DynamicResource SurfaceContainerLowest}"
                             StrokeShape="RoundRectangle 12"
                             Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1"
                             Padding="20">
                         <VerticalStackLayout Spacing="4" HorizontalOptions="Center" VerticalOptions="Center">
-                            <Label Text="{Binding EnergyKcal}"
-                                   FontFamily="OpenSansSemibold" FontSize="40" FontAttributes="Bold"
-                                   TextColor="{DynamicResource SecondaryContainer}"
-                                   HorizontalTextAlignment="Center" />
-                            <Label Text="ENERGY (KCAL)"
+                            <Label Text="{Binding TotalVolume}"
+                                   FontFamily="OpenSansSemibold" FontSize="28" FontAttributes="Bold"
+                                   TextColor="{DynamicResource LimeGreen}"
+                                   HorizontalTextAlignment="Center" LineBreakMode="TailTruncation" />
+                            <Label Text="TOTAL VOLUME"
                                    FontFamily="OpenSansSemibold" FontSize="11"
                                    TextColor="{DynamicResource OnSurfaceVariant}"
                                    CharacterSpacing="1"
@@ -235,6 +261,73 @@
 
             </VerticalStackLayout>
         </ScrollView>
+
+        <!-- Edit Profile Overlay -->
+        <Grid Grid.RowSpan="2" IsVisible="{Binding IsEditing}"
+              BackgroundColor="{DynamicResource Surface}" Padding="24">
+            <VerticalStackLayout Spacing="24" VerticalOptions="Center" MaximumWidthRequest="400"
+                                 HorizontalOptions="Center">
+
+                <VerticalStackLayout Spacing="4" HorizontalOptions="Center">
+                    <Label Text="EDIT PROFILE" FontFamily="SpaceGrotesk" FontSize="24" FontAttributes="Bold"
+                           TextColor="{DynamicResource OnSurface}" HorizontalTextAlignment="Center" />
+                    <Label Text="Update your bio and athlete info" FontFamily="Inter" FontSize="13"
+                           TextColor="{DynamicResource OnSurfaceVariant}" HorizontalTextAlignment="Center" />
+                </VerticalStackLayout>
+
+                <!-- Current Avatar Preview -->
+                <Border BackgroundColor="{DynamicResource SurfaceContainerHigh}"
+                        StrokeShape="RoundRectangle 48" WidthRequest="96" HeightRequest="96" Padding="0"
+                        Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1"
+                        HorizontalOptions="Center">
+                    <Image Source="{Binding AvatarUrl}" Aspect="AspectFill"
+                           WidthRequest="96" HeightRequest="96"
+                           IsVisible="{Binding HasAvatar}" />
+                    <Label Text="{Binding AvatarInitials}" FontFamily="SpaceGrotesk" FontSize="32" FontAttributes="Bold"
+                           TextColor="{DynamicResource OnSurface}"
+                           HorizontalOptions="Center" VerticalOptions="Center"
+                           IsVisible="{Binding HasAvatar, Converter={StaticResource InverseBoolConverter}}" />
+                </Border>
+
+                <!-- Name -->
+                <Border BackgroundColor="{DynamicResource SurfaceContainer}" StrokeShape="RoundRectangle 12"
+                        Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1" Padding="16,6">
+                    <Entry Text="{Binding EditName}" Placeholder="Athlete Name"
+                           FontFamily="Inter" FontSize="16"
+                           TextColor="{DynamicResource OnSurface}" PlaceholderColor="{DynamicResource Outline}"
+                           BackgroundColor="Transparent" />
+                </Border>
+
+                <!-- Bio -->
+                <Border BackgroundColor="{DynamicResource SurfaceContainer}" StrokeShape="RoundRectangle 12"
+                        Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1" Padding="16,6"
+                        HeightRequest="120">
+                    <Editor Text="{Binding EditBio}" Placeholder="Bio..."
+                            FontFamily="Inter" FontSize="14"
+                            TextColor="{DynamicResource OnSurface}" PlaceholderColor="{DynamicResource Outline}"
+                            BackgroundColor="Transparent" AutoSize="TextChanges" />
+                </Border>
+
+                <!-- Save -->
+                <Button Text="SAVE CHANGES" FontFamily="Lexend" FontSize="14" FontAttributes="Bold"
+                        CharacterSpacing="1"
+                        BackgroundColor="{DynamicResource Primary}" TextColor="{DynamicResource OnPrimary}"
+                        HeightRequest="52" CornerRadius="12"
+                        Command="{Binding SaveProfileCommand}" />
+
+                <!-- Cancel -->
+                <Button Text="Cancel" FontFamily="Inter" FontSize="14"
+                        BackgroundColor="Transparent" TextColor="{DynamicResource OnSurfaceVariant}"
+                        Command="{Binding CancelEditCommand}" />
+
+                <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}"
+                                   HorizontalOptions="Center" Color="{DynamicResource Primary}" />
+
+                <Label Text="{Binding ErrorMessage}" IsVisible="{Binding HasError}"
+                       FontFamily="Inter" FontSize="13" TextColor="{DynamicResource Error}"
+                       HorizontalTextAlignment="Center" />
+            </VerticalStackLayout>
+        </Grid>
     </Grid>
 
 </ContentPage>

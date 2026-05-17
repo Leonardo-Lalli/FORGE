@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Forge - Active Workout</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&amp;family=Lexend:wght@400;600&amp;family=Space+Grotesk:wght@500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "chart-fill": "rgba(0, 229, 255, 0.1)",
+                        "surface-variant": "#353534",
+                        "surface": "#131313",
+                        "outline": "#849396",
+                        "on-surface": "#E5E2E1",
+                        "success-accent": "#CCFF00",
+                        "on-surface-variant": "#BAC9CC",
+                        "surface-container": "#0E0E0E",
+                        "chart-line": "#00E5FF"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack-lg": "32px",
+                        "stack-md": "16px",
+                        "section-gap": "48px",
+                        "margin-mobile": "24px",
+                        "stack-sm": "8px",
+                        "unit": "4px",
+                        "gutter": "16px"
+                    },
+                    "fontFamily": {
+                        "label-sm": ["Lexend"],
+                        "headline-md": ["Space Grotesk"],
+                        "headline-lg": ["Space Grotesk"],
+                        "body-md": ["Inter"],
+                        "metric-xl": ["Space Grotesk"],
+                        "display-hero": ["Space Grotesk"],
+                        "body-lg": ["Inter"],
+                        "label-caps": ["Lexend"]
+                    },
+                    "fontSize": {
+                        "label-sm": ["11px", { "lineHeight": "14px", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "500" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "metric-xl": ["48px", { "lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+                        "display-hero": ["72px", { "lineHeight": "72px", "letterSpacing": "-0.04em", "fontWeight": "700" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "label-caps": ["12px", { "lineHeight": "16px", "letterSpacing": "0.1em", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { background-color: #131313; color: #E5E2E1; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-surface text-on-surface antialiased min-h-screen flex flex-col font-body-md text-body-md overflow-x-hidden">
+<!-- Progress Bar -->
+<div class="w-full h-1 bg-surface-variant fixed top-0 left-0 z-50">
+<div class="h-full bg-chart-line w-3/8" style="width: 37.5%;"></div>
+</div>
+<!-- TopAppBar -->
+<header class="bg-surface text-chart-line border-b border-surface-variant w-full fixed top-0 left-0 z-40 transition-all duration-200 mt-1">
+<div class="flex justify-between items-center w-full px-4 h-14">
+<button class="text-on-surface-variant p-2 -ml-2 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">close</span>
+</button>
+<h1 class="font-headline-md text-lg font-medium text-on-surface">Push Day Elite</h1>
+<button class="font-label-caps text-xs text-chart-line font-medium px-2 py-1 -mr-2">
+                FINISH
+            </button>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-grow pt-20 pb-32 px-4 max-w-screen-xl mx-auto w-full flex flex-col gap-6">
+<!-- Exercise Header & Tip -->
+<section class="flex flex-col gap-2">
+<div class="flex justify-between items-end">
+<div>
+<p class="font-label-sm text-[10px] text-chart-line tracking-wider opacity-80 uppercase">Exercise 3 of 8</p>
+<h2 class="font-headline-lg text-2xl text-on-surface mt-1 tracking-tight">Bench Press</h2>
+</div>
+<div class="flex gap-1">
+<button class="p-1.5 text-on-surface-variant hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined text-lg">history</span>
+</button>
+<button class="p-1.5 text-on-surface-variant hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined text-lg">more_vert</span>
+</button>
+</div>
+</div>
+<!-- Technical Tip Card -->
+<div class="mt-2 text-sm text-on-surface-variant/80 font-light flex items-start gap-2">
+<span class="material-symbols-outlined text-chart-line/60 text-sm mt-0.5" style="font-variation-settings: 'FILL' 1;">tips_and_updates</span>
+<p>
+                Explosive ascent, controlled descent. Keep wrists straight.
+                </p>
+</div>
+</section>
+<!-- Sets Table -->
+<section class="flex flex-col gap-1">
+<!-- Header Row -->
+<div class="grid grid-cols-[2rem_1fr_3.5rem_3.5rem_2.5rem] gap-2 px-2 py-2 font-label-sm text-[10px] text-on-surface-variant uppercase tracking-wider border-b border-surface-variant/30">
+<div class="text-center">Set</div>
+<div>Prev</div>
+<div class="text-center">Lbs</div>
+<div class="text-center">Reps</div>
+<div class="text-center"></div>
+</div>
+<!-- Set 1 (Completed) -->
+<div class="grid grid-cols-[2rem_1fr_3.5rem_3.5rem_2.5rem] gap-2 px-2 py-3 items-center border-b border-surface-variant/10 opacity-70">
+<div class="text-center font-body-md text-sm text-on-surface-variant">1</div>
+<div class="font-body-md text-xs text-on-surface-variant/60">135x12</div>
+<div class="text-center">
+<input class="w-full bg-transparent border-none p-0 text-center font-body-md text-base text-on-surface focus:ring-0" readonly="" type="text" value="135"/>
+</div>
+<div class="text-center">
+<input class="w-full bg-transparent border-none p-0 text-center font-body-md text-base text-on-surface focus:ring-0" readonly="" type="text" value="12"/>
+</div>
+<div class="flex justify-center">
+<span class="material-symbols-outlined text-success-accent text-lg" style="font-variation-settings: 'FILL' 1;">check</span>
+</div>
+</div>
+<!-- Set 2 (Completed) -->
+<div class="grid grid-cols-[2rem_1fr_3.5rem_3.5rem_2.5rem] gap-2 px-2 py-3 items-center border-b border-surface-variant/10 opacity-70">
+<div class="text-center font-body-md text-sm text-on-surface-variant">2</div>
+<div class="font-body-md text-xs text-on-surface-variant/60">185x10</div>
+<div class="text-center">
+<input class="w-full bg-transparent border-none p-0 text-center font-body-md text-base text-on-surface focus:ring-0" readonly="" type="text" value="185"/>
+</div>
+<div class="text-center">
+<input class="w-full bg-transparent border-none p-0 text-center font-body-md text-base text-on-surface focus:ring-0" readonly="" type="text" value="10"/>
+</div>
+<div class="flex justify-center">
+<span class="material-symbols-outlined text-success-accent text-lg" style="font-variation-settings: 'FILL' 1;">check</span>
+</div>
+</div>
+<!-- Set 3 (Active) -->
+<div class="grid grid-cols-[2rem_1fr_3.5rem_3.5rem_2.5rem] gap-2 px-2 py-3 items-center relative">
+<div class="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-6 bg-chart-line"></div>
+<div class="text-center font-body-md text-sm text-chart-line font-medium">3</div>
+<div class="font-body-md text-xs text-on-surface-variant/60">205x8</div>
+<div class="text-center">
+<input class="w-full bg-surface-variant/30 border-none rounded px-1 py-1.5 text-center font-body-md text-base text-on-surface focus:ring-1 focus:ring-chart-line placeholder:text-on-surface-variant/50" placeholder="205" type="number"/>
+</div>
+<div class="text-center">
+<input class="w-full bg-surface-variant/30 border-none rounded px-1 py-1.5 text-center font-body-md text-base text-on-surface focus:ring-1 focus:ring-chart-line placeholder:text-on-surface-variant/50" placeholder="8" type="number"/>
+</div>
+<div class="flex justify-center">
+<button class="w-7 h-7 rounded-full border border-surface-variant flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined text-base">check</span>
+</button>
+</div>
+</div>
+<!-- Set 4 (Upcoming) -->
+<div class="grid grid-cols-[2rem_1fr_3.5rem_3.5rem_2.5rem] gap-2 px-2 py-3 items-center border-t border-surface-variant/10">
+<div class="text-center font-body-md text-sm text-on-surface-variant/50">4</div>
+<div class="font-body-md text-xs text-on-surface-variant/40">225x5</div>
+<div class="text-center">
+<input class="w-full bg-transparent border-none p-0 text-center font-body-md text-base text-on-surface-variant/30 focus:ring-0" disabled="" placeholder="-" type="text"/>
+</div>
+<div class="text-center">
+<input class="w-full bg-transparent border-none p-0 text-center font-body-md text-base text-on-surface-variant/30 focus:ring-0" disabled="" placeholder="-" type="text"/>
+</div>
+<div class="flex justify-center">
+<span class="material-symbols-outlined text-surface-variant text-lg">check</span>
+</div>
+</div>
+<!-- Add Set Button -->
+<div class="pt-4 flex justify-center">
+<button class="flex items-center gap-1 font-label-sm text-[11px] text-on-surface-variant hover:text-on-surface uppercase tracking-wider transition-colors py-1">
+<span class="material-symbols-outlined text-xs">add</span> ADD SET
+                </button>
+</div>
+</section>
+<!-- Compact Rest Timer -->
+<div class="bg-surface-variant/20 rounded-lg p-3 flex items-center justify-between border border-surface-variant/30 mt-4">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-chart-line text-xl" style="font-variation-settings: 'FILL' 1;">timer</span>
+<div class="flex flex-col">
+<span class="font-label-sm text-[10px] text-on-surface-variant/70 uppercase tracking-wider">Resting</span>
+<span class="font-metric-xl text-xl text-on-surface leading-none mt-0.5">01:30</span>
+</div>
+</div>
+<div class="flex gap-4 items-center pr-2">
+<button class="text-on-surface hover:text-chart-line transition-colors">
+<span class="material-symbols-outlined text-xl">pause</span>
+</button>
+<button class="text-chart-line hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined text-2xl">skip_next</span>
+</button>
+</div>
+</div>
+<!-- Next Exercise Indicator (Simplified) -->
+<div class="mt-8 flex items-center justify-between border-t border-surface-variant/30 pt-4 opacity-60">
+<div class="flex flex-col">
+<span class="font-label-sm text-[10px] text-on-surface-variant uppercase tracking-wider">Up Next</span>
+<span class="font-body-md text-sm text-on-surface mt-0.5">Incline Dumbbell Press</span>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant text-sm">chevron_right</span>
+</div>
+</main>
+</body></html>
