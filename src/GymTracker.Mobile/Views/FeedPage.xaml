@@ -191,8 +191,15 @@
                                         <Border Grid.Column="0" StrokeThickness="0" BackgroundColor="Transparent" Padding="0">
                                             <HorizontalStackLayout Spacing="6">
                                                 <Label Text="{Binding HeartIcon}" FontSize="20"
-                                                       TextColor="{DynamicResource LimeGreen}"
                                                        VerticalOptions="Center">
+                                                    <Label.Triggers>
+                                                        <DataTrigger TargetType="Label" Binding="{Binding IsLiked}" Value="True">
+                                                            <Setter Property="TextColor" Value="{DynamicResource LimeGreen}" />
+                                                        </DataTrigger>
+                                                        <DataTrigger TargetType="Label" Binding="{Binding IsLiked}" Value="False">
+                                                            <Setter Property="TextColor" Value="{DynamicResource OnSurfaceVariant}" />
+                                                        </DataTrigger>
+                                                    </Label.Triggers>
                                                     <Label.GestureRecognizers>
                                                         <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:FeedViewModel}}, Path=LikeWorkoutCommand}" CommandParameter="{Binding .}" />
                                                     </Label.GestureRecognizers>

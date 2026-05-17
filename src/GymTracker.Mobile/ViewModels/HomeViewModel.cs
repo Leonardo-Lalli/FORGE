@@ -25,6 +25,10 @@ public partial class HomeViewModel : BaseViewModel
     [ObservableProperty] private string streakCount = "0";
     [ObservableProperty] private string streakLabel = "Day streak";
     [ObservableProperty] private string streakDescription = "Start your first workout today!";
+    [ObservableProperty] private string nextWorkout = "Create a plan";
+    [ObservableProperty] private string workoutDuration = "Tap to start";
+    [ObservableProperty] private string randomPlanId = string.Empty;
+    [ObservableProperty] private bool hasProtocol;
     [ObservableProperty] private ObservableCollection<SquadMember> squad = new();
 
     public HomeViewModel(PocketBaseService pb)
@@ -43,6 +47,28 @@ public partial class HomeViewModel : BaseViewModel
     {
         await CalculateStreakAsync();
         await LoadSquadAsync();
+        LoadRandomPlan();
+    }
+
+    private void LoadRandomPlan()
+    {
+        var plans = PlanStore.LoadPlans();
+        if (plans.Count > 0)
+        {
+            var rng = new Random();
+            var plan = plans[rng.Next(plans.Count)];
+            NextWorkout = plan.Name;
+            var estimatedMin = plan.Exercises.Sum(e => e.Sets.Count) * 3 + plan.RestSeconds / 60 * plan.Exercises.Count;
+            WorkoutDuration = $"{plan.Exercises.Count} ex, ~{estimatedMin}m";
+            RandomPlanId = plan.Id;
+            HasProtocol = true;
+        }
+        else
+        {
+            NextWorkout = "Create a plan";
+            WorkoutDuration = "Tap to start";
+            HasProtocol = false;
+        }
     }
 
     private async Task CalculateStreakAsync()
@@ -158,4 +184,21 @@ public partial class HomeViewModel : BaseViewModel
 
     [RelayCommand]
     private async Task OpenFeedAsync() => await Shell.Current.GoToAsync("//feed");
+
+    [RelayCommand]
+    private async Task OpenNextWorkoutAsync()
+    {
+        if (!string.IsNullOrWhiteSpace(RandomPlanId))
+        {
+            await Shell.Current.GoToAsync("activeWorkout", new Dictionary<string, object>
+            {
+                ["mode"] = "plan",
+                ["planId"] = RandomPlanId
+            });
+        }
+        else
+        {
+            await Shell.Current.GoToAsync("startSession");
+        }
+    }
 }

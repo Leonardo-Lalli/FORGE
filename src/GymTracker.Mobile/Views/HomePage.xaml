@@ -153,51 +153,29 @@
                     </VerticalStackLayout>
                 </Border>
 
-                <!-- ===== Next Workout + Hydration ===== -->
-                <Grid ColumnDefinitions="*,16,*" RowDefinitions="Auto">
-
-                    <Border Grid.Column="0" BackgroundColor="{DynamicResource SurfaceContainer}"
-                            StrokeShape="RoundRectangle 12"
-                            Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1"
-                            Padding="16" HeightRequest="128">
-                        <VerticalStackLayout Spacing="0" VerticalOptions="End">
-                            <HorizontalStackLayout>
-                                <Label Text="◉" FontSize="16" TextColor="{DynamicResource Primary}"
-                                       VerticalOptions="Center" Margin="0,0,8,0" />
-                                <Label Text="Today" FontFamily="OpenSansRegular" FontSize="11"
-                                       TextColor="{DynamicResource OnSurfaceVariant}"
-                                       HorizontalOptions="End" VerticalOptions="Center" />
-                            </HorizontalStackLayout>
-                            <Label Text="{Binding NextWorkout}" FontFamily="OpenSansSemibold" FontSize="24"
-                                   FontAttributes="Bold" TextColor="{DynamicResource OnSurface}"
-                                   Margin="0,4,0,0" />
-                            <Label Text="{Binding WorkoutDuration}" FontFamily="OpenSansRegular" FontSize="11"
-                                   TextColor="{DynamicResource Primary}" Margin="0,4,0,0" />
-                        </VerticalStackLayout>
-                    </Border>
-
-                    <Border Grid.Column="2" BackgroundColor="{DynamicResource SurfaceContainer}"
-                            StrokeShape="RoundRectangle 12"
-                            Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1"
-                            Padding="16" HeightRequest="128">
-                        <VerticalStackLayout Spacing="0" VerticalOptions="End">
-                            <HorizontalStackLayout>
-                                <Label Text="◎" FontSize="16" TextColor="{DynamicResource Primary}"
-                                       VerticalOptions="Center" Margin="0,0,8,0" />
-                                <Label Text="{Binding HydrationText}" FontFamily="OpenSansRegular" FontSize="11"
-                                       TextColor="{DynamicResource OnSurfaceVariant}"
-                                       HorizontalOptions="End" VerticalOptions="Center" />
-                            </HorizontalStackLayout>
-                            <Label Text="Hydration" FontFamily="OpenSansSemibold" FontSize="24"
-                                   FontAttributes="Bold" TextColor="{DynamicResource OnSurface}"
-                                   Margin="0,4,0,0" />
-                            <ProgressBar Progress="{Binding HydrationProgress}"
-                                                              ProgressColor="{DynamicResource ElectricBlue}"
-                                         Margin="0,10,0,0" />
-                        </VerticalStackLayout>
-                    </Border>
-
-                </Grid>
+                <!-- ===== Next Workout ===== -->
+                <Border BackgroundColor="{DynamicResource SurfaceContainerLowest}"
+                        StrokeShape="RoundRectangle 12"
+                        Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1"
+                        Padding="24" HeightRequest="128">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding OpenNextWorkoutCommand}" />
+                    </Border.GestureRecognizers>
+                    <VerticalStackLayout Spacing="0" VerticalOptions="End">
+                        <HorizontalStackLayout>
+                            <Label Text="◉" FontSize="16" TextColor="{DynamicResource Primary}"
+                                   VerticalOptions="Center" Margin="0,0,8,0" />
+                            <Label Text="Today" FontFamily="OpenSansRegular" FontSize="11"
+                                   TextColor="{DynamicResource OnSurfaceVariant}"
+                                   HorizontalOptions="End" VerticalOptions="Center" />
+                        </HorizontalStackLayout>
+                        <Label Text="{Binding NextWorkout}" FontFamily="OpenSansSemibold" FontSize="24"
+                               FontAttributes="Bold" TextColor="{DynamicResource OnSurface}"
+                               Margin="0,4,0,0" />
+                        <Label Text="{Binding WorkoutDuration}" FontFamily="OpenSansRegular" FontSize="11"
+                               TextColor="{DynamicResource Primary}" Margin="0,4,0,0" />
+                    </VerticalStackLayout>
+                </Border>
 
                 <!-- ===== Start Workout Button ===== -->
                 <Button Text="▶  START WORKOUT"

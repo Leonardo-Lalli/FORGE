@@ -216,7 +216,87 @@
                                                 WidthRequest="40" HeightRequest="40" Padding="0">
                                             <Label Text="◉" FontSize="14" TextColor="{DynamicResource Primary}"
                                                    HorizontalOptions="Center" VerticalOptions="Center" />
-                                        </Border>
+                </Border>
+
+                <!-- Likes received -->
+                <Border BackgroundColor="{DynamicResource SurfaceContainerLowest}"
+                        StrokeShape="RoundRectangle 12"
+                        Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1" Padding="20"
+                        IsVisible="{Binding HasLikes}">
+                    <VerticalStackLayout Spacing="12">
+                        <Label Text="Likes Received" FontFamily="SpaceGrotesk" FontSize="18" FontAttributes="Bold"
+                               TextColor="{DynamicResource OnSurface}" />
+                        <VerticalStackLayout Spacing="8"
+                            BindableLayout.ItemsSource="{Binding LikeNotifications}">
+                            <BindableLayout.ItemTemplate>
+                                <DataTemplate x:DataType="vm:LikeNotification">
+                                    <HorizontalStackLayout Spacing="8">
+                                        <Label Text="♥" FontSize="14" TextColor="{DynamicResource LimeGreen}"
+                                               VerticalOptions="Center" />
+                                        <Label Text="{Binding DisplayText}" FontFamily="Inter" FontSize="14"
+                                               TextColor="{DynamicResource OnSurfaceVariant}" VerticalOptions="Center" />
+                                    </HorizontalStackLayout>
+                                </DataTemplate>
+                            </BindableLayout.ItemTemplate>
+                        </VerticalStackLayout>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Calendar -->
+                <Border BackgroundColor="{DynamicResource SurfaceContainerLowest}"
+                        StrokeShape="RoundRectangle 12"
+                        Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1" Padding="20">
+                    <VerticalStackLayout Spacing="12">
+                        <Label Text="{Binding CalendarMonth}" FontFamily="SpaceGrotesk" FontSize="18" FontAttributes="Bold"
+                               TextColor="{DynamicResource OnSurface}" />
+                        <!-- Day headers -->
+                        <Grid ColumnDefinitions="*,*,*,*,*,*,*">
+                            <Label Text="Mon" FontFamily="Lexend" FontSize="10" FontAttributes="Bold"
+                                   TextColor="{DynamicResource TextSecondary}" HorizontalTextAlignment="Center" />
+                            <Label Grid.Column="1" Text="Tue" FontFamily="Lexend" FontSize="10" FontAttributes="Bold"
+                                   TextColor="{DynamicResource TextSecondary}" HorizontalTextAlignment="Center" />
+                            <Label Grid.Column="2" Text="Wed" FontFamily="Lexend" FontSize="10" FontAttributes="Bold"
+                                   TextColor="{DynamicResource TextSecondary}" HorizontalTextAlignment="Center" />
+                            <Label Grid.Column="3" Text="Thu" FontFamily="Lexend" FontSize="10" FontAttributes="Bold"
+                                   TextColor="{DynamicResource TextSecondary}" HorizontalTextAlignment="Center" />
+                            <Label Grid.Column="4" Text="Fri" FontFamily="Lexend" FontSize="10" FontAttributes="Bold"
+                                   TextColor="{DynamicResource TextSecondary}" HorizontalTextAlignment="Center" />
+                            <Label Grid.Column="5" Text="Sat" FontFamily="Lexend" FontSize="10" FontAttributes="Bold"
+                                   TextColor="{DynamicResource TextSecondary}" HorizontalTextAlignment="Center" />
+                            <Label Grid.Column="6" Text="Sun" FontFamily="Lexend" FontSize="10" FontAttributes="Bold"
+                                   TextColor="{DynamicResource TextSecondary}" HorizontalTextAlignment="Center" />
+                        </Grid>
+                        <!-- Day cells: 7 per row -->
+                        <CollectionView ItemsSource="{Binding CalendarDays}" ItemsLayout="VerticalGrid, 7">
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate x:DataType="vm:CalendarDay">
+                                    <Border HeightRequest="36" Margin="1"
+                                            StrokeShape="RoundRectangle 4"
+                                            BackgroundColor="{DynamicResource SurfaceContainer}"
+                                            Padding="0">
+                                        <Border.Triggers>
+                                            <DataTrigger TargetType="Border" Binding="{Binding HasWorkout}" Value="True">
+                                                <Setter Property="BackgroundColor" Value="{DynamicResource Primary}" />
+                                            </DataTrigger>
+                                            <DataTrigger TargetType="Border" Binding="{Binding IsToday}" Value="True">
+                                                <Setter Property="Stroke" Value="{DynamicResource LimeGreen}" />
+                                                <Setter Property="StrokeThickness" Value="2" />
+                                            </DataTrigger>
+                                        </Border.Triggers>
+                                        <Label Text="{Binding Day}" FontFamily="Lexend" FontSize="10"
+                                               HorizontalOptions="Center" VerticalOptions="Center">
+                                            <Label.Triggers>
+                                                <DataTrigger TargetType="Label" Binding="{Binding HasWorkout}" Value="True">
+                                                    <Setter Property="TextColor" Value="{DynamicResource OnPrimary}" />
+                                                </DataTrigger>
+                                            </Label.Triggers>
+                                        </Label>
+                                    </Border>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                    </VerticalStackLayout>
+                </Border>
                                         <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="1">
                                             <Label Text="{Binding Name}" FontFamily="SpaceGrotesk" FontSize="18"
                                                    TextColor="{DynamicResource OnSurface}" />

@@ -41,6 +41,10 @@ public partial class StatsViewModel : BaseViewModel
     [ObservableProperty] private string selectedFilter = "week";
     [ObservableProperty] private string statsError = string.Empty;
     [ObservableProperty] private bool hasStatsError;
+    [ObservableProperty] private ObservableCollection<LikeNotification> likeNotifications = new();
+    [ObservableProperty] private bool hasLikes;
+    [ObservableProperty] private ObservableCollection<CalendarDay> calendarDays = new();
+    [ObservableProperty] private string calendarMonth = string.Empty;
 
     public StatsViewModel(PocketBaseService pb)
     {
@@ -84,6 +88,8 @@ public partial class StatsViewModel : BaseViewModel
                 HasData = true;
             }
             ApplyFilter(SelectedFilter);
+            BuildLikeNotifications();
+            BuildCalendar();
         }
         catch (Exception ex)
         {
@@ -220,4 +226,65 @@ public partial class StatsViewModel : BaseViewModel
 
     [RelayCommand]
     private async Task OpenProfileAsync() => await Shell.Current.GoToAsync("profile");
+
+    private void BuildLikeNotifications()
+    {
+        LikeNotifications.Clear();
+        foreach (var w in allWorkouts.Where(w => w.Likes > 0))
+        {
+            LikeNotifications.Add(new LikeNotification
+            {
+                WorkoutName = w.Name,
+                LikeCount = w.Likes,
+                Date = w.Date
+            });
+        }
+        HasLikes = LikeNotifications.Count > 0;
+    }
+
+    private void BuildCalendar()
+    {
+        CalendarDays.Clear();
+        var today = DateTime.Now;
+        CalendarMonth = today.ToString("MMMM yyyy");
+        var firstOfMonth = new DateTime(today.Year, today.Month, 1);
+        var daysInMonth = DateTime.DaysInMonth(today.Year, today.Month);
+        var startDay = (int)firstOfMonth.DayOfWeek;
+        if (startDay == 0) startDay = 7;
+
+        var workoutDates = allWorkouts
+            .Select(w => { DateTime.TryParse(w.Date, out var d); return d.Date; })
+            .Where(d => d != default)
+            .ToHashSet();
+
+        // Empty cells before first day
+        for (int i = 1; i < startDay; i++)
+            CalendarDays.Add(new CalendarDay { Day = "", HasWorkout = false });
+
+        for (int d = 1; d <= daysInMonth; d++)
+        {
+            var date = new DateTime(today.Year, today.Month, d);
+            CalendarDays.Add(new CalendarDay
+            {
+                Day = d.ToString(),
+                HasWorkout = workoutDates.Contains(date),
+                IsToday = date == today.Date
+            });
+        }
+    }
+}
+
+public partial class LikeNotification : ObservableObject
+{
+    public string WorkoutName { get; set; } = "";
+    public int LikeCount { get; set; }
+    public string Date { get; set; } = "";
+    public string DisplayText => $"{WorkoutName} — {LikeCount} like{(LikeCount > 1 ? "s" : "")}";
+}
+
+public partial class CalendarDay : ObservableObject
+{
+    public string Day { get; set; } = "";
+    [ObservableProperty] private bool hasWorkout;
+    [ObservableProperty] private bool isToday;
 }
