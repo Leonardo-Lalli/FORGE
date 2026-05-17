@@ -592,7 +592,11 @@ public class PocketBaseService
             var getReq = new HttpRequestMessage(HttpMethod.Get, $"collections/logged_workouts/records/{workoutId}");
             getReq.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
             var getRes = await http.SendAsync(getReq);
-            if (!getRes.IsSuccessStatusCode) return (false, "Workout non trovato.");
+            if (!getRes.IsSuccessStatusCode)
+            {
+                System.Diagnostics.Debug.WriteLine($"[PB Like] GET fail {getRes.StatusCode}: {await getRes.Content.ReadAsStringAsync()}");
+                return (false, "Impossibile leggere il workout. Verifica API Rule 'View' su PocketBase.");
+            }
 
             var record = await getRes.Content.ReadFromJsonAsync<LoggedWorkoutRecord>(JsonOptions);
             if (record == null) return (false, "Workout non trovato.");
@@ -610,7 +614,13 @@ public class PocketBaseService
             };
             request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
             var response = await http.SendAsync(request);
-            return response.IsSuccessStatusCode ? (true, string.Empty) : (false, "Errore like.");
+            if (!response.IsSuccessStatusCode)
+            {
+                var errBody = await response.Content.ReadAsStringAsync();
+                System.Diagnostics.Debug.WriteLine($"[PB Like] PATCH fail {response.StatusCode}: {errBody[..Math.Min(errBody.Length, 200)]}");
+                return (false, "Like non riuscito. Verifica API Rule 'Update' su PocketBase.");
+            }
+            return (true, string.Empty);
         }
         catch (Exception ex) { return (false, ex.Message); }
     }
