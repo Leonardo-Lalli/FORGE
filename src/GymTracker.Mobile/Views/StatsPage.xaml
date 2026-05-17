@@ -272,30 +272,6 @@
                                                    HorizontalOptions="Center" VerticalOptions="Center" />
                 </Border>
 
-                <!-- Likes received -->
-                <Border BackgroundColor="{DynamicResource SurfaceContainerLowest}"
-                        StrokeShape="RoundRectangle 12"
-                        Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1" Padding="20"
-                        IsVisible="{Binding HasLikes}">
-                    <VerticalStackLayout Spacing="12">
-                        <Label Text="Likes Received" FontFamily="SpaceGrotesk" FontSize="18" FontAttributes="Bold"
-                               TextColor="{DynamicResource OnSurface}" />
-                        <VerticalStackLayout Spacing="8"
-                            BindableLayout.ItemsSource="{Binding LikeNotifications}">
-                            <BindableLayout.ItemTemplate>
-                                <DataTemplate x:DataType="vm:LikeNotification">
-                                    <HorizontalStackLayout Spacing="8">
-                                        <Label Text="♥" FontSize="14" TextColor="{DynamicResource LimeGreen}"
-                                               VerticalOptions="Center" />
-                                        <Label Text="{Binding DisplayText}" FontFamily="Inter" FontSize="14"
-                                               TextColor="{DynamicResource OnSurfaceVariant}" VerticalOptions="Center" />
-                                    </HorizontalStackLayout>
-                                </DataTemplate>
-                            </BindableLayout.ItemTemplate>
-                        </VerticalStackLayout>
-                    </VerticalStackLayout>
-                </Border>
-
                                         <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="1">
                                             <Label Text="{Binding Name}" FontFamily="SpaceGrotesk" FontSize="18"
                                                    TextColor="{DynamicResource OnSurface}" />
