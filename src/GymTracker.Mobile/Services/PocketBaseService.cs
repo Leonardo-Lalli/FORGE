@@ -670,6 +670,40 @@ public class PocketBaseService
         return (likedBy, likes);
     }
 
+    public async Task<List<(string LikerName, string WorkoutName, string WorkoutId)>> GetLikeNotificationsAsync()
+    {
+        var results = new List<(string, string, string)>();
+        if (!IsLoggedIn || currentUser == null) return results;
+
+        try
+        {
+            var workouts = await GetMyWorkoutsAsync(50);
+            foreach (var w in workouts)
+            {
+                var externalLikers = w.LikedBy.Where(id => id != currentUser.Id).ToList();
+                foreach (var likerId in externalLikers)
+                {
+                    try
+                    {
+                        var userReq = new HttpRequestMessage(HttpMethod.Get,
+                            $"collections/users/records/{likerId}");
+                        userReq.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                        var userRes = await http.SendAsync(userReq);
+                        if (userRes.IsSuccessStatusCode)
+                        {
+                            var userRecord = await userRes.Content.ReadFromJsonAsync<PocketBaseUserRecord>(JsonOptions);
+                            var likerName = userRecord?.Name ?? "Unknown";
+                            results.Add((likerName, w.Name, w.Id));
+                        }
+                    }
+                    catch { }
+                }
+            }
+        }
+        catch { }
+        return results;
+    }
+
     public async Task<string?> GetCachedExerciseImageAsync(string exerciseName)
     {
         if (!IsLoggedIn) return null;

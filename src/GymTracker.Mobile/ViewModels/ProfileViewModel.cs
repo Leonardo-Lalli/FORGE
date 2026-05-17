@@ -14,6 +14,7 @@ public partial class ProfileWorkout : ObservableObject
     public string Exercises { get; set; } = string.Empty;
     public string Duration { get; set; } = string.Empty;
     public string Volume { get; set; } = string.Empty;
+    public int Likes { get; set; }
     public string BorderColor { get; set; } = "#ffb4ab";
 }
 
@@ -35,6 +36,7 @@ public partial class ProfileViewModel : BaseViewModel
     [ObservableProperty] private string streakDays = "0";
     [ObservableProperty] private string streakLabel = "Day Streak";
     [ObservableProperty] private string totalVolume = "0";
+    [ObservableProperty] private string totalLikesReceived = "0";
     [ObservableProperty] private string workoutLoadError = string.Empty;
     [ObservableProperty] private bool hasWorkoutError;
     [ObservableProperty] private ObservableCollection<ProfileWorkout> recentWorkouts = new();
@@ -105,6 +107,7 @@ public partial class ProfileViewModel : BaseViewModel
             TotalWorkouts = workouts.Count.ToString();
 
             double totalVol = 0;
+            int totalLikes = 0;
             RecentWorkouts.Clear();
 
             var colors = new[] { "#ffb4ab", "#00E5FF", "#CCFF00", "#a5d6ff" };
@@ -113,6 +116,7 @@ public partial class ProfileViewModel : BaseViewModel
             foreach (var w in workouts)
             {
                 totalVol += w.Volume;
+                totalLikes += w.Likes;
 
                 var dateStr = "";
                 if (DateTime.TryParse(w.Date, out var dt))
@@ -125,12 +129,14 @@ public partial class ProfileViewModel : BaseViewModel
                     Exercises = string.Join(", ", w.Exercises ?? new()),
                     Duration = $"{w.Duration} min",
                     Volume = $"{w.Volume:0.#} kg",
+                    Likes = w.Likes,
                     BorderColor = colors[ci % colors.Length]
                 });
                 ci++;
             }
 
             TotalVolume = $"{totalVol:0.#} kg";
+            TotalLikesReceived = totalLikes.ToString();
 
             if (workouts.Count == 0)
             {

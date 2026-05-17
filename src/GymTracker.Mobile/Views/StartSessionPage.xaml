@@ -28,12 +28,6 @@
                    TextColor="{DynamicResource Primary}"
                    HorizontalOptions="Center" VerticalOptions="Center"
                    CharacterSpacing="-1" />
-            <Border Grid.Column="2" BackgroundColor="{DynamicResource SurfaceContainerHigh}"
-                    StrokeShape="RoundRectangle 999" WidthRequest="40" HeightRequest="40" Padding="0"
-                    Stroke="{DynamicResource OutlineVariant}" StrokeThickness="0.5">
-                <Label Text="👤" FontSize="16" TextColor="{DynamicResource OnSurfaceVariant}"
-                       HorizontalOptions="Center" VerticalOptions="Center" />
-            </Border>
         </Grid>
 
         <!-- Main Canvas -->

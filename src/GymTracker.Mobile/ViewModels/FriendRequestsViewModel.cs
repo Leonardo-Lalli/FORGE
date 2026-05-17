@@ -15,13 +15,22 @@ public partial class FriendRequestItem : ObservableObject
     [ObservableProperty] private bool isAccepted;
 }
 
+public partial class LikeNotificationItem : ObservableObject
+{
+    public string LikerName { get; set; } = string.Empty;
+    public string WorkoutName { get; set; } = string.Empty;
+}
+
 public partial class FriendRequestsViewModel : BaseViewModel
 {
     private readonly PocketBaseService pb;
 
     [ObservableProperty] private ObservableCollection<FriendRequestItem> requests = new();
+    [ObservableProperty] private ObservableCollection<LikeNotificationItem> likeNotifications = new();
     [ObservableProperty] private bool isEmpty;
     [ObservableProperty] private bool isBusy;
+    [ObservableProperty] private bool hasLikeNotifications;
+    [ObservableProperty] private bool hasRequests;
 
     public FriendRequestsViewModel(PocketBaseService pb)
     {
@@ -45,8 +54,23 @@ public partial class FriendRequestsViewModel : BaseViewModel
                     FromName = r.FromName ?? "Unknown"
                 });
             }
-            IsEmpty = Requests.Count == 0;
+
+            var likes = await pb.GetLikeNotificationsAsync();
+            LikeNotifications.Clear();
+            foreach (var (likerName, workoutName, _) in likes)
+            {
+                LikeNotifications.Add(new LikeNotificationItem
+                {
+                    LikerName = likerName,
+                    WorkoutName = workoutName
+                });
+            }
+            HasLikeNotifications = LikeNotifications.Count > 0;
+
+            IsEmpty = Requests.Count == 0 && LikeNotifications.Count == 0;
             HasData = !IsEmpty;
+            HasRequests = Requests.Count > 0;
+            HasLikeNotifications = LikeNotifications.Count > 0;
         }
         catch
         {
@@ -63,8 +87,9 @@ public partial class FriendRequestsViewModel : BaseViewModel
         {
             item.IsAccepted = true;
             Requests.Remove(item);
-            IsEmpty = Requests.Count == 0;
+            IsEmpty = Requests.Count == 0 && LikeNotifications.Count == 0;
             HasData = !IsEmpty;
+            HasRequests = Requests.Count > 0;
         }
     }
 
@@ -75,8 +100,9 @@ public partial class FriendRequestsViewModel : BaseViewModel
         if (ok)
         {
             Requests.Remove(item);
-            IsEmpty = Requests.Count == 0;
+            IsEmpty = Requests.Count == 0 && LikeNotifications.Count == 0;
             HasData = !IsEmpty;
+            HasRequests = Requests.Count > 0;
         }
     }
 

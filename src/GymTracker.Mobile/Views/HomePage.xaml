@@ -20,9 +20,13 @@
                 <Border.GestureRecognizers>
                     <TapGestureRecognizer Command="{Binding OpenProfileCommand}" />
                 </Border.GestureRecognizers>
-                <Label Text="EL" FontFamily="OpenSansSemibold" FontSize="14"
+                <Image Source="{Binding UserAvatarUrl}" Aspect="AspectFill"
+                       WidthRequest="40" HeightRequest="40"
+                       IsVisible="{Binding HasUserAvatar}" />
+                <Label Text="{Binding UserInitials}" FontFamily="OpenSansSemibold" FontSize="14"
                        TextColor="{DynamicResource Primary}" InputTransparent="True"
-                       HorizontalOptions="Center" VerticalOptions="Center" />
+                       HorizontalOptions="Center" VerticalOptions="Center"
+                       IsVisible="{Binding HasUserAvatar, Converter={StaticResource InverseBoolConverter}}" />
             </Border>
             <!-- Center: FORGE_ELITE title -->
             <Label Grid.Column="1" Text="FORGE_ELITE"

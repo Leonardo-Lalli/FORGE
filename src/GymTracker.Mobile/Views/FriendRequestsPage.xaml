@@ -21,65 +21,115 @@
                     </Label.GestureRecognizers>
                 </Label>
             </Border>
-            <Label Grid.Column="1" Text="Friend Requests" FontFamily="SpaceGrotesk" FontSize="18" FontAttributes="Bold"
+            <Label Grid.Column="1" Text="Notifications" FontFamily="SpaceGrotesk" FontSize="18" FontAttributes="Bold"
                    TextColor="{DynamicResource OnSurface}" HorizontalOptions="Center" VerticalOptions="Center" />
             <Label Grid.Column="2" Text="♥" FontSize="22" TextColor="{DynamicResource Primary}"
                    HorizontalOptions="Center" VerticalOptions="Center" />
         </Grid>
 
-        <Grid Grid.Row="1">
-            <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}"
-                               HorizontalOptions="Center" VerticalOptions="Center"
-                               Color="{DynamicResource Primary}" />
-            <Label Text="Nessuna richiesta in sospeso" IsVisible="{Binding IsEmpty}"
-                   FontFamily="Inter" FontSize="14" TextColor="{DynamicResource TextSecondary}"
-                   HorizontalOptions="Center" VerticalOptions="Center" />
+        <ScrollView Grid.Row="1" Padding="16,0,16,100">
+            <VerticalStackLayout Spacing="16">
 
-            <CollectionView ItemsSource="{Binding Requests}" Margin="0,8,0,100">
-                <CollectionView.ItemTemplate>
-                    <DataTemplate x:DataType="vm:FriendRequestItem">
-                        <Border BackgroundColor="{DynamicResource SurfaceContainerLowest}" Margin="16,4"
-                                StrokeShape="RoundRectangle 14" Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1"
-                                Padding="16">
-                            <Grid ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="12">
-                                <Border Grid.Column="0" BackgroundColor="{DynamicResource PrimaryContainer}"
-                                        StrokeShape="RoundRectangle 999" WidthRequest="44" HeightRequest="44" Padding="0">
-                                    <Label Text="{Binding FromName, StringFormat='{0:0}'}"
-                                           FontFamily="SpaceGrotesk" FontSize="18" FontAttributes="Bold"
-                                           TextColor="{DynamicResource Primary}"
-                                           HorizontalOptions="Center" VerticalOptions="Center" />
+                <!-- ActivityIndicator -->
+                <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}"
+                                   HorizontalOptions="Center" Color="{DynamicResource Primary}" />
+
+                <!-- Empty state -->
+                <Label Text="Nessuna notifica" IsVisible="{Binding IsEmpty}"
+                       FontFamily="Inter" FontSize="14" TextColor="{DynamicResource TextSecondary}"
+                       HorizontalOptions="Center" Margin="0,40" />
+
+                <!-- Friend Requests section -->
+                <VerticalStackLayout Spacing="8"
+                    IsVisible="{Binding HasRequests}">
+                    <Label Text="FRIEND REQUESTS" FontFamily="Lexend" FontSize="10" FontAttributes="Bold"
+                           TextColor="{DynamicResource TextSecondary}" CharacterSpacing="1.5" Margin="4,8,0,0" />
+                    <CollectionView ItemsSource="{Binding Requests}">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="vm:FriendRequestItem">
+                                <Border BackgroundColor="{DynamicResource SurfaceContainerLowest}" Margin="0,4"
+                                        StrokeShape="RoundRectangle 14" Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1"
+                                        Padding="16">
+                                    <Grid ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="12">
+                                        <Border Grid.Column="0" BackgroundColor="{DynamicResource PrimaryContainer}"
+                                                StrokeShape="RoundRectangle 999" WidthRequest="44" HeightRequest="44" Padding="0">
+                                            <Label Text="{Binding FromName, StringFormat='{0:0}'}"
+                                                   FontFamily="SpaceGrotesk" FontSize="18" FontAttributes="Bold"
+                                                   TextColor="{DynamicResource Primary}"
+                                                   HorizontalOptions="Center" VerticalOptions="Center" />
+                                        </Border>
+                                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
+                                            <Label Text="{Binding FromName}" FontFamily="SpaceGrotesk" FontSize="16" FontAttributes="Bold"
+                                                   TextColor="{DynamicResource OnSurface}" />
+                                            <Label Text="Wants to follow you" FontFamily="Inter" FontSize="12"
+                                                   TextColor="{DynamicResource TextSecondary}" />
+                                        </VerticalStackLayout>
+                                        <Border Grid.Column="2" BackgroundColor="{DynamicResource Primary}"
+                                                StrokeShape="RoundRectangle 10" Padding="14,8" HeightRequest="36">
+                                            <Label Text="ACCEPT" FontFamily="Lexend" FontSize="11" FontAttributes="Bold"
+                                                   TextColor="{DynamicResource OnPrimary}" CharacterSpacing="1"
+                                                   VerticalOptions="Center">
+                                                <Label.GestureRecognizers>
+                                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:FriendRequestsViewModel}}, Path=AcceptCommand}" CommandParameter="{Binding .}" />
+                                                </Label.GestureRecognizers>
+                                            </Label>
+                                        </Border>
+                                        <Border Grid.Column="3" BackgroundColor="{DynamicResource SurfaceContainerHigh}"
+                                                StrokeShape="RoundRectangle 10" Padding="14,8" HeightRequest="36"
+                                                Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1">
+                                            <Label Text="✕" FontSize="14" TextColor="{DynamicResource OnSurfaceVariant}"
+                                                   HorizontalOptions="Center" VerticalOptions="Center">
+                                                <Label.GestureRecognizers>
+                                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:FriendRequestsViewModel}}, Path=RejectCommand}" CommandParameter="{Binding .}" />
+                                                </Label.GestureRecognizers>
+                                            </Label>
+                                        </Border>
+                                    </Grid>
                                 </Border>
-                                <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
-                                    <Label Text="{Binding FromName}" FontFamily="SpaceGrotesk" FontSize="16" FontAttributes="Bold"
-                                           TextColor="{DynamicResource OnSurface}" />
-                                    <Label Text="Wants to follow you" FontFamily="Inter" FontSize="12"
-                                           TextColor="{DynamicResource TextSecondary}" />
-                                </VerticalStackLayout>
-                                <Border Grid.Column="2" BackgroundColor="{DynamicResource Primary}"
-                                        StrokeShape="RoundRectangle 10" Padding="14,8" HeightRequest="36">
-                                    <Label Text="ACCEPT" FontFamily="Lexend" FontSize="11" FontAttributes="Bold"
-                                           TextColor="{DynamicResource OnPrimary}" CharacterSpacing="1"
-                                           VerticalOptions="Center">
-                                        <Label.GestureRecognizers>
-                                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:FriendRequestsViewModel}}, Path=AcceptCommand}" CommandParameter="{Binding .}" />
-                                        </Label.GestureRecognizers>
-                                    </Label>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </VerticalStackLayout>
+
+                <!-- Like Notifications section -->
+                <VerticalStackLayout Spacing="8"
+                    IsVisible="{Binding HasLikeNotifications}">
+                    <Label Text="LIKE NOTIFICATIONS" FontFamily="Lexend" FontSize="10" FontAttributes="Bold"
+                           TextColor="{DynamicResource TextSecondary}" CharacterSpacing="1.5" Margin="4,8,0,0" />
+                    <CollectionView ItemsSource="{Binding LikeNotifications}">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="vm:LikeNotificationItem">
+                                <Border BackgroundColor="{DynamicResource SurfaceContainerLowest}" Margin="0,4"
+                                        StrokeShape="RoundRectangle 14" Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1"
+                                        Padding="16">
+                                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                                        <Border Grid.Column="0" BackgroundColor="{DynamicResource LimeGreen}"
+                                                Opacity="0.15" StrokeShape="RoundRectangle 999"
+                                                WidthRequest="44" HeightRequest="44" Padding="0">
+                                            <Label Text="♥" FontSize="22"
+                                                   TextColor="{DynamicResource LimeGreen}"
+                                                   HorizontalOptions="Center" VerticalOptions="Center" />
+                                        </Border>
+                                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
+                                            <Label FontFamily="SpaceGrotesk" FontSize="15" FontAttributes="Bold"
+                                                   TextColor="{DynamicResource OnSurface}">
+                                                <Label.Text>
+                                                    <MultiBinding StringFormat="{}{0} liked your workout">
+                                                        <Binding Path="LikerName" />
+                                                    </MultiBinding>
+                                                </Label.Text>
+                                            </Label>
+                                            <Label Text="{Binding WorkoutName}" FontFamily="Inter" FontSize="12"
+                                                   TextColor="{DynamicResource TextSecondary}" />
+                                        </VerticalStackLayout>
+                                    </Grid>
                                 </Border>
-                                <Border Grid.Column="3" BackgroundColor="{DynamicResource SurfaceContainerHigh}"
-                                        StrokeShape="RoundRectangle 10" Padding="14,8" HeightRequest="36"
-                                        Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1">
-                                    <Label Text="✕" FontSize="14" TextColor="{DynamicResource OnSurfaceVariant}"
-                                           HorizontalOptions="Center" VerticalOptions="Center">
-                                        <Label.GestureRecognizers>
-                                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:FriendRequestsViewModel}}, Path=RejectCommand}" CommandParameter="{Binding .}" />
-                                        </Label.GestureRecognizers>
-                                    </Label>
-                                </Border>
-                            </Grid>
-                        </Border>
-                    </DataTemplate>
-                </CollectionView.ItemTemplate>
-            </CollectionView>
-        </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </VerticalStackLayout>
+
+            </VerticalStackLayout>
+        </ScrollView>
     </Grid>
 </ContentPage>

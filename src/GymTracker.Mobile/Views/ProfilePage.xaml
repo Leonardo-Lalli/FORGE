@@ -155,6 +155,25 @@
                                    HorizontalTextAlignment="Center" />
                         </VerticalStackLayout>
                     </Border>
+
+                    <!-- Likes Received -->
+                    <Border Grid.Row="2" Grid.Column="2"
+                            BackgroundColor="{DynamicResource SurfaceContainerLowest}"
+                            StrokeShape="RoundRectangle 12"
+                            Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1"
+                            Padding="20">
+                        <VerticalStackLayout Spacing="4" HorizontalOptions="Center" VerticalOptions="Center">
+                            <Label Text="{Binding TotalLikesReceived}"
+                                   FontFamily="OpenSansSemibold" FontSize="40" FontAttributes="Bold"
+                                   TextColor="{DynamicResource LimeGreen}"
+                                   HorizontalTextAlignment="Center" />
+                            <Label Text="♥ LIKES"
+                                   FontFamily="OpenSansSemibold" FontSize="11"
+                                   TextColor="{DynamicResource OnSurfaceVariant}"
+                                   CharacterSpacing="1"
+                                   HorizontalTextAlignment="Center" />
+                        </VerticalStackLayout>
+                    </Border>
                 </Grid>
 
                 <!-- Recent Forges -->
@@ -229,7 +248,7 @@
                                                     StrokeShape="RoundRectangle 8" Padding="12,8" Margin="0,0,8,8">
                                                 <HorizontalStackLayout Spacing="6">
                                                     <Label Text="♥" FontSize="14" VerticalOptions="Center" />
-                                                    <Label Text="{Binding Exercises}"
+                                                    <Label Text="{Binding Likes}"
                                                            FontFamily="OpenSansSemibold" FontSize="14"
                                                            TextColor="{DynamicResource OnSurface}" />
                                                 </HorizontalStackLayout>

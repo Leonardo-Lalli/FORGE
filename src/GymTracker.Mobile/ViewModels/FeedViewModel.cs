@@ -18,8 +18,7 @@ public partial class FeedPost : ObservableObject
     public string ExercisesList { get; set; } = string.Empty;
     public string Volume { get; set; } = string.Empty;
     public string Duration { get; set; } = string.Empty;
-    public int Likes { get; set; }
-
+    [ObservableProperty] private int likes;
     [ObservableProperty] private bool isLiked;
     [ObservableProperty] private string heartIcon = "\u2661";
     [ObservableProperty] private string avatarUrl = string.Empty;
@@ -71,6 +70,9 @@ public partial class FeedViewModel : BaseViewModel
     [ObservableProperty] private bool isFeedBusy;
     [ObservableProperty] private bool hasFeed;
     [ObservableProperty] private bool hasSearchResults;
+    [ObservableProperty] private string userInitials = "GT";
+    [ObservableProperty] private string userAvatarUrl = string.Empty;
+    [ObservableProperty] private bool hasUserAvatar;
 
     public FeedViewModel(PocketBaseService pb)
     {
@@ -85,6 +87,7 @@ public partial class FeedViewModel : BaseViewModel
     [RelayCommand]
     private async Task LoadFeedAsync()
     {
+        LoadUserInfo();
         if (!pb.IsLoggedIn) return;
         IsFeedBusy = true;
         try
@@ -212,4 +215,19 @@ public partial class FeedViewModel : BaseViewModel
 
     [RelayCommand]
     private async Task OpenProfileAsync() => await Shell.Current.GoToAsync("profile");
+
+    private void LoadUserInfo()
+    {
+        if (pb.IsLoggedIn && pb.CurrentUser != null)
+        {
+            var u = pb.CurrentUser;
+            UserInitials = (u.Name?.Length >= 2) ? u.Name[..2].ToUpper() : (u.Email?.Length >= 2 ? u.Email[..2].ToUpper() : "GT");
+            if (!string.IsNullOrWhiteSpace(u.Avatar))
+            {
+                UserAvatarUrl = pb.GetFileUrl(u.CollectionId, u.Id, u.Avatar);
+                HasUserAvatar = true;
+            }
+            else HasUserAvatar = false;
+        }
+    }
 }

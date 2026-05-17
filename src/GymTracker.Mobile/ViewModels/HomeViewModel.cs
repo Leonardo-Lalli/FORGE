@@ -30,6 +30,9 @@ public partial class HomeViewModel : BaseViewModel
     [ObservableProperty] private string randomPlanId = string.Empty;
     [ObservableProperty] private bool hasProtocol;
     [ObservableProperty] private ObservableCollection<SquadMember> squad = new();
+    [ObservableProperty] private string userInitials = "GT";
+    [ObservableProperty] private string userAvatarUrl = string.Empty;
+    [ObservableProperty] private bool hasUserAvatar;
 
     public HomeViewModel(PocketBaseService pb)
     {
@@ -45,9 +48,25 @@ public partial class HomeViewModel : BaseViewModel
     [RelayCommand]
     private async Task LoadAsync()
     {
+        LoadUserInfo();
         await CalculateStreakAsync();
         await LoadSquadAsync();
         LoadRandomPlan();
+    }
+
+    private void LoadUserInfo()
+    {
+        if (pb.IsLoggedIn && pb.CurrentUser != null)
+        {
+            var u = pb.CurrentUser;
+            UserInitials = (u.Name?.Length >= 2) ? u.Name[..2].ToUpper() : (u.Email?.Length >= 2 ? u.Email[..2].ToUpper() : "GT");
+            if (!string.IsNullOrWhiteSpace(u.Avatar))
+            {
+                UserAvatarUrl = pb.GetFileUrl(u.CollectionId, u.Id, u.Avatar);
+                HasUserAvatar = true;
+            }
+            else HasUserAvatar = false;
+        }
     }
 
     private void LoadRandomPlan()
@@ -178,6 +197,9 @@ public partial class HomeViewModel : BaseViewModel
 
     [RelayCommand]
     private async Task OpenNotificationsAsync() => await Shell.Current.GoToAsync("notifications");
+
+    [RelayCommand]
+    private async Task OpenProfileAsync() => await Shell.Current.GoToAsync("profile");
 
     [RelayCommand]
     private async Task OpenSettingsAsync() => await Shell.Current.GoToAsync("settings");
