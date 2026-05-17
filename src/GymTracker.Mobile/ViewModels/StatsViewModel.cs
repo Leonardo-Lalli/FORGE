@@ -1,6 +1,8 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
+using GymTracker.Mobile.Messages;
 using GymTracker.Mobile.Services;
 
 namespace GymTracker.Mobile.ViewModels;
@@ -37,24 +39,60 @@ public partial class StatsViewModel : BaseViewModel
     [ObservableProperty] private ObservableCollection<BarEntry> barHeights = new();
     [ObservableProperty] private ObservableCollection<LabelEntry> barLabels = new();
     [ObservableProperty] private string selectedFilter = "week";
+    [ObservableProperty] private string statsError = string.Empty;
+    [ObservableProperty] private bool hasStatsError;
 
     public StatsViewModel(PocketBaseService pb)
     {
         this.pb = pb;
-        HasData = true;
+
+        WeakReferenceMessenger.Default.Register<WorkoutSavedMessage>(this, async (_, _) =>
+        {
+            await MainThread.InvokeOnMainThreadAsync(async () => await LoadAsync());
+        });
     }
 
     [RelayCommand]
     private async Task LoadAsync()
     {
-        if (!pb.IsLoggedIn) return;
+        if (!pb.IsLoggedIn)
+        {
+            StatsError = "Effettua il login per vedere le statistiche.";
+            HasStatsError = true;
+            IsEmptyState = true;
+            HasData = false;
+            return;
+        }
         IsBusy = true;
+        StatsError = string.Empty;
+        HasStatsError = false;
+        IsEmptyState = false;
         try
         {
+            System.Diagnostics.Debug.WriteLine("[Stats] LoadAsync fetching workouts...");
             allWorkouts = await pb.GetMyWorkoutsAsync(365);
+            System.Diagnostics.Debug.WriteLine($"[Stats] GetMyWorkoutsAsync returned {allWorkouts.Count} items");
+            if (allWorkouts.Count == 0)
+            {
+                StatsError = "Nessun dato. Verifica su PocketBase:\n1) Collection 'logged_workouts' esiste\n2) API Rule List/Search = @request.auth.id != \"\"";
+                HasStatsError = true;
+                IsEmptyState = true;
+                HasData = false;
+            }
+            else
+            {
+                HasData = true;
+            }
             ApplyFilter(SelectedFilter);
         }
-        catch { ErrorMessage = "Errore caricamento stats."; }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[Stats] LoadAsync ex: {ex}");
+            StatsError = $"Errore caricamento statistiche: {ex.Message}";
+            HasStatsError = true;
+            IsEmptyState = true;
+            HasData = false;
+        }
         finally { IsBusy = false; }
     }
 
@@ -130,11 +168,10 @@ public partial class StatsViewModel : BaseViewModel
         var exerciseStats = new Dictionary<string, double>();
         foreach (var w in workouts)
         {
-            if (string.IsNullOrWhiteSpace(w.Notes) || !w.Notes.StartsWith("{"))
-                continue;
+            if (string.IsNullOrWhiteSpace(w.ExerciseData)) continue;
             try
             {
-                var data = System.Text.Json.JsonSerializer.Deserialize<List<JsonExercise>>(w.Notes);
+                var data = System.Text.Json.JsonSerializer.Deserialize<List<JsonExercise>>(w.ExerciseData);
                 if (data == null) continue;
                 foreach (var ex in data)
                 {
@@ -149,29 +186,6 @@ public partial class StatsViewModel : BaseViewModel
         }
 
         var top = exerciseStats.OrderByDescending(kv => kv.Value).Take(5).ToList();
-
-        if (top.Count == 0)
-        {
-            try
-            {
-                foreach (var w in workouts.Take(10))
-                {
-                    if (string.IsNullOrWhiteSpace(w.ExerciseData)) continue;
-                    var data = System.Text.Json.JsonSerializer.Deserialize<List<JsonExercise>>(w.ExerciseData);
-                    if (data == null) continue;
-                    foreach (var ex in data)
-                    {
-                        var maxKg = ex.Sets?.Max(s => s.WeightKg) ?? 0;
-                        if (exerciseStats.ContainsKey(ex.Name))
-                            exerciseStats[ex.Name] = Math.Max(exerciseStats[ex.Name], maxKg);
-                        else
-                            exerciseStats[ex.Name] = maxKg;
-                    }
-                }
-                top = exerciseStats.OrderByDescending(kv => kv.Value).Take(5).ToList();
-            }
-            catch { }
-        }
 
         foreach (var kv in top)
         {

@@ -58,29 +58,78 @@
                            TextColor="{DynamicResource OnSurfaceVariant}" />
                 </VerticalStackLayout>
 
+                <!-- Empty / Error state -->
+                <VerticalStackLayout IsVisible="{Binding HasStatsError}"
+                                     Spacing="16" HorizontalOptions="Center" Padding="0,40">
+                    <Label Text="📊" FontSize="48" HorizontalTextAlignment="Center" />
+                    <Label Text="{Binding StatsError}"
+                           FontFamily="Inter" FontSize="16"
+                           TextColor="{DynamicResource OnSurfaceVariant}"
+                           HorizontalTextAlignment="Center" />
+                </VerticalStackLayout>
+
+                <!-- Stats content (hidden when empty) -->
+                <VerticalStackLayout Spacing="32"
+                    IsVisible="{Binding IsEmptyState, Converter={StaticResource InverseBoolConverter}}">
+
                 <!-- Time Filters -->
                 <ScrollView Orientation="Horizontal" HorizontalScrollBarVisibility="Never">
                     <HorizontalStackLayout Spacing="8">
                         <Button Text="WEEK" Command="{Binding SetFilterCommand}" CommandParameter="week"
                                 FontFamily="Lexend" FontSize="10" FontAttributes="Bold"
-                                BackgroundColor="{DynamicResource Primary}" TextColor="{DynamicResource OnPrimary}"
-                                HeightRequest="32" CornerRadius="16" Padding="16,0" />
+                                BackgroundColor="{DynamicResource SurfaceContainer}" TextColor="{DynamicResource OnSurfaceVariant}"
+                                HeightRequest="32" CornerRadius="16" Padding="16,0">
+                            <Button.Triggers>
+                                <DataTrigger TargetType="Button" Binding="{Binding SelectedFilter}" Value="week">
+                                    <Setter Property="BackgroundColor" Value="{DynamicResource Primary}" />
+                                    <Setter Property="TextColor" Value="{DynamicResource OnPrimary}" />
+                                </DataTrigger>
+                            </Button.Triggers>
+                        </Button>
                         <Button Text="MONTH" Command="{Binding SetFilterCommand}" CommandParameter="month"
                                 FontFamily="Lexend" FontSize="10" FontAttributes="Bold"
                                 BackgroundColor="{DynamicResource SurfaceContainer}" TextColor="{DynamicResource OnSurfaceVariant}"
-                                HeightRequest="32" CornerRadius="16" Padding="16,0" />
+                                HeightRequest="32" CornerRadius="16" Padding="16,0">
+                            <Button.Triggers>
+                                <DataTrigger TargetType="Button" Binding="{Binding SelectedFilter}" Value="month">
+                                    <Setter Property="BackgroundColor" Value="{DynamicResource Primary}" />
+                                    <Setter Property="TextColor" Value="{DynamicResource OnPrimary}" />
+                                </DataTrigger>
+                            </Button.Triggers>
+                        </Button>
                         <Button Text="3 MONTHS" Command="{Binding SetFilterCommand}" CommandParameter="3months"
                                 FontFamily="Lexend" FontSize="10" FontAttributes="Bold"
                                 BackgroundColor="{DynamicResource SurfaceContainer}" TextColor="{DynamicResource OnSurfaceVariant}"
-                                HeightRequest="32" CornerRadius="16" Padding="16,0" />
+                                HeightRequest="32" CornerRadius="16" Padding="16,0">
+                            <Button.Triggers>
+                                <DataTrigger TargetType="Button" Binding="{Binding SelectedFilter}" Value="3months">
+                                    <Setter Property="BackgroundColor" Value="{DynamicResource Primary}" />
+                                    <Setter Property="TextColor" Value="{DynamicResource OnPrimary}" />
+                                </DataTrigger>
+                            </Button.Triggers>
+                        </Button>
                         <Button Text="1 YEAR" Command="{Binding SetFilterCommand}" CommandParameter="year"
                                 FontFamily="Lexend" FontSize="10" FontAttributes="Bold"
                                 BackgroundColor="{DynamicResource SurfaceContainer}" TextColor="{DynamicResource OnSurfaceVariant}"
-                                HeightRequest="32" CornerRadius="16" Padding="16,0" />
+                                HeightRequest="32" CornerRadius="16" Padding="16,0">
+                            <Button.Triggers>
+                                <DataTrigger TargetType="Button" Binding="{Binding SelectedFilter}" Value="year">
+                                    <Setter Property="BackgroundColor" Value="{DynamicResource Primary}" />
+                                    <Setter Property="TextColor" Value="{DynamicResource OnPrimary}" />
+                                </DataTrigger>
+                            </Button.Triggers>
+                        </Button>
                         <Button Text="ALL" Command="{Binding SetFilterCommand}" CommandParameter="all"
                                 FontFamily="Lexend" FontSize="10" FontAttributes="Bold"
                                 BackgroundColor="{DynamicResource SurfaceContainer}" TextColor="{DynamicResource OnSurfaceVariant}"
-                                HeightRequest="32" CornerRadius="16" Padding="16,0" />
+                                HeightRequest="32" CornerRadius="16" Padding="16,0">
+                            <Button.Triggers>
+                                <DataTrigger TargetType="Button" Binding="{Binding SelectedFilter}" Value="all">
+                                    <Setter Property="BackgroundColor" Value="{DynamicResource Primary}" />
+                                    <Setter Property="TextColor" Value="{DynamicResource OnPrimary}" />
+                                </DataTrigger>
+                            </Button.Triggers>
+                        </Button>
                     </HorizontalStackLayout>
                 </ScrollView>
 
@@ -184,6 +233,7 @@
                     </VerticalStackLayout>
                 </Border>
 
+            </VerticalStackLayout>
             </VerticalStackLayout>
         </ScrollView>
 

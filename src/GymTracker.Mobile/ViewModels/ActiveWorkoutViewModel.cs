@@ -1,6 +1,8 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
+using GymTracker.Mobile.Messages;
 using GymTracker.Mobile.Models;
 using GymTracker.Mobile.Services;
 
@@ -78,6 +80,8 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
         this.workoutSession = workoutSession;
         this.exerciseApi = exerciseApi;
         this.pb = pb;
+
+        workoutStartTime = DateTime.Now;
 
         Exercises.CollectionChanged += (_, _) => HasExercises = Exercises.Count > 0;
 
@@ -275,6 +279,14 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
         if (string.IsNullOrWhiteSpace(imageUrl))
             imageUrl = result.ImageUrl;
 
+        // Try PocketBase cache for resolved image
+        var cached = await exerciseApi.GetCachedImageUrlAsync(result.Name);
+        if (!string.IsNullOrWhiteSpace(cached) && cached.StartsWith("http"))
+        {
+            imageUrl = cached;
+            System.Diagnostics.Debug.WriteLine($"[SelectExercise] using cached image: {cached[..Math.Min(cached.Length, 80)]}");
+        }
+
         System.Diagnostics.Debug.WriteLine($"[SelectExercise] final ImageUrl={imageUrl}");
 
         Exercises.Add(new WorkoutExercise
@@ -461,59 +473,76 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
         };
         PlanStore.SavePlan(plan);
 
-        if (pb.IsLoggedIn)
-        {
-            try
-            {
-                var exerciseData = Exercises.Select(e => new
-                {
-                    name = e.ExerciseName,
-                    bodyPart = e.BodyPart,
-                    equipment = e.Equipment,
-                    notes = e.Notes,
-                    restSeconds = e.RestSeconds,
-                    sets = e.Sets.Select(s => new
-                    {
-                        setNumber = s.SetNumber,
-                        weightKg = s.WeightKg,
-                        reps = s.Reps,
-                        isCompleted = s.IsCompleted
-                    }).ToList()
-                }).ToList();
-
-                var volume = Exercises.Sum(e => e.Sets.Sum(s => s.WeightKg * s.Reps));
-                var duration = (int)(DateTime.Now - workoutStartTime).TotalMinutes;
-
-                var payload = new
-                {
-                    user = pb.CurrentUser!.Id,
-                    user_name = pb.CurrentUser.Name,
-                    name = name,
-                    date = DateTime.UtcNow.ToString("o"),
-                    notes = WorkoutNotes,
-                    exercises = Exercises.Select(e => e.ExerciseName).ToList(),
-                    exercise_data = System.Text.Json.JsonSerializer.Serialize(exerciseData),
-                    volume = volume,
-                    duration = duration
-                };
-                await pb.CreateRecordAsync("logged_workouts", payload);
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"[SaveWorkout] PB error: {ex.Message}");
-            }
-        }
+        await SaveToPocketBaseAsync(name);
 
         ShowNotification($"Scheda \"{name}\" salvata!");
         workoutSession.End();
         await Shell.Current.GoToAsync("..");
     }
 
+    private async Task SaveToPocketBaseAsync(string name)
+    {
+        if (!pb.IsLoggedIn) return;
+
+        try
+        {
+            var exerciseData = Exercises.Select(e => new
+            {
+                name = e.ExerciseName,
+                bodyPart = e.BodyPart,
+                equipment = e.Equipment,
+                notes = e.Notes,
+                restSeconds = e.RestSeconds,
+                sets = e.Sets.Select(s => new
+                {
+                    setNumber = s.SetNumber,
+                    weightKg = s.WeightKg,
+                    reps = s.Reps,
+                    isCompleted = s.IsCompleted
+                }).ToList()
+            }).ToList();
+
+            var volume = Exercises.Sum(e => e.Sets.Sum(s => s.WeightKg * s.Reps));
+            var duration = (int)(DateTime.Now - workoutStartTime).TotalMinutes;
+
+            var payload = new Dictionary<string, object>
+            {
+                ["user"] = pb.CurrentUser!.Id,
+                ["user_name"] = pb.CurrentUser.Name,
+                ["name"] = name,
+                ["date"] = DateTime.UtcNow.ToString("o"),
+                ["notes"] = WorkoutNotes ?? "",
+                ["exercises"] = Exercises.Select(e => e.ExerciseName).ToList(),
+                ["exercise_data"] = System.Text.Json.JsonSerializer.Serialize(exerciseData),
+                ["volume"] = volume,
+                ["duration"] = Math.Max(1, duration)
+            };
+            var (ok, err) = await pb.CreateRecordAsync("logged_workouts", payload);
+            System.Diagnostics.Debug.WriteLine($"[SaveWorkout] PB result: ok={ok} err={err}");
+            if (ok)
+            {
+                WeakReferenceMessenger.Default.Send(new WorkoutSavedMessage());
+            }
+            if (!ok)
+                ShowNotification($"Errore salvataggio: {err}");
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[SaveWorkout] PB ex: {ex.Message}");
+        }
+    }
+
     [RelayCommand]
     private async Task FinishWorkoutAsync()
     {
         elapsedCts?.Cancel();
-        ShowNotification($"Allenamento completato! {TotalSetsCompleted} serie, {Exercises.Count} esercizi.");
+        restCts?.Cancel();
+
+        if (Exercises.Count > 0 && IsTimerRunning)
+        {
+            await SaveToPocketBaseAsync(PlanName);
+        }
+
         workoutSession.End();
         await Shell.Current.GoToAsync("..");
     }

@@ -25,7 +25,10 @@ public class PocketBaseService
     public string GetFileUrl(string collectionId, string recordId, string fileName)
     {
         var baseUrl = secrets.Get("POCKETBASE_URL")?.TrimEnd('/') ?? "";
-        return $"{baseUrl}/api/files/{collectionId}/{recordId}/{fileName}?token={token}";
+        var tokenParam = !string.IsNullOrWhiteSpace(token) ? $"?token={token}" : "";
+        var url = $"{baseUrl}/api/files/{collectionId}/{recordId}/{fileName}{tokenParam}";
+        System.Diagnostics.Debug.WriteLine($"[PB FileUrl] hasToken={!string.IsNullOrWhiteSpace(token)} url={url}");
+        return url;
     }
 
     public PocketBaseService(HttpClient http, BuildSecrets secrets)
@@ -63,6 +66,7 @@ public class PocketBaseService
 
             token = auth.Token;
             currentUser = auth.Record;
+            System.Diagnostics.Debug.WriteLine($"[PB Login] userId={currentUser.Id} name={currentUser.Name}");
             SaveCredentials(email, password);
 
             return (true, string.Empty);
@@ -251,25 +255,29 @@ public class PocketBaseService
         EnsureInitialized();
         try
         {
+            var json = JsonSerializer.Serialize(record, JsonOptions);
+            System.Diagnostics.Debug.WriteLine($"[PB Create] collection={collection} auth={!string.IsNullOrWhiteSpace(token)}");
+            System.Diagnostics.Debug.WriteLine($"[PB Create] payload={json[..Math.Min(json.Length, 500)]}");
             var request = new HttpRequestMessage(HttpMethod.Post, $"collections/{collection}/records")
             {
-                Content = new StringContent(JsonSerializer.Serialize(record, JsonOptions),
-                    Encoding.UTF8, "application/json")
+                Content = new StringContent(json, Encoding.UTF8, "application/json")
             };
             if (!string.IsNullOrWhiteSpace(token))
                 request.Headers.Authorization =
                     new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
             var response = await http.SendAsync(request);
+            var body = await response.Content.ReadAsStringAsync();
+            System.Diagnostics.Debug.WriteLine($"[PB Create] status={response.StatusCode} body[..200]={body[..Math.Min(body.Length, 200)]}");
             if (!response.IsSuccessStatusCode)
             {
-                var body = await response.Content.ReadAsStringAsync();
                 return (false, ParseErrorMessage(body));
             }
             return (true, string.Empty);
         }
         catch (Exception ex)
         {
+            System.Diagnostics.Debug.WriteLine($"[PB Create] EX: {ex.Message}");
             return (false, ex.Message);
         }
     }
@@ -338,14 +346,15 @@ public class PocketBaseService
         if (!IsLoggedIn || currentUser == null) return new();
         try
         {
-            var filter = $"to_user=\"{currentUser.Id}\"&&status=\"pending\"";
-            var url = $"collections/social_graph/records?filter={Uri.EscapeDataString(filter)}&perPage=50";
+            var url = "collections/social_graph/records?perPage=50";
             var request = new HttpRequestMessage(HttpMethod.Get, url);
             request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
             var response = await http.SendAsync(request);
             if (!response.IsSuccessStatusCode) return new();
             var list = await response.Content.ReadFromJsonAsync<PocketBaseListResponse<SocialGraphRecord>>(JsonOptions);
-            return list?.Items ?? new();
+            return list?.Items
+                .Where(r => r.ToUser == currentUser.Id && r.Status == "pending")
+                .ToList() ?? new();
         }
         catch { return new(); }
     }
@@ -391,33 +400,137 @@ public class PocketBaseService
         if (!IsLoggedIn || currentUser == null) return new();
         try
         {
-            var filter = $"from_user=\"{currentUser.Id}\"&&status=\"accepted\"";
-            var url = $"collections/social_graph/records?filter={Uri.EscapeDataString(filter)}&perPage=200";
+            var url = "collections/social_graph/records?perPage=200";
             var request = new HttpRequestMessage(HttpMethod.Get, url);
             request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
             var response = await http.SendAsync(request);
             if (!response.IsSuccessStatusCode) return new();
             var list = await response.Content.ReadFromJsonAsync<PocketBaseListResponse<SocialGraphRecord>>(JsonOptions);
-            return list?.Items.Select(r => r.ToUser).ToList() ?? new();
+            return list?.Items
+                .Where(r => r.FromUser == currentUser.Id && r.Status == "accepted")
+                .Select(r => r.ToUser)
+                .ToList() ?? new();
         }
         catch { return new(); }
     }
 
     public async Task<List<LoggedWorkoutRecord>> GetMyWorkoutsAsync(int limit = 10)
     {
-        if (!IsLoggedIn || currentUser == null) return new();
+        if (!IsLoggedIn || currentUser == null)
+        {
+            System.Diagnostics.Debug.WriteLine($"[PB MyWorkouts] skipped: IsLoggedIn={IsLoggedIn} currentUser={currentUser != null}");
+            return new();
+        }
         try
         {
-            var filter = $"user=\"{currentUser.Id}\"";
-            var url = $"collections/logged_workouts/records?filter={Uri.EscapeDataString(filter)}&perPage={limit}&sort=-created";
+            var userId = currentUser.Id;
+            var cappedLimit = Math.Min(limit, 200);
+
+            var result = await TryFetchWorkoutsAsync(cappedLimit, userId);
+            if (result != null)
+            {
+                result = result.OrderByDescending(w =>
+                {
+                    DateTime.TryParse(w.Date, out var d);
+                    return d;
+                }).ToList();
+            }
+            return result ?? new();
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[PB MyWorkouts] ex={ex}");
+            return new();
+        }
+    }
+
+    private async Task<List<LoggedWorkoutRecord>?> TryFetchWorkoutsAsync(int perPage, string userId)
+    {
+        try
+        {
+            var url = $"collections/logged_workouts/records?perPage={perPage}";
+            System.Diagnostics.Debug.WriteLine($"[PB MyWorkouts] url={url}");
             var request = new HttpRequestMessage(HttpMethod.Get, url);
             request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
             var response = await http.SendAsync(request);
-            if (!response.IsSuccessStatusCode) return new();
-            var list = await response.Content.ReadFromJsonAsync<PocketBaseListResponse<LoggedWorkoutRecord>>(JsonOptions);
-            return list?.Items ?? new();
+            var body = await response.Content.ReadAsStringAsync();
+            System.Diagnostics.Debug.WriteLine($"[PB MyWorkouts] status={response.StatusCode} bodyLen={body.Length}");
+            if (!response.IsSuccessStatusCode)
+            {
+                System.Diagnostics.Debug.WriteLine($"[PB MyWorkouts] FAIL body[..200]={body[..Math.Min(body.Length, 200)]}");
+                return null;
+            }
+            return ParseWorkoutRecords(body, userId);
         }
-        catch { return new(); }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[PB MyWorkouts] TryFetch err: {ex.Message}");
+            return null;
+        }
+    }
+
+    private List<LoggedWorkoutRecord> ParseWorkoutRecords(string body, string? userId)
+    {
+        var results = new List<LoggedWorkoutRecord>();
+        try
+        {
+            using var doc = JsonDocument.Parse(body);
+            if (!doc.RootElement.TryGetProperty("items", out var items) || items.ValueKind != JsonValueKind.Array)
+            {
+                System.Diagnostics.Debug.WriteLine("[PB MyWorkouts] no 'items' array in response");
+                return results;
+            }
+
+            foreach (var item in items.EnumerateArray())
+            {
+                var record = new LoggedWorkoutRecord();
+                if (item.TryGetProperty("id", out var idEl)) record.Id = idEl.GetString() ?? "";
+                if (item.TryGetProperty("name", out var nameEl)) record.Name = nameEl.GetString() ?? "";
+                if (item.TryGetProperty("date", out var dateEl)) record.Date = dateEl.GetString() ?? "";
+                if (item.TryGetProperty("notes", out var notesEl)) record.Notes = notesEl.GetString() ?? "";
+                if (item.TryGetProperty("exercise_data", out var exDataEl))
+                {
+                    if (exDataEl.ValueKind == JsonValueKind.String)
+                        record.ExerciseData = exDataEl.GetString() ?? "";
+                    else
+                        record.ExerciseData = exDataEl.GetRawText();
+                }
+                if (item.TryGetProperty("user_name", out var unameEl)) record.UserName = unameEl.GetString() ?? "";
+                if (item.TryGetProperty("volume", out var volEl) && volEl.TryGetDouble(out var v)) record.Volume = v;
+                if (item.TryGetProperty("duration", out var durEl) && durEl.TryGetInt32(out var d)) record.Duration = d;
+                if (item.TryGetProperty("likes", out var likesEl) && likesEl.TryGetInt32(out var l)) record.Likes = l;
+
+                if (item.TryGetProperty("user", out var userEl))
+                {
+                    if (userEl.ValueKind == JsonValueKind.String)
+                        record.User = userEl.GetString() ?? "";
+                    else if (userEl.ValueKind == JsonValueKind.Object && userEl.TryGetProperty("id", out var uidEl))
+                        record.User = uidEl.GetString() ?? "";
+                }
+
+                if (item.TryGetProperty("exercises", out var exArr) && exArr.ValueKind == JsonValueKind.Array)
+                {
+                    foreach (var ex in exArr.EnumerateArray())
+                        record.Exercises.Add(ex.GetString() ?? "");
+                }
+
+                if (item.TryGetProperty("liked_by", out var likedArr) && likedArr.ValueKind == JsonValueKind.Array)
+                {
+                    foreach (var lb in likedArr.EnumerateArray())
+                        record.LikedBy.Add(lb.GetString() ?? "");
+                }
+
+                if (userId == null || record.User == userId)
+                    results.Add(record);
+            }
+
+            System.Diagnostics.Debug.WriteLine($"[PB MyWorkouts] parsed {results.Count} items (userId='{userId}') from {items.GetArrayLength()} total");
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[PB MyWorkouts] ParseWorkoutRecords ex: {ex}");
+        }
+        return results;
     }
 
     public async Task<List<LoggedWorkoutRecord>> GetFollowedWorkoutsAsync()
@@ -426,27 +539,29 @@ public class PocketBaseService
         try
         {
             var followingIds = await GetFollowingUserIdsAsync();
+            System.Diagnostics.Debug.WriteLine($"[PB FollowedWorkouts] followingIds={string.Join(",", followingIds)}");
             if (followingIds.Count == 0) return new();
 
-            var filterParts = followingIds.Select(id => $"user=\"{id}\"").ToList();
-            var filter = string.Join("||", filterParts);
-            var url = $"collections/logged_workouts/records?filter={Uri.EscapeDataString(filter)}&perPage=30&sort=-created";
+            var url = $"collections/logged_workouts/records?perPage=30";
             var request = new HttpRequestMessage(HttpMethod.Get, url);
             request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
             var response = await http.SendAsync(request);
-            if (!response.IsSuccessStatusCode) return new();
-
-            var list = await response.Content.ReadFromJsonAsync<PocketBaseListResponse<LoggedWorkoutRecord>>(JsonOptions);
-            var records = list?.Items ?? new();
+            var body = await response.Content.ReadAsStringAsync();
+            if (!response.IsSuccessStatusCode)
+            {
+                System.Diagnostics.Debug.WriteLine($"[PB FollowedWorkouts] FAIL status={response.StatusCode} body={body[..Math.Min(body.Length, 200)]}");
+                return new();
+            }
+            var records = ParseWorkoutRecords(body, null);
+            records = records.Where(w => followingIds.Contains(w.User)).ToList();
 
             foreach (var r in records)
             {
-                var user = followingIds.Contains(r.User) ? r.User : "";
-                if (!string.IsNullOrWhiteSpace(user))
+                if (!string.IsNullOrWhiteSpace(r.User))
                 {
                     try
                     {
-                        var userReq = new HttpRequestMessage(HttpMethod.Get, $"collections/users/records/{user}");
+                        var userReq = new HttpRequestMessage(HttpMethod.Get, $"collections/users/records/{r.User}");
                         userReq.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
                         var userRes = await http.SendAsync(userReq);
                         if (userRes.IsSuccessStatusCode)
@@ -522,6 +637,36 @@ public class PocketBaseService
             return response.IsSuccessStatusCode ? (true, string.Empty) : (false, "Errore unlike.");
         }
         catch (Exception ex) { return (false, ex.Message); }
+    }
+
+    public async Task<string?> GetCachedExerciseImageAsync(string exerciseName)
+    {
+        if (!IsLoggedIn) return null;
+        try
+        {
+            var filter = $"name=\"{exerciseName}\"";
+            var url = $"collections/excercise/records?filter={Uri.EscapeDataString(filter)}&perPage=1";
+            var request = new HttpRequestMessage(HttpMethod.Get, url);
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            var response = await http.SendAsync(request);
+            if (!response.IsSuccessStatusCode) return null;
+
+            var body = await response.Content.ReadAsStringAsync();
+            var list = JsonSerializer.Deserialize<CachedExerciseListResponse>(body, JsonOptions);
+            var item = list?.Items?.FirstOrDefault();
+            return item?.ImageUrl;
+        }
+        catch { return null; }
+    }
+
+    public class CachedExerciseListResponse
+    {
+        public List<CachedExerciseItem> Items { get; set; } = new();
+    }
+
+    public class CachedExerciseItem
+    {
+        public string ImageUrl { get; set; } = "";
     }
 
     private static string ParseErrorMessage(string body)

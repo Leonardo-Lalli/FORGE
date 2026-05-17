@@ -168,6 +168,13 @@
                                TextColor="{DynamicResource Primary}" VerticalOptions="Center" />
                     </Grid>
 
+                    <!-- Workout load error -->
+                    <Label Text="{Binding WorkoutLoadError}"
+                           IsVisible="{Binding HasWorkoutError}"
+                           FontFamily="Inter" FontSize="14"
+                           TextColor="{DynamicResource TextSecondary}"
+                           HorizontalTextAlignment="Center" Margin="0,16" />
+
                     <VerticalStackLayout Spacing="16"
                         BindableLayout.ItemsSource="{Binding RecentWorkouts}">
                         <BindableLayout.ItemTemplate>
@@ -197,8 +204,9 @@
                                             <Border Grid.Column="1"
                                                     BackgroundColor="{DynamicResource ErrorContainer}"
                                                     StrokeShape="RoundRectangle 12" Padding="12,6"
-                                                    VerticalOptions="Start">
-                                                <Label Text="{Binding Category}"
+                                                    VerticalOptions="Start"
+                                                    IsVisible="False">
+                                                <Label Text="FORGE"
                                                        FontFamily="OpenSansSemibold" FontSize="11"
                                                        TextColor="{DynamicResource OnErrorContainer}"
                                                        CharacterSpacing="0.6" />
@@ -221,7 +229,7 @@
                                                     StrokeShape="RoundRectangle 8" Padding="12,8" Margin="0,0,8,8">
                                                 <HorizontalStackLayout Spacing="6">
                                                     <Label Text="♥" FontSize="14" VerticalOptions="Center" />
-                                                    <Label Text="{Binding HeartRate}"
+                                                    <Label Text="{Binding Exercises}"
                                                            FontFamily="OpenSansSemibold" FontSize="14"
                                                            TextColor="{DynamicResource OnSurface}" />
                                                 </HorizontalStackLayout>
@@ -243,11 +251,11 @@
                                                  Color="{DynamicResource OutlineVariant}"
                                                  Margin="0,8" />
                                         <VerticalStackLayout Grid.Column="2" Grid.Row="3" Spacing="6" Margin="0,8,0,0">
-                                            <Label Text="PROTOCOL OUTLINE"
+                                            <Label Text="EXERCISES"
                                                    FontFamily="OpenSansSemibold" FontSize="11"
                                                    TextColor="{DynamicResource OnSurfaceVariant}"
                                                    CharacterSpacing="0.6" />
-                                            <Label Text="{Binding Description}"
+                                            <Label Text="{Binding Exercises}"
                                                    FontFamily="OpenSansRegular" FontSize="16"
                                                    TextColor="{DynamicResource OnSurface}"
                                                    LineBreakMode="WordWrap" />

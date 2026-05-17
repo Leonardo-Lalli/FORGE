@@ -1,6 +1,8 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
+using GymTracker.Mobile.Messages;
 using GymTracker.Mobile.Services;
 
 namespace GymTracker.Mobile.ViewModels;
@@ -33,12 +35,19 @@ public partial class ProfileViewModel : BaseViewModel
     [ObservableProperty] private string streakDays = "0";
     [ObservableProperty] private string streakLabel = "Day Streak";
     [ObservableProperty] private string totalVolume = "0";
+    [ObservableProperty] private string workoutLoadError = string.Empty;
+    [ObservableProperty] private bool hasWorkoutError;
     [ObservableProperty] private ObservableCollection<ProfileWorkout> recentWorkouts = new();
 
     public ProfileViewModel(PocketBaseService pb)
     {
         this.pb = pb;
         HasData = true;
+
+        WeakReferenceMessenger.Default.Register<WorkoutSavedMessage>(this, async (_, _) =>
+        {
+            await MainThread.InvokeOnMainThreadAsync(async () => await LoadAsync());
+        });
     }
 
     [RelayCommand]
@@ -63,9 +72,11 @@ public partial class ProfileViewModel : BaseViewModel
             {
                 AvatarUrl = pb.GetFileUrl(user.CollectionId, user.Id, user.Avatar);
                 HasAvatar = true;
+                System.Diagnostics.Debug.WriteLine($"[Profile] AvatarUrl={AvatarUrl}");
             }
             else
             {
+                System.Diagnostics.Debug.WriteLine($"[Profile] No avatar field on user record");
                 HasAvatar = false;
             }
 
@@ -84,9 +95,13 @@ public partial class ProfileViewModel : BaseViewModel
 
     private async Task LoadRealWorkouts()
     {
+        WorkoutLoadError = string.Empty;
+        HasWorkoutError = false;
         try
         {
+            System.Diagnostics.Debug.WriteLine("[Profile] LoadRealWorkouts starting...");
             var workouts = await pb.GetMyWorkoutsAsync(10);
+            System.Diagnostics.Debug.WriteLine($"[Profile] GetMyWorkoutsAsync returned {workouts.Count} items");
             TotalWorkouts = workouts.Count.ToString();
 
             double totalVol = 0;
@@ -117,12 +132,21 @@ public partial class ProfileViewModel : BaseViewModel
 
             TotalVolume = $"{totalVol:0.#} kg";
 
+            if (workouts.Count == 0)
+            {
+                WorkoutLoadError = "Nessun allenamento salvato. Inizia un allenamento!";
+                HasWorkoutError = true;
+            }
+
             await CalculateStreakAsync();
         }
-        catch
+        catch (Exception ex)
         {
+            System.Diagnostics.Debug.WriteLine($"[Profile] LoadRealWorkouts ex: {ex}");
             TotalWorkouts = "0";
             TotalVolume = "0 kg";
+            WorkoutLoadError = $"Errore caricamento: {ex.Message}";
+            HasWorkoutError = true;
         }
     }
 
@@ -228,14 +252,26 @@ public partial class ProfileViewModel : BaseViewModel
 
             using var stream = await result.OpenReadAsync();
             var ok = await pb.UploadAvatarAsync(stream, result.FileName);
+            System.Diagnostics.Debug.WriteLine($"[Profile] UploadAvatar result: {ok}");
             if (ok)
             {
                 await pb.RefreshUserAsync();
-                HasAvatar = !string.IsNullOrWhiteSpace(pb.CurrentUser?.Avatar);
-                if (HasAvatar)
-                    AvatarUrl = pb.GetFileUrl(pb.CurrentUser!.CollectionId, pb.CurrentUser.Id, pb.CurrentUser.Avatar);
+                var user = pb.CurrentUser;
+                if (user != null && !string.IsNullOrWhiteSpace(user.Avatar))
+                {
+                    AvatarUrl = pb.GetFileUrl(user.CollectionId, user.Id, user.Avatar);
+                    HasAvatar = true;
+                    System.Diagnostics.Debug.WriteLine($"[Profile] New AvatarUrl={AvatarUrl}");
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine("[Profile] Avatar still empty after upload/refresh");
+                }
             }
         }
-        catch { }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[Profile] ChangeAvatar ex: {ex.Message}");
+        }
     }
 }

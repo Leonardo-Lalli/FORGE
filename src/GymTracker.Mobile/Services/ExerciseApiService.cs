@@ -61,6 +61,15 @@ public class ExerciseApiService
         }
     }
 
+    public async Task<string?> GetCachedImageUrlAsync(string exerciseName)
+    {
+        try
+        {
+            return await pb.GetCachedExerciseImageAsync(exerciseName);
+        }
+        catch { return null; }
+    }
+
     public async Task<List<ExerciseDbDto>> SearchByNameAsync(string name)
     {
         var searchTerm = name.ToLowerInvariant().Replace(" ", "_");
@@ -142,21 +151,9 @@ public class ExerciseApiService
                 ["force"] = exercise.Force ?? "",
                 ["mechanic"] = exercise.Mechanic ?? ""
             };
-            var json = System.Text.Json.JsonSerializer.Serialize(payload, new System.Text.Json.JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true,
-                PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase
-            });
-            var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
-            var req = new HttpRequestMessage(HttpMethod.Post, "collections/excercise/records")
-            {
-                Content = content
-            };
-            req.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", pb.Token);
-            var res = await http.SendAsync(req);
-            var body = await res.Content.ReadAsStringAsync();
-            if (!res.IsSuccessStatusCode)
-                System.Diagnostics.Debug.WriteLine($"[CacheExercise] status={res.StatusCode} body={body}");
+            var (ok, err) = await pb.CreateRecordAsync("excercise", payload);
+            if (!ok)
+                System.Diagnostics.Debug.WriteLine($"[CacheExercise] pb error: {err}");
         }
         catch (Exception ex)
         {
@@ -225,17 +222,17 @@ public class ExerciseApiService
             var img = exercise.Images.FirstOrDefault() ?? "";
             var imageUrl = img.StartsWith("http") ? img : $"https://{img}";
 
-            var payload = new
+            var payload = new Dictionary<string, object?>
             {
-                name = exercise.Name,
-                bodyPart = exercise.PrimaryMuscles.FirstOrDefault() ?? "",
-                equipment = exercise.Equipment ?? "",
-                instructions = exercise.Instructions ?? new List<string>(),
-                imageUrl,
-                category = exercise.Category ?? "",
-                level = exercise.Level ?? "",
-                force = exercise.Force ?? "",
-                mechanic = exercise.Mechanic ?? ""
+                ["name"] = exercise.Name,
+                ["bodyPart"] = exercise.PrimaryMuscles.FirstOrDefault() ?? "",
+                ["equipment"] = exercise.Equipment ?? "",
+                ["instructions"] = exercise.Instructions ?? new List<string>(),
+                ["imageUrl"] = imageUrl,
+                ["category"] = exercise.Category ?? "",
+                ["level"] = exercise.Level ?? "",
+                ["force"] = exercise.Force ?? "",
+                ["mechanic"] = exercise.Mechanic ?? ""
             };
             await pb.CreateRecordAsync("excercise", payload);
         }

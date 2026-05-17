@@ -1,6 +1,8 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
+using GymTracker.Mobile.Messages;
 using GymTracker.Mobile.Services;
 
 namespace GymTracker.Mobile.ViewModels;
@@ -25,6 +27,11 @@ public partial class HomeViewModel : BaseViewModel
     {
         this.pb = pb;
         HasData = true;
+
+        WeakReferenceMessenger.Default.Register<WorkoutSavedMessage>(this, async (_, _) =>
+        {
+            await MainThread.InvokeOnMainThreadAsync(async () => await LoadAsync());
+        });
     }
 
     [RelayCommand]

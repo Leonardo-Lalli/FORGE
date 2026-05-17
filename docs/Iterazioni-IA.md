@@ -630,3 +630,95 @@ Ricostruita interamente basandosi su `allenamento_attivo_minimal_bianco` e `alle
 | Build status | 0 errori, 0 warning |
 
 *Report aggiornato il 2026-05-15.*
+
+---
+
+## Aggiornamento 2026-05-17 — Branch `mockup`: Social, Stats reali, redesign allenamento, fix PocketBase
+
+### Commit: `5e26124` — feat(mockup): social follow system, real stats/profile/dashboard, live feed search, configurable rest timer, FORGE branding
+
+#### Modifiche
+| Modifica | File | Descrizione |
+|----------|------|-------------|
+| ExerciseSet ObservableObject | `Models/WorkoutPlan.cs` | `ExerciseSet` ora estende `ObservableObject` con `[ObservableProperty]` su `WeightKg`, `Reps`, `IsCompleted` — il checkmark ✓ reagisce al tocco riempiendosi di LimeGreen |
+| Timer pausa configurabile | `Views/ActiveWorkoutPage.xaml`, `ViewModels/ActiveWorkoutViewModel.cs` | Entry per secondi pausa globale; `OnRestDurationChanged` con validazione 5-600s; rest timer per singolo esercizio (`RestSeconds` in `WorkoutExercise`) |
+| Note esercizio | `ActiveWorkoutPage.xaml` | `TextColor="White"` su sfondo blu (`PrimaryContainer`, opacity 0.2) |
+| Entry numeriche al posto dei ± | `ActiveWorkoutPage.xaml` | Set row ridisegnata: `[SET \| KG Entry \| REPS Entry \| ✓]` — tastiera numerica, niente più 9 colonne |
+| Bottone ADD SET mockup | `ActiveWorkoutPage.xaml` | Rimosso bordo dashed, testo centrato Lexend come da mockup `allenamento_attivo_nero_opaco_minimal_v2` |
+| Note generali nascoste | `ActiveWorkoutPage.xaml` | Blocco "Note sull'allenamento" rimosso; `HasExercises` bindato a `Exercises.CollectionChanged` |
+| Nome app FORGE | `GymTracker.Mobile.csproj` | `ApplicationTitle` → "FORGE" |
+| Icona app SVG | `GymTracker.Mobile.csproj` | `MauiIcon` con sfondo `#0E0E0E`, foreground SVG |
+| PocketBase social | `Services/PocketBaseService.cs` | `SearchUsersAsync` (ricerca via `?search=`), `SendFollowRequestAsync`, `GetPendingRequestsAsync`, `AcceptFollowRequestAsync`, `RejectFollowRequestAsync`, `GetFollowingUserIdsAsync`, `GetFollowedWorkoutsAsync`, `LikeWorkoutAsync`, `UnlikeWorkoutAsync`, `GetMyWorkoutsAsync`, `UploadAvatarAsync` (multipart), `GetFileUrl` (con `?token=`) |
+| Social DTO | `Models/Dto/PocketBaseDto.cs` | `SocialGraphRecord`, `LoggedWorkoutRecord` (con `ExerciseData`, `Likes`, `LikedBy`, `UserName`) |
+| FeedPage ridisegnata | `Views/FeedPage.xaml`, `ViewModels/FeedViewModel.cs` | Rimossi mock post. Search bar per cercare utenti (live ad ogni lettera, debounce 400ms). Feed allenamenti dei seguiti con cuore ♥ (like/unlike). `UserSearchResult` con pulsante Follow. |
+| FriendRequestsPage | `Views/FriendRequestsPage.xaml`, `ViewModels/FriendRequestsViewModel.cs` | Lista richieste in sospeso con ACCEPT/REJECT. Auto-load su `OnAppearing`. |
+| StatsPage reale | `Views/StatsPage.xaml`, `ViewModels/StatsViewModel.cs` | Rimossa sezione calorie. Aggiunti filtri tempo: WEEK / MONTH / 3M / YEAR / ALL. Dati reali da PocketBase. Grafico volume dinamico con `BindableLayout`. Top lifts calcolate dai pesi reali. Cuore ♥ al posto dell'ingranaggio, naviga a FriendRequests. |
+| ProfilePage reale | `Views/ProfilePage.xaml`, `ViewModels/ProfileViewModel.cs` | Allenamenti reali da PocketBase. Calorie sostituite con Total Volume. Streak calcolato da date reali. Avatar cliccabile per upload foto profilo. `UriImageSource` per avatar. |
+| Dashboard reale | `Views/HomePage.xaml`, `ViewModels/HomeViewModel.cs` | Streak calcolato da date reali. Achievements rimossi. Squad da utenti seguiti reali. |
+| Cache immagini PocketBase | `Services/ExerciseApiService.cs` | `GetCachedImageUrlAsync` cerca URL risolti in `excercise`. `GetByMuscleAsync` risolve URL prima del return. Payload cache con `Dictionary<string, object?>` (nomi campo esatti). |
+| Salva workout completo | `ViewModels/ActiveWorkoutViewModel.cs` | `exercise_data` JSON con serie, kg, reps, note, restSeconds. Payload via `Dictionary<string, object>` con `user_name`. Debug log su `CreateRecordAsync` e `SaveWorkoutPlanAsync`. |
+| Fix filtri PocketBase | `Services/PocketBaseService.cs` | Rimossi tutti i filtri lato server (causavano 400 Bad Request su campi relation). Filtro client-side in C#. |
+| Tool ExerciseImporter | `tools/ExerciseImporter/` | Console app per pre-caricare immagini risolte da PC a PocketBase (bypassa blocco ISP su `encr.pw`/`acesse.dev`). |
+
+#### Stato PocketBase collections richiesto
+| Collection | Campi necessari | API Rules |
+|-----------|-----------------|-----------|
+| `logged_workouts` | `user`, `user_name`, `name`, `date`, `notes`, `exercises` (json), `exercise_data` (json), `volume` (number), `duration` (number), `likes` (number), `liked_by` (json) | List/Search: `@request.auth.id != ""` |
+| `excercise` | `name`, `bodyPart`, `equipment`, `instructions` (json), `imageUrl` (url), `category`, `level`, `force`, `mechanic` | Create: `@request.auth.id != ""` |
+| `social_graph` | `from_user`, `from_name`, `to_user`, `status` | Create + List/Search: `@request.auth.id != ""` |
+| `users` | — | List/Search: `@request.auth.id != ""` |
+
+#### Problemi noti
+- **Immagini ExerciseDB bloccate dall'ISP**: domini `encr.pw`, `acesse.dev`, `l1nq.com` risolti a `127.0.0.1` da Telecom Italia. Soluzione: eseguire `tools/ExerciseImporter` con VPN attiva per pre-cachare le immagini su PocketBase.
+- **`excercise` collection 404**: la collection non esiste ancora su PocketBase → va creata con i campi sopra.
+- **`logged_workouts` List 400**: manca API Rules → `@request.auth.id != ""`.
+
+### Metriche aggiornate
+| Metrica | Valore |
+|---------|--------|
+| ViewModel | 14 (+FriendRequestsViewModel) |
+| Views | 16 (+FriendRequestsPage, ri-scritte FeedPage, StatsPage, ProfilePage, HomePage, ActiveWorkoutPage) |
+| Services | 6 |
+| DTO | 2 (+SocialGraphRecord, LoggedWorkoutRecord) |
+| Fonts | 5 |
+| Tools | 1 (ExerciseImporter) |
+| Branch attivo | mockup |
+| Build status | 0 errori |
+
+*Report aggiornato il 2026-05-17.*
+
+---
+
+## Aggiornamento 2026-05-17 — Fix dati allenamenti non visibili in Stats e Profilo
+
+### Problema
+L'utente salvava un allenamento (presente su PocketBase) ma non lo vedeva nella tab Stats né nel Profilo.
+
+### Causa root
+`GetMyWorkoutsAsync` deserializzava l'intera lista con `JsonSerializer.Deserialize<PocketBaseListResponse<LoggedWorkoutRecord>>()`. PocketBase può restituire il campo `user` della relazione come oggetto `{id:"..."}` invece di stringa semplice `"..."`. System.Text.Json falliva la deserializzazione dell'intera lista e l'eccezione veniva silenziata dal `catch(Exception)` → lista vuota.
+
+### Fix applicati
+
+| Fix | File | Descrizione |
+|-----|------|-------------|
+| ParseWorkoutRecords robusto | `PocketBaseService.cs` | Nuovo metodo `ParseWorkoutRecords(string body, string? userId)` che usa `JsonDocument` per estrarre ogni campo manualmente da `items[]`. Gestisce il campo `user` sia come stringa che come oggetto `{id:"..."}`. Parsing per-item: se un item fallisce, gli altri sopravvivono |
+| GetFollowedWorkoutsAsync fix | `PocketBaseService.cs` | Stesso parsing robusto invece di `ReadFromJsonAsync` |
+| CreateRecordAsync logging | `PocketBaseService.cs` | Logga payload intero (500 char), auth status, e corpo risposta anche su successo |
+| GetMyWorkoutsAsync logging | `PocketBaseService.cs` | Logga URL, userId, corpo risposta (500 char), ogni item, conteggio post-filtro |
+| StatsViewModel error visibility | `StatsViewModel.cs` | `StatsError` + `HasStatsError` + `IsEmptyState`. Messaggi: non loggato / nessun dato / errore |
+| StatsPage empty/error UI | `StatsPage.xaml` | Sezione vuota con icona e messaggio quando nessun dato |
+| ProfileViewModel error visibility | `ProfileViewModel.cs` | `WorkoutLoadError` + `HasWorkoutError`. Logga conteggio item ricevuti |
+| ProfilePage error UI | `ProfilePage.xaml` | Label errore nella sezione Recent Forges |
+| Stats filter buttons feedback | `StatsPage.xaml` | DataTrigger sui bottoni WEEK/MONTH/3M/YEAR/ALL cambia colore quando selezionato |
+| ProfilePage bindings fix | `ProfilePage.xaml` | Sostituiti `Category`, `HeartRate`, `Description` (inesistenti) con `Exercises` |
+
+### PocketBase: verifiche necessarie
+1. Collection `logged_workouts` deve esistere con campo `user` (tipo `relation` → `users`)
+2. API Rule List/Search: `@request.auth.id != ""`
+3. Se dopo il fix ancora non funziona, controllare i log di debug filtrando `[PB MyWorkouts]` per vedere cosa restituisce PocketBase
+
+### Metriche aggiornate
+| Metrica | Valore |
+|---------|--------|
+| Build status | 0 errori, 107 warning (tutti MVVMTK0045 pre-esistenti) |
+| Branch attivo | mockup |

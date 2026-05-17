@@ -1,6 +1,8 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
+using GymTracker.Mobile.Messages;
 using GymTracker.Mobile.Models.Dto;
 using GymTracker.Mobile.Services;
 
@@ -69,6 +71,11 @@ public partial class FeedViewModel : BaseViewModel
     public FeedViewModel(PocketBaseService pb)
     {
         this.pb = pb;
+
+        WeakReferenceMessenger.Default.Register<WorkoutSavedMessage>(this, async (_, _) =>
+        {
+            await MainThread.InvokeOnMainThreadAsync(async () => await LoadFeedAsync());
+        });
     }
 
     [RelayCommand]
