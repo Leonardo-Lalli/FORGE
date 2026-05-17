@@ -13,6 +13,7 @@
 [Perché FORGE](#perché-forge) ·
 [Come funziona](#come-funziona) ·
 [Architettura](#architettura) ·
+[Download APK](#download-apk) ·
 [Installazione e Build](#installazione-e-build) ·
 [Documentazione](#documentazione)
 
@@ -184,6 +185,17 @@ Route di dettaglio:
 
 ---
 
+## Download APK
+
+L'APK Release già compilato si trova nella cartella `publish`:
+
+📦 **[`src/GymTracker.Mobile/bin/Release/net10.0-android/publish/com.companyname.gymtracker.mobile-Signed.apk`](src/GymTracker.Mobile/bin/Release/net10.0-android/publish/com.companyname.gymtracker.mobile-Signed.apk)**
+
+> Per installarlo: trasferisci l'APK sul dispositivo Android e aprilo, oppure usa `adb install com.companyname.gymtracker.mobile-Signed.apk`.  
+> Richiede Android 7.0+ e connessione Internet per le API.
+
+---
+
 ## Installazione e Build
 
 ### Prerequisiti
@@ -208,11 +220,11 @@ POCKETBASE_URL=https://tuo-server-pb.dominio.com
 # Build
 dotnet build src/GymTracker.Mobile/GymTracker.Mobile.csproj -f net10.0-android
 
-# Publish APK
-dotnet publish src/GymTracker.Mobile/GymTracker.Mobile.csproj -f net10.0-android -c Release
+# Publish APK Release
+dotnet publish src/GymTracker.Mobile/GymTracker.Mobile.csproj -f net10.0-android -c Release /p:AndroidPackageFormats=apk
 
-# Run su emulatore/device
-dotnet build src/GymTracker.Mobile/GymTracker.Mobile.csproj -f net10.0-android -t:Run
+# APK generato in:
+# src/GymTracker.Mobile/bin/Release/net10.0-android/publish/com.companyname.gymtracker.mobile-Signed.apk
 ```
 
 ---
