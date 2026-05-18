@@ -57,11 +57,11 @@ FORGE risolve tre problemi reali:
 3. Le credenziali vengono salvate in locale per l'auto-login
 4. Dopo il login, atterra sulla **Dashboard**
 
-<p align="center"><img src="assets/screenshots/01-login.jpg" width="280" /></p>
+<p align="center"><img src="assets/screenshots/login.jpeg" width="280" /></p>
 
 ### 📋 Dashboard (Tab 1)
 
-<p align="center"><img src="assets/screenshots/02-dashboard.jpg" width="280" /></p>
+<p align="center"><img src="assets/screenshots/dashboard.jpeg" width="280" /></p>
 
 - **Squad Activity**: avatar circolari degli amici seguiti con allenamenti recenti — tap per andare al Feed
 - **Current Streak**: numero di settimane consecutive con almeno un allenamento (reset dopo 7+ giorni di inattività)
@@ -70,7 +70,7 @@ FORGE risolve tre problemi reali:
 
 ### 🔍 Feed & Social (Tab 2)
 
-<p align="center"><img src="assets/screenshots/03-feed.jpg" width="280" /></p>
+<p align="center"><img src="assets/screenshots/feed.jpeg" width="280" /></p>
 
 - **Search Bar**: cerca altri atleti per nome (live search con debounce 400ms)
 - **Follow/Unfollow**: invia richieste di amicizia con un tap
@@ -83,7 +83,7 @@ FORGE risolve tre problemi reali:
 
 ### 📊 Statistiche (Tab 3)
 
-<p align="center"><img src="assets/screenshots/04-stats.jpg" width="280" /></p>
+<p align="center"><img src="assets/screenshots/stats.jpeg" width="280" /></p>
 
 - **TopBar**: avatar profilo (tap → Profilo), titolo FORGE, ♥ (tap → Notifiche)
 - **Total Workouts / Volume / Hours**: card riepilogative con trend
@@ -96,6 +96,8 @@ FORGE risolve tre problemi reali:
 - **Friend Requests**: richieste di amicizia in sospeso con pulsanti ACCEPT / REJECT
 - **Like Notifications**: quando un utente mette like a un tuo allenamento, vedi: `{Nome} liked your workout {NomeWorkout}`
 
+<p align="center"><img src="assets/screenshots/feed-notification.jpeg" width="280" /></p>
+
 ### 🏋️ Start Session
 - **Quick Start**: avvia un allenamento libero (modalità free)
 - **Create New Plan**: vai alla creazione guidata di un piano
@@ -103,7 +105,7 @@ FORGE risolve tre problemi reali:
 
 ### 💪 Allenamento Attivo
 
-<p align="center"><img src="assets/screenshots/05-workout.jpg" width="280" /></p>
+<p align="center"><img src="assets/screenshots/active-workout1.jpeg" width="280" /></p>
 
 - **Progress Bar**: barra Primary in cima, percentuale completamento
 - **Header**: ✕ chiudi, nome scheda (SpaceGrotesk), pulsante FINISH
@@ -114,9 +116,11 @@ FORGE risolve tre problemi reali:
 - **Rest Timer**: input secondi pausa globale, timer per esercizio
 - **Finish**: salva l'allenamento su PocketBase con nome, data, volume, durata, esercizi
 
+<p align="center"><img src="assets/screenshots/allenamento attivo 2.jpeg" width="280" /></p>
+
 ### 👤 Profilo
 
-<p align="center"><img src="assets/screenshots/06-profile.jpg" width="280" /></p>
+<p align="center"><img src="assets/screenshots/profile.jpeg" width="280" /></p>
 
 - **Avatar**: foto profilo da PocketBase (o iniziali se non caricata) — tappabile per cambiare foto
 - **Statistiche**: Total Workouts, Total Volume, Week Streak, ♥ Likes ricevuti
