@@ -52,18 +52,26 @@ FORGE risolve tre problemi reali:
 ## Come funziona
 
 ### 🚀 Primo avvio
-1. L'utente apre l'app e vede la schermata di **Login**
+1. L'utente apre l'app e vede la schermata di **Login** (sopra)
 2. Può registrarsi con email, nome e password (account creato su PocketBase)
 3. Le credenziali vengono salvate in locale per l'auto-login
 4. Dopo il login, atterra sulla **Dashboard**
 
+<p align="center"><img src="assets/screenshots/01-login.jpg" width="280" /></p>
+
 ### 📋 Dashboard (Tab 1)
+
+<p align="center"><img src="assets/screenshots/02-dashboard.jpg" width="280" /></p>
+
 - **Squad Activity**: avatar circolari degli amici seguiti con allenamenti recenti — tap per andare al Feed
 - **Current Streak**: numero di settimane consecutive con almeno un allenamento (reset dopo 7+ giorni di inattività)
 - **Today Card**: piano di allenamento casuale dalla tua libreria — tap per avviarlo subito
 - **▶ START WORKOUT**: pulsante principale che apre la schermata Start Session
 
 ### 🔍 Feed & Social (Tab 2)
+
+<p align="center"><img src="assets/screenshots/03-feed.jpg" width="280" /></p>
+
 - **Search Bar**: cerca altri atleti per nome (live search con debounce 400ms)
 - **Follow/Unfollow**: invia richieste di amicizia con un tap
 - **Feed Allenamenti**: scroll verticale dei workout degli amici con:
@@ -74,6 +82,9 @@ FORGE risolve tre problemi reali:
 - **⚙ in alto a destra**: Impostazioni (tema chiaro/scuro, logout)
 
 ### 📊 Statistiche (Tab 3)
+
+<p align="center"><img src="assets/screenshots/04-stats.jpg" width="280" /></p>
+
 - **TopBar**: avatar profilo (tap → Profilo), titolo FORGE, ♥ (tap → Notifiche)
 - **Total Workouts / Volume / Hours**: card riepilogative con trend
 - **Filtri temporali**: WEEK / MONTH / 3M / YEAR / ALL — cliccabili con feedback visivo
@@ -91,6 +102,9 @@ FORGE risolve tre problemi reali:
 - **Your Protocols**: lista dei piani salvati con esercizi, serie, peso, ripetizioni, tempo di recupero — tap per avviare, ✕ per eliminare
 
 ### 💪 Allenamento Attivo
+
+<p align="center"><img src="assets/screenshots/05-workout.jpg" width="280" /></p>
+
 - **Progress Bar**: barra Primary in cima, percentuale completamento
 - **Header**: ✕ chiudi, nome scheda (SpaceGrotesk), pulsante FINISH
 - **Ricerca esercizi**: barra ricerca con chip per gruppo muscolare e attrezzatura — fetch da ExerciseDB API con cache su PocketBase
@@ -101,6 +115,9 @@ FORGE risolve tre problemi reali:
 - **Finish**: salva l'allenamento su PocketBase con nome, data, volume, durata, esercizi
 
 ### 👤 Profilo
+
+<p align="center"><img src="assets/screenshots/06-profile.jpg" width="280" /></p>
+
 - **Avatar**: foto profilo da PocketBase (o iniziali se non caricata) — tappabile per cambiare foto
 - **Statistiche**: Total Workouts, Total Volume, Week Streak, ♥ Likes ricevuti
 - **Recent Forges**: lista ultimi allenamenti con titolo, data, durata, like, volume
