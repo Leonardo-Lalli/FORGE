@@ -187,11 +187,11 @@ Route di dettaglio:
 
 ## Download APK
 
-L'APK Release già compilato si trova nella cartella `publish`:
+L'APK Release già compilato è disponibile nella root del repository:
 
-📦 **[`src/GymTracker.Mobile/bin/Release/net10.0-android/publish/com.companyname.gymtracker.mobile-Signed.apk`](src/GymTracker.Mobile/bin/Release/net10.0-android/publish/com.companyname.gymtracker.mobile-Signed.apk)**
+📦 **[`FORGE.apk`](FORGE.apk)** *(33.4 MB)*
 
-> Per installarlo: trasferisci l'APK sul dispositivo Android e aprilo, oppure usa `adb install com.companyname.gymtracker.mobile-Signed.apk`.  
+> Per installarlo: scarica il file, trasferiscilo sul dispositivo Android e aprilo, oppure usa `adb install FORGE.apk`.  
 > Richiede Android 7.0+ e connessione Internet per le API.
 
 ---
