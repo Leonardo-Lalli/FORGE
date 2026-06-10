@@ -38,6 +38,7 @@ public class ExerciseDbApiService
         if (warmDone) return;
         warmDone = true;
 
+        await db.DeleteExercisesByPrefixAsync("wger-");
         var count = (await db.GetCachedExercisesAsync()).Count;
         if (count >= 100) return;
 

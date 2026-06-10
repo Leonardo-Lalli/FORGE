@@ -107,6 +107,12 @@ public class DatabaseService
             await d.InsertAsync(plan);
     }
 
+    public async Task DeleteExercisesByPrefixAsync(string prefix)
+    {
+        var d = await GetDbAsync();
+        await d.ExecuteAsync("DELETE FROM cached_exercises WHERE Id LIKE ?", $"{prefix}%");
+    }
+
     public async Task DeletePlanAsync(string planId)
     {
         var d = await GetDbAsync();
