@@ -103,26 +103,28 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
 
         MuscleFilters = new ObservableCollection<FilterChip>
         {
-            new() { Label = "Tutti", Value = "all", IsSelected = true },
-            new() { Label = "Petto", Value = "chest" },
-            new() { Label = "Schiena", Value = "back" },
-            new() { Label = "Spalle", Value = "shoulders" },
+            new() { Label = "Tutti", Value = "", IsSelected = true },
+            new() { Label = "Petto", Value = "pectorals" },
+            new() { Label = "Dorsali", Value = "lats" },
+            new() { Label = "Spalle", Value = "delts" },
             new() { Label = "Bicipiti", Value = "biceps" },
             new() { Label = "Tricipiti", Value = "triceps" },
-            new() { Label = "Addominali", Value = "abdominals" },
+            new() { Label = "Addominali", Value = "abs" },
             new() { Label = "Quadricipiti", Value = "quadriceps" },
             new() { Label = "Femorali", Value = "hamstrings" },
-            new() { Label = "Glutei", Value = "glutes" }
+            new() { Label = "Glutei", Value = "glutes" },
+            new() { Label = "Polpacci", Value = "calves" }
         };
 
         EquipmentFilters = new ObservableCollection<FilterChip>
         {
-            new() { Label = "Tutti", Value = "all", IsSelected = true },
+            new() { Label = "Tutti", Value = "", IsSelected = true },
             new() { Label = "Bilanciere", Value = "barbell" },
             new() { Label = "Manubri", Value = "dumbbell" },
             new() { Label = "Cavi", Value = "cable" },
             new() { Label = "Macchinari", Value = "machine" },
-            new() { Label = "Corpo libero", Value = "body only" },
+            new() { Label = "Corpo libero", Value = "body weight" },
+            new() { Label = "Elastico", Value = "band" },
             new() { Label = "Kettlebell", Value = "kettlebells" }
         };
     }
@@ -220,16 +222,27 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
     {
         foreach (var m in MuscleFilters) m.IsSelected = false;
         chip.IsSelected = true;
-        SearchError = string.Empty;
 
-        if (chip.Value == "all") { SearchQuery = ""; return; }
+        if (string.IsNullOrEmpty(chip.Value))
+        {
+            SearchQuery = "";
+            SearchResults.Clear();
+            SearchError = "";
+            return;
+        }
 
         IsSearchingApi = true;
         try
         {
-            var results = await exerciseDbApi.GetByMuscleAsync(chip.Value);
+            var all = await db.GetCachedExercisesAsync();
+            var results = all
+                .Where(e => e.BodyPart.Contains(chip.Value, StringComparison.OrdinalIgnoreCase)
+                         || e.Category.Contains(chip.Value, StringComparison.OrdinalIgnoreCase))
+                .Take(20)
+                .ToList();
+
             SearchResults.Clear();
-            foreach (var r in results.Take(10))
+            foreach (var r in results)
             {
                 SearchResults.Add(new ExerciseSearchResult
                 {
@@ -239,18 +252,50 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
                     ImageUrl = r.ImageUrl
                 });
             }
+            SearchError = results.Count == 0 ? "Nessun esercizio trovato per questo muscolo." : "";
         }
-        catch { SearchError = "API non raggiungibile."; }
+        catch { SearchError = "Cache non disponibile."; }
         finally { IsSearchingApi = false; }
     }
 
     [RelayCommand]
-    private void SelectEquipmentFilter(FilterChip chip)
+    private async Task SelectEquipmentFilterAsync(FilterChip chip)
     {
         foreach (var e in EquipmentFilters) e.IsSelected = false;
         chip.IsSelected = true;
-        // Filter client-side by equipment
-        SearchError = "";
+
+        if (string.IsNullOrEmpty(chip.Value))
+        {
+            SearchQuery = "";
+            SearchResults.Clear();
+            SearchError = "";
+            return;
+        }
+
+        IsSearchingApi = true;
+        try
+        {
+            var all = await db.GetCachedExercisesAsync();
+            var results = all
+                .Where(e => e.Equipment.Contains(chip.Value, StringComparison.OrdinalIgnoreCase))
+                .Take(20)
+                .ToList();
+
+            SearchResults.Clear();
+            foreach (var r in results)
+            {
+                SearchResults.Add(new ExerciseSearchResult
+                {
+                    Id = r.Id, Name = r.Name,
+                    BodyPart = r.BodyPart,
+                    Equipment = r.Equipment,
+                    ImageUrl = r.ImageUrl
+                });
+            }
+            SearchError = results.Count == 0 ? "Nessun esercizio trovato per questa attrezzatura." : "";
+        }
+        catch { SearchError = "Cache non disponibile."; }
+        finally { IsSearchingApi = false; }
     }
 
     [RelayCommand]

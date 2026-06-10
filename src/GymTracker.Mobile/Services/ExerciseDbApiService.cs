@@ -140,52 +140,27 @@ public class ExerciseDbApiService
         return matches.Take(20).Select(ToSearchResult).ToList();
     }
 
-    public async Task<List<ExerciseSearchResultDto>> GetByMuscleAsync(string muscle)
+    public async Task<List<ExerciseSearchResultDto>> GetByBodyPartAsync(string bodyPart)
     {
-        var target = muscle.ToLowerInvariant();
-
+        var target = bodyPart.ToLowerInvariant();
         var cached = await db.GetCachedExercisesAsync();
-        var matches = cached
+        return cached
             .Where(e => e.BodyPart.ToLowerInvariant().Contains(target)
                      || e.Category.ToLowerInvariant().Contains(target))
-            .Take(15)
+            .Take(20)
+            .Select(ToSearchResult)
             .ToList();
+    }
 
-        if (matches.Count >= 5)
-            return matches.Select(ToSearchResult).ToList();
-
-        try
-        {
-            var url = $"exercises/muscles?muscle={Uri.EscapeDataString(muscle)}&limit=20";
-            var response = await GetHttp().GetAsync(url);
-            response.EnsureSuccessStatusCode();
-            var json = await response.Content.ReadAsStringAsync();
-            var result = JsonSerializer.Deserialize<ExerciseDbV1ListResponse>(json, JsonOptions);
-            if (result?.Data != null)
-            {
-                foreach (var ex in result.Data)
-                {
-                    var cachedEx = new CachedExercise
-                    {
-                        Id = ex.ExerciseId,
-                        Name = Capitalize(ex.Name),
-                        BodyPart = ex.GetBodyParts().FirstOrDefault() ?? "",
-                        Equipment = ex.GetEquipments().FirstOrDefault() ?? "",
-                        InstructionsJson = JsonSerializer.Serialize(ex.GetInstructions()),
-                        ImageUrl = ex.GifUrl,
-                        Category = ex.GetBodyParts().FirstOrDefault() ?? ""
-                    };
-                    await db.SaveCachedExerciseAsync(cachedEx);
-                    matches.Add(cachedEx);
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            System.Diagnostics.Debug.WriteLine($"[ExerciseDB Muscle] ex: {ex.Message}");
-        }
-
-        return matches.Take(15).Select(ToSearchResult).ToList();
+    public async Task<List<ExerciseSearchResultDto>> GetByEquipmentAsync(string equipment)
+    {
+        var target = equipment.ToLowerInvariant();
+        var cached = await db.GetCachedExercisesAsync();
+        return cached
+            .Where(e => e.Equipment.ToLowerInvariant().Contains(target))
+            .Take(20)
+            .Select(ToSearchResult)
+            .ToList();
     }
 
     public async Task<ExerciseDbV1Dto?> GetByIdAsync(string exerciseId)
