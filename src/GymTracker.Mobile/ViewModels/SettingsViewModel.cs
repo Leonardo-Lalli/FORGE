@@ -9,15 +9,21 @@ public partial class SettingsViewModel : BaseViewModel
 {
     private readonly ThemeService themeService;
     private readonly PocketBaseService pb;
+    private readonly CsvImportService csvImport;
+    private readonly CsvExportService csvExport;
     private bool suppressChange;
 
-    [ObservableProperty]
-    private bool isDarkMode;
+    [ObservableProperty] private bool isDarkMode;
+    [ObservableProperty] private string importStatus = string.Empty;
+    [ObservableProperty] private bool hasImportStatus;
 
-    public SettingsViewModel(ThemeService themeService, PocketBaseService pb)
+    public SettingsViewModel(ThemeService themeService, PocketBaseService pb,
+        CsvImportService csvImport, CsvExportService csvExport)
     {
         this.themeService = themeService;
         this.pb = pb;
+        this.csvImport = csvImport;
+        this.csvExport = csvExport;
         suppressChange = true;
         IsDarkMode = themeService.IsDarkMode;
         suppressChange = false;
@@ -37,6 +43,74 @@ public partial class SettingsViewModel : BaseViewModel
         var window = App.Current!.Windows[0];
         window.Page = new LoginPage(
             App.Current!.Handler!.MauiContext!.Services.GetService<LoginViewModel>()!);
+    }
+
+    [RelayCommand]
+    private async Task ImportCsvAsync()
+    {
+        if (!pb.IsLoggedIn || pb.CurrentUser == null)
+        {
+            SetImportStatus("Effettua il login prima di importare.");
+            return;
+        }
+
+        try
+        {
+            var result = await FilePicker.PickAsync(new PickOptions
+            {
+                PickerTitle = "Seleziona file CSV",
+                FileTypes = new FilePickerFileType(new Dictionary<DevicePlatform, IEnumerable<string>>
+                {
+                    { DevicePlatform.Android, new[] { "text/csv", "text/comma-separated-values", "application/csv" } },
+                    { DevicePlatform.iOS, new[] { "public.comma-separated-values-text" } }
+                })
+            });
+
+            if (result == null) return;
+
+            using var stream = await result.OpenReadAsync();
+            using var reader = new StreamReader(stream);
+            var content = await reader.ReadToEndAsync();
+
+            var (imported, skipped, errors) = await csvImport.ImportFromCsvAsync(
+                content, pb.CurrentUser.Id, pb.CurrentUser.Name);
+
+            var msg = $"Importati {imported} allenamenti. Saltati {skipped}.";
+            if (errors.Count > 0)
+                msg += $"\nErrori: {string.Join("; ", errors.Take(3))}";
+            SetImportStatus(msg);
+        }
+        catch (Exception ex)
+        {
+            SetImportStatus($"Errore: {ex.Message}");
+        }
+    }
+
+    [RelayCommand]
+    private async Task ExportCsvAsync()
+    {
+        if (!pb.IsLoggedIn || pb.CurrentUser == null)
+        {
+            SetImportStatus("Effettua il login prima di esportare.");
+            return;
+        }
+
+        try
+        {
+            SetImportStatus("Esportazione in corso...");
+            await csvExport.SaveCsvFileAsync(pb.CurrentUser.Id);
+            SetImportStatus("Esportazione completata!");
+        }
+        catch (Exception ex)
+        {
+            SetImportStatus($"Errore export: {ex.Message}");
+        }
+    }
+
+    private void SetImportStatus(string msg)
+    {
+        ImportStatus = msg;
+        HasImportStatus = true;
     }
 
     [RelayCommand]

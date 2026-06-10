@@ -38,6 +38,7 @@ public static class MauiProgram
 
         builder.Services.AddHttpClient("pocketbase");
         builder.Services.AddHttpClient("exercisedb");
+        builder.Services.AddHttpClient("wger");
         builder.Services.AddHttpClient("redirect", client =>
         {
             client.Timeout = TimeSpan.FromSeconds(5);
@@ -58,6 +59,9 @@ public static class MauiProgram
         });
         builder.Services.AddSingleton<SyncService>();
         builder.Services.AddSingleton<PlanService>();
+        builder.Services.AddSingleton<WgerExerciseService>();
+        builder.Services.AddSingleton<CsvImportService>();
+        builder.Services.AddSingleton<CsvExportService>();
 
         // ViewModels
         builder.Services.AddTransient<HomeViewModel>();

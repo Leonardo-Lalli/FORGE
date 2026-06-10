@@ -58,6 +58,65 @@
                 </Border>
 
                 <!-- Account Section -->
+                <Label Text="DATI"
+                       FontFamily="OpenSansSemibold" FontSize="11" FontAttributes="Bold"
+                       TextColor="{DynamicResource TextSecondary}"
+                       CharacterSpacing="0.8" Margin="0,8,0,0" />
+
+                <!-- Import CSV -->
+                <Border BackgroundColor="{DynamicResource SurfaceContainerHigh}"
+                        StrokeShape="RoundRectangle 12"
+                        Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1"
+                        Padding="16">
+                    <VerticalStackLayout Spacing="8">
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="Importa CSV"
+                                   FontFamily="OpenSansSemibold" FontSize="16" FontAttributes="Bold"
+                                   TextColor="{DynamicResource OnSurface}" />
+                            <Label Text="Importa allenamenti da altre app (Date,WorkoutName,ExerciseName,Sets,Reps,WeightKg,Notes)"
+                                   FontFamily="OpenSansRegular" FontSize="13"
+                                   TextColor="{DynamicResource TextSecondary}" />
+                        </VerticalStackLayout>
+                        <Button Text="IMPORTA CSV"
+                                BackgroundColor="{DynamicResource Primary}"
+                                TextColor="{DynamicResource OnPrimary}"
+                                FontFamily="OpenSansSemibold" FontSize="14" FontAttributes="Bold"
+                                HeightRequest="44" CornerRadius="8"
+                                Command="{Binding ImportCsvCommand}" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Export CSV -->
+                <Border BackgroundColor="{DynamicResource SurfaceContainerHigh}"
+                        StrokeShape="RoundRectangle 12"
+                        Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1"
+                        Padding="16">
+                    <VerticalStackLayout Spacing="8">
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="Esporta CSV"
+                                   FontFamily="OpenSansSemibold" FontSize="16" FontAttributes="Bold"
+                                   TextColor="{DynamicResource OnSurface}" />
+                            <Label Text="Esporta i tuoi allenamenti in formato CSV"
+                                   FontFamily="OpenSansRegular" FontSize="13"
+                                   TextColor="{DynamicResource TextSecondary}" />
+                        </VerticalStackLayout>
+                        <Button Text="ESPORTA CSV"
+                                BackgroundColor="{DynamicResource Secondary}"
+                                TextColor="{DynamicResource OnSecondary}"
+                                FontFamily="OpenSansSemibold" FontSize="14" FontAttributes="Bold"
+                                HeightRequest="44" CornerRadius="8"
+                                Command="{Binding ExportCsvCommand}" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Import Status -->
+                <Label Text="{Binding ImportStatus}"
+                       FontFamily="OpenSansRegular" FontSize="13"
+                       TextColor="{DynamicResource TextSecondary}"
+                       IsVisible="{Binding HasImportStatus}"
+                       HorizontalTextAlignment="Center" />
+
+                <!-- Account Section -->
                 <Label Text="ACCOUNT"
                        FontFamily="OpenSansSemibold" FontSize="11" FontAttributes="Bold"
                        TextColor="{DynamicResource TextSecondary}"
