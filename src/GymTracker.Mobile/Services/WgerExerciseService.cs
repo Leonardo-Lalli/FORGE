@@ -8,6 +8,7 @@ public class WgerExerciseService
 {
     private readonly IHttpClientFactory httpFactory;
     private readonly DatabaseService db;
+    private readonly PocketBaseService? pb;
     private HttpClient? _http;
 
     private HttpClient GetHttp()
@@ -25,10 +26,11 @@ public class WgerExerciseService
         PropertyNameCaseInsensitive = true
     };
 
-    public WgerExerciseService(IHttpClientFactory httpFactory, DatabaseService db)
+    public WgerExerciseService(IHttpClientFactory httpFactory, DatabaseService db, PocketBaseService pb)
     {
         this.httpFactory = httpFactory;
         this.db = db;
+        this.pb = pb;
     }
 
     public async Task WarmCacheAsync()
@@ -69,10 +71,51 @@ public class WgerExerciseService
             }
             var afterCount = (await db.GetCachedExercisesAsync()).Count;
             System.Diagnostics.Debug.WriteLine($"[Wger WarmCache] cached {afterCount} exercises (+{afterCount - count})");
+
+            _ = SyncToPocketBaseAsync().ContinueWith(t =>
+            {
+                if (t.IsFaulted)
+                    System.Diagnostics.Debug.WriteLine($"[Wger Sync] ex: {t.Exception?.InnerException?.Message}");
+            }, TaskContinuationOptions.OnlyOnFaulted);
         }
         catch (Exception ex)
         {
             System.Diagnostics.Debug.WriteLine($"[Wger WarmCache] ex: {ex.Message}");
+        }
+    }
+
+    private async Task SyncToPocketBaseAsync()
+    {
+        if (pb == null || !pb.IsLoggedIn) return;
+
+        try
+        {
+            var cached = await db.GetCachedExercisesAsync();
+            var synced = 0;
+            foreach (var ex in cached)
+            {
+                try
+                {
+                    var instructions = JsonSerializer.Deserialize<List<string>>(ex.InstructionsJson) ?? new();
+                    var payload = new Dictionary<string, object?>
+                    {
+                        ["name"] = ex.Name,
+                        ["bodyPart"] = ex.BodyPart,
+                        ["equipment"] = ex.Equipment,
+                        ["instructions"] = instructions,
+                        ["imageUrl"] = ex.ImageUrl,
+                        ["category"] = ex.Category
+                    };
+                    await pb.CreateRecordAsync("excercise", payload);
+                    synced++;
+                }
+                catch { }
+            }
+            System.Diagnostics.Debug.WriteLine($"[Wger Sync] synced {synced} exercises to PocketBase");
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[Wger Sync] ex: {ex.Message}");
         }
     }
 

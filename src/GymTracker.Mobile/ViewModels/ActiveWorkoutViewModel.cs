@@ -316,44 +316,29 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
     [RelayCommand]
     private async Task SelectExerciseAsync(ExerciseSearchResult result)
     {
-        var full = await exerciseApi.GetExerciseByIdAsync(result.Id);
-        var imageUrl = "";
-        var gifUrl = "";
+        var imageUrl = result.ImageUrl;
         var instructions = new List<string>();
+        var exerciseName = result.Name;
+        var bodyPart = result.BodyPart;
+        var equipment = result.Equipment;
 
+        var full = await exerciseApi.GetExerciseByIdAsync(result.Id);
         if (full != null)
         {
-            if (full.Images.Count > 0)
-            {
-                var img = full.Images[0];
-                imageUrl = img.StartsWith("http") ? img : $"https://{img}";
-                System.Diagnostics.Debug.WriteLine($"[SelectExercise] raw={img} resolved={imageUrl}");
-            }
-            gifUrl = imageUrl;
+            exerciseName = full.Name;
+            bodyPart = full.PrimaryMuscles.FirstOrDefault() ?? bodyPart;
+            equipment = full.Equipment ?? equipment;
             instructions = full.Instructions;
         }
-
-        if (string.IsNullOrWhiteSpace(imageUrl))
-            imageUrl = result.ImageUrl;
-
-        // Try PocketBase cache for resolved image
-        var cached = await exerciseApi.GetCachedImageUrlAsync(result.Name);
-        if (!string.IsNullOrWhiteSpace(cached) && cached.StartsWith("http"))
-        {
-            imageUrl = cached;
-            System.Diagnostics.Debug.WriteLine($"[SelectExercise] using cached image: {cached[..Math.Min(cached.Length, 80)]}");
-        }
-
-        System.Diagnostics.Debug.WriteLine($"[SelectExercise] final ImageUrl={imageUrl}");
 
         Exercises.Add(new WorkoutExercise
         {
             ExerciseId = result.Id,
-            ExerciseName = result.Name,
-            BodyPart = result.BodyPart,
-            Equipment = result.Equipment,
+            ExerciseName = exerciseName,
+            BodyPart = bodyPart,
+            Equipment = equipment,
             ImageUrl = imageUrl,
-            GifUrl = gifUrl,
+            GifUrl = imageUrl,
             Instructions = instructions,
             Order = Exercises.Count + 1
         });
