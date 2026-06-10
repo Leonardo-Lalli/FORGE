@@ -1,4 +1,5 @@
 using System.Text.Json;
+using GymTracker.Mobile.Models;
 using GymTracker.Mobile.Models.Dto;
 
 namespace GymTracker.Mobile.Services;
@@ -6,6 +7,7 @@ namespace GymTracker.Mobile.Services;
 public class WgerExerciseService
 {
     private readonly IHttpClientFactory httpFactory;
+    private readonly DatabaseService db;
     private HttpClient? _http;
 
     private HttpClient GetHttp()
@@ -14,7 +16,7 @@ public class WgerExerciseService
         _http = httpFactory.CreateClient("wger");
         _http.BaseAddress = new Uri("https://wger.de/api/v2/");
         _http.DefaultRequestHeaders.UserAgent.ParseAdd("FORGE/1.0");
-        _http.Timeout = TimeSpan.FromSeconds(10);
+        _http.Timeout = TimeSpan.FromSeconds(15);
         return _http;
     }
 
@@ -23,158 +25,162 @@ public class WgerExerciseService
         PropertyNameCaseInsensitive = true
     };
 
-    public WgerExerciseService(IHttpClientFactory httpFactory)
+    public WgerExerciseService(IHttpClientFactory httpFactory, DatabaseService db)
     {
         this.httpFactory = httpFactory;
+        this.db = db;
     }
 
     public async Task<List<ExerciseDbDto>> SearchExercisesAsync(string name, string? language = "2")
     {
+        var lang = language ?? "2";
+        var searchTerm = name.ToLowerInvariant();
+
+        var cached = await db.GetCachedExercisesAsync();
+        var matches = cached
+            .Where(e => e.Name.ToLowerInvariant().Contains(searchTerm))
+            .Take(15)
+            .ToList();
+
+        if (matches.Count >= 5)
+            return MapToDto(matches);
+
         try
         {
-            var lang = language ?? "2";
-            var url = $"exercise/search/?language={lang}&limit=15&term={Uri.EscapeDataString(name)}";
+            var url = $"exerciseinfo/?language={lang}&limit=100&offset=0";
             var response = await GetHttp().GetAsync(url);
             response.EnsureSuccessStatusCode();
             var json = await response.Content.ReadAsStringAsync();
-            var result = JsonSerializer.Deserialize<WgerListResponse<WgerExercise>>(json, JsonOptions);
+            var result = JsonSerializer.Deserialize<WgerListResponse>(json, JsonOptions);
 
-            if (result?.Results == null || result.Results.Count == 0)
-                return new();
+            if (result?.Results == null)
+                return MapToDto(matches);
 
-            var exercises = new List<ExerciseDbDto>();
-            foreach (var ex in result.Results)
+            var apiMatches = result.Results
+                .Where(ex => ex.Translations?.FirstOrDefault()?.Name?.ToLowerInvariant().Contains(searchTerm) == true)
+                .Take(15)
+                .ToList();
+
+            foreach (var ex in apiMatches)
             {
-                var dto = new ExerciseDbDto
+                var translation = ex.Translations?.FirstOrDefault();
+                if (translation == null) continue;
+
+                var cachedEx = new CachedExercise
                 {
                     Id = $"wger-{ex.Id}",
-                    Name = ex.Name,
-                    Category = ex.Category?.Name ?? "",
-                    Equipment = ex.Equipment?.Select(e => e.Name).FirstOrDefault() ?? "",
-                    PrimaryMuscles = ex.Muscles?.Select(m => m.Name).Where(n => n != null).Cast<string>().ToList() ?? new(),
-                    Instructions = ex.Description != null ? new List<string> { ex.Description } : new(),
-                    Images = new List<string>()
+                    Name = translation.Name ?? ex.Id.ToString(),
+                    BodyPart = ex.Category?.Name ?? string.Empty,
+                    Equipment = ex.Equipment?.FirstOrDefault()?.Name ?? string.Empty,
+                    InstructionsJson = JsonSerializer.Serialize(new List<string> { translation.Description ?? "" }),
+                    ImageUrl = ex.Images?.FirstOrDefault()?.Image ?? string.Empty,
+                    Category = ex.Category?.Name ?? string.Empty,
+                    Level = "",
+                    Force = "",
+                    Mechanic = ""
                 };
+                await db.SaveCachedExerciseAsync(cachedEx);
 
-                var imageUrl = await GetExerciseImageUrlAsync(ex.Id);
-                if (!string.IsNullOrWhiteSpace(imageUrl))
-                    dto.Images.Add(imageUrl);
-
-                exercises.Add(dto);
+                if (!matches.Any(m => m.Id == cachedEx.Id))
+                    matches.Add(cachedEx);
             }
 
-            return exercises;
+            return MapToDto(matches);
         }
         catch (Exception ex)
         {
             System.Diagnostics.Debug.WriteLine($"[Wger Search] ex: {ex.Message}");
-            return new();
+            return MapToDto(matches);
         }
     }
 
     public async Task<List<ExerciseDbDto>> GetByMuscleAsync(string muscle)
     {
+        var targetMuscle = muscle.ToLowerInvariant();
+
+        var cached = await db.GetCachedExercisesAsync();
+        var matches = cached
+            .Where(e => e.BodyPart.ToLowerInvariant().Contains(targetMuscle)
+                     || e.Category.ToLowerInvariant().Contains(targetMuscle))
+            .Take(15)
+            .ToList();
+
+        if (matches.Count >= 5)
+            return MapToDto(matches);
+
         try
         {
-            var muscleId = GetMuscleId(muscle);
-            if (muscleId == 0) return new();
-
-            var url = $"exercise/?language=2&limit=15&muscles={muscleId}";
+            var url = "exerciseinfo/?language=2&limit=100&offset=0";
             var response = await GetHttp().GetAsync(url);
             response.EnsureSuccessStatusCode();
             var json = await response.Content.ReadAsStringAsync();
-            var result = JsonSerializer.Deserialize<WgerListResponse<WgerExercise>>(json, JsonOptions);
+            var result = JsonSerializer.Deserialize<WgerListResponse>(json, JsonOptions);
 
-            if (result?.Results == null || result.Results.Count == 0)
-                return new();
-
-            var exercises = new List<ExerciseDbDto>();
-            foreach (var ex in result.Results)
+            if (result?.Results != null)
             {
-                var dto = new ExerciseDbDto
+                foreach (var ex in result.Results)
                 {
-                    Id = $"wger-{ex.Id}",
-                    Name = ex.Name,
-                    Category = ex.Category?.Name ?? "",
-                    Equipment = ex.Equipment?.Select(e => e.Name).FirstOrDefault() ?? "",
-                    PrimaryMuscles = ex.Muscles?.Select(m => m.Name).Where(n => n != null).Cast<string>().ToList() ?? new(),
-                    Instructions = ex.Description != null ? new List<string> { ex.Description } : new(),
-                    Images = new List<string>()
-                };
+                    var translation = ex.Translations?.FirstOrDefault();
+                    if (translation == null) continue;
 
-                var imageUrl = await GetExerciseImageUrlAsync(ex.Id);
-                if (!string.IsNullOrWhiteSpace(imageUrl))
-                    dto.Images.Add(imageUrl);
+                    var bodyPart = (ex.Category?.Name ?? "").ToLowerInvariant();
+                    var muscleNames = ex.Muscles?.Select(m => m.NameEn?.ToLowerInvariant() ?? "").ToList() ?? new();
 
-                exercises.Add(dto);
+                    if (!bodyPart.Contains(targetMuscle) && !muscleNames.Any(m => m.Contains(targetMuscle)))
+                        continue;
+
+                    var cachedEx = new CachedExercise
+                    {
+                        Id = $"wger-{ex.Id}",
+                        Name = translation.Name ?? ex.Id.ToString(),
+                        BodyPart = ex.Category?.Name ?? string.Empty,
+                        Equipment = ex.Equipment?.FirstOrDefault()?.Name ?? string.Empty,
+                        InstructionsJson = JsonSerializer.Serialize(new List<string> { translation.Description ?? "" }),
+                        ImageUrl = ex.Images?.FirstOrDefault()?.Image ?? string.Empty,
+                        Category = ex.Category?.Name ?? string.Empty
+                    };
+                    await db.SaveCachedExerciseAsync(cachedEx);
+                    matches.Add(cachedEx);
+                }
             }
 
-            return exercises;
+            return MapToDto(matches.Take(15).ToList());
         }
         catch (Exception ex)
         {
             System.Diagnostics.Debug.WriteLine($"[Wger Muscle] ex: {ex.Message}");
-            return new();
+            return MapToDto(matches);
         }
     }
 
-    private async Task<string?> GetExerciseImageUrlAsync(int exerciseId)
+    private static List<ExerciseDbDto> MapToDto(List<CachedExercise> exercises)
     {
-        try
+        return exercises.Select(e => new ExerciseDbDto
         {
-            var url = $"exerciseimage/?exercise={exerciseId}&limit=1";
-            var response = await GetHttp().GetAsync(url);
-            if (!response.IsSuccessStatusCode) return null;
-
-            var json = await response.Content.ReadAsStringAsync();
-            var result = JsonSerializer.Deserialize<WgerListResponse<WgerImage>>(json, JsonOptions);
-            var img = result?.Results?.FirstOrDefault();
-            if (img?.Image != null)
-                return img.Image.StartsWith("http") ? img.Image : $"https://wger.de{img.Image}";
-            return null;
-        }
-        catch
-        {
-            return null;
-        }
+            Id = e.Id,
+            Name = e.Name,
+            PrimaryMuscles = new List<string> { e.BodyPart },
+            Equipment = e.Equipment,
+            Instructions = JsonSerializer.Deserialize<List<string>>(e.InstructionsJson) ?? new(),
+            Images = string.IsNullOrWhiteSpace(e.ImageUrl) ? new() : new List<string> { e.ImageUrl },
+            Category = e.Category
+        }).ToList();
     }
 
-    private static int GetMuscleId(string muscle)
+    private class WgerListResponse
     {
-        return muscle.ToLowerInvariant() switch
-        {
-            "chest" or "petto" or "pectorals" => 4,
-            "back" or "schiena" or "dorsals" => 12,
-            "shoulders" or "spalle" or "deltoids" => 2,
-            "biceps" or "bicipiti" => 1,
-            "triceps" or "tricipiti" => 5,
-            "abdominals" or "addominali" or "abs" => 6,
-            "quadriceps" or "quadricipiti" or "quads" => 3,
-            "hamstrings" or "femorali" => 11,
-            "glutes" or "glutei" => 8,
-            "calves" or "polpacci" => 15,
-            _ => 0
-        };
+        public int Count { get; set; }
+        public List<WgerExerciseInfo> Results { get; set; } = new();
     }
 
-    private class WgerListResponse<T>
-    {
-        public List<T> Results { get; set; } = new();
-    }
-
-    private class WgerExercise
+    private class WgerExerciseInfo
     {
         public int Id { get; set; }
-        public string Name { get; set; } = "";
-        public string? Description { get; set; }
         public WgerCategory? Category { get; set; }
-        public List<WgerNameId>? Muscles { get; set; }
-        public List<WgerNameId>? Equipment { get; set; }
-    }
-
-    private class WgerImage
-    {
-        public string? Image { get; set; }
+        public List<WgerMuscle>? Muscles { get; set; }
+        public List<WgerEquipment>? Equipment { get; set; }
+        public List<WgerImage>? Images { get; set; }
+        public List<WgerTranslation>? Translations { get; set; }
     }
 
     private class WgerCategory
@@ -182,8 +188,26 @@ public class WgerExerciseService
         public string? Name { get; set; }
     }
 
-    private class WgerNameId
+    private class WgerMuscle
     {
         public string? Name { get; set; }
+        public string? NameEn { get; set; }
+    }
+
+    private class WgerEquipment
+    {
+        public string? Name { get; set; }
+    }
+
+    private class WgerImage
+    {
+        public string? Image { get; set; }
+        public bool IsMain { get; set; }
+    }
+
+    private class WgerTranslation
+    {
+        public string? Name { get; set; }
+        public string? Description { get; set; }
     }
 }
