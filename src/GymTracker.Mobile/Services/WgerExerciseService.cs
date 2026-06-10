@@ -144,6 +144,8 @@ public class WgerExerciseService
 
         return null;
     }
+
+    public async Task<List<ExerciseDbDto>> GetByMuscleAsync(string muscle)
     {
         var targetMuscle = muscle.ToLowerInvariant();
 
