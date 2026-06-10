@@ -38,7 +38,6 @@ public static class MauiProgram
 
         builder.Services.AddHttpClient("pocketbase");
         builder.Services.AddHttpClient("exercisedbv1");
-        builder.Services.AddHttpClient("wger");
         builder.Services.AddSingleton(sp =>
         {
             var factory = sp.GetRequiredService<IHttpClientFactory>();

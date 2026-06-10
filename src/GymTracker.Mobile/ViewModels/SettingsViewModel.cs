@@ -15,13 +15,6 @@ public partial class SettingsViewModel : BaseViewModel
 
     public static string LanguageCode => Preferences.Get("exercise_language", "2");
 
-    public static string WgerLanguage => LanguageCode switch
-    {
-        "it" or "13" => "13",
-        "en" or "2" => "2",
-        _ => "2"
-    };
-
     [ObservableProperty] private bool isDarkMode;
     [ObservableProperty] private string importStatus = string.Empty;
     [ObservableProperty] private bool hasImportStatus;
