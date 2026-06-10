@@ -15,11 +15,18 @@ public partial class SettingsViewModel : BaseViewModel
 
     public static string LanguageCode => Preferences.Get("exercise_language", "2");
 
+    public static string WgerLanguage => LanguageCode switch
+    {
+        "it" or "13" => "13",
+        "en" or "2" => "2",
+        _ => "2"
+    };
+
     [ObservableProperty] private bool isDarkMode;
     [ObservableProperty] private string importStatus = string.Empty;
     [ObservableProperty] private bool hasImportStatus;
-    [ObservableProperty] private bool isItalian = LanguageCode == "2";
-    [ObservableProperty] private bool isEnglish = LanguageCode == "1";
+    [ObservableProperty] private bool isItalian = LanguageCode == "13";
+    [ObservableProperty] private bool isEnglish = LanguageCode == "2";
 
     public SettingsViewModel(ThemeService themeService, PocketBaseService pb,
         CsvImportService csvImport, CsvExportService csvExport)
@@ -126,7 +133,7 @@ public partial class SettingsViewModel : BaseViewModel
     [RelayCommand]
     private void SetItalian()
     {
-        Preferences.Set("exercise_language", "2");
+        Preferences.Set("exercise_language", "13");
         IsItalian = true;
         IsEnglish = false;
     }
@@ -134,7 +141,7 @@ public partial class SettingsViewModel : BaseViewModel
     [RelayCommand]
     private void SetEnglish()
     {
-        Preferences.Set("exercise_language", "1");
+        Preferences.Set("exercise_language", "2");
         IsItalian = false;
         IsEnglish = true;
     }
