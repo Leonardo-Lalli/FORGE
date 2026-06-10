@@ -283,8 +283,11 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
                 {
                     var img = r.Images.FirstOrDefault() ?? "";
 
-                    if (!img.StartsWith("http") || img.Contains("encr.pw") || img.Contains("acesse.dev"))
-                        img = await wgerApi.GetImageForExerciseAsync(r.Name) ?? img;
+                    var wgerImg = await wgerApi.GetImageForExerciseAsync(r.Name);
+                    if (!string.IsNullOrWhiteSpace(wgerImg))
+                        img = wgerImg;
+                    else if (!img.StartsWith("http") || img.Contains("encr.pw") || img.Contains("acesse.dev"))
+                        img = "";
 
                     SearchResults.Add(new ExerciseSearchResult
                     {
@@ -292,7 +295,7 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
                         Name = r.Name,
                         BodyPart = r.PrimaryMuscles.FirstOrDefault() ?? string.Empty,
                         Equipment = r.Equipment,
-                        ImageUrl = img.StartsWith("http") ? img : $"https://{img}"
+                        ImageUrl = img
                     });
                 }
             }

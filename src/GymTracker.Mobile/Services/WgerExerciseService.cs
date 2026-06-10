@@ -96,45 +96,67 @@ public class WgerExerciseService
 
     public async Task<string?> GetImageForExerciseAsync(string exerciseName)
     {
-        var searchTerm = exerciseName.ToLowerInvariant();
+        var searchWords = exerciseName.ToLowerInvariant()
+            .Split(' ', StringSplitOptions.RemoveEmptyEntries)
+            .Select(w => w.TrimEnd(',', '.', '-'))
+            .Where(w => w.Length > 2)
+            .ToHashSet();
+        if (searchWords.Count == 0) return null;
 
         var cached = await db.GetCachedExercisesAsync();
-        var match = cached.FirstOrDefault(e => e.Name.ToLowerInvariant().Contains(searchTerm)
-                                            || searchTerm.Contains(e.Name.ToLowerInvariant()));
-        if (match != null && !string.IsNullOrWhiteSpace(match.ImageUrl))
-            return match.ImageUrl;
+        var match = FindBestMatch(cached.Select(e => e.Name), searchWords);
+        if (match != null)
+        {
+            var cachedMatch = cached.First(e => e.Name == match);
+            if (!string.IsNullOrWhiteSpace(cachedMatch.ImageUrl))
+                return cachedMatch.ImageUrl;
+        }
 
         try
         {
-            var url = "exerciseinfo/?language=2&limit=200&offset=0";
-            var response = await GetHttp().GetAsync(url);
-            response.EnsureSuccessStatusCode();
-            var json = await response.Content.ReadAsStringAsync();
-            var result = JsonSerializer.Deserialize<WgerListResponse>(json, JsonOptions);
-
-            if (result?.Results != null)
+            for (int offset = 0; offset < 600; offset += 200)
             {
+                var url = $"exerciseinfo/?language=2&limit=200&offset={offset}";
+                var response = await GetHttp().GetAsync(url);
+                response.EnsureSuccessStatusCode();
+                var json = await response.Content.ReadAsStringAsync();
+                var result = JsonSerializer.Deserialize<WgerListResponse>(json, JsonOptions);
+                if (result?.Results == null || result.Results.Count == 0) break;
+
+                var bestEx = (WgerExerciseInfo?)null;
+                var bestScore = 0;
+                var bestName = "";
+
                 foreach (var ex in result.Results)
                 {
                     var translation = ex.Translations?.FirstOrDefault();
-                    var name = translation?.Name?.ToLowerInvariant() ?? "";
+                    var name = translation?.Name ?? "";
+                    if (string.IsNullOrWhiteSpace(name)) continue;
 
-                    if (!name.Contains(searchTerm) && !searchTerm.Contains(name))
-                        continue;
+                    var score = CountMatchingWords(name, searchWords);
+                    if (score > bestScore)
+                    {
+                        bestScore = score;
+                        bestEx = ex;
+                        bestName = name;
+                    }
+                }
 
-                    var img = ex.Images?.FirstOrDefault()?.Image;
-                    if (string.IsNullOrWhiteSpace(img)) continue;
-
+                if (bestEx != null && bestScore >= 2)
+                {
+                    var img = bestEx.Images?.FirstOrDefault()?.Image;
                     var cachedEx = new CachedExercise
                     {
-                        Id = $"wger-{ex.Id}",
-                        Name = translation?.Name ?? ex.Id.ToString(),
-                        BodyPart = ex.Category?.Name ?? "",
-                        ImageUrl = img
+                        Id = $"wger-{bestEx.Id}",
+                        Name = bestName,
+                        BodyPart = bestEx.Category?.Name ?? "",
+                        ImageUrl = img ?? ""
                     };
                     await db.SaveCachedExerciseAsync(cachedEx);
-                    return img;
+                    if (!string.IsNullOrWhiteSpace(img)) return img;
                 }
+
+                if (result.Results.Count < 200) break;
             }
         }
         catch (Exception ex)
@@ -143,6 +165,25 @@ public class WgerExerciseService
         }
 
         return null;
+    }
+
+    private static string? FindBestMatch(IEnumerable<string> names, HashSet<string> searchWords)
+    {
+        var bestScore = 0;
+        string? bestName = null;
+        foreach (var name in names)
+        {
+            var score = CountMatchingWords(name, searchWords);
+            if (score > bestScore) { bestScore = score; bestName = name; }
+        }
+        return bestScore >= 2 ? bestName : null;
+    }
+
+    private static int CountMatchingWords(string name, HashSet<string> searchWords)
+    {
+        var nameWords = name.ToLowerInvariant().Split(' ', StringSplitOptions.RemoveEmptyEntries)
+            .Select(w => w.TrimEnd(',', '.', '-')).ToHashSet();
+        return searchWords.Count(w => nameWords.Contains(w));
     }
 
     public async Task<List<ExerciseDbDto>> GetByMuscleAsync(string muscle)
