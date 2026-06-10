@@ -94,7 +94,56 @@ public class WgerExerciseService
         }
     }
 
-    public async Task<List<ExerciseDbDto>> GetByMuscleAsync(string muscle)
+    public async Task<string?> GetImageForExerciseAsync(string exerciseName)
+    {
+        var searchTerm = exerciseName.ToLowerInvariant();
+
+        var cached = await db.GetCachedExercisesAsync();
+        var match = cached.FirstOrDefault(e => e.Name.ToLowerInvariant().Contains(searchTerm)
+                                            || searchTerm.Contains(e.Name.ToLowerInvariant()));
+        if (match != null && !string.IsNullOrWhiteSpace(match.ImageUrl))
+            return match.ImageUrl;
+
+        try
+        {
+            var url = "exerciseinfo/?language=2&limit=200&offset=0";
+            var response = await GetHttp().GetAsync(url);
+            response.EnsureSuccessStatusCode();
+            var json = await response.Content.ReadAsStringAsync();
+            var result = JsonSerializer.Deserialize<WgerListResponse>(json, JsonOptions);
+
+            if (result?.Results != null)
+            {
+                foreach (var ex in result.Results)
+                {
+                    var translation = ex.Translations?.FirstOrDefault();
+                    var name = translation?.Name?.ToLowerInvariant() ?? "";
+
+                    if (!name.Contains(searchTerm) && !searchTerm.Contains(name))
+                        continue;
+
+                    var img = ex.Images?.FirstOrDefault()?.Image;
+                    if (string.IsNullOrWhiteSpace(img)) continue;
+
+                    var cachedEx = new CachedExercise
+                    {
+                        Id = $"wger-{ex.Id}",
+                        Name = translation?.Name ?? ex.Id.ToString(),
+                        BodyPart = ex.Category?.Name ?? "",
+                        ImageUrl = img
+                    };
+                    await db.SaveCachedExerciseAsync(cachedEx);
+                    return img;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[Wger GetImg] ex: {ex.Message}");
+        }
+
+        return null;
+    }
     {
         var targetMuscle = muscle.ToLowerInvariant();
 

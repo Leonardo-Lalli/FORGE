@@ -223,9 +223,9 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
         IsSearchingApi = true;
         try
         {
-            var results = await wgerApi.GetByMuscleAsync(chip.Value);
+            var results = await exerciseApi.GetByMuscleAsync(chip.Value);
             if (results.Count == 0)
-                results = await exerciseApi.GetByMuscleAsync(chip.Value);
+                results = await wgerApi.GetByMuscleAsync(chip.Value);
             SearchResults.Clear();
             foreach (var r in results.Take(10))
             {
@@ -265,9 +265,12 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
         IsSearchingApi = true;
         try
         {
-            var results = await wgerApi.SearchExercisesAsync(SearchQuery, language: SettingsViewModel.LanguageCode);
+            var results = await exerciseApi.SearchByNameAsync(SearchQuery);
             if (results.Count == 0)
-                results = await exerciseApi.SearchByNameAsync(SearchQuery);
+            {
+                try { results = await wgerApi.SearchExercisesAsync(SearchQuery, language: "2"); }
+                catch { }
+            }
 
             SearchResults.Clear();
             if (results.Count == 0)
@@ -279,6 +282,10 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
                 foreach (var r in results.Take(10))
                 {
                     var img = r.Images.FirstOrDefault() ?? "";
+
+                    if (!img.StartsWith("http") || img.Contains("encr.pw") || img.Contains("acesse.dev"))
+                        img = await wgerApi.GetImageForExerciseAsync(r.Name) ?? img;
+
                     SearchResults.Add(new ExerciseSearchResult
                     {
                         Id = r.Id,
