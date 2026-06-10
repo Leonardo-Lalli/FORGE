@@ -14,6 +14,7 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
 {
     private readonly WorkoutSession workoutSession;
     private readonly ExerciseApiService exerciseApi;
+    private readonly WgerExerciseService wgerApi;
     private readonly PocketBaseService pb;
     private readonly PlanService planService;
     private readonly DatabaseService db;
@@ -82,10 +83,11 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
         }
     }
 
-    public ActiveWorkoutViewModel(WorkoutSession workoutSession, ExerciseApiService exerciseApi, PocketBaseService pb, PlanService planService, DatabaseService db, ConnectivityService connectivity)
+    public ActiveWorkoutViewModel(WorkoutSession workoutSession, ExerciseApiService exerciseApi, WgerExerciseService wgerApi, PocketBaseService pb, PlanService planService, DatabaseService db, ConnectivityService connectivity)
     {
         this.workoutSession = workoutSession;
         this.exerciseApi = exerciseApi;
+        this.wgerApi = wgerApi;
         this.pb = pb;
         this.planService = planService;
         this.db = db;
@@ -221,7 +223,9 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
         IsSearchingApi = true;
         try
         {
-            var results = await exerciseApi.GetByMuscleAsync(chip.Value);
+            var results = await wgerApi.GetByMuscleAsync(chip.Value);
+            if (results.Count == 0)
+                results = await exerciseApi.GetByMuscleAsync(chip.Value);
             SearchResults.Clear();
             foreach (var r in results.Take(10))
             {
@@ -261,7 +265,10 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
         IsSearchingApi = true;
         try
         {
-            var results = await exerciseApi.SearchByNameAsync(SearchQuery);
+            var results = await wgerApi.SearchExercisesAsync(SearchQuery, language: SettingsViewModel.LanguageCode);
+            if (results.Count == 0)
+                results = await exerciseApi.SearchByNameAsync(SearchQuery);
+
             SearchResults.Clear();
             if (results.Count == 0)
             {

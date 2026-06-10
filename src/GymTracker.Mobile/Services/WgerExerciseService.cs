@@ -129,7 +129,9 @@ public class WgerExerciseService
             var json = await response.Content.ReadAsStringAsync();
             var result = JsonSerializer.Deserialize<WgerListResponse<WgerImage>>(json, JsonOptions);
             var img = result?.Results?.FirstOrDefault();
-            return img?.Image;
+            if (img?.Image != null)
+                return img.Image.StartsWith("http") ? img.Image : $"https://wger.de{img.Image}";
+            return null;
         }
         catch
         {

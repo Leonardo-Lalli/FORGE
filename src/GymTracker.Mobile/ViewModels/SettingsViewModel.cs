@@ -13,9 +13,13 @@ public partial class SettingsViewModel : BaseViewModel
     private readonly CsvExportService csvExport;
     private bool suppressChange;
 
+    public static string LanguageCode => Preferences.Get("exercise_language", "2");
+
     [ObservableProperty] private bool isDarkMode;
     [ObservableProperty] private string importStatus = string.Empty;
     [ObservableProperty] private bool hasImportStatus;
+    [ObservableProperty] private bool isItalian = LanguageCode == "2";
+    [ObservableProperty] private bool isEnglish = LanguageCode == "1";
 
     public SettingsViewModel(ThemeService themeService, PocketBaseService pb,
         CsvImportService csvImport, CsvExportService csvExport)
@@ -61,8 +65,8 @@ public partial class SettingsViewModel : BaseViewModel
                 PickerTitle = "Seleziona file CSV",
                 FileTypes = new FilePickerFileType(new Dictionary<DevicePlatform, IEnumerable<string>>
                 {
-                    { DevicePlatform.Android, new[] { "text/csv", "text/comma-separated-values", "application/csv" } },
-                    { DevicePlatform.iOS, new[] { "public.comma-separated-values-text" } }
+                    { DevicePlatform.Android, new[] { "text/*", "text/csv", "text/comma-separated-values", "application/octet-stream" } },
+                    { DevicePlatform.iOS, new[] { "public.comma-separated-values-text", "public.text" } }
                 })
             });
 
@@ -117,5 +121,21 @@ public partial class SettingsViewModel : BaseViewModel
     private async Task GoBackAsync()
     {
         await Shell.Current.GoToAsync("..");
+    }
+
+    [RelayCommand]
+    private void SetItalian()
+    {
+        Preferences.Set("exercise_language", "2");
+        IsItalian = true;
+        IsEnglish = false;
+    }
+
+    [RelayCommand]
+    private void SetEnglish()
+    {
+        Preferences.Set("exercise_language", "1");
+        IsItalian = false;
+        IsEnglish = true;
     }
 }

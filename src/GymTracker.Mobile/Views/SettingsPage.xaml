@@ -57,6 +57,44 @@
                     </Grid>
                 </Border>
 
+                <!-- Language -->
+                <Label Text="LINGUA"
+                       FontFamily="OpenSansSemibold" FontSize="11" FontAttributes="Bold"
+                       TextColor="{DynamicResource TextSecondary}"
+                       CharacterSpacing="0.8" Margin="0,8,0,0" />
+                <Border BackgroundColor="{DynamicResource SurfaceContainerHigh}"
+                        StrokeShape="RoundRectangle 12"
+                        Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1"
+                        Padding="16">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="Lingua Esercizi"
+                               FontFamily="OpenSansSemibold" FontSize="16" FontAttributes="Bold"
+                               TextColor="{DynamicResource OnSurface}" />
+                        <FlexLayout Wrap="Wrap">
+                            <Border Padding="12,8" Margin="0,0,8,0"
+                                    StrokeShape="RoundRectangle 999"
+                                    Stroke="{DynamicResource Outline}" StrokeThickness="1">
+                                <Label Text="🇮🇹 Italiano" FontFamily="Lexend" FontSize="14"
+                                       TextColor="{DynamicResource OnSurface}">
+                                    <Label.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding SetItalianCommand}" />
+                                    </Label.GestureRecognizers>
+                                </Label>
+                            </Border>
+                            <Border Padding="12,8"
+                                    StrokeShape="RoundRectangle 999"
+                                    Stroke="{DynamicResource Outline}" StrokeThickness="1">
+                                <Label Text="🇬🇧 English" FontFamily="Lexend" FontSize="14"
+                                       TextColor="{DynamicResource OnSurface}">
+                                    <Label.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding SetEnglishCommand}" />
+                                    </Label.GestureRecognizers>
+                                </Label>
+                            </Border>
+                        </FlexLayout>
+                    </VerticalStackLayout>
+                </Border>
+
                 <!-- Account Section -->
                 <Label Text="DATI"
                        FontFamily="OpenSansSemibold" FontSize="11" FontAttributes="Bold"
