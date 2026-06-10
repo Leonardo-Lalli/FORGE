@@ -31,67 +31,82 @@ public class WgerExerciseService
         this.db = db;
     }
 
-    public async Task<List<ExerciseDbDto>> SearchExercisesAsync(string name, string? language = "2")
+    public async Task WarmCacheAsync()
     {
-        var lang = language ?? "2";
-        var searchTerm = name.ToLowerInvariant();
-
-        var cached = await db.GetCachedExercisesAsync();
-        var matches = cached
-            .Where(e => e.Name.ToLowerInvariant().Contains(searchTerm))
-            .Take(15)
-            .ToList();
-
-        if (matches.Count >= 5)
-            return MapToDto(matches);
+        var count = (await db.GetCachedExercisesAsync()).Count;
+        if (count >= 100) return;
 
         try
         {
-            var url = $"exerciseinfo/?language={lang}&limit=100&offset=0";
-            var response = await GetHttp().GetAsync(url);
-            response.EnsureSuccessStatusCode();
-            var json = await response.Content.ReadAsStringAsync();
-            var result = JsonSerializer.Deserialize<WgerListResponse>(json, JsonOptions);
-
-            if (result?.Results == null)
-                return MapToDto(matches);
-
-            var apiMatches = result.Results
-                .Where(ex => ex.Translations?.FirstOrDefault()?.Name?.ToLowerInvariant().Contains(searchTerm) == true)
-                .Take(15)
-                .ToList();
-
-            foreach (var ex in apiMatches)
+            for (int offset = 0; offset < 800; offset += 200)
             {
-                var translation = ex.Translations?.FirstOrDefault();
-                if (translation == null) continue;
+                var url = $"exerciseinfo/?language=2&limit=200&offset={offset}";
+                var response = await GetHttp().GetAsync(url);
+                response.EnsureSuccessStatusCode();
+                var json = await response.Content.ReadAsStringAsync();
+                var result = JsonSerializer.Deserialize<WgerListResponse>(json, JsonOptions);
+                if (result?.Results == null || result.Results.Count == 0) break;
 
-                var cachedEx = new CachedExercise
+                foreach (var ex in result.Results)
                 {
-                    Id = $"wger-{ex.Id}",
-                    Name = translation.Name ?? ex.Id.ToString(),
-                    BodyPart = ex.Category?.Name ?? string.Empty,
-                    Equipment = ex.Equipment?.FirstOrDefault()?.Name ?? string.Empty,
-                    InstructionsJson = JsonSerializer.Serialize(new List<string> { translation.Description ?? "" }),
-                    ImageUrl = ex.Images?.FirstOrDefault()?.Image ?? string.Empty,
-                    Category = ex.Category?.Name ?? string.Empty,
-                    Level = "",
-                    Force = "",
-                    Mechanic = ""
-                };
-                await db.SaveCachedExerciseAsync(cachedEx);
+                    var translation = ex.Translations?.FirstOrDefault();
+                    if (translation == null) continue;
+                    var img = ex.Images?.FirstOrDefault()?.Image;
+                    if (string.IsNullOrWhiteSpace(img)) continue;
 
-                if (!matches.Any(m => m.Id == cachedEx.Id))
-                    matches.Add(cachedEx);
+                    var cachedEx = new CachedExercise
+                    {
+                        Id = $"wger-{ex.Id}",
+                        Name = translation.Name ?? "",
+                        BodyPart = ex.Category?.Name ?? "",
+                        Equipment = ex.Equipment?.FirstOrDefault()?.Name ?? "",
+                        InstructionsJson = JsonSerializer.Serialize(new List<string> { translation.Description ?? "" }),
+                        ImageUrl = img,
+                        Category = ex.Category?.Name ?? ""
+                    };
+                    await db.SaveCachedExerciseAsync(cachedEx);
+                }
             }
-
-            return MapToDto(matches);
+            var afterCount = (await db.GetCachedExercisesAsync()).Count;
+            System.Diagnostics.Debug.WriteLine($"[Wger WarmCache] cached {afterCount} exercises (+{afterCount - count})");
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"[Wger Search] ex: {ex.Message}");
-            return MapToDto(matches);
+            System.Diagnostics.Debug.WriteLine($"[Wger WarmCache] ex: {ex.Message}");
         }
+    }
+
+    public async Task<List<ExerciseDbDto>> SearchLocalAsync(string name)
+    {
+        var searchWords = name.ToLowerInvariant()
+            .Split(' ', StringSplitOptions.RemoveEmptyEntries)
+            .ToHashSet();
+        if (searchWords.Count == 0) return new();
+
+        var cached = await db.GetCachedExercisesAsync();
+        var scored = new List<(CachedExercise Ex, int Score)>();
+
+        foreach (var ex in cached)
+        {
+            var score = CountMatchingWords(ex.Name, searchWords);
+            score += CountMatchingWords(ex.BodyPart, searchWords);
+            score += CountMatchingWords(ex.Equipment, searchWords);
+            if (score > 0) scored.Add((ex, score));
+        }
+
+        return scored
+            .OrderByDescending(s => s.Score)
+            .Take(15)
+            .Select(s => new ExerciseDbDto
+            {
+                Id = s.Ex.Id,
+                Name = s.Ex.Name,
+                PrimaryMuscles = new List<string> { s.Ex.BodyPart },
+                Equipment = s.Ex.Equipment,
+                Instructions = JsonSerializer.Deserialize<List<string>>(s.Ex.InstructionsJson) ?? new(),
+                Images = string.IsNullOrWhiteSpace(s.Ex.ImageUrl) ? new() : new List<string> { s.Ex.ImageUrl },
+                Category = s.Ex.Category
+            }).ToList();
     }
 
     public async Task<string?> GetImageForExerciseAsync(string exerciseName)
@@ -188,61 +203,15 @@ public class WgerExerciseService
 
     public async Task<List<ExerciseDbDto>> GetByMuscleAsync(string muscle)
     {
-        var targetMuscle = muscle.ToLowerInvariant();
-
+        var target = muscle.ToLowerInvariant();
         var cached = await db.GetCachedExercisesAsync();
         var matches = cached
-            .Where(e => e.BodyPart.ToLowerInvariant().Contains(targetMuscle)
-                     || e.Category.ToLowerInvariant().Contains(targetMuscle))
+            .Where(e => e.BodyPart.ToLowerInvariant().Contains(target)
+                     || e.Category.ToLowerInvariant().Contains(target))
             .Take(15)
             .ToList();
 
-        if (matches.Count >= 5)
-            return MapToDto(matches);
-
-        try
-        {
-            var url = "exerciseinfo/?language=2&limit=100&offset=0";
-            var response = await GetHttp().GetAsync(url);
-            response.EnsureSuccessStatusCode();
-            var json = await response.Content.ReadAsStringAsync();
-            var result = JsonSerializer.Deserialize<WgerListResponse>(json, JsonOptions);
-
-            if (result?.Results != null)
-            {
-                foreach (var ex in result.Results)
-                {
-                    var translation = ex.Translations?.FirstOrDefault();
-                    if (translation == null) continue;
-
-                    var bodyPart = (ex.Category?.Name ?? "").ToLowerInvariant();
-                    var muscleNames = ex.Muscles?.Select(m => m.NameEn?.ToLowerInvariant() ?? "").ToList() ?? new();
-
-                    if (!bodyPart.Contains(targetMuscle) && !muscleNames.Any(m => m.Contains(targetMuscle)))
-                        continue;
-
-                    var cachedEx = new CachedExercise
-                    {
-                        Id = $"wger-{ex.Id}",
-                        Name = translation.Name ?? ex.Id.ToString(),
-                        BodyPart = ex.Category?.Name ?? string.Empty,
-                        Equipment = ex.Equipment?.FirstOrDefault()?.Name ?? string.Empty,
-                        InstructionsJson = JsonSerializer.Serialize(new List<string> { translation.Description ?? "" }),
-                        ImageUrl = ex.Images?.FirstOrDefault()?.Image ?? string.Empty,
-                        Category = ex.Category?.Name ?? string.Empty
-                    };
-                    await db.SaveCachedExerciseAsync(cachedEx);
-                    matches.Add(cachedEx);
-                }
-            }
-
-            return MapToDto(matches.Take(15).ToList());
-        }
-        catch (Exception ex)
-        {
-            System.Diagnostics.Debug.WriteLine($"[Wger Muscle] ex: {ex.Message}");
-            return MapToDto(matches);
-        }
+        return MapToDto(matches);
     }
 
     private static List<ExerciseDbDto> MapToDto(List<CachedExercise> exercises)

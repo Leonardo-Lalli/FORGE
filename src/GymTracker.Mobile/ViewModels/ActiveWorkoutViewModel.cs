@@ -93,6 +93,12 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
         this.db = db;
         this.connectivity = connectivity;
 
+        _ = wgerApi.WarmCacheAsync().ContinueWith(t =>
+        {
+            if (t.IsFaulted)
+                System.Diagnostics.Debug.WriteLine($"[ActiveWk WarmCache] ex: {t.Exception?.InnerException?.Message}");
+        }, TaskContinuationOptions.OnlyOnFaulted);
+
         workoutStartTime = DateTime.Now;
 
         Exercises.CollectionChanged += (_, _) => HasExercises = Exercises.Count > 0;
@@ -223,9 +229,9 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
         IsSearchingApi = true;
         try
         {
-            var results = await exerciseApi.GetByMuscleAsync(chip.Value);
+            var results = await wgerApi.GetByMuscleAsync(chip.Value);
             if (results.Count == 0)
-                results = await wgerApi.GetByMuscleAsync(chip.Value);
+                results = await exerciseApi.GetByMuscleAsync(chip.Value);
             SearchResults.Clear();
             foreach (var r in results.Take(10))
             {
@@ -265,12 +271,9 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
         IsSearchingApi = true;
         try
         {
-            var results = await exerciseApi.SearchByNameAsync(SearchQuery);
+            var results = await wgerApi.SearchLocalAsync(SearchQuery);
             if (results.Count == 0)
-            {
-                try { results = await wgerApi.SearchExercisesAsync(SearchQuery, language: "2"); }
-                catch { }
-            }
+                results = await exerciseApi.SearchByNameAsync(SearchQuery);
 
             SearchResults.Clear();
             if (results.Count == 0)
@@ -282,12 +285,6 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
                 foreach (var r in results.Take(10))
                 {
                     var img = r.Images.FirstOrDefault() ?? "";
-
-                    var wgerImg = await wgerApi.GetImageForExerciseAsync(r.Name);
-                    if (!string.IsNullOrWhiteSpace(wgerImg))
-                        img = wgerImg;
-                    else if (!img.StartsWith("http") || img.Contains("encr.pw") || img.Contains("acesse.dev"))
-                        img = "";
 
                     SearchResults.Add(new ExerciseSearchResult
                     {
