@@ -39,8 +39,6 @@ public partial class App : Application
         var pb = services.GetRequiredService<PocketBaseService>();
         pb.Initialize();
 
-        services.GetRequiredService<ExerciseApiService>().Initialize();
-
         var sync = services.GetRequiredService<SyncService>();
         _ = sync.SyncPendingWorkoutsAsync().ContinueWith(t =>
         {

@@ -5,15 +5,13 @@ namespace GymTracker.Mobile.Services;
 public class CsvImportService
 {
     private readonly DatabaseService db;
-    private readonly WgerExerciseService wger;
-    private readonly ExerciseApiService exerciseApi;
+    private readonly ExerciseDbApiService exerciseDbApi;
     private readonly PocketBaseService pb;
 
-    public CsvImportService(DatabaseService db, WgerExerciseService wger, ExerciseApiService exerciseApi, PocketBaseService pb)
+    public CsvImportService(DatabaseService db, ExerciseDbApiService exerciseDbApi, PocketBaseService pb)
     {
         this.db = db;
-        this.wger = wger;
-        this.exerciseApi = exerciseApi;
+        this.exerciseDbApi = exerciseDbApi;
         this.pb = pb;
     }
 

@@ -37,13 +37,8 @@ public static class MauiProgram
         builder.Services.AddSingleton<ConnectivityService>();
 
         builder.Services.AddHttpClient("pocketbase");
-        builder.Services.AddHttpClient("exercisedb");
+        builder.Services.AddHttpClient("exercisedbv1");
         builder.Services.AddHttpClient("wger");
-        builder.Services.AddHttpClient("redirect", client =>
-        {
-            client.Timeout = TimeSpan.FromSeconds(5);
-            client.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0");
-        });
         builder.Services.AddSingleton(sp =>
         {
             var factory = sp.GetRequiredService<IHttpClientFactory>();
@@ -54,12 +49,12 @@ public static class MauiProgram
         {
             var factory = sp.GetRequiredService<IHttpClientFactory>();
             var secrets = sp.GetRequiredService<BuildSecrets>();
-            var pb = sp.GetRequiredService<PocketBaseService>();
-            return new ExerciseApiService(factory, secrets, pb);
+            var db = sp.GetRequiredService<DatabaseService>();
+            var pbService = sp.GetRequiredService<PocketBaseService>();
+            return new ExerciseDbApiService(factory, db, pbService);
         });
         builder.Services.AddSingleton<SyncService>();
         builder.Services.AddSingleton<PlanService>();
-        builder.Services.AddSingleton<WgerExerciseService>();
         builder.Services.AddSingleton<CsvImportService>();
         builder.Services.AddSingleton<CsvExportService>();
 

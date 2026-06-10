@@ -13,8 +13,7 @@ namespace GymTracker.Mobile.ViewModels;
 public partial class ActiveWorkoutViewModel : BaseViewModel
 {
     private readonly WorkoutSession workoutSession;
-    private readonly ExerciseApiService exerciseApi;
-    private readonly WgerExerciseService wgerApi;
+    private readonly ExerciseDbApiService exerciseDbApi;
     private readonly PocketBaseService pb;
     private readonly PlanService planService;
     private readonly DatabaseService db;
@@ -83,17 +82,16 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
         }
     }
 
-    public ActiveWorkoutViewModel(WorkoutSession workoutSession, ExerciseApiService exerciseApi, WgerExerciseService wgerApi, PocketBaseService pb, PlanService planService, DatabaseService db, ConnectivityService connectivity)
+    public ActiveWorkoutViewModel(WorkoutSession workoutSession, ExerciseDbApiService exerciseDbApi, PocketBaseService pb, PlanService planService, DatabaseService db, ConnectivityService connectivity)
     {
         this.workoutSession = workoutSession;
-        this.exerciseApi = exerciseApi;
-        this.wgerApi = wgerApi;
+        this.exerciseDbApi = exerciseDbApi;
         this.pb = pb;
         this.planService = planService;
         this.db = db;
         this.connectivity = connectivity;
 
-        _ = wgerApi.WarmCacheAsync().ContinueWith(t =>
+        _ = exerciseDbApi.WarmCacheAsync().ContinueWith(t =>
         {
             if (t.IsFaulted)
                 System.Diagnostics.Debug.WriteLine($"[ActiveWk WarmCache] ex: {t.Exception?.InnerException?.Message}");
@@ -229,19 +227,16 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
         IsSearchingApi = true;
         try
         {
-            var results = await wgerApi.GetByMuscleAsync(chip.Value);
-            if (results.Count == 0)
-                results = await exerciseApi.GetByMuscleAsync(chip.Value);
+            var results = await exerciseDbApi.GetByMuscleAsync(chip.Value);
             SearchResults.Clear();
             foreach (var r in results.Take(10))
             {
-                var img = r.Images.FirstOrDefault() ?? "";
                 SearchResults.Add(new ExerciseSearchResult
                 {
                     Id = r.Id, Name = r.Name,
-                    BodyPart = r.PrimaryMuscles.FirstOrDefault() ?? "",
+                    BodyPart = r.BodyPart,
                     Equipment = r.Equipment,
-                    ImageUrl = img.StartsWith("http") ? img : $"https://{img}"
+                    ImageUrl = r.ImageUrl
                 });
             }
         }
@@ -271,9 +266,7 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
         IsSearchingApi = true;
         try
         {
-            var results = await wgerApi.SearchLocalAsync(SearchQuery);
-            if (results.Count == 0)
-                results = await exerciseApi.SearchByNameAsync(SearchQuery);
+            var results = await exerciseDbApi.SearchAsync(SearchQuery);
 
             SearchResults.Clear();
             if (results.Count == 0)
@@ -284,15 +277,13 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
             {
                 foreach (var r in results.Take(10))
                 {
-                    var img = r.Images.FirstOrDefault() ?? "";
-
                     SearchResults.Add(new ExerciseSearchResult
                     {
                         Id = r.Id,
                         Name = r.Name,
-                        BodyPart = r.PrimaryMuscles.FirstOrDefault() ?? string.Empty,
+                        BodyPart = r.BodyPart,
                         Equipment = r.Equipment,
-                        ImageUrl = img
+                        ImageUrl = r.ImageUrl
                     });
                 }
             }
@@ -314,32 +305,17 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
     }
 
     [RelayCommand]
-    private async Task SelectExerciseAsync(ExerciseSearchResult result)
+    private void SelectExercise(ExerciseSearchResult result)
     {
-        var imageUrl = result.ImageUrl;
-        var instructions = new List<string>();
-        var exerciseName = result.Name;
-        var bodyPart = result.BodyPart;
-        var equipment = result.Equipment;
-
-        var full = await exerciseApi.GetExerciseByIdAsync(result.Id);
-        if (full != null)
-        {
-            exerciseName = full.Name;
-            bodyPart = full.PrimaryMuscles.FirstOrDefault() ?? bodyPart;
-            equipment = full.Equipment ?? equipment;
-            instructions = full.Instructions;
-        }
-
         Exercises.Add(new WorkoutExercise
         {
             ExerciseId = result.Id,
-            ExerciseName = exerciseName,
-            BodyPart = bodyPart,
-            Equipment = equipment,
-            ImageUrl = imageUrl,
-            GifUrl = imageUrl,
-            Instructions = instructions,
+            ExerciseName = result.Name,
+            BodyPart = result.BodyPart,
+            Equipment = result.Equipment,
+            ImageUrl = result.ImageUrl,
+            GifUrl = result.ImageUrl,
+            Instructions = new List<string>(),
             Order = Exercises.Count + 1
         });
         IsSearchVisible = false;
