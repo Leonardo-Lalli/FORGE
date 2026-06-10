@@ -15,6 +15,9 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
     private readonly WorkoutSession workoutSession;
     private readonly ExerciseApiService exerciseApi;
     private readonly PocketBaseService pb;
+    private readonly PlanService planService;
+    private readonly DatabaseService db;
+    private readonly ConnectivityService connectivity;
     private CancellationTokenSource? restCts;
     private CancellationTokenSource? elapsedCts;
     private int restSecondsRemaining;
@@ -79,11 +82,14 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
         }
     }
 
-    public ActiveWorkoutViewModel(WorkoutSession workoutSession, ExerciseApiService exerciseApi, PocketBaseService pb)
+    public ActiveWorkoutViewModel(WorkoutSession workoutSession, ExerciseApiService exerciseApi, PocketBaseService pb, PlanService planService, DatabaseService db, ConnectivityService connectivity)
     {
         this.workoutSession = workoutSession;
         this.exerciseApi = exerciseApi;
         this.pb = pb;
+        this.planService = planService;
+        this.db = db;
+        this.connectivity = connectivity;
 
         workoutStartTime = DateTime.Now;
 
@@ -140,10 +146,11 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
             _ = LoadPlanAsync().ContinueWith(t => { if (t.IsFaulted) System.Diagnostics.Debug.WriteLine($"[ActiveWk LoadPlan2] ex: {t.Exception?.InnerException?.Message}"); }, TaskContinuationOptions.OnlyOnFaulted);
     }
 
-    private Task LoadPlanAsync()
+    private async Task LoadPlanAsync()
     {
-        var plan = PlanStore.LoadPlans().FirstOrDefault(p => p.Id == PlanId);
-        if (plan == null) return Task.CompletedTask;
+        var plans = await planService.LoadPlansAsync();
+        var plan = plans.FirstOrDefault(p => p.Id == PlanId);
+        if (plan == null) return;
 
         PlanName = plan.Name;
         PlanNameInput = plan.Name;
@@ -161,8 +168,6 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
             ex.IsCompleted = false;
             Exercises.Add(ex);
         }
-
-        return Task.CompletedTask;
     }
 
     partial void OnNotificationMessageChanged(string value)
@@ -513,7 +518,7 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
             CreatedAt = DateTime.Now,
             UpdatedAt = DateTime.Now
         };
-        PlanStore.SavePlan(plan);
+        await planService.SavePlanAsync(plan);
 
         await SaveToPocketBaseAsync(name);
 
@@ -561,10 +566,25 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
             };
             var (ok, err) = await pb.CreateRecordAsync("logged_workouts", payload);
             System.Diagnostics.Debug.WriteLine($"[SaveWorkout] PB result: ok={ok} err={err}");
-            if (ok)
+
+            var localWorkout = new Models.LocalWorkout
             {
-                WeakReferenceMessenger.Default.Send(new WorkoutSavedMessage());
-            }
+                Id = Guid.NewGuid().ToString(),
+                UserId = pb.CurrentUser!.Id,
+                Name = name,
+                Date = DateTime.UtcNow.ToString("o"),
+                ExercisesJson = System.Text.Json.JsonSerializer.Serialize(Exercises.Select(e => e.ExerciseName).ToList()),
+                Volume = volume,
+                Duration = Math.Max(1, duration),
+                Notes = WorkoutNotes ?? "",
+                ExerciseDataJson = System.Text.Json.JsonSerializer.Serialize(exerciseData),
+                UserName = pb.CurrentUser.Name,
+                PendingSync = !ok
+            };
+            await db.SaveWorkoutAsync(localWorkout);
+
+            WeakReferenceMessenger.Default.Send(new WorkoutSavedMessage());
+
             if (!ok)
                 ShowNotification($"Errore salvataggio: {err}");
         }

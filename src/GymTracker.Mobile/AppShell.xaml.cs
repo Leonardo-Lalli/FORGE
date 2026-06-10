@@ -8,7 +8,6 @@ public partial class AppShell : Shell
     {
         InitializeComponent();
         Routing.RegisterRoute("activeWorkout", typeof(ActiveWorkoutPage));
-        Routing.RegisterRoute("notifications", typeof(NotificationsPage));
         Routing.RegisterRoute("settings", typeof(SettingsPage));
         Routing.RegisterRoute("profile", typeof(ProfilePage));
         Routing.RegisterRoute("startSession", typeof(StartSessionPage));

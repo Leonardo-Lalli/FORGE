@@ -33,6 +33,8 @@ public static class MauiProgram
         builder.Services.AddSingleton<BuildSecrets>();
         builder.Services.AddSingleton<ThemeService>();
         builder.Services.AddSingleton<WorkoutSession>();
+        builder.Services.AddSingleton<DatabaseService>();
+        builder.Services.AddSingleton<ConnectivityService>();
 
         builder.Services.AddHttpClient("pocketbase");
         builder.Services.AddHttpClient("exercisedb");
@@ -54,19 +56,16 @@ public static class MauiProgram
             var pb = sp.GetRequiredService<PocketBaseService>();
             return new ExerciseApiService(factory, secrets, pb);
         });
+        builder.Services.AddSingleton<SyncService>();
+        builder.Services.AddSingleton<PlanService>();
 
         // ViewModels
         builder.Services.AddTransient<HomeViewModel>();
         builder.Services.AddTransient<FeedViewModel>();
         builder.Services.AddTransient<StatsViewModel>();
         builder.Services.AddTransient<SettingsViewModel>();
-        builder.Services.AddTransient<DashboardViewModel>();
-        builder.Services.AddTransient<CatalogViewModel>();
-        builder.Services.AddTransient<WorkoutViewModel>();
         builder.Services.AddTransient<ActiveWorkoutViewModel>();
-        builder.Services.AddTransient<SocialViewModel>();
         builder.Services.AddTransient<ProfileViewModel>();
-        builder.Services.AddTransient<NotificationsViewModel>();
         builder.Services.AddTransient<StartSessionViewModel>();
         builder.Services.AddTransient<LoginViewModel>();
         builder.Services.AddTransient<FriendRequestsViewModel>();
@@ -75,13 +74,8 @@ public static class MauiProgram
         builder.Services.AddTransient<HomePage>();
         builder.Services.AddTransient<FeedPage>();
         builder.Services.AddTransient<StatsPage>();
-        builder.Services.AddTransient<DashboardPage>();
-        builder.Services.AddTransient<CatalogPage>();
-        builder.Services.AddTransient<WorkoutPage>();
         builder.Services.AddTransient<ActiveWorkoutPage>();
-        builder.Services.AddTransient<SocialPage>();
         builder.Services.AddTransient<ProfilePage>();
-        builder.Services.AddTransient<NotificationsPage>();
         builder.Services.AddTransient<SettingsPage>();
         builder.Services.AddTransient<StartSessionPage>();
         builder.Services.AddTransient<LoginPage>();

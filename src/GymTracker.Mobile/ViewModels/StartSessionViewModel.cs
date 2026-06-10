@@ -18,18 +18,30 @@ public partial class ProtocolCard : ObservableObject
 
 public partial class StartSessionViewModel : BaseViewModel
 {
+    private readonly PlanService planService;
+
     [ObservableProperty] private ObservableCollection<ProtocolCard> protocols = new();
 
-    public StartSessionViewModel()
+    public StartSessionViewModel(PlanService planService)
     {
+        this.planService = planService;
         HasData = true;
-        SeedMockPlansIfEmpty();
-        LoadProtocols();
+        _ = InitializeAsync().ContinueWith(t =>
+        {
+            if (t.IsFaulted)
+                System.Diagnostics.Debug.WriteLine($"[StartSession Init] ex: {t.Exception?.InnerException?.Message}");
+        }, TaskContinuationOptions.OnlyOnFaulted);
     }
 
-    private static void SeedMockPlansIfEmpty()
+    private async Task InitializeAsync()
     {
-        var existing = PlanStore.LoadPlans();
+        await SeedMockPlansIfEmptyAsync();
+        await LoadProtocolsAsync();
+    }
+
+    private async Task SeedMockPlansIfEmptyAsync()
+    {
+        var existing = await planService.LoadPlansAsync();
         if (existing.Count > 0) return;
 
         var plans = new List<WorkoutPlan>
@@ -73,12 +85,12 @@ public partial class StartSessionViewModel : BaseViewModel
         };
 
         foreach (var plan in plans)
-            PlanStore.SavePlan(plan);
+            await planService.SavePlanAsync(plan);
     }
 
-    public void LoadProtocols()
+    public async Task LoadProtocolsAsync()
     {
-        var plans = PlanStore.LoadPlans();
+        var plans = await planService.LoadPlansAsync();
         Protocols.Clear();
         foreach (var plan in plans.Take(3))
         {
@@ -139,9 +151,9 @@ public partial class StartSessionViewModel : BaseViewModel
     }
 
     [RelayCommand]
-    private void DeleteProtocol(ProtocolCard protocol)
+    private async Task DeleteProtocolAsync(ProtocolCard protocol)
     {
-        PlanStore.DeletePlan(protocol.Id);
-        LoadProtocols();
+        await planService.DeletePlanAsync(protocol.Id);
+        await LoadProtocolsAsync();
     }
 }

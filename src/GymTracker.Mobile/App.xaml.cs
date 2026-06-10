@@ -40,5 +40,12 @@ public partial class App : Application
         pb.Initialize();
 
         services.GetRequiredService<ExerciseApiService>().Initialize();
+
+        var sync = services.GetRequiredService<SyncService>();
+        _ = sync.SyncPendingWorkoutsAsync().ContinueWith(t =>
+        {
+            if (t.IsFaulted)
+                System.Diagnostics.Debug.WriteLine($"[App Sync] ex: {t.Exception?.InnerException?.Message}");
+        }, TaskContinuationOptions.OnlyOnFaulted);
     }
 }

@@ -14,6 +14,10 @@ public partial class StartSessionPage : ContentPage
     {
         base.OnAppearing();
         if (BindingContext is StartSessionViewModel vm)
-            vm.LoadProtocols();
+            _ = vm.LoadProtocolsAsync().ContinueWith(t =>
+            {
+                if (t.IsFaulted)
+                    System.Diagnostics.Debug.WriteLine($"[StartSession OnAppearing] ex: {t.Exception?.InnerException?.Message}");
+            }, TaskContinuationOptions.OnlyOnFaulted);
     }
 }

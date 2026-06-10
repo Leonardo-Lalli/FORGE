@@ -22,6 +22,7 @@ public partial class SquadMember : ObservableObject
 public partial class HomeViewModel : BaseViewModel
 {
     private readonly PocketBaseService pb;
+    private readonly PlanService planService;
 
     [ObservableProperty] private string streakCount = "0";
     [ObservableProperty] private string streakLabel = "Week streak";
@@ -36,9 +37,10 @@ public partial class HomeViewModel : BaseViewModel
     [ObservableProperty] private ImageSource? userAvatarSource;
     [ObservableProperty] private bool hasUserAvatar;
 
-    public HomeViewModel(PocketBaseService pb)
+    public HomeViewModel(PocketBaseService pb, PlanService planService)
     {
         this.pb = pb;
+        this.planService = planService;
         HasData = true;
 
         WeakReferenceMessenger.Default.Register<WorkoutSavedMessage>(this, async (_, _) =>
@@ -53,7 +55,7 @@ public partial class HomeViewModel : BaseViewModel
         LoadUserInfo();
         await CalculateStreakAsync();
         await LoadSquadAsync();
-        LoadRandomPlan();
+        await LoadRandomPlanAsync();
     }
 
     private void LoadUserInfo()
@@ -72,9 +74,9 @@ public partial class HomeViewModel : BaseViewModel
         }
     }
 
-    private void LoadRandomPlan()
+    private async Task LoadRandomPlanAsync()
     {
-        var plans = PlanStore.LoadPlans();
+        var plans = await planService.LoadPlansAsync();
         if (plans.Count > 0)
         {
             var rng = new Random();
@@ -222,7 +224,7 @@ public partial class HomeViewModel : BaseViewModel
     private async Task StartWorkoutAsync() => await Shell.Current.GoToAsync("startSession");
 
     [RelayCommand]
-    private async Task OpenNotificationsAsync() => await Shell.Current.GoToAsync("notifications");
+    private async Task OpenNotificationsAsync() => await Shell.Current.GoToAsync("friendRequests");
 
     [RelayCommand]
     private async Task OpenProfileAsync() => await Shell.Current.GoToAsync("profile");
