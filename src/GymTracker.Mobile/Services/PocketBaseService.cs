@@ -7,10 +7,22 @@ namespace GymTracker.Mobile.Services;
 
 public class PocketBaseService
 {
-    private readonly HttpClient http;
+    private readonly IHttpClientFactory httpFactory;
     private readonly BuildSecrets secrets;
     private string? token;
     private PocketBaseUserRecord? currentUser;
+    private HttpClient? _http;
+
+    private HttpClient GetHttp()
+    {
+        if (_http != null) return _http;
+        var client = httpFactory.CreateClient("pocketbase");
+        var pbUrl = secrets.Get("POCKETBASE_URL") ?? "https://pocketbase.server-casa-leo.duckdns.org";
+        client.BaseAddress = new Uri($"{pbUrl}/api/");
+        client.Timeout = TimeSpan.FromSeconds(15);
+        _http = client;
+        return _http;
+    }
 
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
@@ -27,13 +39,15 @@ public class PocketBaseService
         var baseUrl = secrets.Get("POCKETBASE_URL")?.TrimEnd('/') ?? "";
         var tokenParam = !string.IsNullOrWhiteSpace(token) ? $"?token={token}" : "";
         var url = $"{baseUrl}/api/files/{collectionId}/{recordId}/{fileName}{tokenParam}";
-        System.Diagnostics.Debug.WriteLine($"[PB FileUrl] hasToken={!string.IsNullOrWhiteSpace(token)} url={url}");
+#if DEBUG
+        System.Diagnostics.Debug.WriteLine($"[PB FileUrl] hasToken={!string.IsNullOrWhiteSpace(token)}");
+#endif
         return url;
     }
 
-    public PocketBaseService(HttpClient http, BuildSecrets secrets)
+    public PocketBaseService(IHttpClientFactory httpFactory, BuildSecrets secrets)
     {
-        this.http = http;
+        this.httpFactory = httpFactory;
         this.secrets = secrets;
     }
 
@@ -45,13 +59,19 @@ public class PocketBaseService
     {
     }
 
+    private async Task EnsureAuthAsync()
+    {
+        if (!string.IsNullOrWhiteSpace(token)) return;
+        await TryAutoLoginAsync();
+    }
+
     public async Task<(bool Success, string Error)> LoginAsync(string email, string password)
     {
         EnsureInitialized();
         try
         {
             var payload = new { identity = email, password };
-            var response = await http.PostAsJsonAsync("collections/users/auth-with-password", payload, JsonOptions);
+            var response = await GetHttp().PostAsJsonAsync("collections/users/auth-with-password", payload, JsonOptions);
 
             if (!response.IsSuccessStatusCode)
             {
@@ -66,8 +86,10 @@ public class PocketBaseService
 
             token = auth.Token;
             currentUser = auth.Record;
-            System.Diagnostics.Debug.WriteLine($"[PB Login] userId={currentUser.Id} name={currentUser.Name}");
-            SaveCredentials(email, password);
+#if DEBUG
+            System.Diagnostics.Debug.WriteLine($"[PB Login] userId={currentUser.Id}");
+#endif
+            await SaveCredentialsAsync(email, password);
 
             return (true, string.Empty);
         }
@@ -97,7 +119,7 @@ public class PocketBaseService
                 passwordConfirm = password,
                 name
             };
-            var response = await http.PostAsJsonAsync("collections/users/records", payload, JsonOptions);
+            var response = await GetHttp().PostAsJsonAsync("collections/users/records", payload, JsonOptions);
 
             if (!response.IsSuccessStatusCode)
             {
@@ -123,12 +145,13 @@ public class PocketBaseService
         token = null;
         currentUser = null;
         Preferences.Remove("pb_email");
-        Preferences.Remove("pb_password");
+        try { SecureStorage.Remove("pb_password"); } catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[PB Logout] SecureStorage remove err: {ex.Message}"); }
+        _ = SecureStorage.Remove("pb_email");
     }
 
     public async Task<(bool Success, string Error)> RefreshUserAsync()
     {
-        EnsureInitialized();
+        await EnsureAuthAsync();
         if (currentUser == null || string.IsNullOrWhiteSpace(token))
             return (false, "Non autenticato.");
 
@@ -139,7 +162,7 @@ public class PocketBaseService
             request.Headers.Authorization =
                 new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
-            var response = await http.SendAsync(request);
+            var response = await GetHttp().SendAsync(request);
             if (!response.IsSuccessStatusCode)
                 return (false, "Impossibile recuperare il profilo.");
 
@@ -154,7 +177,7 @@ public class PocketBaseService
 
     public async Task<(bool Success, string Error)> UpdateUserAsync(string? name = null, string? bio = null)
     {
-        EnsureInitialized();
+        await EnsureAuthAsync();
         if (currentUser == null || string.IsNullOrWhiteSpace(token))
             return (false, "Non autenticato.");
 
@@ -173,7 +196,7 @@ public class PocketBaseService
             request.Headers.Authorization =
                 new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
-            var response = await http.SendAsync(request);
+            var response = await GetHttp().SendAsync(request);
             if (!response.IsSuccessStatusCode)
             {
                 var body = await response.Content.ReadAsStringAsync();
@@ -191,6 +214,7 @@ public class PocketBaseService
 
     public async Task<bool> UploadAvatarAsync(Stream fileStream, string fileName)
     {
+        await EnsureAuthAsync();
         if (currentUser == null || string.IsNullOrWhiteSpace(token))
             return false;
 
@@ -210,14 +234,20 @@ public class PocketBaseService
             request.Headers.Authorization =
                 new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
-            var response = await http.SendAsync(request);
+            var response = await GetHttp().SendAsync(request);
             if (!response.IsSuccessStatusCode)
                 return false;
 
             currentUser = await response.Content.ReadFromJsonAsync<PocketBaseUserRecord>(JsonOptions);
             return true;
         }
-        catch { return false; }
+        catch (Exception ex)
+        {
+#if DEBUG
+            System.Diagnostics.Debug.WriteLine($"[PB UploadAvatar] ex: {ex.Message}");
+#endif
+            return false;
+        }
     }
 
     public async Task<(bool Success, string Error)> GetListAsync<T>(string collection, string? filter = null)
@@ -234,7 +264,7 @@ public class PocketBaseService
                 request.Headers.Authorization =
                     new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
-            var response = await http.SendAsync(request);
+            var response = await GetHttp().SendAsync(request);
             if (!response.IsSuccessStatusCode)
             {
                 var body = await response.Content.ReadAsStringAsync();
@@ -256,8 +286,9 @@ public class PocketBaseService
         try
         {
             var json = JsonSerializer.Serialize(record, JsonOptions);
+#if DEBUG
             System.Diagnostics.Debug.WriteLine($"[PB Create] collection={collection} auth={!string.IsNullOrWhiteSpace(token)}");
-            System.Diagnostics.Debug.WriteLine($"[PB Create] payload={json[..Math.Min(json.Length, 500)]}");
+#endif
             var request = new HttpRequestMessage(HttpMethod.Post, $"collections/{collection}/records")
             {
                 Content = new StringContent(json, Encoding.UTF8, "application/json")
@@ -266,9 +297,12 @@ public class PocketBaseService
                 request.Headers.Authorization =
                     new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
-            var response = await http.SendAsync(request);
+            var response = await GetHttp().SendAsync(request);
             var body = await response.Content.ReadAsStringAsync();
-            System.Diagnostics.Debug.WriteLine($"[PB Create] status={response.StatusCode} body[..200]={body[..Math.Min(body.Length, 200)]}");
+#if DEBUG
+            if (!response.IsSuccessStatusCode)
+                System.Diagnostics.Debug.WriteLine($"[PB Create] status={response.StatusCode} err={body[..Math.Min(body.Length, 50)]}");
+#endif
             if (!response.IsSuccessStatusCode)
             {
                 return (false, ParseErrorMessage(body));
@@ -277,7 +311,9 @@ public class PocketBaseService
         }
         catch (Exception ex)
         {
+#if DEBUG
             System.Diagnostics.Debug.WriteLine($"[PB Create] EX: {ex.Message}");
+#endif
             return (false, ex.Message);
         }
     }
@@ -285,7 +321,7 @@ public class PocketBaseService
     public async Task<bool> TryAutoLoginAsync()
     {
         var email = Preferences.Get("pb_email", string.Empty);
-        var password = Preferences.Get("pb_password", string.Empty);
+        var password = await SecureStorage.GetAsync("pb_password") ?? Preferences.Get("pb_password", string.Empty);
         if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
             return false;
 
@@ -293,24 +329,35 @@ public class PocketBaseService
         return success;
     }
 
-    private void SaveCredentials(string email, string password)
+    private async Task SaveCredentialsAsync(string email, string password)
     {
         Preferences.Set("pb_email", email);
-        Preferences.Set("pb_password", password);
+        try
+        {
+            await SecureStorage.SetAsync("pb_password", password);
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[PB] SecureStorage fallback: {ex.Message}");
+            Preferences.Set("pb_password", password);
+        }
     }
 
     public async Task<List<PocketBaseUserRecord>> SearchUsersAsync(string query)
     {
+        await EnsureAuthAsync();
         if (!IsLoggedIn) return new();
         try
         {
             var url = $"collections/users/records?search={Uri.EscapeDataString(query)}&perPage=20";
             var request = new HttpRequestMessage(HttpMethod.Get, url);
             request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-            var response = await http.SendAsync(request);
+            var response = await GetHttp().SendAsync(request);
             if (!response.IsSuccessStatusCode)
             {
+#if DEBUG
                 System.Diagnostics.Debug.WriteLine($"[PB Search] status={response.StatusCode} body={await response.Content.ReadAsStringAsync()}");
+#endif
                 return new();
             }
             var list = await response.Content.ReadFromJsonAsync<PocketBaseListResponse<PocketBaseUserRecord>>(JsonOptions);
@@ -325,6 +372,7 @@ public class PocketBaseService
 
     public async Task<bool> SendFollowRequestAsync(string targetUserId)
     {
+        await EnsureAuthAsync();
         if (!IsLoggedIn || currentUser == null) return false;
         try
         {
@@ -338,29 +386,39 @@ public class PocketBaseService
             var (success, _) = await CreateRecordAsync("social_graph", payload);
             return success;
         }
-        catch { return false; }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[PB SendFollow] ex: {ex.Message}");
+            return false;
+        }
     }
 
     public async Task<List<SocialGraphRecord>> GetPendingRequestsAsync()
     {
+        await EnsureAuthAsync();
         if (!IsLoggedIn || currentUser == null) return new();
         try
         {
             var url = "collections/social_graph/records?perPage=50";
             var request = new HttpRequestMessage(HttpMethod.Get, url);
             request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-            var response = await http.SendAsync(request);
+            var response = await GetHttp().SendAsync(request);
             if (!response.IsSuccessStatusCode) return new();
             var list = await response.Content.ReadFromJsonAsync<PocketBaseListResponse<SocialGraphRecord>>(JsonOptions);
             return list?.Items
                 .Where(r => r.ToUser == currentUser.Id && r.Status == "pending")
                 .ToList() ?? new();
         }
-        catch { return new(); }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[PB PendingReq] ex: {ex.Message}");
+            return new();
+        }
     }
 
     public async Task<bool> AcceptFollowRequestAsync(string recordId)
     {
+        await EnsureAuthAsync();
         if (!IsLoggedIn) return false;
         try
         {
@@ -371,14 +429,19 @@ public class PocketBaseService
                 Content = new StringContent(json, Encoding.UTF8, "application/json")
             };
             request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-            var response = await http.SendAsync(request);
+            var response = await GetHttp().SendAsync(request);
             return response.IsSuccessStatusCode;
         }
-        catch { return false; }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[PB AcceptReq] ex: {ex.Message}");
+            return false;
+        }
     }
 
     public async Task<bool> RejectFollowRequestAsync(string recordId)
     {
+        await EnsureAuthAsync();
         if (!IsLoggedIn) return false;
         try
         {
@@ -389,21 +452,26 @@ public class PocketBaseService
                 Content = new StringContent(json, Encoding.UTF8, "application/json")
             };
             request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-            var response = await http.SendAsync(request);
-            return response.IsSuccessStatusCode;
+            var response2 = await GetHttp().SendAsync(request);
+            return response2.IsSuccessStatusCode;
         }
-        catch { return false; }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[PB RejectReq] ex: {ex.Message}");
+            return false;
+        }
     }
 
     public async Task<List<string>> GetFollowingUserIdsAsync()
     {
+        await EnsureAuthAsync();
         if (!IsLoggedIn || currentUser == null) return new();
         try
         {
             var url = "collections/social_graph/records?perPage=200";
             var request = new HttpRequestMessage(HttpMethod.Get, url);
             request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-            var response = await http.SendAsync(request);
+            var response = await GetHttp().SendAsync(request);
             if (!response.IsSuccessStatusCode) return new();
             var list = await response.Content.ReadFromJsonAsync<PocketBaseListResponse<SocialGraphRecord>>(JsonOptions);
             return list?.Items
@@ -411,11 +479,16 @@ public class PocketBaseService
                 .Select(r => r.ToUser)
                 .ToList() ?? new();
         }
-        catch { return new(); }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[PB FollowingIds] ex: {ex.Message}");
+            return new();
+        }
     }
 
     public async Task<List<LoggedWorkoutRecord>> GetMyWorkoutsAsync(int limit = 10)
     {
+        await EnsureAuthAsync();
         if (!IsLoggedIn || currentUser == null)
         {
             System.Diagnostics.Debug.WriteLine($"[PB MyWorkouts] skipped: IsLoggedIn={IsLoggedIn} currentUser={currentUser != null}");
@@ -452,12 +525,14 @@ public class PocketBaseService
             System.Diagnostics.Debug.WriteLine($"[PB MyWorkouts] url={url}");
             var request = new HttpRequestMessage(HttpMethod.Get, url);
             request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-            var response = await http.SendAsync(request);
+            var response = await GetHttp().SendAsync(request);
             var body = await response.Content.ReadAsStringAsync();
             System.Diagnostics.Debug.WriteLine($"[PB MyWorkouts] status={response.StatusCode} bodyLen={body.Length}");
             if (!response.IsSuccessStatusCode)
             {
+#if DEBUG
                 System.Diagnostics.Debug.WriteLine($"[PB MyWorkouts] FAIL body[..200]={body[..Math.Min(body.Length, 200)]}");
+#endif
                 return null;
             }
             return ParseWorkoutRecords(body, userId);
@@ -535,6 +610,7 @@ public class PocketBaseService
 
     public async Task<List<LoggedWorkoutRecord>> GetFollowedWorkoutsAsync()
     {
+        await EnsureAuthAsync();
         if (!IsLoggedIn || currentUser == null) return new();
         try
         {
@@ -545,11 +621,13 @@ public class PocketBaseService
             var url = $"collections/logged_workouts/records?perPage=30";
             var request = new HttpRequestMessage(HttpMethod.Get, url);
             request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-            var response = await http.SendAsync(request);
+            var response = await GetHttp().SendAsync(request);
             var body = await response.Content.ReadAsStringAsync();
             if (!response.IsSuccessStatusCode)
             {
+#if DEBUG
                 System.Diagnostics.Debug.WriteLine($"[PB FollowedWorkouts] FAIL status={response.StatusCode} body={body[..Math.Min(body.Length, 200)]}");
+#endif
                 return new();
             }
             var records = ParseWorkoutRecords(body, null);
@@ -563,7 +641,7 @@ public class PocketBaseService
                     {
                         var userReq = new HttpRequestMessage(HttpMethod.Get, $"collections/users/records/{r.User}");
                         userReq.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-                        var userRes = await http.SendAsync(userReq);
+                        var userRes = await GetHttp().SendAsync(userReq);
                         if (userRes.IsSuccessStatusCode)
                         {
                             var userRecord = await userRes.Content.ReadFromJsonAsync<PocketBaseUserRecord>(JsonOptions);
@@ -575,23 +653,31 @@ public class PocketBaseService
                             }
                         }
                     }
-                    catch { }
+                    catch (Exception ex)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"[PB FollowedWk] userRes err: {ex.Message}");
+                    }
                 }
             }
             return records;
         }
-        catch { return new(); }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[PB FollowedWk] ex: {ex.Message}");
+            return new();
+        }
     }
 
     public async Task<(bool Success, string Error)> LikeWorkoutAsync(string workoutId)
     {
+        await EnsureAuthAsync();
         if (!IsLoggedIn || currentUser == null) return (false, "Non autenticato.");
 
         try
         {
             var getReq = new HttpRequestMessage(HttpMethod.Get, $"collections/logged_workouts/records/{workoutId}");
             getReq.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-            var getRes = await http.SendAsync(getReq);
+            var getRes = await GetHttp().SendAsync(getReq);
             if (!getRes.IsSuccessStatusCode)
             {
                 System.Diagnostics.Debug.WriteLine($"[PB Like] GET fail {getRes.StatusCode}");
@@ -611,11 +697,13 @@ public class PocketBaseService
                 Content = new StringContent(json, Encoding.UTF8, "application/json")
             };
             request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-            var response = await http.SendAsync(request);
+            var response = await GetHttp().SendAsync(request);
             if (!response.IsSuccessStatusCode)
             {
+#if DEBUG
                 var errBody = await response.Content.ReadAsStringAsync();
-                System.Diagnostics.Debug.WriteLine($"[PB Like] PATCH fail {response.StatusCode}: {errBody[..Math.Min(errBody.Length, 200)]}");
+                System.Diagnostics.Debug.WriteLine($"[PB Like] PATCH fail {response.StatusCode}: {errBody[..Math.Min(errBody.Length, 50)]}");
+#endif
                 return (false, "Like non riuscito. Verifica API Rule 'Update' su PocketBase.");
             }
             System.Diagnostics.Debug.WriteLine($"[PB Like] OK, likes={likedBy.Count}");
@@ -626,13 +714,14 @@ public class PocketBaseService
 
     public async Task<(bool Success, string Error)> UnlikeWorkoutAsync(string workoutId)
     {
+        await EnsureAuthAsync();
         if (!IsLoggedIn || currentUser == null) return (false, "Non autenticato.");
 
         try
         {
             var getReq = new HttpRequestMessage(HttpMethod.Get, $"collections/logged_workouts/records/{workoutId}");
             getReq.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-            var getRes = await http.SendAsync(getReq);
+            var getRes = await GetHttp().SendAsync(getReq);
             if (!getRes.IsSuccessStatusCode) return (false, "Workout non trovato.");
 
             var body = await getRes.Content.ReadAsStringAsync();
@@ -645,7 +734,7 @@ public class PocketBaseService
                 Content = new StringContent(json, Encoding.UTF8, "application/json")
             };
             request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-            var response = await http.SendAsync(request);
+            var response = await GetHttp().SendAsync(request);
             return response.IsSuccessStatusCode ? (true, string.Empty) : (false, "Errore unlike.");
         }
         catch (Exception ex) { return (false, ex.Message); }
@@ -666,13 +755,17 @@ public class PocketBaseService
             if (doc.RootElement.TryGetProperty("likes", out var l) && l.TryGetInt32(out var lv))
                 likes = lv;
         }
-        catch { }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[PB ParseLikes] ex: {ex.Message}");
+        }
         return (likedBy, likes);
     }
 
     public async Task<List<(string LikerName, string WorkoutName, string WorkoutId)>> GetLikeNotificationsAsync()
     {
         var results = new List<(string, string, string)>();
+        await EnsureAuthAsync();
         if (!IsLoggedIn || currentUser == null) return results;
 
         try
@@ -688,7 +781,7 @@ public class PocketBaseService
                         var userReq = new HttpRequestMessage(HttpMethod.Get,
                             $"collections/users/records/{likerId}");
                         userReq.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-                        var userRes = await http.SendAsync(userReq);
+                        var userRes = await GetHttp().SendAsync(userReq);
                         if (userRes.IsSuccessStatusCode)
                         {
                             var userRecord = await userRes.Content.ReadFromJsonAsync<PocketBaseUserRecord>(JsonOptions);
@@ -696,16 +789,23 @@ public class PocketBaseService
                             results.Add((likerName, w.Name, w.Id));
                         }
                     }
-                    catch { }
+                    catch (Exception ex)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"[PB LikeNotif] userRes err: {ex.Message}");
+                    }
                 }
             }
         }
-        catch { }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[PB LikeNotif] ex: {ex.Message}");
+        }
         return results;
     }
 
     public async Task<string?> GetCachedExerciseImageAsync(string exerciseName)
     {
+        await EnsureAuthAsync();
         if (!IsLoggedIn) return null;
         try
         {
@@ -713,7 +813,7 @@ public class PocketBaseService
             var url = $"collections/excercise/records?filter={Uri.EscapeDataString(filter)}&perPage=1";
             var request = new HttpRequestMessage(HttpMethod.Get, url);
             request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-            var response = await http.SendAsync(request);
+            var response = await GetHttp().SendAsync(request);
             if (!response.IsSuccessStatusCode) return null;
 
             var body = await response.Content.ReadAsStringAsync();
@@ -721,7 +821,11 @@ public class PocketBaseService
             var item = list?.Items?.FirstOrDefault();
             return item?.ImageUrl;
         }
-        catch { return null; }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[PB CacheImg] ex: {ex.Message}");
+            return null;
+        }
     }
 
     public class CachedExerciseListResponse
@@ -755,7 +859,10 @@ public class PocketBaseService
                     return string.Join(" ", messages);
             }
         }
-        catch { }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[PB ParseErr] ex: {ex.Message}");
+        }
 
         return body.Length > 200 ? body[..200] : body;
     }

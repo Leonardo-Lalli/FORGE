@@ -18,7 +18,11 @@ public partial class LoginViewModel : BaseViewModel
     {
         this.pb = pb;
         HasData = true;
-        _ = TryAutoLoginAsync();
+        _ = TryAutoLoginAsync().ContinueWith(t =>
+        {
+            if (t.IsFaulted && t.Exception != null)
+                System.Diagnostics.Debug.WriteLine($"[Login AutoLogin] ex: {t.Exception.InnerException?.Message}");
+        }, TaskContinuationOptions.OnlyOnFaulted);
     }
 
     private async Task TryAutoLoginAsync()

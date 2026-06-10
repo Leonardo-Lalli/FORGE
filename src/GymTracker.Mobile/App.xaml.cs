@@ -20,9 +20,14 @@ public partial class App : Application
     protected override Window CreateWindow(IActivationState? activationState)
     {
         themeService.Initialize();
-        var loginPage = services.GetRequiredService<LoginPage>();
-        var window = new Window(loginPage);
-        window.Created += async (_, _) => await InitializeAsync();
+
+        var window = new Window(new ContentPage { BackgroundColor = Colors.Black });
+        window.Created += async (_, _) =>
+        {
+            await InitializeAsync();
+            var loginPage = services.GetRequiredService<LoginPage>();
+            window.Page = loginPage;
+        };
         return window;
     }
 

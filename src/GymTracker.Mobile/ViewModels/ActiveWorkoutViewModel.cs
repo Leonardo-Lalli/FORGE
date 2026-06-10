@@ -71,7 +71,11 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
                 await Task.Delay(400, token);
                 if (!token.IsCancellationRequested)
                     MainThread.BeginInvokeOnMainThread(() => _ = SearchExercisesAsync());
-            }, token);
+            }, token).ContinueWith(t =>
+            {
+                if (t.IsFaulted && t.Exception != null)
+                    System.Diagnostics.Debug.WriteLine($"[ActiveWk SearcDeb] ex: {t.Exception.InnerException?.Message}");
+            }, TaskContinuationOptions.OnlyOnFaulted);
         }
     }
 
@@ -120,20 +124,20 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
         workoutStartTime = DateTime.Now;
 
         if (!string.IsNullOrWhiteSpace(PlanId))
-            _ = LoadPlanAsync();
+            _ = LoadPlanAsync().ContinueWith(t => { if (t.IsFaulted) System.Diagnostics.Debug.WriteLine($"[ActiveWk LoadPlan] ex: {t.Exception?.InnerException?.Message}"); }, TaskContinuationOptions.OnlyOnFaulted);
 
         if (!IsCreating)
         {
             IsTimerRunning = true;
             workoutSession.Start(PlanName);
-            _ = RunElapsedTimerAsync();
+            _ = RunElapsedTimerAsync().ContinueWith(t => { if (t.IsFaulted) System.Diagnostics.Debug.WriteLine($"[ActiveWk Elapsed] ex: {t.Exception?.InnerException?.Message}"); }, TaskContinuationOptions.OnlyOnFaulted);
         }
     }
 
     partial void OnPlanIdChanged(string value)
     {
         if (!string.IsNullOrWhiteSpace(value) && Mode == "plan")
-            _ = LoadPlanAsync();
+            _ = LoadPlanAsync().ContinueWith(t => { if (t.IsFaulted) System.Diagnostics.Debug.WriteLine($"[ActiveWk LoadPlan2] ex: {t.Exception?.InnerException?.Message}"); }, TaskContinuationOptions.OnlyOnFaulted);
     }
 
     private Task LoadPlanAsync()
@@ -175,7 +179,7 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
         IsTimerRunning = true;
         workoutStartTime = DateTime.Now;
         workoutSession.Start(PlanName);
-        _ = RunElapsedTimerAsync();
+        _ = RunElapsedTimerAsync().ContinueWith(t => { if (t.IsFaulted) System.Diagnostics.Debug.WriteLine($"[ActiveWk Elapsed2] ex: {t.Exception?.InnerException?.Message}"); }, TaskContinuationOptions.OnlyOnFaulted);
         ShowNotification("Allenamento iniziato! Forza!");
     }
 
@@ -451,8 +455,12 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
                     HapticFeedback.Default.Perform(HapticFeedbackType.LongPress);
                 }
             }
-            catch (TaskCanceledException) { }
-        }, token);
+            catch (TaskCanceledException) { /* timer cancelled, expected */ }
+        }, token).ContinueWith(t =>
+        {
+            if (t.IsFaulted && t.Exception != null)
+                System.Diagnostics.Debug.WriteLine($"[ActiveWk RunTimer] ex: {t.Exception.InnerException?.Message}");
+        }, TaskContinuationOptions.OnlyOnFaulted);
     }
 
     private void RefreshRestTimerUI() => RestTimerText = $"{restSecondsRemaining}s";
@@ -598,7 +606,7 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
                 await Task.Delay(1000, token);
             }
         }
-        catch (TaskCanceledException) { }
+        catch (TaskCanceledException) { /* elapsed timer cancelled, expected */ }
     }
 }
 

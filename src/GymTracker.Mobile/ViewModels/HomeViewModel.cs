@@ -134,7 +134,10 @@ public partial class HomeViewModel : BaseViewModel
                 ? $"You trained {streak} week{(streak > 1 ? "s" : "")} in a row. Keep going!"
                 : "Start your first workout today!";
         }
-        catch { }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[Home Streak] ex: {ex.Message}");
+        }
     }
 
     private async Task LoadSquadAsync()
@@ -159,7 +162,11 @@ public partial class HomeViewModel : BaseViewModel
                         avatarUrl = pb.GetFileUrl(u.CollectionId, u.Id, u.Avatar);
                     members.Add((id, name, avatarUrl));
                 }
-                catch { members.Add((id, id[..2].ToUpper(), "")); }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"[Home Squad] userRes err: {ex.Message}");
+                    members.Add((id, id[..2].ToUpper(), ""));
+                }
             }
 
             // Check which members have workouts
@@ -205,7 +212,10 @@ public partial class HomeViewModel : BaseViewModel
                 }
             }
         }
-        catch { }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[Home Squad] ex: {ex.Message}");
+        }
     }
 
     [RelayCommand]

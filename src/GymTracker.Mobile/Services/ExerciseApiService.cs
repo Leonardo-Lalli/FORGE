@@ -6,28 +6,39 @@ namespace GymTracker.Mobile.Services;
 
 public class ExerciseApiService
 {
-    private readonly HttpClient http;
-    private readonly HttpClient redirectHttp;
+    private readonly IHttpClientFactory httpFactory;
     private readonly BuildSecrets secrets;
     private readonly PocketBaseService? pb;
     private List<string>? cachedIds;
     private readonly HashSet<string> pbCacheCheck = new();
+    private HttpClient? _http;
+    private HttpClient? _redirectHttp;
+
+    private HttpClient GetHttp()
+    {
+        if (_http != null) return _http;
+        _http = httpFactory.CreateClient("exercisedb");
+        _http.Timeout = TimeSpan.FromSeconds(10);
+        return _http;
+    }
+
+    private HttpClient GetRedirectHttp()
+    {
+        if (_redirectHttp != null) return _redirectHttp;
+        _redirectHttp = httpFactory.CreateClient("redirect");
+        return _redirectHttp;
+    }
 
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
         PropertyNameCaseInsensitive = true
     };
 
-    public ExerciseApiService(HttpClient http, BuildSecrets secrets, PocketBaseService pb)
+    public ExerciseApiService(IHttpClientFactory httpFactory, BuildSecrets secrets, PocketBaseService pb)
     {
-        this.http = http;
+        this.httpFactory = httpFactory;
         this.secrets = secrets;
         this.pb = pb;
-        this.redirectHttp = new HttpClient(new HttpClientHandler { AllowAutoRedirect = true })
-        {
-            Timeout = TimeSpan.FromSeconds(5)
-        };
-        redirectHttp.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0");
     }
 
     public void Initialize()
@@ -35,10 +46,11 @@ public class ExerciseApiService
         var apiKey = secrets.Get("EXERCISEDB_API_KEY");
         if (string.IsNullOrWhiteSpace(apiKey)) return;
 
-        http.BaseAddress = new Uri("https://exercise-db-fitness-workout-gym.p.rapidapi.com");
-        http.DefaultRequestHeaders.Clear();
-        http.DefaultRequestHeaders.Add("x-rapidapi-key", apiKey);
-        http.DefaultRequestHeaders.Add("x-rapidapi-host", "exercise-db-fitness-workout-gym.p.rapidapi.com");
+        var http = GetHttp();
+        GetHttp().BaseAddress = new Uri("https://exercise-db-fitness-workout-gym.p.rapidapi.com");
+        GetHttp().DefaultRequestHeaders.Clear();
+        GetHttp().DefaultRequestHeaders.Add("x-rapidapi-key", apiKey);
+        GetHttp().DefaultRequestHeaders.Add("x-rapidapi-host", "exercise-db-fitness-workout-gym.p.rapidapi.com");
     }
 
     public async Task<List<string>> GetAllExerciseIdsAsync()
@@ -47,7 +59,7 @@ public class ExerciseApiService
 
         try
         {
-            var response = await http.GetAsync("/exercises");
+            var response = await GetHttp().GetAsync("/exercises");
             response.EnsureSuccessStatusCode();
             var json = await response.Content.ReadAsStringAsync();
             var list = JsonSerializer.Deserialize<ExerciseListResponse>(json, JsonOptions);
@@ -65,9 +77,14 @@ public class ExerciseApiService
     {
         try
         {
+            if (pb == null) return null;
             return await pb.GetCachedExerciseImageAsync(exerciseName);
         }
-        catch { return null; }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[ExerciseApi CacheImg] ex: {ex.Message}");
+            return null;
+        }
     }
 
     public async Task<List<ExerciseDbDto>> SearchByNameAsync(string name)
@@ -87,7 +104,7 @@ public class ExerciseApiService
         {
             try
             {
-                var response = await http.GetAsync($"/exercise/{Uri.EscapeDataString(id)}");
+                var response = await GetHttp().GetAsync($"/exercise/{Uri.EscapeDataString(id)}");
                 response.EnsureSuccessStatusCode();
                 var json = await response.Content.ReadAsStringAsync();
                 var detail = JsonSerializer.Deserialize<ExerciseDbDto>(json, JsonOptions);
@@ -105,7 +122,11 @@ public class ExerciseApiService
                 }
                 return detail;
             }
-            catch { return null; }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[ExerciseApi Search] id ex: {ex.Message}");
+                return null;
+            }
         });
 
         var results = await Task.WhenAll(tasks);
@@ -121,11 +142,12 @@ public class ExerciseApiService
         try
         {
             var fullUrl = shortUrl.StartsWith("http") ? shortUrl : $"https://{shortUrl}";
-            var response = await redirectHttp.GetAsync(fullUrl);
+            var response = await GetRedirectHttp().GetAsync(fullUrl);
             return response.RequestMessage?.RequestUri?.ToString() ?? fullUrl;
         }
-        catch
+        catch (Exception ex)
         {
+            System.Diagnostics.Debug.WriteLine($"[ExerciseApi ResolveImg] ex: {ex.Message}");
             return $"https://{shortUrl}";
         }
     }
@@ -165,7 +187,7 @@ public class ExerciseApiService
     {
         try
         {
-            var response = await http.GetAsync($"/exercise/{Uri.EscapeDataString(exerciseId)}");
+            var response = await GetHttp().GetAsync($"/exercise/{Uri.EscapeDataString(exerciseId)}");
             response.EnsureSuccessStatusCode();
             var json = await response.Content.ReadAsStringAsync();
             return JsonSerializer.Deserialize<ExerciseDbDto>(json, JsonOptions);
@@ -181,7 +203,7 @@ public class ExerciseApiService
     {
         try
         {
-            var response = await http.GetAsync($"/exercises/muscle/{Uri.EscapeDataString(muscle)}");
+            var response = await GetHttp().GetAsync($"/exercises/muscle/{Uri.EscapeDataString(muscle)}");
             response.EnsureSuccessStatusCode();
             var json = await response.Content.ReadAsStringAsync();
             var exercises = JsonSerializer.Deserialize<List<ExerciseDbDto>>(json, JsonOptions) ?? new();
@@ -199,7 +221,11 @@ public class ExerciseApiService
                 }
                 await CacheExerciseAsync(ex, resolved);
             });
-            _ = Task.WhenAll(tasks);
+            _ = Task.WhenAll(tasks).ContinueWith(t =>
+            {
+                if (t.IsFaulted && t.Exception != null)
+                    System.Diagnostics.Debug.WriteLine($"[ExerciseApi MuscCache] ex: {t.Exception.InnerException?.Message}");
+            }, TaskContinuationOptions.OnlyOnFaulted);
 
             return exercises;
         }

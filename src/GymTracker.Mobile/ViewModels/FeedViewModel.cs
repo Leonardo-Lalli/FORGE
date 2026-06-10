@@ -50,7 +50,7 @@ public partial class FeedViewModel : BaseViewModel
     partial void OnSearchQueryChanged(string value)
     {
         if (value.Length >= 2)
-            _ = SearchUsersAsyncDebounced(value);
+            _ = SearchUsersAsyncDebounced(value).ContinueWith(t => { if (t.IsFaulted) System.Diagnostics.Debug.WriteLine($"[Feed SrchDeb] ex: {t.Exception?.InnerException?.Message}"); }, TaskContinuationOptions.OnlyOnFaulted);
     }
 
     private CancellationTokenSource? searchCts;
@@ -64,9 +64,9 @@ public partial class FeedViewModel : BaseViewModel
         {
             await Task.Delay(400, token);
             if (!token.IsCancellationRequested)
-                MainThread.BeginInvokeOnMainThread(() => _ = SearchUsersAsync());
+                MainThread.BeginInvokeOnMainThread(() => _ = SearchUsersAsync().ContinueWith(t => { if (t.IsFaulted) System.Diagnostics.Debug.WriteLine($"[Feed Srch] ex: {t.Exception?.InnerException?.Message}"); }, TaskContinuationOptions.OnlyOnFaulted));
         }
-        catch (TaskCanceledException) { }
+        catch (TaskCanceledException) { /* debounce cancelled, expected */ }
     }
     [ObservableProperty] private bool isSearching;
     [ObservableProperty] private bool isFeedBusy;

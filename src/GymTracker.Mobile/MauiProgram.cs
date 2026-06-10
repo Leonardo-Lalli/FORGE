@@ -34,16 +34,25 @@ public static class MauiProgram
         builder.Services.AddSingleton<ThemeService>();
         builder.Services.AddSingleton<WorkoutSession>();
 
-        builder.Services.AddSingleton(sp =>
+        builder.Services.AddHttpClient("pocketbase");
+        builder.Services.AddHttpClient("exercisedb");
+        builder.Services.AddHttpClient("redirect", client =>
         {
-            var http = new HttpClient { BaseAddress = new Uri("https://pocketbase.server-casa-leo.duckdns.org/api/") };
-            return new PocketBaseService(http, sp.GetRequiredService<BuildSecrets>());
+            client.Timeout = TimeSpan.FromSeconds(5);
+            client.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0");
         });
         builder.Services.AddSingleton(sp =>
         {
-            var http = new HttpClient();
-            return new ExerciseApiService(http, sp.GetRequiredService<BuildSecrets>(),
-                sp.GetRequiredService<PocketBaseService>());
+            var factory = sp.GetRequiredService<IHttpClientFactory>();
+            var secrets = sp.GetRequiredService<BuildSecrets>();
+            return new PocketBaseService(factory, secrets);
+        });
+        builder.Services.AddSingleton(sp =>
+        {
+            var factory = sp.GetRequiredService<IHttpClientFactory>();
+            var secrets = sp.GetRequiredService<BuildSecrets>();
+            var pb = sp.GetRequiredService<PocketBaseService>();
+            return new ExerciseApiService(factory, secrets, pb);
         });
 
         // ViewModels

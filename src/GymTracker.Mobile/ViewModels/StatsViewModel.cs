@@ -29,6 +29,7 @@ public partial class StatsViewModel : BaseViewModel
 {
     private readonly PocketBaseService pb;
     private List<Models.Dto.LoggedWorkoutRecord> allWorkouts = new();
+    private DateTime lastCalendarDate = DateTime.MinValue;
 
     [ObservableProperty] private string totalHours = "0";
     [ObservableProperty] private string totalHoursTrend = "";
@@ -236,7 +237,10 @@ public partial class StatsViewModel : BaseViewModel
                         exerciseStats[ex.Name] = maxKg;
                 }
             }
-            catch { }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[Stats BuildTopLifts] ex: {ex.Message}");
+            }
         }
 
         var top = exerciseStats.Where(kv => kv.Value > 0).OrderByDescending(kv => kv.Value).Take(5).ToList();
@@ -306,8 +310,18 @@ public partial class StatsViewModel : BaseViewModel
 
     private void BuildCalendar()
     {
-        CalendarDays.Clear();
         var today = DateTime.Now;
+        if (lastCalendarDate != DateTime.MinValue && lastCalendarDate.Date != today.Date)
+        {
+            foreach (var day in CalendarDays)
+                day.IsToday = day.Day == today.Day.ToString();
+            lastCalendarDate = today;
+            CalendarMonth = today.ToString("MMMM yyyy");
+            return;
+        }
+        lastCalendarDate = today;
+
+        CalendarDays.Clear();
         CalendarMonth = today.ToString("MMMM yyyy");
         var firstOfMonth = new DateTime(today.Year, today.Month, 1);
         var daysInMonth = DateTime.DaysInMonth(today.Year, today.Month);
