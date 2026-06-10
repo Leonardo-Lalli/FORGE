@@ -33,8 +33,9 @@ public class SyncService
 
                 var payload = new Dictionary<string, object?>
                 {
+                    ["user"] = w.UserId,
+                    ["user_name"] = w.UserName,
                     ["name"] = w.Name,
-                    ["user_name"] = pb.CurrentUser?.Name ?? w.UserName,
                     ["date"] = w.Date,
                     ["exercises"] = exercises,
                     ["exercise_data"] = exerciseData,
