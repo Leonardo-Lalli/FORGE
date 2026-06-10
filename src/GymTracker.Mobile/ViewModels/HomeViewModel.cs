@@ -52,10 +52,17 @@ public partial class HomeViewModel : BaseViewModel
     [RelayCommand]
     private async Task LoadAsync()
     {
-        LoadUserInfo();
-        await CalculateStreakAsync();
-        await LoadSquadAsync();
-        await LoadRandomPlanAsync();
+        if (IsBusy) return;
+        IsBusy = true;
+        try
+        {
+            LoadUserInfo();
+            await CalculateStreakAsync();
+            await LoadSquadAsync();
+            await LoadRandomPlanAsync();
+            SetSuccess(true);
+        }
+        finally { IsBusy = false; }
     }
 
     private void LoadUserInfo()

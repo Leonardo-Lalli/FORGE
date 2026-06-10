@@ -5,7 +5,7 @@
     xmlns:vm="clr-namespace:GymTracker.Mobile.ViewModels"
     x:Class="GymTracker.Mobile.Views.HomePage"
     x:DataType="vm:HomeViewModel"
-    Title="FORGE_ELITE"
+    Title="FORGE"
     Shell.NavBarIsVisible="False">
 
     <Grid RowDefinitions="Auto,*" BackgroundColor="{DynamicResource Surface}">
@@ -28,8 +28,8 @@
                        HorizontalOptions="Center" VerticalOptions="Center"
                        IsVisible="{Binding HasUserAvatar, Converter={StaticResource InverseBoolConverter}}" />
             </Border>
-            <!-- Center: FORGE_ELITE title -->
-            <Label Grid.Column="1" Text="FORGE_ELITE"
+            <!-- Center: FORGE title -->
+            <Label Grid.Column="1" Text="FORGE"
                    FontFamily="OpenSansSemibold" FontSize="18" FontAttributes="Bold"
                    TextColor="{DynamicResource Primary}"
                    HorizontalOptions="Center" VerticalOptions="Center"

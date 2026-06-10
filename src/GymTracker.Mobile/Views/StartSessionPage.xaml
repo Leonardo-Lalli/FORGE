@@ -5,7 +5,7 @@
     xmlns:vm="clr-namespace:GymTracker.Mobile.ViewModels"
     x:Class="GymTracker.Mobile.Views.StartSessionPage"
     x:DataType="vm:StartSessionViewModel"
-    Title="FORGE_ELITE"
+    Title="FORGE"
     Shell.NavBarIsVisible="False">
 
     <Grid RowDefinitions="Auto,*" BackgroundColor="{DynamicResource Surface}">
@@ -23,7 +23,7 @@
                     </Label.GestureRecognizers>
                 </Label>
             </Border>
-            <Label Grid.Column="1" Text="FORGE_ELITE"
+            <Label Grid.Column="1" Text="FORGE"
                    FontFamily="OpenSansSemibold" FontSize="18" FontAttributes="Bold"
                    TextColor="{DynamicResource Primary}"
                    HorizontalOptions="Center" VerticalOptions="Center"

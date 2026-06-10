@@ -28,7 +28,7 @@
                        HorizontalOptions="Center" VerticalOptions="Center"
                        IsVisible="{Binding HasUserAvatar, Converter={StaticResource InverseBoolConverter}}" />
             </Border>
-            <Label Grid.Column="1" Text="FORGE ELITE"
+            <Label Grid.Column="1" Text="FORGE"
                    FontFamily="OpenSansSemibold" FontSize="20" FontAttributes="Bold"
                    TextColor="{DynamicResource Primary}"
                    HorizontalOptions="Center" VerticalOptions="Center"
