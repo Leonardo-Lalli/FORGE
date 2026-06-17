@@ -153,7 +153,7 @@ while (true)
 
     Console.Write($" ({imported} total)");
 
-    if (!string.IsNullOrEmpty(result.Meta?.NextCursor) && result.Meta.HasNextPage)
+    if (!string.IsNullOrEmpty(result.Meta?.NextCursor) && result.Meta.HasNextPage && pageCount < 50)
     {
         cursor = result.Meta.NextCursor;
         File.WriteAllLines(resumeFile, new[] { cursor, imported.ToString() });
