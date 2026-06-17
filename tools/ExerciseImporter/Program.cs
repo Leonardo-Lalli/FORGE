@@ -32,7 +32,7 @@ var exHttp = new HttpClient
 
 // Login PocketBase (admin o utente normale)
 var authEndpoint = PB_IS_ADMIN
-    ? "admins/auth-with-password"
+    ? "collections/_superusers/auth-with-password"
     : "collections/users/auth-with-password";
 
 Console.WriteLine($"[1/3] Login PocketBase ({(PB_IS_ADMIN ? "admin" : "user")})...");
