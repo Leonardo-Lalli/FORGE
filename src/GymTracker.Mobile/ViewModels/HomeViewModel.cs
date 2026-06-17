@@ -38,9 +38,15 @@ public partial class HomeViewModel : BaseViewModel
     [ObservableProperty] private string userAvatarUrl = string.Empty;
     [ObservableProperty] private ImageSource? userAvatarSource;
     [ObservableProperty] private bool hasUserAvatar;
-    [ObservableProperty] private string achievementProgress = "0/50";
+    [ObservableProperty] private string achievementProgress = "0/48";
     [ObservableProperty] private double achievementPercent;
     [ObservableProperty] private string achievementCount = "0";
+    [ObservableProperty] private string nextAchievementName = string.Empty;
+    [ObservableProperty] private string nextAchievementDesc = string.Empty;
+    [ObservableProperty] private string nextAchievementIcon = string.Empty;
+    [ObservableProperty] private double nextAchievementProgress;
+    [ObservableProperty] private string nextAchievementText = string.Empty;
+    [ObservableProperty] private bool hasNextAchievement;
 
     public HomeViewModel(PocketBaseService pb, PlanService planService, AchievementService achievementService)
     {
@@ -97,6 +103,22 @@ public partial class HomeViewModel : BaseViewModel
             AchievementCount = unlocked.ToString();
             AchievementProgress = $"{unlocked}/{AchievementsCatalog.All.Count}";
             AchievementPercent = percent;
+
+            var all = await achievementService.GetAllAsync();
+            var next = all
+                .Where(a => !a.State.IsUnlocked && a.State.Progress > 0)
+                .OrderByDescending(a => (double)a.State.Progress / a.Def.MaxProgress)
+                .FirstOrDefault();
+
+            if (next != default)
+            {
+                NextAchievementName = next.Def.Name;
+                NextAchievementDesc = next.Def.Description;
+                NextAchievementIcon = next.Def.Icon;
+                NextAchievementProgress = (double)next.State.Progress / next.Def.MaxProgress;
+                NextAchievementText = $"{next.State.Progress}/{next.Def.MaxProgress}";
+                HasNextAchievement = true;
+            }
         }
         catch { }
     }

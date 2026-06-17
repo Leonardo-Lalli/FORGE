@@ -150,33 +150,63 @@
                     <Border.GestureRecognizers>
                         <TapGestureRecognizer Command="{Binding OpenAchievementsCommand}" />
                     </Border.GestureRecognizers>
-                    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
-                        <Border Grid.Column="0" StrokeShape="RoundRectangle 16"
-                                BackgroundColor="{DynamicResource PrimaryContainer}"
-                                WidthRequest="44" HeightRequest="44">
-                            <Image Source="achievements/Legend.png" WidthRequest="30" HeightRequest="30"
-                                   HorizontalOptions="Center" VerticalOptions="Center" Aspect="AspectFit" />
-                        </Border>
-                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
-                            <Label Text="Achievements" FontFamily="SpaceGrotesk"
-                                   FontSize="14" FontAttributes="Bold"
-                                   TextColor="{DynamicResource OnSurface}" />
-                            <Label FontFamily="Inter" FontSize="11"
-                                   TextColor="{DynamicResource OnSurfaceVariant}"
-                                   Text="{Binding AchievementProgress, StringFormat='{0} sbloccati'}" />
-                        </VerticalStackLayout>
-                        <VerticalStackLayout Grid.Column="2" VerticalOptions="Center"
-                            HorizontalOptions="End" Spacing="2">
-                            <Label Text="{Binding AchievementCount}" FontFamily="SpaceGrotesk"
+                    <VerticalStackLayout Spacing="10">
+                        <!-- Header -->
+                        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                            <Border Grid.Column="0" StrokeShape="RoundRectangle 16"
+                                    BackgroundColor="{DynamicResource PrimaryContainer}"
+                                    WidthRequest="44" HeightRequest="44">
+                                <Image Source="achievements/Legend.png" WidthRequest="30" HeightRequest="30"
+                                       HorizontalOptions="Center" VerticalOptions="Center" Aspect="AspectFit" />
+                            </Border>
+                            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
+                                <Label Text="Achievements" FontFamily="SpaceGrotesk"
+                                       FontSize="14" FontAttributes="Bold"
+                                       TextColor="{DynamicResource OnSurface}" />
+                                <Label FontFamily="Inter" FontSize="11"
+                                       TextColor="{DynamicResource OnSurfaceVariant}"
+                                       Text="{Binding AchievementProgress, StringFormat='{0} sbloccati'}" />
+                            </VerticalStackLayout>
+                            <Label Grid.Column="2" Text="{Binding AchievementCount}" FontFamily="SpaceGrotesk"
                                    FontSize="20" FontAttributes="Bold"
                                    TextColor="{DynamicResource Primary}"
-                                   HorizontalTextAlignment="End" />
-                            <ProgressBar Progress="{Binding AchievementPercent}"
-                                         ProgressColor="{DynamicResource Primary}"
-                                         BackgroundColor="{DynamicResource SurfaceContainerHigh}"
-                                         WidthRequest="70" HeightRequest="4" />
+                                   VerticalOptions="Center" />
+                        </Grid>
+                        <ProgressBar Progress="{Binding AchievementPercent}"
+                                     ProgressColor="{DynamicResource Primary}"
+                                     BackgroundColor="{DynamicResource SurfaceContainerHigh}"
+                                     HeightRequest="4" />
+
+                        <!-- Next Achievement -->
+                        <VerticalStackLayout IsVisible="{Binding HasNextAchievement}" Spacing="4">
+                            <Label FontFamily="Lexend" FontSize="10" FontAttributes="Bold"
+                                   TextColor="{DynamicResource TextSecondary}"
+                                   Text="PROSSIMO" CharacterSpacing="1" />
+                            <Grid ColumnDefinitions="36,*" ColumnSpacing="10">
+                                <Image Grid.Column="0" Source="{Binding NextAchievementIcon}"
+                                       WidthRequest="36" HeightRequest="36" Aspect="AspectFit"
+                                       VerticalOptions="Center" />
+                                <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                                    <Label Text="{Binding NextAchievementName}" FontFamily="SpaceGrotesk"
+                                           FontSize="12" FontAttributes="Bold"
+                                           TextColor="{DynamicResource Primary}" />
+                                    <Label Text="{Binding NextAchievementDesc}" FontFamily="Inter"
+                                           FontSize="10" TextColor="{DynamicResource OnSurfaceVariant}"
+                                           LineBreakMode="TailTruncation" MaxLines="1" />
+                                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="6">
+                                        <ProgressBar Grid.Column="0" Progress="{Binding NextAchievementProgress}"
+                                                     ProgressColor="{DynamicResource Primary}"
+                                                     BackgroundColor="{DynamicResource SurfaceContainerHigh}"
+                                                     HeightRequest="3" VerticalOptions="Center" />
+                                        <Label Grid.Column="1" Text="{Binding NextAchievementText}"
+                                               FontFamily="Inter" FontSize="9"
+                                               TextColor="{DynamicResource TextSecondary}"
+                                               VerticalOptions="Center" />
+                                    </Grid>
+                                </VerticalStackLayout>
+                            </Grid>
                         </VerticalStackLayout>
-                    </Grid>
+                    </VerticalStackLayout>
                 </Border>
 
                 <!-- ===== Next Workout ===== -->

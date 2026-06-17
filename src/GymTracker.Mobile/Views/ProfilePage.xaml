@@ -170,6 +170,36 @@
                     </Border>
                 </Grid>
 
+                <!-- Achievement Badges -->
+                <VerticalStackLayout IsVisible="{Binding HasUnlockedBadges}" Spacing="8">
+                    <Grid ColumnDefinitions="*,Auto" Padding="0,0,0,4">
+                        <Label Grid.Column="0" Text="Badge Sbloccati" FontFamily="Lexend"
+                               FontSize="13" FontAttributes="Bold"
+                               TextColor="{DynamicResource OnSurfaceVariant}" />
+                        <Label Grid.Column="1" Text="{Binding AchievementSummary}"
+                               FontFamily="Inter" FontSize="11"
+                               TextColor="{DynamicResource TextSecondary}"
+                               VerticalOptions="Center" />
+                    </Grid>
+                    <ScrollView Orientation="Horizontal" HorizontalScrollBarVisibility="Never">
+                        <HorizontalStackLayout Spacing="8"
+                            BindableLayout.ItemsSource="{Binding UnlockedBadges}">
+                            <BindableLayout.ItemTemplate>
+                                <DataTemplate x:DataType="x:String">
+                                    <Border StrokeShape="RoundRectangle 12"
+                                            BackgroundColor="{DynamicResource SurfaceContainer}"
+                                            Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1"
+                                            WidthRequest="50" HeightRequest="50">
+                                        <Image Source="{Binding .}" WidthRequest="44" HeightRequest="44"
+                                               Aspect="AspectFit"
+                                               HorizontalOptions="Center" VerticalOptions="Center" />
+                                    </Border>
+                                </DataTemplate>
+                            </BindableLayout.ItemTemplate>
+                        </HorizontalStackLayout>
+                    </ScrollView>
+                </VerticalStackLayout>
+
                 <!-- Recent Forges -->
                 <VerticalStackLayout Spacing="16">
                     <Grid ColumnDefinitions="*" Padding="0,0,0,8">

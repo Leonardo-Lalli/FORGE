@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using GymTracker.Mobile.Messages;
+using GymTracker.Mobile.Models;
 using GymTracker.Mobile.Services;
 
 namespace GymTracker.Mobile.ViewModels;
@@ -22,6 +23,7 @@ public partial class ProfileWorkout : ObservableObject
 public partial class ProfileViewModel : BaseViewModel
 {
     private readonly PocketBaseService pb;
+    private readonly AchievementService achievementService;
 
     [ObservableProperty] private string username = string.Empty;
     [ObservableProperty] private string tier = string.Empty;
@@ -42,10 +44,14 @@ public partial class ProfileViewModel : BaseViewModel
     [ObservableProperty] private string workoutLoadError = string.Empty;
     [ObservableProperty] private bool hasWorkoutError;
     [ObservableProperty] private ObservableCollection<ProfileWorkout> recentWorkouts = new();
+    [ObservableProperty] private ObservableCollection<string> unlockedBadges = new();
+    [ObservableProperty] private bool hasUnlockedBadges;
+    [ObservableProperty] private string achievementSummary = string.Empty;
 
-    public ProfileViewModel(PocketBaseService pb)
+    public ProfileViewModel(PocketBaseService pb, AchievementService achievementService)
     {
         this.pb = pb;
+        this.achievementService = achievementService;
         HasData = true;
 
         WeakReferenceMessenger.Default.Register<WorkoutSavedMessage>(this, async (_, _) =>
@@ -89,6 +95,7 @@ public partial class ProfileViewModel : BaseViewModel
             Tier = "FORGE ATHLETE";
 
             await LoadRealWorkouts();
+            await LoadAchievementBadges();
         }
         else
         {
@@ -296,5 +303,18 @@ public partial class ProfileViewModel : BaseViewModel
         {
             System.Diagnostics.Debug.WriteLine($"[Profile] ChangeAvatar ex: {ex.Message}");
         }
+    }
+
+    private async Task LoadAchievementBadges()
+    {
+        try
+        {
+            var all = await achievementService.GetAllAsync();
+            var unlocked = all.Where(a => a.State.IsUnlocked).ToList();
+            UnlockedBadges = new ObservableCollection<string>(unlocked.Select(a => a.Def.Icon));
+            HasUnlockedBadges = UnlockedBadges.Count > 0;
+            AchievementSummary = $"{unlocked.Count}/{AchievementsCatalog.All.Count} sbloccati";
+        }
+        catch { }
     }
 }
