@@ -8,6 +8,7 @@ const string PB_URL = "https://leoforge.duckdns.org/api/";
 var PB_EMAIL = Environment.GetEnvironmentVariable("FORGE_PB_EMAIL") ?? "";
 var PB_PASSWORD = Environment.GetEnvironmentVariable("FORGE_PB_PASSWORD") ?? "";
 var PB_IS_ADMIN = Environment.GetEnvironmentVariable("FORGE_PB_ADMIN") == "1";
+var PB_DEDUP = Environment.GetEnvironmentVariable("FORGE_PB_DEDUP") == "1";
 
 if (string.IsNullOrWhiteSpace(PB_EMAIL))
 {
@@ -47,6 +48,53 @@ var auth = await authResp.Content.ReadFromJsonAsync<AuthResponse>();
 var token = auth?.Token ?? "";
 var userId = auth?.Record?.Id ?? auth?.Admin?.Id ?? "?";
 Console.WriteLine($"  OK, id={userId}");
+
+// Dedup mode: remove duplicate exercises by exercise_id
+if (PB_DEDUP)
+{
+    Console.WriteLine("[DEDUP] Removing duplicate exercises...");
+    int deleted = 0, kept = 0;
+    var seen = new HashSet<string>();
+    var page = 1;
+    while (true)
+    {
+        var url = $"collections/excercise/records?perPage=200&page={page}&sort=created";
+        var req = new HttpRequestMessage(HttpMethod.Get, url);
+        req.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+        var resp = await pbHttp.SendAsync(req);
+        if (!resp.IsSuccessStatusCode) break;
+
+        var body = await resp.Content.ReadAsStringAsync();
+        using var doc = JsonDocument.Parse(body);
+        if (!doc.RootElement.TryGetProperty("items", out var items) || items.GetArrayLength() == 0) break;
+
+        foreach (var item in items.EnumerateArray())
+        {
+            var id = item.TryGetProperty("id", out var idEl) ? idEl.GetString() ?? "" : "";
+            var exId = item.TryGetProperty("exercise_id", out var exIdEl) ? exIdEl.GetString() ?? "" : "";
+
+            if (string.IsNullOrEmpty(exId)) { kept++; continue; }
+
+            if (seen.Contains(exId))
+            {
+                var delReq = new HttpRequestMessage(HttpMethod.Delete, $"collections/excercise/records/{id}");
+                delReq.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                await pbHttp.SendAsync(delReq);
+                deleted++;
+                if (deleted % 100 == 0) Console.WriteLine($"  ... {deleted} duplicates deleted");
+            }
+            else
+            {
+                seen.Add(exId);
+                kept++;
+            }
+        }
+        page++;
+        Console.Write($"\r  Page {page}: {kept} kept, {deleted} deleted  ");
+    }
+    Console.WriteLine($"\n[DEDUP] Done. {kept} unique exercises, {deleted} duplicates removed.");
+    return;
+}
 
 // Resume file
 var resumeFile = Path.Combine(Directory.GetCurrentDirectory(), "import_resume.txt");
