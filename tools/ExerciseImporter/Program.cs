@@ -7,12 +7,18 @@ using System.Text.Json.Serialization;
 const string PB_URL = "https://leoforge.duckdns.org/api/";
 var PB_EMAIL = Environment.GetEnvironmentVariable("FORGE_PB_EMAIL") ?? "";
 var PB_PASSWORD = Environment.GetEnvironmentVariable("FORGE_PB_PASSWORD") ?? "";
+var PB_IS_ADMIN = Environment.GetEnvironmentVariable("FORGE_PB_ADMIN") == "1";
 
 if (string.IsNullOrWhiteSpace(PB_EMAIL))
 {
     Console.WriteLine("ERRORE: imposta le variabili d'ambiente:");
-    Console.WriteLine("  set FORGE_PB_EMAIL=tua_email");
-    Console.WriteLine("  set FORGE_PB_PASSWORD=tua_password");
+    Console.WriteLine("  Per utente PocketBase normale:");
+    Console.WriteLine("    $env:FORGE_PB_EMAIL='tua_email'");
+    Console.WriteLine("    $env:FORGE_PB_PASSWORD='tua_password'");
+    Console.WriteLine("  Per admin PocketBase:");
+    Console.WriteLine("    $env:FORGE_PB_EMAIL='admin_email'");
+    Console.WriteLine("    $env:FORGE_PB_PASSWORD='admin_password'");
+    Console.WriteLine("    $env:FORGE_PB_ADMIN='1'");
     return;
 }
 
@@ -24,10 +30,14 @@ var exHttp = new HttpClient
     Timeout = TimeSpan.FromSeconds(30)
 };
 
-// Login PocketBase
-Console.WriteLine("[1/3] Login PocketBase...");
+// Login PocketBase (admin o utente normale)
+var authEndpoint = PB_IS_ADMIN
+    ? "admins/auth-with-password"
+    : "collections/users/auth-with-password";
+
+Console.WriteLine($"[1/3] Login PocketBase ({(PB_IS_ADMIN ? "admin" : "user")})...");
 var authPayload = new { identity = PB_EMAIL, password = PB_PASSWORD };
-var authResp = await pbHttp.PostAsJsonAsync("collections/users/auth-with-password", authPayload);
+var authResp = await pbHttp.PostAsJsonAsync(authEndpoint, authPayload);
 if (!authResp.IsSuccessStatusCode)
 {
     Console.WriteLine($"ERRORE login: {await authResp.Content.ReadAsStringAsync()}");
@@ -35,7 +45,8 @@ if (!authResp.IsSuccessStatusCode)
 }
 var auth = await authResp.Content.ReadFromJsonAsync<AuthResponse>();
 var token = auth?.Token ?? "";
-Console.WriteLine($"  OK, user={auth?.Record?.Id}");
+var userId = auth?.Record?.Id ?? auth?.Admin?.Id ?? "?";
+Console.WriteLine($"  OK, id={userId}");
 
 // Resume file
 var resumeFile = Path.Combine(Directory.GetCurrentDirectory(), "import_resume.txt");
@@ -131,10 +142,10 @@ while (true)
                     Console.Write("F");
             }
         }
-        catch (Exception ex)
+        catch (Exception exc)
         {
             Console.Write("E");
-            System.Diagnostics.Debug.WriteLine($"  ERR [{ex.ExerciseId}]: {ex.Message}");
+            System.Diagnostics.Debug.WriteLine($"  ERR [{ex.ExerciseId}]: {exc.Message}");
         }
 
         await Task.Delay(100); // 10 req/s to avoid rate limiting
@@ -175,6 +186,7 @@ class AuthResponse
 {
     [JsonPropertyName("token")] public string Token { get; set; } = "";
     [JsonPropertyName("record")] public AuthRecord? Record { get; set; }
+    [JsonPropertyName("admin")] public AuthRecord? Admin { get; set; }
 }
 class AuthRecord { [JsonPropertyName("id")] public string Id { get; set; } = ""; }
 
