@@ -215,6 +215,8 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
 
         if (!string.IsNullOrWhiteSpace(PlanId))
             _ = LoadPlanAsync().ContinueWith(t => { if (t.IsFaulted) System.Diagnostics.Debug.WriteLine($"[ActiveWk LoadPlan] ex: {t.Exception?.InnerException?.Message}"); }, TaskContinuationOptions.OnlyOnFaulted);
+        else if (value == "free")
+            _ = LoadDraftAsync().ContinueWith(t => { if (t.IsFaulted) System.Diagnostics.Debug.WriteLine($"[ActiveWk LoadDraft] ex: {t.Exception?.InnerException?.Message}"); }, TaskContinuationOptions.OnlyOnFaulted);
 
         if (!IsCreating)
         {
@@ -273,7 +275,7 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
     }
 
     [RelayCommand]
-    private void MinimizeWorkout()
+    private void CollapseWorkout()
     {
         workoutSession.Minimize();
     }
@@ -693,10 +695,155 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
     }
 
     [RelayCommand]
+    private async Task MinimizeWorkoutAsync()
+    {
+        elapsedCts?.Cancel();
+        restCts?.Cancel();
+
+        if (Exercises.Count > 0)
+        {
+            await SaveDraftAsync();
+            workoutSession.Minimize();
+        }
+        else
+        {
+            workoutSession.End();
+        }
+        await Shell.Current.GoToAsync("..");
+    }
+
+    private async Task SaveDraftAsync()
+    {
+        try
+        {
+            // Delete old drafts first (keep only 1)
+            var oldDrafts = await GetDraftsAsync();
+            foreach (var d in oldDrafts)
+                await db.DeleteWorkoutAsync(d.Id);
+
+            var exerciseData = Exercises.Select(e => new
+            {
+                name = e.ExerciseName,
+                bodyPart = e.BodyPart,
+                equipment = e.Equipment,
+                notes = e.Notes,
+                restSeconds = e.RestSeconds,
+                sets = e.Sets.Select(s => new
+                {
+                    setNumber = s.SetNumber,
+                    weightKg = s.WeightKg,
+                    reps = s.Reps,
+                    isCompleted = s.IsCompleted
+                }).ToList()
+            }).ToList();
+
+            var volume = Exercises.Sum(e => e.Sets.Sum(s => s.WeightKg * s.Reps));
+            var duration = (int)(DateTime.Now - workoutStartTime).TotalMinutes;
+
+            var draft = new Models.LocalWorkout
+            {
+                Id = "draft_" + Guid.NewGuid().ToString()[..8],
+                UserId = pb.IsLoggedIn ? pb.CurrentUser?.Id ?? "" : "",
+                Name = string.IsNullOrWhiteSpace(PlanNameInput) ? PlanName : PlanNameInput,
+                Date = DateTime.UtcNow.ToString("o"),
+                ExercisesJson = System.Text.Json.JsonSerializer.Serialize(Exercises.Select(e => e.ExerciseName).ToList()),
+                ExerciseDataJson = System.Text.Json.JsonSerializer.Serialize(exerciseData),
+                Volume = volume,
+                Duration = Math.Max(1, duration),
+                Notes = WorkoutNotes ?? "",
+                UserName = pb.IsLoggedIn ? pb.CurrentUser?.Name ?? "" : "",
+                PhotosJson = System.Text.Json.JsonSerializer.Serialize(WorkoutPhotos.ToList()),
+                IsDraft = true
+            };
+            await db.SaveWorkoutAsync(draft);
+            System.Diagnostics.Debug.WriteLine($"[Draft] saved id={draft.Id}");
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[Draft] ex: {ex.Message}");
+        }
+    }
+
+    private async Task<List<LocalWorkout>> GetDraftsAsync()
+    {
+        var all = await db.GetWorkoutsAsync();
+        return all.Where(w => w.IsDraft).ToList();
+    }
+
+    private async Task LoadDraftAsync()
+    {
+        try
+        {
+            var drafts = await GetDraftsAsync();
+            var draft = drafts.FirstOrDefault();
+            if (draft == null) return;
+
+            Exercises.Clear();
+            var exerciseData = System.Text.Json.JsonSerializer.Deserialize<List<System.Text.Json.JsonElement>>(draft.ExerciseDataJson);
+            var exerciseNames = System.Text.Json.JsonSerializer.Deserialize<List<string>>(draft.ExercisesJson);
+
+            if (exerciseData == null) return;
+
+            int order = 1;
+            for (int i = 0; i < exerciseData.Count; i++)
+            {
+                var ed = exerciseData[i];
+                var ex = new WorkoutExercise
+                {
+                    ExerciseName = ed.TryGetProperty("name", out var n) ? n.GetString() ?? "" : "",
+                    BodyPart = ed.TryGetProperty("bodyPart", out var bp) ? bp.GetString() ?? "" : "",
+                    Equipment = ed.TryGetProperty("equipment", out var eq) ? eq.GetString() ?? "" : "",
+                    Notes = ed.TryGetProperty("notes", out var nt) ? nt.GetString() ?? "" : "",
+                    RestSeconds = ed.TryGetProperty("restSeconds", out var rs) && rs.TryGetInt32(out var rsv) ? rsv : 90,
+                    Order = order++
+                };
+
+                if (ed.TryGetProperty("sets", out var setsArr) && setsArr.ValueKind == System.Text.Json.JsonValueKind.Array)
+                {
+                    int setNum = 1;
+                    foreach (var s in setsArr.EnumerateArray())
+                    {
+                        ex.Sets.Add(new ExerciseSet
+                        {
+                            SetNumber = setNum++,
+                            WeightKg = s.TryGetProperty("weightKg", out var wk) && wk.TryGetDouble(out var w) ? w : 0,
+                            Reps = s.TryGetProperty("reps", out var rp) && rp.TryGetInt32(out var r) ? r : 0,
+                            IsCompleted = s.TryGetProperty("isCompleted", out var ic) && ic.ValueKind == System.Text.Json.JsonValueKind.True
+                        });
+                    }
+                }
+                Exercises.Add(ex);
+            }
+
+            PlanName = draft.Name;
+            PlanNameInput = draft.Name;
+            WorkoutNotes = draft.Notes;
+            if (!string.IsNullOrWhiteSpace(draft.PhotosJson) && draft.PhotosJson != "[]")
+            {
+                var photos = System.Text.Json.JsonSerializer.Deserialize<List<string>>(draft.PhotosJson);
+                if (photos != null)
+                    foreach (var p in photos)
+                        WorkoutPhotos.Add(p);
+                HasWorkoutPhotos = WorkoutPhotos.Count > 0;
+            }
+
+            System.Diagnostics.Debug.WriteLine($"[Draft] loaded {Exercises.Count} exercises from {draft.Id}");
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[Draft] Load ex: {ex.Message}");
+        }
+    }
+
+    [RelayCommand]
     private async Task FinishWorkoutAsync()
     {
         elapsedCts?.Cancel();
         restCts?.Cancel();
+
+        // Delete draft before saving final
+        var drafts = await GetDraftsAsync();
+        foreach (var d in drafts) await db.DeleteWorkoutAsync(d.Id);
 
         if (Exercises.Count > 0 && IsTimerRunning)
         {

@@ -25,7 +25,7 @@
                 <Label Text="✕" FontSize="14" TextColor="{DynamicResource OnSurface}"
                        HorizontalOptions="Center" VerticalOptions="Center">
                     <Label.GestureRecognizers>
-                        <TapGestureRecognizer Command="{Binding FinishWorkoutCommand}" />
+                        <TapGestureRecognizer Command="{Binding MinimizeWorkoutCommand}" />
                     </Label.GestureRecognizers>
                 </Label>
             </Border>
@@ -47,7 +47,7 @@
                     IsVisible="{Binding IsTimerRunning}">
                 <Label Text="🔽" FontSize="14" HorizontalOptions="Center" VerticalOptions="Center">
                     <Label.GestureRecognizers>
-                        <TapGestureRecognizer Command="{Binding MinimizeWorkoutCommand}" />
+                        <TapGestureRecognizer Command="{Binding CollapseWorkoutCommand}" />
                     </Label.GestureRecognizers>
                 </Label>
             </Border>

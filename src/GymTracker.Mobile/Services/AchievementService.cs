@@ -59,7 +59,7 @@ public class AchievementService
     {
         await LoadStatesAsync();
 
-        var workouts = await db.GetWorkoutsAsync();
+        var workouts = (await db.GetWorkoutsAsync()).Where(w => !w.IsDraft).ToList();
         var totalWorkouts = workouts.Count;
         var now = DateTime.UtcNow;
 
