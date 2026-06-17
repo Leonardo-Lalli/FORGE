@@ -27,7 +27,13 @@ App .NET MAUI Android-first per tracciare allenamenti in palestra, con catalogo 
 | IT-01 | Bootstrap MAUI + Shell 3-tab + Design System + ThemeService | Nessuna | Basso | ✅ Completata |
 | IT-02/03/08 | Catalogo esercizi + Allenamento + Piani salvabili | IT-01 | Medio | ✅ Completata |
 | IT-05/06/07 | PocketBase Auth + Social + Dashboard + Stats + Profilo | IT-02/03/08 | Alto | ✅ Completata |
-| IT-04 | Tracking peso corporeo e misure | IT-01 | Basso | ❌ Non implementata |
+| IT-FEAT-01 | SQLite offline (DatabaseService, LocalWorkout, CachedExercise) | IT-01 | Medio | ✅ Completata |
+| IT-FEAT-02 | PlanStore → PlanService (SQLite + auto-migration) | IT-FEAT-01 | Basso | ✅ Completata |
+| IT-FEAT-03 | Rimozione 5 ViewModel stub + 5 Page stub | IT-07 | Basso | ✅ Completata |
+| IT-FEAT-04 | Wger API → ExerciseDB v1 free API | IT-02 | Alto | ✅ Completata |
+| IT-FEAT-05 | CSV import/export in Settings | IT-01 | Basso | ✅ Completata |
+| IT-FEAT-06 | WorkoutDetailPage + foto progresso in allenamento | IT-FEAT-01, IT-07 | Medio | ✅ Completata |
+| IT-04 | Tracking peso corporeo e misure | IT-01 | Basso | ❌ Posticipata |
 
 ## 3. Dettaglio iterazioni
 
@@ -196,16 +202,20 @@ L'utente può registrare peso e misure corporee e visualizzarne l'andamento nel 
 | Profilo | ✅ | ProfilePage: avatar, bio, edit, recent workouts |
 | Friend requests | ✅ | FriendRequestsPage: follow + like notifications |
 | Tema doppio | ✅ | Toggle runtime chiaro/scuro su tutte le pagine |
+| Dettaglio workout | ✅ | WorkoutDetailPage: serie, reps, kg, foto |
+| Foto progresso | ✅ | Camera/gallery in ActiveWorkout, salvate nel workout |
+| CSV import/export | ✅ | Backup/ripristino dati in Settings |
 | Body tracking | ❌ | IT-04 non implementata |
 | Leaderboard | ❌ | Sostituita da feed + like |
 | Confronto diretto | ❌ | Post-MVP |
-| SQLite locale | ❌ | Usato PocketBase remoto, Preferences per PlanStore |
+| Test automatici | ❌ | Nessun progetto di test |
 
 ## 5. Prossimi passi
 
 1. Valutare se implementare IT-04 (body tracking) in una nuova iterazione
-2. Aggiungere leaderboard settimanale
-3. Implementare confronto diretto statistiche tra amici
-4. Aggiungere persistenza offline con SQLite
+2. Importare 1.500 esercizi in PocketBase per eliminare dipendenza API
+3. Aggiungere leaderboard settimanale tra amici
+4. Implementare confronto diretto statistiche tra amici
 5. Aggiungere test automatici (unit test su ViewModel, integration test su PocketBase)
 6. Esplorare notifiche push per like e friend requests
+7. Pubblicazione su Google Play Store

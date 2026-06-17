@@ -51,14 +51,6 @@ public class PocketBaseService
         this.secrets = secrets;
     }
 
-    private void EnsureInitialized()
-    {
-    }
-
-    public void Initialize()
-    {
-    }
-
     private async Task EnsureAuthAsync()
     {
         if (!string.IsNullOrWhiteSpace(token)) return;
@@ -67,7 +59,7 @@ public class PocketBaseService
 
     public async Task<(bool Success, string Error)> LoginAsync(string email, string password)
     {
-        EnsureInitialized();
+        
         try
         {
             var payload = new { identity = email, password };
@@ -109,7 +101,7 @@ public class PocketBaseService
 
     public async Task<(bool Success, string Error)> RegisterAsync(string email, string password, string name)
     {
-        EnsureInitialized();
+        
         try
         {
             var payload = new
@@ -252,7 +244,7 @@ public class PocketBaseService
 
     public async Task<(bool Success, string Error)> GetListAsync<T>(string collection, string? filter = null)
     {
-        EnsureInitialized();
+        
         try
         {
             var url = $"collections/{collection}/records";
@@ -282,7 +274,7 @@ public class PocketBaseService
 
     public async Task<(bool Success, string Error)> CreateRecordAsync<T>(string collection, T record)
     {
-        EnsureInitialized();
+        
         try
         {
             var json = JsonSerializer.Serialize(record, JsonOptions);
@@ -544,6 +536,49 @@ public class PocketBaseService
         }
     }
 
+    public async Task<LoggedWorkoutRecord?> GetWorkoutByIdAsync(string workoutId)
+    {
+        await EnsureAuthAsync();
+        if (!IsLoggedIn) return null;
+        try
+        {
+            var url = $"collections/logged_workouts/records/{Uri.EscapeDataString(workoutId)}";
+            var request = new HttpRequestMessage(HttpMethod.Get, url);
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            var response = await GetHttp().SendAsync(request);
+            var body = await response.Content.ReadAsStringAsync();
+            if (!response.IsSuccessStatusCode)
+            {
+                System.Diagnostics.Debug.WriteLine($"[PB WorkoutById] status={response.StatusCode}");
+                return null;
+            }
+            var records = ParseWorkoutRecordsFromSingleItem(body);
+            return records.FirstOrDefault();
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[PB WorkoutById] ex={ex.Message}");
+            return null;
+        }
+    }
+
+    private List<LoggedWorkoutRecord> ParseWorkoutRecordsFromSingleItem(string body)
+    {
+        var results = new List<LoggedWorkoutRecord>();
+        try
+        {
+            using var doc = JsonDocument.Parse(body);
+            var item = doc.RootElement;
+            var record = ParseWorkoutItem(item);
+            if (record != null) results.Add(record);
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[PB ParseSingle] ex: {ex.Message}");
+        }
+        return results;
+    }
+
     private List<LoggedWorkoutRecord> ParseWorkoutRecords(string body, string? userId)
     {
         var results = new List<LoggedWorkoutRecord>();
@@ -558,44 +593,8 @@ public class PocketBaseService
 
             foreach (var item in items.EnumerateArray())
             {
-                var record = new LoggedWorkoutRecord();
-                if (item.TryGetProperty("id", out var idEl)) record.Id = idEl.GetString() ?? "";
-                if (item.TryGetProperty("name", out var nameEl)) record.Name = nameEl.GetString() ?? "";
-                if (item.TryGetProperty("date", out var dateEl)) record.Date = dateEl.GetString() ?? "";
-                if (item.TryGetProperty("notes", out var notesEl)) record.Notes = notesEl.GetString() ?? "";
-                if (item.TryGetProperty("exercise_data", out var exDataEl))
-                {
-                    if (exDataEl.ValueKind == JsonValueKind.String)
-                        record.ExerciseData = exDataEl.GetString() ?? "";
-                    else
-                        record.ExerciseData = exDataEl.GetRawText();
-                }
-                if (item.TryGetProperty("user_name", out var unameEl)) record.UserName = unameEl.GetString() ?? "";
-                if (item.TryGetProperty("volume", out var volEl) && volEl.TryGetDouble(out var v)) record.Volume = v;
-                if (item.TryGetProperty("duration", out var durEl) && durEl.TryGetInt32(out var d)) record.Duration = d;
-                if (item.TryGetProperty("likes", out var likesEl) && likesEl.TryGetInt32(out var l)) record.Likes = l;
-
-                if (item.TryGetProperty("user", out var userEl))
-                {
-                    if (userEl.ValueKind == JsonValueKind.String)
-                        record.User = userEl.GetString() ?? "";
-                    else if (userEl.ValueKind == JsonValueKind.Object && userEl.TryGetProperty("id", out var uidEl))
-                        record.User = uidEl.GetString() ?? "";
-                }
-
-                if (item.TryGetProperty("exercises", out var exArr) && exArr.ValueKind == JsonValueKind.Array)
-                {
-                    foreach (var ex in exArr.EnumerateArray())
-                        record.Exercises.Add(ex.GetString() ?? "");
-                }
-
-                if (item.TryGetProperty("liked_by", out var likedArr) && likedArr.ValueKind == JsonValueKind.Array)
-                {
-                    foreach (var lb in likedArr.EnumerateArray())
-                        record.LikedBy.Add(lb.GetString() ?? "");
-                }
-
-                if (userId == null || record.User == userId)
+                var record = ParseWorkoutItem(item);
+                if (record != null && (userId == null || record.User == userId))
                     results.Add(record);
             }
 
@@ -606,6 +605,62 @@ public class PocketBaseService
             System.Diagnostics.Debug.WriteLine($"[PB MyWorkouts] ParseWorkoutRecords ex: {ex}");
         }
         return results;
+    }
+
+    private static LoggedWorkoutRecord? ParseWorkoutItem(JsonElement item)
+    {
+        try
+        {
+            var record = new LoggedWorkoutRecord();
+            if (item.TryGetProperty("id", out var idEl)) record.Id = idEl.GetString() ?? "";
+            if (item.TryGetProperty("name", out var nameEl)) record.Name = nameEl.GetString() ?? "";
+            if (item.TryGetProperty("date", out var dateEl)) record.Date = dateEl.GetString() ?? "";
+            if (item.TryGetProperty("notes", out var notesEl)) record.Notes = notesEl.GetString() ?? "";
+            if (item.TryGetProperty("exercise_data", out var exDataEl))
+            {
+                if (exDataEl.ValueKind == JsonValueKind.String)
+                    record.ExerciseData = exDataEl.GetString() ?? "";
+                else
+                    record.ExerciseData = exDataEl.GetRawText();
+            }
+            if (item.TryGetProperty("user_name", out var unameEl)) record.UserName = unameEl.GetString() ?? "";
+            if (item.TryGetProperty("volume", out var volEl) && volEl.TryGetDouble(out var v)) record.Volume = v;
+            if (item.TryGetProperty("duration", out var durEl) && durEl.TryGetInt32(out var d)) record.Duration = d;
+            if (item.TryGetProperty("likes", out var likesEl) && likesEl.TryGetInt32(out var l)) record.Likes = l;
+
+            if (item.TryGetProperty("user", out var userEl))
+            {
+                if (userEl.ValueKind == JsonValueKind.String)
+                    record.User = userEl.GetString() ?? "";
+                else if (userEl.ValueKind == JsonValueKind.Object && userEl.TryGetProperty("id", out var uidEl))
+                    record.User = uidEl.GetString() ?? "";
+            }
+
+            if (item.TryGetProperty("exercises", out var exArr) && exArr.ValueKind == JsonValueKind.Array)
+            {
+                foreach (var ex in exArr.EnumerateArray())
+                    record.Exercises.Add(ex.GetString() ?? "");
+            }
+
+            if (item.TryGetProperty("liked_by", out var likedArr) && likedArr.ValueKind == JsonValueKind.Array)
+            {
+                foreach (var lb in likedArr.EnumerateArray())
+                    record.LikedBy.Add(lb.GetString() ?? "");
+            }
+
+            if (item.TryGetProperty("photos", out var photosArr) && photosArr.ValueKind == JsonValueKind.Array)
+            {
+                foreach (var p in photosArr.EnumerateArray())
+                    record.Photos.Add(p.GetString() ?? "");
+            }
+
+            return record;
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[PB ParseItem] ex: {ex.Message}");
+            return null;
+        }
     }
 
     public async Task<List<LoggedWorkoutRecord>> GetFollowedWorkoutsAsync()

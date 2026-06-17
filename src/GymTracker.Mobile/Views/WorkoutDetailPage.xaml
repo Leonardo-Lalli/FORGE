@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:GymTracker.Mobile.ViewModels"
+             x:Class="GymTracker.Mobile.Views.WorkoutDetailPage"
+             x:DataType="vm:WorkoutDetailViewModel"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="{DynamicResource Surface}">
+
+    <Grid RowDefinitions="Auto,*">
+
+        <!-- Top Bar -->
+        <Grid Grid.Row="0" Padding="16,12" ColumnDefinitions="Auto,*">
+            <Border Grid.Column="0" StrokeShape="RoundRectangle 20"
+                    BackgroundColor="{DynamicResource SurfaceContainer}"
+                    HeightRequest="36" WidthRequest="36"
+                    HorizontalOptions="Start"
+                    VerticalOptions="Center">
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding GoBackCommand}" />
+                </Border.GestureRecognizers>
+                <Label Text="&#x2190;" FontSize="18" FontFamily="Lexend"
+                       TextColor="{DynamicResource Primary}"
+                       HorizontalOptions="Center" VerticalOptions="Center" />
+            </Border>
+            <Label Grid.Column="1" Text="Dettaglio Allenamento"
+                   FontFamily="SpaceGrotesk" FontSize="18"
+                   FontAttributes="Bold"
+                   TextColor="{DynamicResource OnSurface}"
+                   VerticalOptions="Center" Margin="12,0,0,0" />
+        </Grid>
+
+        <!-- Loading -->
+        <ActivityIndicator Grid.Row="1" IsVisible="{Binding IsBusy}" IsRunning="{Binding IsBusy}"
+                           Color="{DynamicResource Primary}" VerticalOptions="Center" />
+
+        <!-- Error -->
+        <VerticalStackLayout Grid.Row="1" IsVisible="{Binding HasError}"
+                             VerticalOptions="Center" HorizontalOptions="Center" Spacing="8">
+            <Label Text="&#x26A0;" FontSize="40" HorizontalOptions="Center" />
+            <Label Text="{Binding ErrorMessage}" FontFamily="Inter" FontSize="14"
+                   TextColor="{DynamicResource Error}" HorizontalOptions="Center" />
+        </VerticalStackLayout>
+
+        <!-- Content -->
+        <ScrollView Grid.Row="1" IsVisible="{Binding HasData}">
+            <VerticalStackLayout Spacing="16" Padding="16,0,16,24">
+
+                <!-- Header Card -->
+                <Border StrokeShape="RoundRectangle 16" Padding="20"
+                        BackgroundColor="{DynamicResource SurfaceContainer}"
+                        Stroke="{DynamicResource Outline}">
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="{Binding WorkoutName}" FontFamily="SpaceGrotesk"
+                               FontSize="22" FontAttributes="Bold"
+                               TextColor="{DynamicResource Primary}" />
+                        <Label Text="{Binding WorkoutDate}" FontFamily="Inter" FontSize="13"
+                               TextColor="{DynamicResource OnSurfaceVariant}" />
+                        <HorizontalStackLayout Spacing="16" Margin="0,4,0,0">
+                            <Label FontFamily="Inter" FontSize="13"
+                                   TextColor="{DynamicResource OnSurfaceVariant}">
+                                <Label.FormattedText>
+                                    <FormattedString>
+                                        <Span Text="&#x23F1; " FontFamily="Inter" />
+                                        <Span Text="{Binding Duration}" />
+                                    </FormattedString>
+                                </Label.FormattedText>
+                            </Label>
+                            <Label FontFamily="Inter" FontSize="13"
+                                   TextColor="{DynamicResource OnSurfaceVariant}">
+                                <Label.FormattedText>
+                                    <FormattedString>
+                                        <Span Text="&#x2696; " FontFamily="Inter" />
+                                        <Span Text="{Binding Volume}" />
+                                    </FormattedString>
+                                </Label.FormattedText>
+                            </Label>
+                        </HorizontalStackLayout>
+                        <HorizontalStackLayout IsVisible="{Binding HasLikes}"
+                                               Spacing="4" Margin="0,4,0,0">
+                            <Label Text="&#x2665;" FontSize="14" TextColor="{DynamicResource Primary}" />
+                            <Label Text="{Binding Likes, StringFormat='{0}'}"
+                                   FontFamily="Inter" FontSize="13"
+                                   TextColor="{DynamicResource OnSurfaceVariant}" />
+                        </HorizontalStackLayout>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Notes -->
+                <Border StrokeShape="RoundRectangle 12" Padding="16"
+                        BackgroundColor="{DynamicResource SurfaceContainer}"
+                        Stroke="{DynamicResource Outline}"
+                        IsVisible="{Binding HasNotes}">
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="Note" FontFamily="Lexend" FontSize="11"
+                               TextColor="{DynamicResource Primary}" FontAttributes="Bold" />
+                        <Label Text="{Binding Notes}" FontFamily="Inter" FontSize="14"
+                               TextColor="{DynamicResource OnSurface}"
+                               LineBreakMode="WordWrap" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Photos Gallery -->
+                <VerticalStackLayout IsVisible="{Binding HasPhotos}" Spacing="8">
+                    <Label Text="Foto Progresso" FontFamily="Lexend" FontSize="13"
+                           FontAttributes="Bold" TextColor="{DynamicResource OnSurfaceVariant}"
+                           Margin="4,0,0,0" />
+                    <ScrollView Orientation="Horizontal" HorizontalScrollBarVisibility="Never">
+                        <HorizontalStackLayout Spacing="10" BindableLayout.ItemsSource="{Binding Photos}">
+                            <BindableLayout.ItemTemplate>
+                                <DataTemplate x:DataType="x:String">
+                                    <Border StrokeShape="RoundRectangle 12"
+                                            Stroke="{DynamicResource Outline}"
+                                            BackgroundColor="{DynamicResource SurfaceContainer}"
+                                            HeightRequest="140" WidthRequest="110">
+                                        <Border.GestureRecognizers>
+                                            <TapGestureRecognizer
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type vm:WorkoutDetailViewModel}}, Path=ExpandPhotoCommand}"
+                                                CommandParameter="{Binding .}" />
+                                        </Border.GestureRecognizers>
+                                        <Image Source="{Binding .}" Aspect="AspectFill" />
+                                    </Border>
+                                </DataTemplate>
+                            </BindableLayout.ItemTemplate>
+                        </HorizontalStackLayout>
+                    </ScrollView>
+                </VerticalStackLayout>
+
+                <!-- Exercises -->
+                <Label Text="Esercizi" FontFamily="Lexend" FontSize="13"
+                       FontAttributes="Bold" TextColor="{DynamicResource OnSurfaceVariant}"
+                       Margin="4,0,0,0" />
+
+                <VerticalStackLayout Spacing="8"
+                    BindableLayout.ItemsSource="{Binding Exercises}">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate x:DataType="vm:DetailExercise">
+                            <VerticalStackLayout Spacing="8">
+                                <!-- Exercise Header -->
+                                <Border StrokeShape="RoundRectangle 12" Padding="14"
+                                        BackgroundColor="{DynamicResource SurfaceContainer}"
+                                        Stroke="{DynamicResource Outline}">
+                                    <VerticalStackLayout Spacing="4">
+                                        <Label Text="{Binding Name}" FontFamily="SpaceGrotesk"
+                                               FontSize="15" FontAttributes="Bold"
+                                               TextColor="{DynamicResource OnSurface}" />
+                                        <HorizontalStackLayout Spacing="8">
+                                            <Label Text="{Binding BodyPart}" FontFamily="Inter"
+                                                   FontSize="11" TextColor="{DynamicResource Primary}" />
+                                            <Label Text="·" FontFamily="Inter" FontSize="11"
+                                                   TextColor="{DynamicResource OutlineVariant}" />
+                                            <Label Text="{Binding Equipment}" FontFamily="Inter"
+                                                   FontSize="11" TextColor="{DynamicResource OnSurfaceVariant}" />
+                                        </HorizontalStackLayout>
+                                        <Label Text="{Binding Notes}" FontFamily="Inter" FontSize="12"
+                                               TextColor="{DynamicResource OnSurfaceVariant}"
+                                               FontAttributes="Italic" LineBreakMode="WordWrap"
+                                               IsVisible="{Binding HasNotes}" />
+                                    </VerticalStackLayout>
+                                </Border>
+
+                                <!-- Sets Table -->
+                                <Border StrokeShape="RoundRectangle 10" Padding="12"
+                                        BackgroundColor="{DynamicResource SurfaceContainerLow}">
+                                    <VerticalStackLayout Spacing="6"
+                                        BindableLayout.ItemsSource="{Binding Sets}">
+                                        <BindableLayout.ItemTemplate>
+                                            <DataTemplate x:DataType="vm:DetailSet">
+                                                <Grid ColumnDefinitions="40,*,*,40" ColumnSpacing="8">
+                                                    <Label Grid.Column="0" Text="{Binding SetNumber, StringFormat='{0}.'}"
+                                                           FontFamily="Lexend" FontSize="13"
+                                                           TextColor="{DynamicResource Primary}"
+                                                           VerticalOptions="Center" />
+                                                    <Label Grid.Column="1"
+                                                           Text="{Binding WeightKg, StringFormat='{0:F1} kg'}"
+                                                           FontFamily="Inter" FontSize="13"
+                                                           TextColor="{DynamicResource OnSurface}"
+                                                           VerticalOptions="Center" />
+                                                    <Label Grid.Column="2"
+                                                           Text="{Binding Reps, StringFormat='{0} reps'}"
+                                                           FontFamily="Inter" FontSize="13"
+                                                           TextColor="{DynamicResource OnSurface}"
+                                                           VerticalOptions="Center" />
+                                                    <Label Grid.Column="3" Text="{Binding CompletedIcon}"
+                                                           FontSize="16" TextColor="{DynamicResource Primary}"
+                                                           HorizontalOptions="Center"
+                                                           VerticalOptions="Center" />
+                                                </Grid>
+                                            </DataTemplate>
+                                        </BindableLayout.ItemTemplate>
+                                    </VerticalStackLayout>
+                                </Border>
+                            </VerticalStackLayout>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </VerticalStackLayout>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- Photo Overlay -->
+        <Grid Grid.RowSpan="2" IsVisible="{Binding IsPhotoExpanded}"
+              BackgroundColor="#CC000000">
+            <Grid.GestureRecognizers>
+                <TapGestureRecognizer Command="{Binding ClosePhotoCommand}" />
+            </Grid.GestureRecognizers>
+            <Image Source="{Binding SelectedPhoto}" Aspect="AspectFit"
+                   Margin="20" MaximumHeightRequest="500"
+                   VerticalOptions="Center" />
+            <Border StrokeShape="RoundRectangle 20"
+                    BackgroundColor="{DynamicResource SurfaceContainer}"
+                    HeightRequest="32" WidthRequest="32"
+                    HorizontalOptions="End" VerticalOptions="Start"
+                    Margin="0,60,16,0">
+                <Label Text="✕" FontSize="14" TextColor="{DynamicResource OnSurface}"
+                       HorizontalOptions="Center" VerticalOptions="Center" />
+            </Border>
+        </Grid>
+
+    </Grid>
+
+</ContentPage>

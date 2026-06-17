@@ -120,4 +120,7 @@ public class LoggedWorkoutRecord
 
     [JsonIgnore]
     public string AvatarUrl { get; set; } = string.Empty;
+
+    [JsonPropertyName("photos")]
+    public List<string> Photos { get; set; } = new();
 }

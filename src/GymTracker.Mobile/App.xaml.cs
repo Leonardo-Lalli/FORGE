@@ -36,9 +36,6 @@ public partial class App : Application
         try { await buildSecrets.LoadAsync(); }
         catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[App] Secrets failed: {ex.Message}"); }
 
-        var pb = services.GetRequiredService<PocketBaseService>();
-        pb.Initialize();
-
         var sync = services.GetRequiredService<SyncService>();
         _ = sync.SyncPendingWorkoutsAsync().ContinueWith(t =>
         {

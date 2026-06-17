@@ -61,6 +61,82 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
     [ObservableProperty] private string workoutNotes = string.Empty;
     [ObservableProperty] private ObservableCollection<FilterChip> muscleFilters = new();
     [ObservableProperty] private ObservableCollection<FilterChip> equipmentFilters = new();
+    [ObservableProperty] private ObservableCollection<string> workoutPhotos = new();
+    [ObservableProperty] private bool hasWorkoutPhotos;
+
+    [RelayCommand]
+    private async Task TakePhotoAsync()
+    {
+        if (WorkoutPhotos.Count >= 5)
+        {
+            ShowNotification("Massimo 5 foto per allenamento.");
+            return;
+        }
+        try
+        {
+            if (!MediaPicker.Default.IsCaptureSupported)
+            {
+                ShowNotification("Fotocamera non disponibile.");
+                return;
+            }
+            var photo = await MediaPicker.Default.CapturePhotoAsync();
+            if (photo == null) return;
+            await AddPhotoFromFileAsync(photo);
+        }
+        catch (PermissionException)
+        {
+            ShowNotification("Permesso fotocamera negato.");
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[TakePhoto] ex: {ex.Message}");
+            ShowNotification("Errore nell'acquisizione foto.");
+        }
+    }
+
+    [RelayCommand]
+    private async Task PickPhotoAsync()
+    {
+        if (WorkoutPhotos.Count >= 5)
+        {
+            ShowNotification("Massimo 5 foto per allenamento.");
+            return;
+        }
+        try
+        {
+            var photos = await MediaPicker.Default.PickPhotosAsync();
+            if (photos == null) return;
+            foreach (var photo in photos)
+            {
+                if (WorkoutPhotos.Count >= 5) break;
+                await AddPhotoFromFileAsync(photo);
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[PickPhoto] ex: {ex.Message}");
+            ShowNotification("Errore nella selezione foto.");
+        }
+    }
+
+    private async Task AddPhotoFromFileAsync(FileResult file)
+    {
+        using var stream = await file.OpenReadAsync();
+        using var ms = new MemoryStream();
+        await stream.CopyToAsync(ms);
+        var bytes = ms.ToArray();
+        var base64 = Convert.ToBase64String(bytes);
+        var dataUri = $"data:image/jpeg;base64,{base64}";
+        WorkoutPhotos.Add(dataUri);
+        HasWorkoutPhotos = WorkoutPhotos.Count > 0;
+    }
+
+    [RelayCommand]
+    private void RemovePhoto(string photo)
+    {
+        WorkoutPhotos.Remove(photo);
+        HasWorkoutPhotos = WorkoutPhotos.Count > 0;
+    }
 
     partial void OnSearchQueryChanged(string value)
     {
@@ -390,10 +466,10 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
         for (int i = 0; i < parent?.Sets.Count; i++) parent.Sets[i].SetNumber = i + 1;
     }
 
-    [RelayCommand] private void IncReps(ExerciseSet s) { s.Reps++; OnPropertyChanged(nameof(s)); }
-    [RelayCommand] private void DecReps(ExerciseSet s) { if (s.Reps > 1) s.Reps--; OnPropertyChanged(nameof(s)); }
-    [RelayCommand] private void IncWeight(ExerciseSet s) { s.WeightKg += 2.5; OnPropertyChanged(nameof(s)); }
-    [RelayCommand] private void DecWeight(ExerciseSet s) { if (s.WeightKg >= 2.5) s.WeightKg -= 2.5; OnPropertyChanged(nameof(s)); }
+    [RelayCommand] private void IncReps(ExerciseSet s) => s.Reps++;
+    [RelayCommand] private void DecReps(ExerciseSet s) { if (s.Reps > 1) s.Reps--; }
+    [RelayCommand] private void IncWeight(ExerciseSet s) => s.WeightKg += 2.5;
+    [RelayCommand] private void DecWeight(ExerciseSet s) { if (s.WeightKg >= 2.5) s.WeightKg -= 2.5; }
 
     [RelayCommand]
     private void CompleteSet(ExerciseSet set)
@@ -582,7 +658,8 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
                 ["exercises"] = Exercises.Select(e => e.ExerciseName).ToList(),
                 ["exercise_data"] = System.Text.Json.JsonSerializer.Serialize(exerciseData),
                 ["volume"] = volume,
-                ["duration"] = Math.Max(1, duration)
+                ["duration"] = Math.Max(1, duration),
+                ["photos"] = WorkoutPhotos.ToList()
             };
             var (ok, err) = await pb.CreateRecordAsync("logged_workouts", payload);
             System.Diagnostics.Debug.WriteLine($"[SaveWorkout] PB result: ok={ok} err={err}");
@@ -599,6 +676,7 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
                 Notes = WorkoutNotes ?? "",
                 ExerciseDataJson = System.Text.Json.JsonSerializer.Serialize(exerciseData),
                 UserName = pb.CurrentUser.Name,
+                PhotosJson = System.Text.Json.JsonSerializer.Serialize(WorkoutPhotos.ToList()),
                 PendingSync = !ok
             };
             await db.SaveWorkoutAsync(localWorkout);

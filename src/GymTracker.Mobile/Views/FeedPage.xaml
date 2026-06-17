@@ -138,6 +138,11 @@
                                     StrokeShape="RoundRectangle 16"
                                     Stroke="{DynamicResource OutlineVariant}" StrokeThickness="0.5"
                                     Padding="20">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type vm:FeedViewModel}}, Path=OpenWorkoutDetailCommand}"
+                                        CommandParameter="{Binding .}" />
+                                </Border.GestureRecognizers>
                                 <VerticalStackLayout Spacing="12">
                                     <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
                                         <Border Grid.Column="0" StrokeShape="RoundRectangle 999"

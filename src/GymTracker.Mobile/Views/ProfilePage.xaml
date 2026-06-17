@@ -196,6 +196,11 @@
                                         StrokeShape="RoundRectangle 12"
                                         Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1"
                                         Padding="20">
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ProfileViewModel}}, Path=OpenWorkoutDetailCommand}"
+                                            CommandParameter="{Binding .}" />
+                                    </Border.GestureRecognizers>
                                     <Grid ColumnDefinitions="4,16,*" RowDefinitions="Auto,Auto,Auto,Auto">
                                         <!-- Colored left border -->
                                         <Border Grid.Column="0" Grid.RowSpan="4"

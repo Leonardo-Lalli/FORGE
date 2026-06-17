@@ -37,31 +37,23 @@ src/GymTracker.Mobile/
 │   ├── FeedViewModel.cs            # Feed: search users, follow, feed posts, like
 │   ├── StatsViewModel.cs           # Statistiche: top lifts, bar chart, calendar, like notifications
 │   ├── ProfileViewModel.cs         # Profilo: avatar, stats, recent forges, edit
-│   ├── ActiveWorkoutViewModel.cs   # Allenamento: ricerca, esercizi, set, salvataggio
+│   ├── ActiveWorkoutViewModel.cs   # Allenamento: ricerca, esercizi, set, salvataggio, foto progresso
 │   ├── StartSessionViewModel.cs    # Quick Start, Create Plan, Your Protocols
+│   ├── WorkoutDetailViewModel.cs   # Dettaglio allenamento: serie, kg, reps, note, foto
 │   ├── LoginViewModel.cs           # Login, Register, auto-login
 │   ├── FriendRequestsViewModel.cs  # Friend requests + like notifications
-│   ├── SettingsViewModel.cs        # Toggle tema, logout
-│   ├── NotificationsViewModel.cs   # (stub)
-│   ├── SocialViewModel.cs          # (stub)
-│   ├── DashboardViewModel.cs       # (stub)
-│   ├── CatalogViewModel.cs         # (stub)
-│   └── WorkoutViewModel.cs         # (stub)
+│   └── SettingsViewModel.cs        # Toggle tema, lingua, CSV import/export, logout
 ├── Views/
 │   ├── HomePage.xaml(.cs)          # Dashboard
-│   ├── FeedPage.xaml(.cs)          # Feed & search
+│   ├── FeedPage.xaml(.cs)          # Feed &amp; search
 │   ├── StatsPage.xaml(.cs)         # Statistiche
 │   ├── ProfilePage.xaml(.cs)       # Profilo utente
 │   ├── ActiveWorkoutPage.xaml(.cs) # Allenamento attivo
 │   ├── StartSessionPage.xaml(.cs)  # Start Session
+│   ├── WorkoutDetailPage.xaml(.cs) # Dettaglio allenamento
 │   ├── LoginPage.xaml(.cs)         # Login/Register
 │   ├── FriendRequestsPage.xaml(.cs)# Notifiche
-│   ├── SettingsPage.xaml(.cs)      # Impostazioni
-│   ├── NotificationsPage.xaml(.cs) # (stub)
-│   ├── SocialPage.xaml(.cs)        # (stub)
-│   ├── DashboardPage.xaml(.cs)     # (stub)
-│   ├── CatalogPage.xaml(.cs)       # (stub)
-│   └── WorkoutPage.xaml(.cs)       # (stub)
+│   └── SettingsPage.xaml(.cs)      # Impostazioni
 ├── Converters/
 │   ├── InverseBoolConverter.cs
 │   ├── BoolToVisibilityConverter.cs
@@ -95,7 +87,8 @@ src/GymTracker.Mobile/
 ```csharp
 // Route di dettaglio
 Routing.RegisterRoute("activeWorkout", typeof(ActiveWorkoutPage));
-Routing.RegisterRoute("notifications", typeof(NotificationsPage));
+Routing.RegisterRoute("workoutDetail", typeof(WorkoutDetailPage));
+Routing.RegisterRoute("notifications", typeof(FriendRequestsPage));
 Routing.RegisterRoute("settings", typeof(SettingsPage));
 Routing.RegisterRoute("profile", typeof(ProfilePage));
 Routing.RegisterRoute("startSession", typeof(StartSessionPage));
@@ -203,6 +196,8 @@ LoginViewModel costruttore:
 | `LikeNotificationItem` | FriendRequestsViewModel | LikerName, WorkoutName |
 | `ProtocolCard` | StartSessionViewModel | Id, Name, ExerciseCount, Duration, HasExercises |
 | `ExerciseSearchResult` | ActiveWorkoutViewModel | Id, Name, BodyPart, Equipment, ImageUrl |
+| `DetailExercise` | WorkoutDetailViewModel | Name, BodyPart, Equipment, Notes, Sets |
+| `DetailSet` | WorkoutDetailViewModel | SetNumber, WeightKg, Reps, IsCompleted |
 
 ## 10. Flusso dati tipico (START WORKOUT)
 

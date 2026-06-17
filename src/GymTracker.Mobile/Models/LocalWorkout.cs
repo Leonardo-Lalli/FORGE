@@ -18,6 +18,7 @@ public class LocalWorkout
     public int Likes { get; set; }
     public string LikedByJson { get; set; } = "[]";
     public string UserName { get; set; } = string.Empty;
+    public string PhotosJson { get; set; } = "[]";
 
     [Indexed]
     public bool PendingSync { get; set; }

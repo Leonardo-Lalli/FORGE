@@ -139,6 +139,13 @@ public partial class FeedViewModel : BaseViewModel
     }
 
     [RelayCommand]
+    private async Task OpenWorkoutDetailAsync(FeedPost post)
+    {
+        if (string.IsNullOrWhiteSpace(post?.WorkoutId)) return;
+        await Shell.Current.GoToAsync($"workoutDetail?workoutId={Uri.EscapeDataString(post.WorkoutId)}&source=pocketbase");
+    }
+
+    [RelayCommand]
     private async Task SearchUsersAsync()
     {
         if (string.IsNullOrWhiteSpace(SearchQuery) || SearchQuery.Length < 2) return;

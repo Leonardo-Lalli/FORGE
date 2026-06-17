@@ -9,6 +9,7 @@ namespace GymTracker.Mobile.ViewModels;
 
 public partial class ProfileWorkout : ObservableObject
 {
+    public string WorkoutId { get; set; } = string.Empty;
     public string Title { get; set; } = string.Empty;
     public string Date { get; set; } = string.Empty;
     public string Exercises { get; set; } = string.Empty;
@@ -127,6 +128,7 @@ public partial class ProfileViewModel : BaseViewModel
 
                 RecentWorkouts.Add(new ProfileWorkout
                 {
+                    WorkoutId = w.Id,
                     Title = w.Name,
                     Date = dateStr,
                     Exercises = string.Join(", ", w.Exercises ?? new()),
@@ -208,6 +210,13 @@ public partial class ProfileViewModel : BaseViewModel
         EditName = Username;
         EditBio = Bio;
         IsEditing = true;
+    }
+
+    [RelayCommand]
+    private async Task OpenWorkoutDetailAsync(ProfileWorkout workout)
+    {
+        if (string.IsNullOrWhiteSpace(workout?.WorkoutId)) return;
+        await Shell.Current.GoToAsync($"workoutDetail?workoutId={Uri.EscapeDataString(workout.WorkoutId)}&source=pocketbase");
     }
 
     [RelayCommand]
