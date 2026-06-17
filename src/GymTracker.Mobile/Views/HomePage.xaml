@@ -156,7 +156,7 @@
                             <Border Grid.Column="0" StrokeShape="RoundRectangle 16"
                                     BackgroundColor="{DynamicResource PrimaryContainer}"
                                     WidthRequest="44" HeightRequest="44">
-                                <Image Source="achievements/Legend.png" WidthRequest="30" HeightRequest="30"
+                                <Image Source="achievements/legend.png" WidthRequest="30" HeightRequest="30"
                                        HorizontalOptions="Center" VerticalOptions="Center" Aspect="AspectFit" />
                             </Border>
                             <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
