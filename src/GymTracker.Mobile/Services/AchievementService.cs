@@ -142,10 +142,10 @@ public class AchievementService
         await SaveStatesAsync();
 
         // Check "Divinità del Fitness" - all others unlocked
-        var allDefs = AchievementsCatalog.All.Where(a => a.Id != "fitness_god").ToList();
+        var allDefs = AchievementsCatalog.All.Where(a => a.Id != "legend").ToList();
         var allUnlocked = allDefs.All(def => states.Any(s => s.Id == def.Id && s.IsUnlocked));
         if (allUnlocked)
-            UnlockAchievement("fitness_god");
+            UnlockAchievement("legend");
 
         await SaveStatesAsync();
     }

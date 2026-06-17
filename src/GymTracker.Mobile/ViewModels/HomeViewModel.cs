@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using GymTracker.Mobile.Messages;
+using GymTracker.Mobile.Models;
 using GymTracker.Mobile.Services;
 
 namespace GymTracker.Mobile.ViewModels;
@@ -94,7 +95,7 @@ public partial class HomeViewModel : BaseViewModel
             var unlocked = await achievementService.GetUnlockedCountAsync();
             var percent = await achievementService.GetProgressPercentAsync();
             AchievementCount = unlocked.ToString();
-            AchievementProgress = $"{unlocked}/50";
+            AchievementProgress = $"{unlocked}/{AchievementsCatalog.All.Count}";
             AchievementPercent = percent;
         }
         catch { }

@@ -154,8 +154,8 @@
                         <Border Grid.Column="0" StrokeShape="RoundRectangle 16"
                                 BackgroundColor="{DynamicResource PrimaryContainer}"
                                 WidthRequest="44" HeightRequest="44">
-                            <Label Text="🏆" FontSize="22"
-                                   HorizontalOptions="Center" VerticalOptions="Center" />
+                            <Image Source="achievements/Legend.png" WidthRequest="30" HeightRequest="30"
+                                   HorizontalOptions="Center" VerticalOptions="Center" Aspect="AspectFit" />
                         </Border>
                         <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
                             <Label Text="Achievements" FontFamily="SpaceGrotesk"
