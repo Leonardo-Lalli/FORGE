@@ -111,64 +111,63 @@
                    TextColor="{DynamicResource TextSecondary}" VerticalOptions="Center" />
         </HorizontalStackLayout>
 
-        <!-- Foto Progresso -->
-        <HorizontalStackLayout Grid.Row="1" Spacing="8" Padding="20,4" Margin="0,4,0,0"
-                                HorizontalOptions="Center">
-            <Border StrokeShape="RoundRectangle 8" BackgroundColor="{DynamicResource SurfaceContainer}"
-                    Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1"
-                    Padding="8,4" HeightRequest="32">
-                <Label FontFamily="Lexend" FontSize="10" TextColor="{DynamicResource TextSecondary}"
-                       VerticalOptions="Center">
-                    <Label.FormattedText>
-                        <FormattedString>
-                            <Span Text="&#x1F4F7; " />
-                            <Span Text="{Binding WorkoutPhotos.Count, StringFormat='{0}'}" />
-                        </FormattedString>
-                    </Label.FormattedText>
-                </Label>
-            </Border>
-            <Border StrokeShape="RoundRectangle 8" BackgroundColor="{DynamicResource Primary}"
-                    Padding="8,4" HeightRequest="32">
-                <Border.GestureRecognizers>
-                    <TapGestureRecognizer Command="{Binding TakePhotoCommand}" />
-                </Border.GestureRecognizers>
-                <Label Text="Scatta" FontFamily="Lexend" FontSize="10" FontAttributes="Bold"
-                       TextColor="{DynamicResource OnPrimary}" VerticalOptions="Center" />
-            </Border>
-            <Border StrokeShape="RoundRectangle 8" BackgroundColor="{DynamicResource SurfaceContainer}"
-                    Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1"
-                    Padding="8,4" HeightRequest="32">
-                <Border.GestureRecognizers>
-                    <TapGestureRecognizer Command="{Binding PickPhotoCommand}" />
-                </Border.GestureRecognizers>
-                <Label Text="Galleria" FontFamily="Lexend" FontSize="10"
-                       TextColor="{DynamicResource OnSurface}" VerticalOptions="Center" />
-            </Border>
-        </HorizontalStackLayout>
-
-        <!-- Foto thumbnails -->
-        <ScrollView Grid.Row="1" Orientation="Horizontal" HorizontalScrollBarVisibility="Never"
-                    Margin="20,2" IsVisible="{Binding HasWorkoutPhotos}">
-            <HorizontalStackLayout Spacing="8" BindableLayout.ItemsSource="{Binding WorkoutPhotos}">
-                <BindableLayout.ItemTemplate>
-                    <DataTemplate x:DataType="x:String">
-                        <Border StrokeShape="RoundRectangle 8"
-                                Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1"
-                                HeightRequest="60" WidthRequest="60">
-                            <Image Source="{Binding .}" Aspect="AspectFill" />
-                            <Border.GestureRecognizers>
-                                <TapGestureRecognizer
-                                    Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ActiveWorkoutViewModel}}, Path=RemovePhotoCommand}"
-                                    CommandParameter="{Binding .}" />
-                            </Border.GestureRecognizers>
-                        </Border>
-                    </DataTemplate>
-                </BindableLayout.ItemTemplate>
-            </HorizontalStackLayout>
-        </ScrollView>
-
         <!-- Content -->
         <Grid Grid.Row="2">
+
+            <!-- Foto Progresso -->
+            <VerticalStackLayout Spacing="4" Padding="20,6,20,0">
+                <HorizontalStackLayout Spacing="8" HorizontalOptions="Center">
+                    <Border StrokeShape="RoundRectangle 8" BackgroundColor="{DynamicResource SurfaceContainer}"
+                            Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1"
+                            Padding="8,4" HeightRequest="32">
+                        <Label FontFamily="Lexend" FontSize="10" TextColor="{DynamicResource TextSecondary}"
+                               VerticalOptions="Center">
+                            <Label.FormattedText>
+                                <FormattedString>
+                                    <Span Text="&#x1F4F7; " />
+                                    <Span Text="{Binding WorkoutPhotos.Count, StringFormat='{0}'}" />
+                                </FormattedString>
+                            </Label.FormattedText>
+                        </Label>
+                    </Border>
+                    <Border StrokeShape="RoundRectangle 8" BackgroundColor="{DynamicResource Primary}"
+                            Padding="8,4" HeightRequest="32">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding TakePhotoCommand}" />
+                        </Border.GestureRecognizers>
+                        <Label Text="Scatta" FontFamily="Lexend" FontSize="10" FontAttributes="Bold"
+                               TextColor="{DynamicResource OnPrimary}" VerticalOptions="Center" />
+                    </Border>
+                    <Border StrokeShape="RoundRectangle 8" BackgroundColor="{DynamicResource SurfaceContainer}"
+                            Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1"
+                            Padding="8,4" HeightRequest="32">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding PickPhotoCommand}" />
+                        </Border.GestureRecognizers>
+                        <Label Text="Galleria" FontFamily="Lexend" FontSize="10"
+                               TextColor="{DynamicResource OnSurface}" VerticalOptions="Center" />
+                    </Border>
+                </HorizontalStackLayout>
+                <ScrollView Orientation="Horizontal" HorizontalScrollBarVisibility="Never"
+                            IsVisible="{Binding HasWorkoutPhotos}" HeightRequest="66">
+                    <HorizontalStackLayout Spacing="8" BindableLayout.ItemsSource="{Binding WorkoutPhotos}">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate x:DataType="x:String">
+                                <Border StrokeShape="RoundRectangle 8"
+                                        Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1"
+                                        HeightRequest="60" WidthRequest="60">
+                                    <Image Source="{Binding .}" Aspect="AspectFill" />
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ActiveWorkoutViewModel}}, Path=RemovePhotoCommand}"
+                                            CommandParameter="{Binding .}" />
+                                    </Border.GestureRecognizers>
+                                </Border>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </HorizontalStackLayout>
+                </ScrollView>
+            </VerticalStackLayout>
 
             <!-- Creating mode: start button overlay -->
             <VerticalStackLayout IsVisible="{Binding IsCreating}"

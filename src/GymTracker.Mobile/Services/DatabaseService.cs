@@ -23,6 +23,9 @@ public class DatabaseService
         await db.CreateTableAsync<SavedPlan>();
         await db.CreateTableAsync<AchievementState>();
 
+        try { await db.ExecuteAsync("ALTER TABLE local_workouts ADD COLUMN IsDraft INTEGER DEFAULT 0"); }
+        catch { /* column already exists */ }
+
         return db;
     }
 
