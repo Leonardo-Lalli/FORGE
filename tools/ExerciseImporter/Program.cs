@@ -58,15 +58,26 @@ if (PB_DEDUP)
     var page = 1;
     while (true)
     {
-        var url = $"collections/excercise/records?perPage=200&page={page}&sort=created";
+        var url = $"collections/excercise/records?perPage=200&page={page}";
         var req = new HttpRequestMessage(HttpMethod.Get, url);
         req.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
         var resp = await pbHttp.SendAsync(req);
-        if (!resp.IsSuccessStatusCode) break;
+        if (!resp.IsSuccessStatusCode)
+        {
+            Console.WriteLine($"  ERR page {page}: {resp.StatusCode}");
+            break;
+        }
 
         var body = await resp.Content.ReadAsStringAsync();
         using var doc = JsonDocument.Parse(body);
-        if (!doc.RootElement.TryGetProperty("items", out var items) || items.GetArrayLength() == 0) break;
+        if (!doc.RootElement.TryGetProperty("items", out var items) || items.GetArrayLength() == 0)
+        {
+            Console.WriteLine($"  No items on page {page}");
+            break;
+        }
+
+        var count = items.GetArrayLength();
+        Console.WriteLine($"  Page {page}: {count} items (total {kept} kept, {deleted} deleted)");
 
         foreach (var item in items.EnumerateArray())
         {
