@@ -71,7 +71,7 @@ if (PB_DEDUP)
         foreach (var item in items.EnumerateArray())
         {
             var id = item.TryGetProperty("id", out var idEl) ? idEl.GetString() ?? "" : "";
-            var exId = item.TryGetProperty("exercise_id", out var exIdEl) ? exIdEl.GetString() ?? "" : "";
+            var exId = item.TryGetProperty("name", out var exIdEl) ? exIdEl.GetString()?.ToLowerInvariant() ?? "" : "";
 
             if (string.IsNullOrEmpty(exId)) { kept++; continue; }
 
