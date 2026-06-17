@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:GymTracker.Mobile.ViewModels"
+             x:Class="GymTracker.Mobile.Views.AchievementsPage"
+             x:DataType="vm:AchievementsViewModel"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="{DynamicResource Surface}">
+
+    <Grid RowDefinitions="Auto,Auto,*">
+
+        <!-- Top Bar -->
+        <Grid Grid.Row="0" Padding="16,12" ColumnDefinitions="Auto,*,Auto">
+            <Border Grid.Column="0" StrokeShape="RoundRectangle 20"
+                    BackgroundColor="{DynamicResource SurfaceContainer}"
+                    HeightRequest="36" WidthRequest="36"
+                    HorizontalOptions="Start" VerticalOptions="Center">
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding GoBackCommand}" />
+                </Border.GestureRecognizers>
+                <Label Text="&#x2190;" FontSize="18" FontFamily="Lexend"
+                       TextColor="{DynamicResource Primary}"
+                       HorizontalOptions="Center" VerticalOptions="Center" />
+            </Border>
+            <Label Grid.Column="1" Text="Achievements"
+                   FontFamily="SpaceGrotesk" FontSize="18" FontAttributes="Bold"
+                   TextColor="{DynamicResource OnSurface}"
+                   VerticalOptions="Center" HorizontalOptions="Center" />
+            <Border Grid.Column="2" StrokeShape="RoundRectangle 12"
+                    BackgroundColor="{DynamicResource Primary}" Padding="10,4"
+                    VerticalOptions="Center">
+                <Label FontFamily="SpaceGrotesk" FontSize="13" FontAttributes="Bold"
+                       TextColor="{DynamicResource OnPrimary}">
+                    <Label.FormattedText>
+                        <FormattedString>
+                            <Span Text="{Binding UnlockedCount}" />
+                            <Span Text="/" />
+                            <Span Text="{Binding TotalCount}" />
+                        </FormattedString>
+                    </Label.FormattedText>
+                </Label>
+            </Border>
+        </Grid>
+
+        <!-- Progress bar + Category filters -->
+        <VerticalStackLayout Grid.Row="1" Spacing="8" Padding="16,0">
+            <ProgressBar Progress="{Binding ProgressPercent}"
+                         ProgressColor="{DynamicResource Primary}"
+                         BackgroundColor="{DynamicResource SurfaceContainerHigh}" />
+
+            <!-- Category Chips -->
+            <ScrollView Orientation="Horizontal" HorizontalScrollBarVisibility="Never"
+                        HeightRequest="36">
+                <HorizontalStackLayout Spacing="6">
+                    <Border StrokeShape="RoundRectangle 12" Padding="10,4"
+                            BackgroundColor="{DynamicResource Primary}"
+                            HeightRequest="30">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding FilterCategoryCommand}" CommandParameter="Tutti" />
+                        </Border.GestureRecognizers>
+                        <Label Text="Tutti" FontFamily="Lexend" FontSize="11"
+                               TextColor="{DynamicResource OnPrimary}" VerticalOptions="Center" />
+                    </Border>
+                    <Border StrokeShape="RoundRectangle 12" Padding="10,4"
+                            BackgroundColor="{DynamicResource SurfaceContainer}"
+                            Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1"
+                            HeightRequest="30">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding FilterCategoryCommand}" CommandParameter="Costanza" />
+                        </Border.GestureRecognizers>
+                        <Label Text="📅 Costanza" FontFamily="Lexend" FontSize="11"
+                               TextColor="{DynamicResource OnSurface}" VerticalOptions="Center" />
+                    </Border>
+                    <Border StrokeShape="RoundRectangle 12" Padding="10,4"
+                            BackgroundColor="{DynamicResource SurfaceContainer}"
+                            Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1"
+                            HeightRequest="30">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding FilterCategoryCommand}" CommandParameter="Forza" />
+                        </Border.GestureRecognizers>
+                        <Label Text="💪 Forza" FontFamily="Lexend" FontSize="11"
+                               TextColor="{DynamicResource OnSurface}" VerticalOptions="Center" />
+                    </Border>
+                    <Border StrokeShape="RoundRectangle 12" Padding="10,4"
+                            BackgroundColor="{DynamicResource SurfaceContainer}"
+                            Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1"
+                            HeightRequest="30">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding FilterCategoryCommand}" CommandParameter="Varietà" />
+                        </Border.GestureRecognizers>
+                        <Label Text="🧬 Varietà" FontFamily="Lexend" FontSize="11"
+                               TextColor="{DynamicResource OnSurface}" VerticalOptions="Center" />
+                    </Border>
+                    <Border StrokeShape="RoundRectangle 12" Padding="10,4"
+                            BackgroundColor="{DynamicResource SurfaceContainer}"
+                            Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1"
+                            HeightRequest="30">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding FilterCategoryCommand}" CommandParameter="Social" />
+                        </Border.GestureRecognizers>
+                        <Label Text="🦋 Social" FontFamily="Lexend" FontSize="11"
+                               TextColor="{DynamicResource OnSurface}" VerticalOptions="Center" />
+                    </Border>
+                    <Border StrokeShape="RoundRectangle 12" Padding="10,4"
+                            BackgroundColor="{DynamicResource SurfaceContainer}"
+                            Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1"
+                            HeightRequest="30">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding FilterCategoryCommand}" CommandParameter="Elite" />
+                        </Border.GestureRecognizers>
+                        <Label Text="👑 Elite" FontFamily="Lexend" FontSize="11"
+                               TextColor="{DynamicResource OnSurface}" VerticalOptions="Center" />
+                    </Border>
+                </HorizontalStackLayout>
+            </ScrollView>
+        </VerticalStackLayout>
+
+        <!-- Loading -->
+        <ActivityIndicator Grid.Row="2" IsVisible="{Binding IsBusy}" IsRunning="{Binding IsBusy}"
+                           Color="{DynamicResource Primary}" VerticalOptions="Center" />
+
+        <!-- Error -->
+        <Label Grid.Row="2" Text="{Binding ErrorMessage}" IsVisible="{Binding HasError}"
+               FontFamily="Inter" FontSize="14" TextColor="{DynamicResource Error}"
+               HorizontalOptions="Center" VerticalOptions="Center" />
+
+        <!-- Achievement List -->
+        <ScrollView Grid.Row="2" IsVisible="{Binding HasData}">
+            <VerticalStackLayout Spacing="12" Padding="16,8,16,24">
+
+                <!-- Recent Unlocks -->
+                <VerticalStackLayout IsVisible="{Binding HasRecentUnlocks}" Spacing="8">
+                    <Label Text="Sbloccati di recente" FontFamily="Lexend" FontSize="13"
+                           FontAttributes="Bold" TextColor="{DynamicResource Primary}"
+                           Margin="4,0,0,0" />
+                    <HorizontalStackLayout Spacing="10"
+                        BindableLayout.ItemsSource="{Binding RecentUnlocks}">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate x:DataType="vm:AchievementDisplay">
+                                <Border StrokeShape="RoundRectangle 14" Padding="14"
+                                        BackgroundColor="{DynamicResource PrimaryContainer}"
+                                        WidthRequest="140">
+                                    <VerticalStackLayout Spacing="4" HorizontalOptions="Center">
+                                        <Label Text="{Binding Icon}" FontSize="28"
+                                               HorizontalOptions="Center" />
+                                        <Label Text="{Binding Name}" FontFamily="SpaceGrotesk"
+                                               FontSize="12" FontAttributes="Bold"
+                                               TextColor="{DynamicResource Primary}"
+                                               HorizontalTextAlignment="Center"
+                                               LineBreakMode="TailTruncation" MaxLines="1" />
+                                    </VerticalStackLayout>
+                                </Border>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </HorizontalStackLayout>
+                </VerticalStackLayout>
+
+                <!-- Achievement Cards -->
+                <VerticalStackLayout Spacing="8"
+                    BindableLayout.ItemsSource="{Binding Achievements}">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate x:DataType="vm:AchievementDisplay">
+                            <Border StrokeShape="RoundRectangle 14" Padding="14"
+                                    BackgroundColor="{DynamicResource SurfaceContainer}"
+                                    Stroke="{DynamicResource OutlineVariant}" StrokeThickness="0.5"
+                                    Opacity="{Binding IsUnlocked, Converter={StaticResource InverseBoolConverter}}">
+                                <Grid ColumnDefinitions="44,*" ColumnSpacing="14">
+                                    <!-- Icon -->
+                                    <Border Grid.Column="0"
+                                            StrokeShape="RoundRectangle 22"
+                                            BackgroundColor="{DynamicResource SurfaceContainerHigh}"
+                                            WidthRequest="44" HeightRequest="44">
+                                        <Label Text="{Binding Icon}" FontSize="22"
+                                               HorizontalOptions="Center" VerticalOptions="Center" />
+                                    </Border>
+
+                                    <!-- Info -->
+                                    <VerticalStackLayout Grid.Column="1" Spacing="3"
+                                                         VerticalOptions="Center">
+                                        <Label Text="{Binding Name}" FontFamily="SpaceGrotesk"
+                                               FontSize="14" FontAttributes="Bold"
+                                               TextColor="{DynamicResource OnSurface}" />
+                                        <Label Text="{Binding Description}" FontFamily="Inter"
+                                               FontSize="11"
+                                               TextColor="{DynamicResource OnSurfaceVariant}"
+                                               LineBreakMode="TailTruncation" MaxLines="1" />
+
+                                        <!-- Progress bar for locked achievements -->
+                                        <Grid IsVisible="{Binding IsUnlocked, Converter={StaticResource InverseBoolConverter}}"
+                                              ColumnDefinitions="*,Auto" ColumnSpacing="8" Margin="0,4,0,0">
+                                            <ProgressBar Grid.Column="0"
+                                                         Progress="{Binding ProgressPercent}"
+                                                         ProgressColor="{DynamicResource Primary}"
+                                                         BackgroundColor="{DynamicResource SurfaceContainerHigh}"
+                                                         HeightRequest="4" VerticalOptions="Center" />
+                                            <Label Grid.Column="1" Text="{Binding ProgressText}"
+                                                   FontFamily="Inter" FontSize="10"
+                                                   TextColor="{DynamicResource TextSecondary}"
+                                                   VerticalOptions="Center" />
+                                        </Grid>
+                                    </VerticalStackLayout>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </VerticalStackLayout>
+            </VerticalStackLayout>
+        </ScrollView>
+
+    </Grid>
+
+</ContentPage>

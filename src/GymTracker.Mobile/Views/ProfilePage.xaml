@@ -172,13 +172,10 @@
 
                 <!-- Recent Forges -->
                 <VerticalStackLayout Spacing="16">
-                    <Grid ColumnDefinitions="*,Auto" Padding="0,0,0,8">
+                    <Grid ColumnDefinitions="*" Padding="0,0,0,8">
                         <Label Grid.Column="0" Text="Recent Forges"
                                FontFamily="OpenSansSemibold" FontSize="20" FontAttributes="Bold"
                                TextColor="{DynamicResource OnSurface}" />
-                        <Label Grid.Column="1" Text="View All"
-                               FontFamily="OpenSansSemibold" FontSize="12"
-                               TextColor="{DynamicResource Primary}" VerticalOptions="Center" />
                     </Grid>
 
                     <!-- Workout load error -->
@@ -219,16 +216,6 @@
                                                        FontFamily="OpenSansRegular" FontSize="16"
                                                        TextColor="{DynamicResource OnSurfaceVariant}" />
                                             </VerticalStackLayout>
-                                            <Border Grid.Column="1"
-                                                    BackgroundColor="{DynamicResource ErrorContainer}"
-                                                    StrokeShape="RoundRectangle 12" Padding="12,6"
-                                                    VerticalOptions="Start"
-                                                    IsVisible="False">
-                                                <Label Text="FORGE"
-                                                       FontFamily="OpenSansSemibold" FontSize="11"
-                                                       TextColor="{DynamicResource OnErrorContainer}"
-                                                       CharacterSpacing="0.6" />
-                                            </Border>
                                         </Grid>
 
                                         <!-- Stats chips -->

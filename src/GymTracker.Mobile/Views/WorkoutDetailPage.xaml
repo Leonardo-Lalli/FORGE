@@ -210,7 +210,8 @@
                     BackgroundColor="{DynamicResource SurfaceContainer}"
                     HeightRequest="32" WidthRequest="32"
                     HorizontalOptions="End" VerticalOptions="Start"
-                    Margin="0,60,16,0">
+                    Margin="0,60,16,0"
+                    InputTransparent="True">
                 <Label Text="✕" FontSize="14" TextColor="{DynamicResource OnSurface}"
                        HorizontalOptions="Center" VerticalOptions="Center" />
             </Border>

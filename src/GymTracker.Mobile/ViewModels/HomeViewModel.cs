@@ -23,6 +23,7 @@ public partial class HomeViewModel : BaseViewModel
 {
     private readonly PocketBaseService pb;
     private readonly PlanService planService;
+    private readonly AchievementService achievementService;
 
     [ObservableProperty] private string streakCount = "0";
     [ObservableProperty] private string streakLabel = "Week streak";
@@ -36,11 +37,15 @@ public partial class HomeViewModel : BaseViewModel
     [ObservableProperty] private string userAvatarUrl = string.Empty;
     [ObservableProperty] private ImageSource? userAvatarSource;
     [ObservableProperty] private bool hasUserAvatar;
+    [ObservableProperty] private string achievementProgress = "0/50";
+    [ObservableProperty] private double achievementPercent;
+    [ObservableProperty] private string achievementCount = "0";
 
-    public HomeViewModel(PocketBaseService pb, PlanService planService)
+    public HomeViewModel(PocketBaseService pb, PlanService planService, AchievementService achievementService)
     {
         this.pb = pb;
         this.planService = planService;
+        this.achievementService = achievementService;
         HasData = true;
 
         WeakReferenceMessenger.Default.Register<WorkoutSavedMessage>(this, async (_, _) =>
@@ -60,6 +65,7 @@ public partial class HomeViewModel : BaseViewModel
             await CalculateStreakAsync();
             await LoadSquadAsync();
             await LoadRandomPlanAsync();
+            await LoadAchievementProgressAsync();
             SetSuccess(true);
         }
         finally { IsBusy = false; }
@@ -79,6 +85,19 @@ public partial class HomeViewModel : BaseViewModel
             }
             else { UserAvatarSource = null; HasUserAvatar = false; }
         }
+    }
+
+    private async Task LoadAchievementProgressAsync()
+    {
+        try
+        {
+            var unlocked = await achievementService.GetUnlockedCountAsync();
+            var percent = await achievementService.GetProgressPercentAsync();
+            AchievementCount = unlocked.ToString();
+            AchievementProgress = $"{unlocked}/50";
+            AchievementPercent = percent;
+        }
+        catch { }
     }
 
     private async Task LoadRandomPlanAsync()
@@ -235,6 +254,9 @@ public partial class HomeViewModel : BaseViewModel
 
     [RelayCommand]
     private async Task OpenProfileAsync() => await Shell.Current.GoToAsync("profile");
+
+    [RelayCommand]
+    private async Task OpenAchievementsAsync() => await Shell.Current.GoToAsync("achievements");
 
     [RelayCommand]
     private async Task OpenSettingsAsync() => await Shell.Current.GoToAsync("settings");

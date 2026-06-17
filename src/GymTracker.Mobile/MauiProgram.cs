@@ -56,6 +56,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<PlanService>();
         builder.Services.AddSingleton<CsvImportService>();
         builder.Services.AddSingleton<CsvExportService>();
+        builder.Services.AddSingleton<AchievementService>();
 
         // ViewModels
         builder.Services.AddTransient<HomeViewModel>();
@@ -68,6 +69,7 @@ public static class MauiProgram
         builder.Services.AddTransient<LoginViewModel>();
         builder.Services.AddTransient<FriendRequestsViewModel>();
         builder.Services.AddTransient<WorkoutDetailViewModel>();
+        builder.Services.AddTransient<AchievementsViewModel>();
 
         // Pages
         builder.Services.AddTransient<HomePage>();
@@ -80,6 +82,7 @@ public static class MauiProgram
         builder.Services.AddTransient<LoginPage>();
         builder.Services.AddTransient<FriendRequestsPage>();
         builder.Services.AddTransient<WorkoutDetailPage>();
+        builder.Services.AddTransient<AchievementsPage>();
 
 #if DEBUG
         builder.Logging.AddDebug();

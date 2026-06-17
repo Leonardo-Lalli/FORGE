@@ -142,6 +142,43 @@
                     </VerticalStackLayout>
                 </Border>
 
+                <!-- ===== Achievements Card ===== -->
+                <Border BackgroundColor="{DynamicResource SurfaceContainerLowest}"
+                        StrokeShape="RoundRectangle 12"
+                        Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1"
+                        Padding="16">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding OpenAchievementsCommand}" />
+                    </Border.GestureRecognizers>
+                    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                        <Border Grid.Column="0" StrokeShape="RoundRectangle 16"
+                                BackgroundColor="{DynamicResource PrimaryContainer}"
+                                WidthRequest="44" HeightRequest="44">
+                            <Label Text="🏆" FontSize="22"
+                                   HorizontalOptions="Center" VerticalOptions="Center" />
+                        </Border>
+                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
+                            <Label Text="Achievements" FontFamily="SpaceGrotesk"
+                                   FontSize="14" FontAttributes="Bold"
+                                   TextColor="{DynamicResource OnSurface}" />
+                            <Label FontFamily="Inter" FontSize="11"
+                                   TextColor="{DynamicResource OnSurfaceVariant}"
+                                   Text="{Binding AchievementProgress, StringFormat='{0} sbloccati'}" />
+                        </VerticalStackLayout>
+                        <VerticalStackLayout Grid.Column="2" VerticalOptions="Center"
+                            HorizontalOptions="End" Spacing="2">
+                            <Label Text="{Binding AchievementCount}" FontFamily="SpaceGrotesk"
+                                   FontSize="20" FontAttributes="Bold"
+                                   TextColor="{DynamicResource Primary}"
+                                   HorizontalTextAlignment="End" />
+                            <ProgressBar Progress="{Binding AchievementPercent}"
+                                         ProgressColor="{DynamicResource Primary}"
+                                         BackgroundColor="{DynamicResource SurfaceContainerHigh}"
+                                         WidthRequest="70" HeightRequest="4" />
+                        </VerticalStackLayout>
+                    </Grid>
+                </Border>
+
                 <!-- ===== Next Workout ===== -->
                 <Border BackgroundColor="{DynamicResource SurfaceContainerLowest}"
                         StrokeShape="RoundRectangle 12"

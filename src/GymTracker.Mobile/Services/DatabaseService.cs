@@ -21,6 +21,7 @@ public class DatabaseService
         await db.CreateTableAsync<LocalWorkout>();
         await db.CreateTableAsync<CachedExercise>();
         await db.CreateTableAsync<SavedPlan>();
+        await db.CreateTableAsync<AchievementState>();
 
         return db;
     }
@@ -117,5 +118,21 @@ public class DatabaseService
     {
         var d = await GetDbAsync();
         await d.DeleteAsync<SavedPlan>(planId);
+    }
+
+    public async Task<List<AchievementState>> GetAchievementsAsync()
+    {
+        var d = await GetDbAsync();
+        return await d.Table<AchievementState>().ToListAsync();
+    }
+
+    public async Task SaveAchievementAsync(AchievementState state)
+    {
+        var d = await GetDbAsync();
+        var existing = await d.FindAsync<AchievementState>(state.Id);
+        if (existing != null)
+            await d.UpdateAsync(state);
+        else
+            await d.InsertAsync(state);
     }
 }
