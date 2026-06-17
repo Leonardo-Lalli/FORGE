@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <RootNamespace>GymTracker.Mobile.Tests</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Using Include="Microsoft.Maui.Controls" />
+    <Using Include="GymTracker.Mobile.Converters" />
+    <Using Include="GymTracker.Mobile.Models" />
+    <Using Include="GymTracker.Mobile.Models.Dto" />
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.13.0" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.0.2">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+    <PackageReference Include="sqlite-net-pcl" Version="1.9.172" />
+    <PackageReference Include="SQLitePCLRaw.bundle_green" Version="2.1.11" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\..\src\GymTracker.Mobile\Models\*.cs" Link="Shared\Models\%(Filename)%(Extension)" />
+    <Compile Include="..\..\src\GymTracker.Mobile\Models\Dto\*.cs" Link="Shared\Models\Dto\%(Filename)%(Extension)" />
+    <Compile Include="..\..\src\GymTracker.Mobile\Converters\*.cs" Link="Shared\Converters\%(Filename)%(Extension)" />
+    <Compile Include="..\..\src\GymTracker.Mobile\Messages\*.cs" Link="Shared\Messages\%(Filename)%(Extension)" />
+  </ItemGroup>
+
+</Project>
