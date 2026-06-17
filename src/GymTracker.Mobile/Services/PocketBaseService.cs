@@ -17,7 +17,7 @@ public class PocketBaseService
     {
         if (_http != null) return _http;
         var client = httpFactory.CreateClient("pocketbase");
-        var pbUrl = secrets.Get("POCKETBASE_URL") ?? "https://pocketbase.server-casa-leo.duckdns.org";
+        var pbUrl = secrets.Get("POCKETBASE_URL") ?? "https://leoforge.duckdns.org";
         client.BaseAddress = new Uri($"{pbUrl}/api/");
         client.Timeout = TimeSpan.FromSeconds(15);
         _http = client;
@@ -164,6 +164,29 @@ public class PocketBaseService
         catch (Exception ex)
         {
             return (false, ex.Message);
+        }
+    }
+
+    public async Task UpdateFcmTokenAsync(string fcmToken)
+    {
+        if (!IsLoggedIn || string.IsNullOrWhiteSpace(fcmToken) || currentUser == null) return;
+        try
+        {
+            var payload = new Dictionary<string, object> { ["fcm_token"] = fcmToken };
+            var json = System.Text.Json.JsonSerializer.Serialize(payload);
+            var request = new HttpRequestMessage(HttpMethod.Patch,
+                $"collections/users/records/{currentUser.Id}")
+            {
+                Content = new StringContent(json, System.Text.Encoding.UTF8, "application/json")
+            };
+            request.Headers.Authorization =
+                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            await GetHttp().SendAsync(request);
+            System.Diagnostics.Debug.WriteLine($"[PB FcmToken] updated");
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[PB FcmToken] ex: {ex.Message}");
         }
     }
 

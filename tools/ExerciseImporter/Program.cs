@@ -4,13 +4,15 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 
 // Config
-const string PB_URL = "https://pocketbase.server-casa-leo.duckdns.org/api/";
-const string PB_EMAIL = "YOUR_EMAIL";
-const string PB_PASSWORD = "YOUR_PASSWORD";
+const string PB_URL = "https://leoforge.duckdns.org/api/";
+var PB_EMAIL = Environment.GetEnvironmentVariable("FORGE_PB_EMAIL") ?? "";
+var PB_PASSWORD = Environment.GetEnvironmentVariable("FORGE_PB_PASSWORD") ?? "";
 
-if (PB_EMAIL == "YOUR_EMAIL")
+if (string.IsNullOrWhiteSpace(PB_EMAIL))
 {
-    Console.WriteLine("ERRORE: imposta PB_EMAIL e PB_PASSWORD nel codice.");
+    Console.WriteLine("ERRORE: imposta le variabili d'ambiente:");
+    Console.WriteLine("  set FORGE_PB_EMAIL=tua_email");
+    Console.WriteLine("  set FORGE_PB_PASSWORD=tua_password");
     return;
 }
 

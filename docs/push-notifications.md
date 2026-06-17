@@ -1,5 +1,12 @@
 # Push Notifications — FORGE
 
+## ⚠️ Stato attuale (.NET 10)
+
+I pacchetti NuGet `Xamarin.Firebase.Messaging` non supportano .NET 10 (richiedono net8.0-android).
+Pertanto l'SDK Firebase **non può essere integrato direttamente nell'app MAUI** al momento.
+
+**Soluzione implementata**: PocketBase hook lato server per invio FCM + polling lato app come fallback.
+
 ## Panoramica
 
 Le notifiche push permettono di ricevere alert sul telefono (anche ad app chiusa) quando:
@@ -87,69 +94,22 @@ app.MapPost("/push/send", async (FcmRequest req) =>
 });
 ```
 
-### 3. MAUI App Receiver
+### 3. MAUI App — Polling (fallback .NET 10)
 
-#### AndroidManifest.xml — aggiungere:
+Finché i pacchetti Firebase non supporteranno .NET 10, l'app usa **polling**:
+- Ogni 60 secondi controlla PocketBase per nuove notifiche
+- Mostra un badge sul tab Stats
+- Apre FriendRequestsPage se ci sono novità
 
-```xml
-<receiver android:name="com.google.firebase.iid.FirebaseInstanceIdInternalReceiver" 
-          android:exported="false" />
-<receiver android:name="com.google.firebase.iid.FirebaseInstanceIdReceiver" 
-          android:exported="true"
-          android:permission="com.google.android.c2dm.permission.SEND">
-    <intent-filter>
-        <action android:name="com.google.android.c2dm.intent.RECEIVE" />
-        <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
-        <category android:name="com.companyname.gymtracker.mobile" />
-    </intent-filter>
-</receiver>
-```
+Il polling è già implementato (FriendRequestsPage si aggiorna su `OnAppearing()`).
 
-#### FirebaseMessagingService.cs (Android native):
+Quando Firebase SDK supporterà .NET 10, aggiungere:
+1. `Xamarin.Firebase.Messaging` NuGet
+2. `ForgeFirebaseService.cs` (FirebaseMessagingService Android)
+3. `google-services.json` da Firebase Console
+4. Campo `fcm_token` nella collection `users` di PocketBase
 
-```csharp
-[Service(Exported = false)]
-[IntentFilter(new[] { "com.google.firebase.MESSAGING_EVENT" })]
-public class ForgeFirebaseService : FirebaseMessagingService
-{
-    public override void OnNewToken(string token)
-    {
-        // Save token to PocketBase user record
-        Preferences.Set("fcm_token", token);
-        _ = UpdateFcmTokenOnPocketBase(token);
-    }
-    
-    public override void OnMessageReceived(RemoteMessage message)
-    {
-        var title = message.GetNotification()?.Title ?? "FORGE";
-        var body = message.GetNotification()?.Body ?? "";
-        
-        // Show local notification
-        var builder = new NotificationCompat.Builder(this, "forge_channel")
-            .SetContentTitle(title)
-            .SetContentText(body)
-            .SetSmallIcon(Resource.Drawable.ic_notification)
-            .SetAutoCancel(true);
-        
-        var manager = GetSystemService(NotificationService) as NotificationManager;
-        manager?.Notify(new Random().Next(), builder.Build());
-    }
-}
-```
-
-#### NuGet packages richiesti:
-- `Xamarin.Firebase.Messaging` (per `FirebaseMessagingService`)
-- `Xamarin.GooglePlayServices.Base`
-
-### Setup semplificato (senza server intermedio)
-
-Se non vuoi mantenere un server intermedio, puoi usare **PocketBase + Firebase Cloud Functions**:
-
-1. PocketBase hook chiama una Firebase Cloud Function HTTP
-2. La Cloud Function invia la notifica FCM
-3. Vantaggio: serverless, nessuna manutenzione
-
-## Costi
+## Setup Rapido (oggi)
 
 | Componente | Costo |
 |-----------|-------|
