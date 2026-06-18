@@ -1,5 +1,11 @@
 <div align="center">
 
+> ⚠️ **PROGETTO AMATORIALE A SCOPO DIDATTICO** ⚠️  
+> Questa app è sviluppata da uno studente come progetto scolastico.  
+> **Non è un prodotto commerciale.** Il server è self-hosted su hardware casalingo.  
+> Potrebbero esserci bug, limitazioni e downtime non pianificati.  
+> Usala per test e dimostrazioni, non per dati importanti.
+
 <img src="assets/screenshots/dashboard.jpeg" width="120" style="border-radius:24px" />
 
 # FORGE
