@@ -120,7 +120,7 @@ public partial class HomeViewModel : BaseViewModel
                 HasNextAchievement = true;
             }
         }
-        catch { }
+        catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[Home Achieve] ex: {ex.Message}"); }
     }
 
     private async Task LoadRandomPlanAsync()

@@ -315,6 +315,6 @@ public partial class ProfileViewModel : BaseViewModel
             HasUnlockedBadges = UnlockedBadges.Count > 0;
             AchievementSummary = $"{unlocked.Count}/{AchievementsCatalog.All.Count} sbloccati";
         }
-        catch { }
+        catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[Profile Badges] ex: {ex.Message}"); }
     }
 }

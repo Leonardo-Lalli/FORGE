@@ -14,7 +14,7 @@ public class LocalWorkout
     public double Volume { get; set; }
     public int Duration { get; set; }
     public string Notes { get; set; } = string.Empty;
-    public string ExerciseDataJson { get; set; } = string.Empty;
+    public string ExerciseDataJson { get; set; } = "[]";
     public int Likes { get; set; }
     public string LikedByJson { get; set; } = "[]";
     public string UserName { get; set; } = string.Empty;

@@ -48,7 +48,7 @@ public class ExerciseDbApiService
             var fetched = 0;
             while (true)
             {
-                var url = $"exercises?limit=100{(string.IsNullOrEmpty(cursor) ? "" : $"&cursor={cursor}")}";
+                var url = $"exercises?limit=100{(string.IsNullOrEmpty(cursor) ? "" : $"&cursor={Uri.EscapeDataString(cursor)}")}";
                 var response = await GetHttp().GetAsync(url);
                 response.EnsureSuccessStatusCode();
                 var json = await response.Content.ReadAsStringAsync();

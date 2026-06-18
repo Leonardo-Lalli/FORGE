@@ -51,6 +51,9 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
     [ObservableProperty] private string searchQuery = string.Empty;
     [ObservableProperty] private bool isSearchingApi;
     [ObservableProperty] private string searchError = string.Empty;
+    public bool HasSearchError => !string.IsNullOrWhiteSpace(SearchError);
+
+    partial void OnSearchErrorChanged(string value) => OnPropertyChanged(nameof(HasSearchError));
     [ObservableProperty] private ObservableCollection<ExerciseSearchResult> searchResults = new();
     private CancellationTokenSource? searchCts;
 
@@ -332,7 +335,7 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
             }
             SearchError = results.Count == 0 ? "Nessun esercizio trovato per questo muscolo." : "";
         }
-        catch { SearchError = "Cache non disponibile."; }
+        catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[ActiveWk Filter] ex: {ex.Message}"); SearchError = "Cache non disponibile."; }
         finally { IsSearchingApi = false; }
     }
 
@@ -372,7 +375,7 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
             }
             SearchError = results.Count == 0 ? "Nessun esercizio trovato per questa attrezzatura." : "";
         }
-        catch { SearchError = "Cache non disponibile."; }
+        catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[ActiveWk Filter] ex: {ex.Message}"); SearchError = "Cache non disponibile."; }
         finally { IsSearchingApi = false; }
     }
 

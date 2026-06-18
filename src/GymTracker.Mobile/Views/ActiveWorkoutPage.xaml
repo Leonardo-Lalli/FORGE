@@ -464,7 +464,7 @@
             <VerticalStackLayout Grid.Row="5" Spacing="4">
                 <ActivityIndicator IsRunning="{Binding IsSearchingApi}" IsVisible="{Binding IsSearchingApi}"
                                    HorizontalOptions="Center" Color="{DynamicResource Primary}" />
-                <Label Text="{Binding SearchError}" IsVisible="{Binding SearchError}"
+                <Label Text="{Binding SearchError}" IsVisible="{Binding HasSearchError}"
                        FontFamily="Inter" FontSize="13" TextColor="{DynamicResource Error}"
                        HorizontalTextAlignment="Center" Margin="0,2" />
             </VerticalStackLayout>

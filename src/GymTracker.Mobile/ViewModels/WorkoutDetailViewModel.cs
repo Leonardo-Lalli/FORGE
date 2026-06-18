@@ -186,7 +186,7 @@ public partial class WorkoutDetailViewModel : BaseViewModel
                 foreach (var p in list)
                     Photos.Add(p);
         }
-        catch { }
+        catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[WorkoutDetail] ParsePhotos ex: {ex.Message}"); }
         HasPhotos = Photos.Count > 0;
     }
 
