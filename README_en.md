@@ -179,9 +179,7 @@ Data is stored in two places:
 - **On your phone**: local SQLite database (workouts, exercises, achievements, plans)
 - **On the FORGE server**: authentication, completed workouts, likes, followers
 
-Workout **photos** are saved as part of the workout. Only those with access to the workout detail can view them.
-
-The developer, as server administrator, has technical access to data. Data is **not** shared with third parties. To delete your data, use Logout in Settings.
+See [`PRIVACY.md`](PRIVACY.md) for full details.
 
 ## Security
 

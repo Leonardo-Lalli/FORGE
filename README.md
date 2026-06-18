@@ -189,11 +189,9 @@ dotnet publish src/Forge/Forge.csproj -f net10.0-android -c Release /p:AndroidPa
 
 I dati sono salvati in due posti:
 - **Sul tuo telefono**: database SQLite locale (workout, esercizi, achievement, piani)
-- **Sul server FORGE**: autenticazione, workout completati, like, follower, commenti
+- **Sul server FORGE**: autenticazione, workout completati, like, follower
 
-Le **foto** degli allenamenti sono salvate come parte del workout. Solo chi ha accesso al dettaglio del workout può vederle.
-
-Lo sviluppatore, in quanto amministratore del server, ha accesso tecnico ai dati. I dati **non** sono condivisi con terze parti. Per cancellare i tuoi dati, usa Logout nelle Impostazioni.
+Vedi [`PRIVACY.md`](PRIVACY.md) per i dettagli completi.
 
 ## Sicurezza
 
