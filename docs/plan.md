@@ -216,7 +216,6 @@ L'utente può registrare peso e misure corporee e visualizzarne l'andamento nel 
 
 ## 5. Prossimi passi
 
-1. Applicare regole API PocketBase (row-level ownership) — vedi `docs/security-hardening.md`
 2. Configurare Nginx per bloccare admin panel `/_/` dall'esterno
 3. Valutare se implementare IT-04 (body tracking) in una nuova iterazione
 4. Aggiungere leaderboard settimanale tra amici

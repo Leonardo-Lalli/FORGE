@@ -180,7 +180,6 @@ dotnet publish src/Forge/Forge.csproj -f net10.0-android -c Release /p:AndroidPa
 | [`docs/plan.md`](docs/plan.md) | Piano iterazioni con stato |
 | [`docs/architecture.md`](docs/architecture.md) | Architettura tecnica |
 | [`docs/project-journal.md`](docs/project-journal.md) | Diario di sviluppo completo |
-| [`docs/security-hardening.md`](docs/security-hardening.md) | Guida sicurezza PocketBase + Nginx |
 | [`docs/test-matrix.md`](docs/test-matrix.md) | Matrice 42 test manuali |
 | [`docs/api-notes.md`](docs/api-notes.md) | Note tecniche API |
 

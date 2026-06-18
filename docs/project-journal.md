@@ -261,7 +261,6 @@ Abbiamo condotto un audit di sicurezza completo (18 vulnerabilità identificate)
 - `android:allowBackup=false` (blocca backup Google Drive dei dati sensibili)
 - `Logout()`: pulisce anche vecchie password in `Preferences`
 
-**Da applicare sul server (documentato in `docs/security-hardening.md`):**
 - API Rules PocketBase con row-level ownership
 - Nginx: bloccare admin panel `/_/` dall'esterno
 - Rate limiting per endpoint auth
@@ -454,10 +453,6 @@ Abbiamo condotto un audit di sicurezza con 18 vulnerabilità identificate. Ecco 
 
 | # | Severità | Azione | File di riferimento |
 |---|----------|--------|---------------------|
-| 7 | CRIT | API Rules PocketBase con row-level ownership | `docs/security-hardening.md` |
-| 8 | HIGH | Nginx: bloccare `/_/` dall'esterno | `docs/security-hardening.md` |
-| 9 | HIGH | Nginx: rate limiting endpoint auth | `docs/security-hardening.md` |
-| 10 | MED | Nginx: security headers (HSTS, X-Frame-Options) | `docs/security-hardening.md` |
 | 11 | LOW | Ruotare chiave ExerciseDB su RapidAPI (se ancora attiva) | rapidapi.com |
 
 ---
@@ -465,7 +460,6 @@ Abbiamo condotto un audit di sicurezza con 18 vulnerabilità identificate. Ecco 
 ## 7. Prossimi Passi
 
 ### Immediato (questa settimana)
-1. Applicare API Rules PocketBase — vedi `docs/security-hardening.md`
 2. Configurare Nginx per bloccare admin panel e aggiungere rate limiting
 
 ### Breve termine
@@ -493,7 +487,6 @@ Abbiamo condotto un audit di sicurezza con 18 vulnerabilità identificate. Ecco 
 | [`docs/plan.md`](docs/plan.md) | Piano iterazioni con stato |
 | [`docs/architecture.md`](docs/architecture.md) | Architettura tecnica dettagliata |
 | [`docs/api-notes.md`](docs/api-notes.md) | Note tecniche API PocketBase e ExerciseDB |
-| [`docs/security-hardening.md`](docs/security-hardening.md) | Guida sicurezza PocketBase + Nginx |
 | [`docs/pocketbase-schema.md`](docs/pocketbase-schema.md) | Schema collezioni PocketBase |
 | [`docs/push-notifications.md`](docs/push-notifications.md) | Setup notifiche push FCM |
 | [`docs/test-matrix.md`](docs/test-matrix.md) | Matrice 42 test manuali eseguiti |

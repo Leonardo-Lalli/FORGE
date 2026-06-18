@@ -38,5 +38,3 @@ FORGE adotta comunque le seguenti misure di sicurezza:
 - **Rate limiting**: 5 tentativi di login al minuto
 - **Admin panel**: bloccato da accesso esterno (403)
 - **Backup Android**: disabilitato (`allowBackup=false`)
-
-Per dettagli tecnici, vedi [`docs/security-hardening.md`](docs/security-hardening.md).
