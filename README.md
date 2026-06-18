@@ -6,10 +6,10 @@
 > Potrebbero esserci bug, limitazioni e downtime non pianificati.  
 > Usala per test e dimostrazioni, non per dati importanti.
 
-[🇬🇧 English](README_en.md) · [🇮🇹 Italiano](README.md) · [🇪🇸 Español](README_es.md) · [🇨🇳 中文](README_zh.md)
 
 <img src="assets/screenshots/dashboard.jpeg" width="120" style="border-radius:24px" />
 
+[🇬🇧 English](README_en.md) · [🇮🇹 Italiano](README.md) · [🇪🇸 Español](README_es.md) · [🇨🇳 中文](README_zh.md)
 # FORGE
 
 ### Il diario di allenamento sociale
