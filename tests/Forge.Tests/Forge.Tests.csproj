@@ -30,10 +30,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="..\..\src\GymTracker.Mobile\Models\*.cs" Link="Shared\Models\%(Filename)%(Extension)" />
-    <Compile Include="..\..\src\GymTracker.Mobile\Models\Dto\*.cs" Link="Shared\Models\Dto\%(Filename)%(Extension)" />
-    <Compile Include="..\..\src\GymTracker.Mobile\Converters\*.cs" Link="Shared\Converters\%(Filename)%(Extension)" />
-    <Compile Include="..\..\src\GymTracker.Mobile\Messages\*.cs" Link="Shared\Messages\%(Filename)%(Extension)" />
+    <Compile Include="..\..\src\Forge\Models\*.cs" Link="Shared\Models\%(Filename)%(Extension)" />
+    <Compile Include="..\..\src\Forge\Models\Dto\*.cs" Link="Shared\Models\Dto\%(Filename)%(Extension)" />
+    <Compile Include="..\..\src\Forge\Converters\*.cs" Link="Shared\Converters\%(Filename)%(Extension)" />
+    <Compile Include="..\..\src\Forge\Messages\*.cs" Link="Shared\Messages\%(Filename)%(Extension)" />
   </ItemGroup>
 
 </Project>
