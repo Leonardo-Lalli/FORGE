@@ -1,6 +1,6 @@
-﻿using Foundation;
+using Foundation;
 
-namespace GymTracker.Mobile;
+namespace Forge;
 
 [Register("AppDelegate")]
 public class AppDelegate : MauiUIApplicationDelegate

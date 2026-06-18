@@ -1,9 +1,9 @@
 using System.Collections.ObjectModel;
 using System.Text.Json;
-using GymTracker.Mobile.Models;
-using GymTracker.Mobile.Models.Dto;
+using Forge.Models;
+using Forge.Models.Dto;
 
-namespace GymTracker.Mobile.Tests.Models;
+namespace Forge.Tests.Models;
 
 public class ExerciseSetTests
 {

@@ -2,11 +2,11 @@ using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
-using GymTracker.Mobile.Messages;
-using GymTracker.Mobile.Models;
-using GymTracker.Mobile.Services;
+using Forge.Messages;
+using Forge.Models;
+using Forge.Services;
 
-namespace GymTracker.Mobile.ViewModels;
+namespace Forge.ViewModels;
 
 public partial class ProfileWorkout : ObservableObject
 {

@@ -1,8 +1,8 @@
-using GymTracker.Mobile.Messages;
-using GymTracker.Mobile.Models.Dto;
+using Forge.Messages;
+using Forge.Models.Dto;
 using System.Text.Json;
 
-namespace GymTracker.Mobile.Tests.Integration;
+namespace Forge.Tests.Integration;
 
 public class WorkoutSavedMessageTests
 {

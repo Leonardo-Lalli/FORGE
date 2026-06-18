@@ -1,6 +1,6 @@
 using SQLite;
 
-namespace GymTracker.Mobile.Models;
+namespace Forge.Models;
 
 [Table("local_workouts")]
 public class LocalWorkout

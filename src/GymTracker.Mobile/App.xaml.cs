@@ -1,7 +1,7 @@
-﻿using GymTracker.Mobile.Services;
-using GymTracker.Mobile.Views;
+using Forge.Services;
+using Forge.Views;
 
-namespace GymTracker.Mobile;
+namespace Forge;
 
 public partial class App : Application
 {

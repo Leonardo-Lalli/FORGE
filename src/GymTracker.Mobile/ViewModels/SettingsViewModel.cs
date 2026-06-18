@@ -1,9 +1,9 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using GymTracker.Mobile.Services;
-using GymTracker.Mobile.Views;
+using Forge.Services;
+using Forge.Views;
 
-namespace GymTracker.Mobile.ViewModels;
+namespace Forge.ViewModels;
 
 public partial class SettingsViewModel : BaseViewModel
 {

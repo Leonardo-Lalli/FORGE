@@ -1,7 +1,7 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 
-namespace GymTracker.Mobile.Models;
+namespace Forge.Models;
 
 public class WorkoutPlan
 {

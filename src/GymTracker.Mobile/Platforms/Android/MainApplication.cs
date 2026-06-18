@@ -1,7 +1,7 @@
-﻿using Android.App;
+using Android.App;
 using Android.Runtime;
 
-namespace GymTracker.Mobile;
+namespace Forge;
 
 [Application]
 public class MainApplication : MauiApplication

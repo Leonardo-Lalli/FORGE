@@ -1,8 +1,8 @@
 using System.Text.Json;
-using GymTracker.Mobile.Models;
-using GymTracker.Mobile.Models.Dto;
+using Forge.Models;
+using Forge.Models.Dto;
 
-namespace GymTracker.Mobile.Services;
+namespace Forge.Services;
 
 public class SyncService
 {

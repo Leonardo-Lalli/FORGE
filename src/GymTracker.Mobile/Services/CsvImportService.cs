@@ -1,6 +1,6 @@
-using GymTracker.Mobile.Models;
+using Forge.Models;
 
-namespace GymTracker.Mobile.Services;
+namespace Forge.Services;
 
 public class CsvImportService
 {

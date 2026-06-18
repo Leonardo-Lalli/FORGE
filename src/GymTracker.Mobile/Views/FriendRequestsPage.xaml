@@ -2,8 +2,8 @@
 <ContentPage
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:vm="clr-namespace:GymTracker.Mobile.ViewModels"
-    x:Class="GymTracker.Mobile.Views.FriendRequestsPage"
+    xmlns:vm="clr-namespace:Forge.ViewModels"
+    x:Class="Forge.Views.FriendRequestsPage"
     x:DataType="vm:FriendRequestsViewModel"
     Title="FriendRequests"
     Shell.NavBarIsVisible="False">

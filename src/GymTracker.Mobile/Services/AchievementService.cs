@@ -1,8 +1,8 @@
 using CommunityToolkit.Mvvm.Messaging;
-using GymTracker.Mobile.Messages;
-using GymTracker.Mobile.Models;
+using Forge.Messages;
+using Forge.Models;
 
-namespace GymTracker.Mobile.Services;
+namespace Forge.Services;
 
 public class AchievementService
 {

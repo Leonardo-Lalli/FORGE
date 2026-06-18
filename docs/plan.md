@@ -45,7 +45,7 @@ Progetto MAUI compilabile su Android con Shell navigation a 3 tab e doppio tema 
 
 **In scope**
 
-- Creazione progetto `src/GymTracker.Mobile/`
+- Creazione progetto `src/Forge/`
 - AppShell con 3 tab: Dashboard, Feed, Stats
 - Pagine placeholder per ogni tab
 - `ThemeService` con palette dark/light inline e `WriteResources()`

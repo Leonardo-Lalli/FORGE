@@ -2,8 +2,8 @@
 <ContentPage
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:vm="clr-namespace:GymTracker.Mobile.ViewModels"
-    x:Class="GymTracker.Mobile.Views.StatsPage"
+    xmlns:vm="clr-namespace:Forge.ViewModels"
+    x:Class="Forge.Views.StatsPage"
     x:DataType="vm:StatsViewModel"
     Title="Stats"
     Shell.NavBarIsVisible="False">

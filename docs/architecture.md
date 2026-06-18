@@ -13,7 +13,7 @@ L'architettura supporta l'uso online per la registrazione allenamenti e la sincr
 ## 2. Struttura del repository
 
 ```
-src/GymTracker.Mobile/
+src/Forge/
 ├── App.xaml / App.xaml.cs
 ├── AppShell.xaml / AppShell.xaml.cs
 ├── MauiProgram.cs                  # DI composition root

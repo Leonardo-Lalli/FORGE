@@ -2,9 +2,9 @@ using System.Collections.ObjectModel;
 using System.Text.Json;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using GymTracker.Mobile.Services;
+using Forge.Services;
 
-namespace GymTracker.Mobile.ViewModels;
+namespace Forge.ViewModels;
 
 public partial class DetailExercise : ObservableObject
 {

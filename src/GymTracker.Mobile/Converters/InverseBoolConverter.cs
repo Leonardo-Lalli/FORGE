@@ -1,6 +1,6 @@
 using System.Globalization;
 
-namespace GymTracker.Mobile.Converters;
+namespace Forge.Converters;
 
 public class InverseBoolConverter : IValueConverter
 {

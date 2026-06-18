@@ -1,6 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 
-namespace GymTracker.Mobile.ViewModels;
+namespace Forge.ViewModels;
 
 public partial class BaseViewModel : ObservableObject
 {

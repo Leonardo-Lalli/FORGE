@@ -2,9 +2,9 @@
 <ContentPage
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:vm="clr-namespace:GymTracker.Mobile.ViewModels"
-    xmlns:models="clr-namespace:GymTracker.Mobile.Models"
-    x:Class="GymTracker.Mobile.Views.ActiveWorkoutPage"
+    xmlns:vm="clr-namespace:Forge.ViewModels"
+    xmlns:models="clr-namespace:Forge.Models"
+    x:Class="Forge.Views.ActiveWorkoutPage"
     x:Name="workoutPage"
     x:DataType="vm:ActiveWorkoutViewModel"
     Title="WORKOUT"

@@ -1,6 +1,6 @@
-﻿using GymTracker.Mobile.Views;
+using Forge.Views;
 
-namespace GymTracker.Mobile;
+namespace Forge;
 
 public partial class AppShell : Shell
 {

@@ -1,9 +1,9 @@
-﻿using GymTracker.Mobile.Services;
-using GymTracker.Mobile.ViewModels;
-using GymTracker.Mobile.Views;
+using Forge.Services;
+using Forge.ViewModels;
+using Forge.Views;
 using Microsoft.Extensions.Logging;
 
-namespace GymTracker.Mobile;
+namespace Forge;
 
 public static class MauiProgram
 {

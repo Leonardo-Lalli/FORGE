@@ -1,7 +1,7 @@
 using System.Globalization;
-using GymTracker.Mobile.Converters;
+using Forge.Converters;
 
-namespace GymTracker.Mobile.Tests.Converters;
+namespace Forge.Tests.Converters;
 
 public class InverseBoolConverterTests
 {

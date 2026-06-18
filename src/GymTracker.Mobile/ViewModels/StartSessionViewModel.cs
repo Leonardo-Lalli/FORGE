@@ -1,10 +1,10 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using GymTracker.Mobile.Models;
-using GymTracker.Mobile.Services;
+using Forge.Models;
+using Forge.Services;
 
-namespace GymTracker.Mobile.ViewModels;
+namespace Forge.ViewModels;
 
 public partial class ProtocolCard : ObservableObject
 {

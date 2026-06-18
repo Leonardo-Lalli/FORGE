@@ -1,7 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace GymTracker.Mobile.Models.Dto;
+namespace Forge.Models.Dto;
 
 public class ExerciseDbV1Dto
 {

@@ -1,6 +1,6 @@
 using CommunityToolkit.Mvvm.Messaging.Messages;
 
-namespace GymTracker.Mobile.Messages;
+namespace Forge.Messages;
 
 public class WorkoutSavedMessage : ValueChangedMessage<bool>
 {

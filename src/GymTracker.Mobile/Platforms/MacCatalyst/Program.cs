@@ -1,7 +1,7 @@
-﻿using ObjCRuntime;
+using ObjCRuntime;
 using UIKit;
 
-namespace GymTracker.Mobile;
+namespace Forge;
 
 public class Program
 {

@@ -1,6 +1,6 @@
-using GymTracker.Mobile.ViewModels;
+using Forge.ViewModels;
 
-namespace GymTracker.Mobile.Views;
+namespace Forge.Views;
 
 public partial class FriendRequestsPage : ContentPage
 {

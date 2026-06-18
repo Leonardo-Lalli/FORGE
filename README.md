@@ -127,26 +127,26 @@ cp .env.example .env
 # Modifica .env con l'URL del tuo server PocketBase
 
 # 3. Build
-dotnet build src/GymTracker.Mobile/GymTracker.Mobile.csproj -f net10.0-android
+dotnet build src/Forge/Forge.csproj -f net10.0-android
 
 # 4. Test
-dotnet test tests/GymTracker.Mobile.Tests/
+dotnet test tests/Forge.Tests/
 
 # 5. Pubblica APK
-dotnet publish src/GymTracker.Mobile/GymTracker.Mobile.csproj -f net10.0-android -c Release /p:AndroidPackageFormats=apk
+dotnet publish src/Forge/Forge.csproj -f net10.0-android -c Release /p:AndroidPackageFormats=apk
 ```
 
 ### Struttura
 
 ```text
-├── src/GymTracker.Mobile/       # Progetto MAUI
+├── src/Forge/       # Progetto MAUI
 │   ├── Models/                  # Entità dominio + DTO
 │   ├── ViewModels/              # MVVM ViewModels (12)
 │   ├── Views/                   # XAML Views (10)
 │   ├── Services/                # Business logic (11)
 │   ├── Converters/              # Value converters (3)
 │   └── Resources/               # Stili, font, immagini
-├── tests/GymTracker.Mobile.Tests/  # Test xUnit (36)
+├── tests/Forge.Tests/  # Test xUnit (36)
 ├── tools/
 │   ├── ExerciseImporter/        # Import esercizi su PocketBase
 │   └── pb_hooks/                # Hook PocketBase (FCM)

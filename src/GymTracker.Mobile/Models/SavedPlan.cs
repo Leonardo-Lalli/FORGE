@@ -1,6 +1,6 @@
 using SQLite;
 
-namespace GymTracker.Mobile.Models;
+namespace Forge.Models;
 
 [Table("saved_plans")]
 public class SavedPlan
