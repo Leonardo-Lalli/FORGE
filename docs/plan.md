@@ -202,20 +202,24 @@ L'utente può registrare peso e misure corporee e visualizzarne l'andamento nel 
 | Profilo | ✅ | ProfilePage: avatar, bio, edit, recent workouts |
 | Friend requests | ✅ | FriendRequestsPage: follow + like notifications |
 | Tema doppio | ✅ | Toggle runtime chiaro/scuro su tutte le pagine |
-| Dettaglio workout | ✅ | WorkoutDetailPage: serie, reps, kg, foto |
+| Dettaglio workout | ✅ | WorkoutDetailPage: serie, kg, reps, note, foto |
 | Foto progresso | ✅ | Camera/gallery in ActiveWorkout, salvate nel workout |
+| Achievement system | ✅ | 48 badge, tracking automatico, pagina dedicata, vetrina profilo |
+| Offline SQLite | ✅ | DatabaseService: local_workouts, cached_exercises, saved_plans, achievements |
 | CSV import/export | ✅ | Backup/ripristino dati in Settings |
+| Minimize workout | ✅ | Allenamento non finito salvato come draft, non conta per stats |
+| Push notifications | ⚠️ | PocketBase hook pronto, Firebase SDK non compatibile con .NET 10 |
 | Body tracking | ❌ | IT-04 non implementata |
 | Leaderboard | ❌ | Sostituita da feed + like |
 | Confronto diretto | ❌ | Post-MVP |
-| Test automatici | ❌ | Nessun progetto di test |
+| Test automatici | ✅ | 36 test xUnit (Converter, Model, DTO, Message)
 
 ## 5. Prossimi passi
 
-1. Valutare se implementare IT-04 (body tracking) in una nuova iterazione
-2. Importare 1.500 esercizi in PocketBase per eliminare dipendenza API
-3. Aggiungere leaderboard settimanale tra amici
-4. Implementare confronto diretto statistiche tra amici
-5. Aggiungere test automatici (unit test su ViewModel, integration test su PocketBase)
-6. Esplorare notifiche push per like e friend requests
+1. Applicare regole API PocketBase (row-level ownership) — vedi `docs/security-hardening.md`
+2. Configurare Nginx per bloccare admin panel `/_/` dall'esterno
+3. Valutare se implementare IT-04 (body tracking) in una nuova iterazione
+4. Aggiungere leaderboard settimanale tra amici
+5. Implementare confronto diretto statistiche tra amici
+6. Integrare Firebase SDK per push notification quando supporterà .NET 10
 7. Pubblicazione su Google Play Store
