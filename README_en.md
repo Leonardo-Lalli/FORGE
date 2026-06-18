@@ -6,7 +6,7 @@
 > Expect bugs, limitations, and unplanned downtime.  
 > Use for testing and demos, not for important data.
 
-[🇬🇧 English](README_en.md) · [🇮🇹 Italiano](README.md)
+[🇬🇧 English](README_en.md) · [🇮🇹 Italiano](README.md) · [🇪🇸 Español](README_es.md) · [🇨🇳 中文](README_zh.md)
 
 <img src="assets/screenshots/dashboard.jpeg" width="120" style="border-radius:24px" />
 
