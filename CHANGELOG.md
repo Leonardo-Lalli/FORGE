@@ -13,7 +13,7 @@
 - Language selection con feedback visivo (DataTrigger)
 
 ### Changed
-- PocketBase URL: `leoforge.duckdns.org` (HTTPS, Let's Encrypt)
+- PocketBase self-hosted con HTTPS e Let's Encrypt
 - Email spostata da Preferences a SecureStorage
 - `catch(Exception)` non espongono più `ex.Message` all'utente
 - `ParseErrorMessage`: fallback non restituisce più il body raw del server

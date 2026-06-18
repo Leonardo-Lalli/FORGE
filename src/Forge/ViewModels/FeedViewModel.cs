@@ -64,9 +64,53 @@ public partial class FeedViewModel : BaseViewModel
         {
             await Task.Delay(400, token);
             if (!token.IsCancellationRequested)
-                MainThread.BeginInvokeOnMainThread(() => _ = SearchUsersAsync().ContinueWith(t => { if (t.IsFaulted) System.Diagnostics.Debug.WriteLine($"[Feed Srch] ex: {t.Exception?.InnerException?.Message}"); }, TaskContinuationOptions.OnlyOnFaulted));
+                MainThread.BeginInvokeOnMainThread(() => _ = SearchUsersCoreAsync(token).ContinueWith(t => { if (t.IsFaulted) System.Diagnostics.Debug.WriteLine($"[Feed Srch] ex: {t.Exception?.InnerException?.Message}"); }, TaskContinuationOptions.OnlyOnFaulted));
         }
         catch (TaskCanceledException) { /* debounce cancelled, expected */ }
+    }
+
+    private async Task SearchUsersCoreAsync(CancellationToken ct)
+    {
+        if (string.IsNullOrWhiteSpace(SearchQuery) || SearchQuery.Length < 2) return;
+        if (!pb.IsLoggedIn) return;
+
+        IsSearching = true;
+        try
+        {
+            if (ct.IsCancellationRequested) return;
+            var followingIds = await pb.GetFollowingUserIdsAsync();
+            if (ct.IsCancellationRequested) return;
+            var results = await pb.SearchUsersAsync(SearchQuery);
+            System.Diagnostics.Debug.WriteLine($"[FeedSearch] query='{SearchQuery}' results={results.Count}");
+            SearchResults.Clear();
+            foreach (var user in results)
+            {
+                if (ct.IsCancellationRequested) return;
+                if (user.Id == pb.CurrentUser?.Id) continue;
+                System.Diagnostics.Debug.WriteLine($"[FeedSearch] user={user.Name} id={user.Id}");
+                var isFollowing = followingIds.Contains(user.Id);
+                var avatarUrl = string.IsNullOrWhiteSpace(user.Avatar) ? "" : pb.GetFileUrl(user.CollectionId, user.Id, user.Avatar);
+                SearchResults.Add(new UserSearchResult
+                {
+                    UserId = user.Id,
+                    Name = user.Name,
+                    Initial = (user.Name.Length > 0 ? user.Name[..1].ToUpper() : "?"),
+                    IsFollowing = isFollowing,
+                    FollowLabel = isFollowing ? "Following" : "Follow",
+                    AvatarUrl = avatarUrl,
+                    AvatarSource = !string.IsNullOrWhiteSpace(avatarUrl)
+                        ? ImageSource.FromUri(new Uri(avatarUrl)) : null,
+                    HasAvatar = !string.IsNullOrWhiteSpace(user.Avatar)
+                });
+            }
+            HasSearchResults = SearchResults.Count > 0;
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[FeedSearch] ex={ex.Message}");
+            ErrorMessage = "Errore ricerca utenti.";
+        }
+        finally { IsSearching = false; }
     }
     [ObservableProperty] private bool isSearching;
     [ObservableProperty] private bool isFeedBusy;
@@ -148,43 +192,7 @@ public partial class FeedViewModel : BaseViewModel
     [RelayCommand]
     private async Task SearchUsersAsync()
     {
-        if (string.IsNullOrWhiteSpace(SearchQuery) || SearchQuery.Length < 2) return;
-        if (!pb.IsLoggedIn) return;
-
-        IsSearching = true;
-        try
-        {
-            var followingIds = await pb.GetFollowingUserIdsAsync();
-            var results = await pb.SearchUsersAsync(SearchQuery);
-            System.Diagnostics.Debug.WriteLine($"[FeedSearch] query='{SearchQuery}' results={results.Count}");
-            SearchResults.Clear();
-            foreach (var user in results)
-            {
-                if (user.Id == pb.CurrentUser?.Id) continue;
-                System.Diagnostics.Debug.WriteLine($"[FeedSearch] user={user.Name} id={user.Id}");
-                var isFollowing = followingIds.Contains(user.Id);
-                var avatarUrl = string.IsNullOrWhiteSpace(user.Avatar) ? "" : pb.GetFileUrl(user.CollectionId, user.Id, user.Avatar);
-                SearchResults.Add(new UserSearchResult
-                {
-                    UserId = user.Id,
-                    Name = user.Name,
-                    Initial = (user.Name.Length > 0 ? user.Name[..1].ToUpper() : "?"),
-                    IsFollowing = isFollowing,
-                    FollowLabel = isFollowing ? "Following" : "Follow",
-                    AvatarUrl = avatarUrl,
-                    AvatarSource = !string.IsNullOrWhiteSpace(avatarUrl)
-                        ? ImageSource.FromUri(new Uri(avatarUrl)) : null,
-                    HasAvatar = !string.IsNullOrWhiteSpace(user.Avatar)
-                });
-            }
-            HasSearchResults = SearchResults.Count > 0;
-        }
-        catch (Exception ex)
-        {
-            System.Diagnostics.Debug.WriteLine($"[FeedSearch] ex={ex.Message}");
-            ErrorMessage = "Errore ricerca utenti.";
-        }
-        finally { IsSearching = false; }
+        await SearchUsersCoreAsync(CancellationToken.None);
     }
 
     [RelayCommand]

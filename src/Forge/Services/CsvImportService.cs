@@ -15,17 +15,33 @@ public class CsvImportService
         this.pb = pb;
     }
 
+    private const int MaxCsvBytes = 2 * 1024 * 1024; // 2MB
+    private const int MaxCsvRows = 1000;
+
     public async Task<(int Imported, int Skipped, List<string> Errors)> ImportFromCsvAsync(string csvContent, string userId, string userName)
     {
         var imported = 0;
         var skipped = 0;
         var errors = new List<string>();
 
+        if (string.IsNullOrWhiteSpace(csvContent) || csvContent.Length > MaxCsvBytes)
+        {
+            errors.Add(csvContent.Length > MaxCsvBytes
+                ? $"CSV troppo grande (max {MaxCsvBytes / 1024 / 1024}MB)."
+                : "CSV vuoto.");
+            return (0, 0, errors);
+        }
+
         var lines = csvContent.Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
         if (lines.Length < 2)
         {
             errors.Add("CSV vuoto o con sola intestazione.");
             return (0, lines.Length, errors);
+        }
+        if (lines.Length > MaxCsvRows)
+        {
+            errors.Add($"CSV contiene {lines.Length} righe (max {MaxCsvRows}).");
+            return (0, 0, errors);
         }
 
         var header = lines[0].ToLowerInvariant().Split(',');

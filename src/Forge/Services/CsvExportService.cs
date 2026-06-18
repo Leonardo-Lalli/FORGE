@@ -24,12 +24,15 @@ public class CsvExportService
 
             foreach (var ex in exercises)
             {
-                sb.AppendLine($"\"{w.Date}\",\"{w.Name}\",\"{ex}\",1,0,0,\"{w.Notes}\"");
+                sb.AppendLine($"\"{EscapeCsv(w.Date)}\",\"{EscapeCsv(w.Name)}\",\"{EscapeCsv(ex)}\",1,0,0,\"{EscapeCsv(w.Notes)}\"");
             }
         }
 
         return sb.ToString();
     }
+
+    private static string EscapeCsv(string value) =>
+        (value ?? "").Replace("\"", "\"\"");
 
     public async Task SaveCsvFileAsync(string userId)
     {

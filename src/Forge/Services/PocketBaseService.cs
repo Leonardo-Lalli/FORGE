@@ -39,7 +39,10 @@ public class PocketBaseService
     public string GetFileUrl(string collectionId, string recordId, string fileName)
     {
         var pbUrl = secrets.Get("POCKETBASE_URL")?.TrimEnd('/') ?? "";
-        return $"{pbUrl}/api/files/{collectionId}/{recordId}/{fileName}";
+        var url = $"{pbUrl}/api/files/{collectionId}/{recordId}/{fileName}";
+        if (!string.IsNullOrWhiteSpace(token))
+            url += $"?token={Uri.EscapeDataString(token)}";
+        return url;
     }
 
     public PocketBaseService(IHttpClientFactory httpFactory, BuildSecrets secrets)
@@ -52,6 +55,22 @@ public class PocketBaseService
     {
         if (!string.IsNullOrWhiteSpace(token)) return;
         await TryAutoLoginAsync();
+    }
+
+    private async Task<bool> TryHandle401Async(HttpResponseMessage response)
+    {
+        if (response.StatusCode != System.Net.HttpStatusCode.Unauthorized)
+            return false;
+        if (string.IsNullOrWhiteSpace(token))
+            return false;
+
+        System.Diagnostics.Debug.WriteLine("[PB] 401 received, attempting token refresh...");
+        var refreshed = await RefreshTokenAsync();
+        if (refreshed)
+            System.Diagnostics.Debug.WriteLine("[PB] Token refreshed successfully after 401.");
+        else
+            System.Diagnostics.Debug.WriteLine("[PB] Token refresh failed after 401.");
+        return refreshed;
     }
 
     private async Task<bool> RefreshTokenAsync()
@@ -355,21 +374,36 @@ public class PocketBaseService
 
     public async Task<bool> TryAutoLoginAsync()
     {
-        string? email;
+        string? email = null;
         try { email = await SecureStorage.GetAsync("pb_email"); }
-        catch { email = null; }
+        catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[PB AutoLogin] SecureStorage email err: {ex.Message}"); }
+
         if (string.IsNullOrWhiteSpace(email))
-            email = Preferences.Get("pb_email", string.Empty); // migration from old version
+        {
+            email = Preferences.Get("pb_email", string.Empty);
+            if (!string.IsNullOrWhiteSpace(email))
+            {
+                try { await SecureStorage.SetAsync("pb_email", email); }
+                catch { }
+                Preferences.Remove("pb_email");
+            }
+        }
         if (string.IsNullOrWhiteSpace(email)) return false;
 
-        string? password;
+        string? password = null;
         try { password = await SecureStorage.GetAsync("pb_password"); }
-        catch { password = null; }
+        catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[PB AutoLogin] SecureStorage pw err: {ex.Message}"); }
 
-        // Clean up old Preferences fallback if it exists (previous version bug)
-        if (!string.IsNullOrWhiteSpace(Preferences.Get("pb_password", string.Empty)))
-            Preferences.Remove("pb_password");
-
+        if (string.IsNullOrWhiteSpace(password))
+        {
+            password = Preferences.Get("pb_password", string.Empty);
+            if (!string.IsNullOrWhiteSpace(password))
+            {
+                try { await SecureStorage.SetAsync("pb_password", password); }
+                catch { }
+                Preferences.Remove("pb_password");
+            }
+        }
         if (string.IsNullOrWhiteSpace(password)) return false;
 
         var (success, _) = await LoginAsync(email, password);
@@ -573,6 +607,15 @@ public class PocketBaseService
             var request = new HttpRequestMessage(HttpMethod.Get, url);
             request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
             var response = await GetHttp().SendAsync(request);
+            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                if (await TryHandle401Async(response))
+                {
+                    request = new HttpRequestMessage(HttpMethod.Get, url);
+                    request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                    response = await GetHttp().SendAsync(request);
+                }
+            }
             var body = await response.Content.ReadAsStringAsync();
             System.Diagnostics.Debug.WriteLine($"[PB MyWorkouts] status={response.StatusCode} bodyLen={body.Length}");
             if (!response.IsSuccessStatusCode)
@@ -732,6 +775,15 @@ public class PocketBaseService
             var request = new HttpRequestMessage(HttpMethod.Get, url);
             request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
             var response = await GetHttp().SendAsync(request);
+            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                if (await TryHandle401Async(response))
+                {
+                    request = new HttpRequestMessage(HttpMethod.Get, url);
+                    request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                    response = await GetHttp().SendAsync(request);
+                }
+            }
             var body = await response.Content.ReadAsStringAsync();
             if (!response.IsSuccessStatusCode)
             {

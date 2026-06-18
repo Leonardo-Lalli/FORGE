@@ -36,7 +36,8 @@ public static class MauiProgram
         builder.Services.AddSingleton<DatabaseService>();
         builder.Services.AddSingleton<ConnectivityService>();
 
-        builder.Services.AddHttpClient("pocketbase");
+        builder.Services.AddHttpClient("pocketbase")
+            .ConfigurePrimaryHttpMessageHandler(() => new CertificatePinningHandler());
         builder.Services.AddHttpClient("exercisedbv1");
         builder.Services.AddSingleton(sp =>
         {

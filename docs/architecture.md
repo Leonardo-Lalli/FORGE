@@ -26,11 +26,17 @@ src/Forge/
 │       └── ExerciseDbDto.cs        # DTO per ExerciseDB API
 ├── Services/
 │   ├── PocketBaseService.cs        # Auth, CRUD, social, file, like notifications
-│   ├── ExerciseApiService.cs       # HTTP ExerciseDB, cache PocketBase, resolve URL immagini
+│   ├── ExerciseDbApiService.cs     # HTTP ExerciseDB, cache SQLite/PocketBase
 │   ├── ThemeService.cs             # Palette dark/light inline, Apply(), WriteResources()
 │   ├── BuildSecrets.cs             # .env → Dictionary, ConcurrentDictionary
 │   ├── WorkoutSession.cs           # Sessione allenamento attivo
-│   └── PlanStore.cs                # CRUD piani su Preferences (JSON)
+│   ├── PlanService.cs              # CRUD piani su SQLite (migrato da Preferences)
+│   ├── DatabaseService.cs          # SQLite 4 tabelle
+│   ├── SyncService.cs              # Sync offline→online
+│   ├── ConnectivityService.cs      # Monitoraggio rete
+│   ├── AchievementService.cs       # Tracking 48 badge
+│   ├── CsvImportService.cs         # Import CSV validato
+│   └── CsvExportService.cs         # Export CSV con escape
 ├── ViewModels/
 │   ├── BaseViewModel.cs            # IsBusy, ErrorMessage, HasData, IsEmptyState
 │   ├── HomeViewModel.cs            # Dashboard: streak, squad, open profile/feed/settings
@@ -55,9 +61,7 @@ src/Forge/
 │   ├── FriendRequestsPage.xaml(.cs)# Notifiche
 │   └── SettingsPage.xaml(.cs)      # Impostazioni
 ├── Converters/
-│   ├── InverseBoolConverter.cs
-│   ├── BoolToVisibilityConverter.cs
-│   └── DateTimeFormatConverter.cs
+│   └── InverseBoolConverter.cs
 └── Resources/
     ├── Styles/Styles.xaml          # Stili globali
     ├── Fonts/                      # Inter, Lexend, Space Grotesk, OpenSans

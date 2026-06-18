@@ -491,3 +491,8 @@ docs/iterations/
 docs/method/
 AGENTS.md
 docs/security-hardening.md
+
+# Build output (APK/AAB)
+*.apk
+*.aab
+*.apks

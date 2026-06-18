@@ -268,6 +268,66 @@ Abbiamo condotto un audit di sicurezza completo (18 vulnerabilità identificate)
 
 ---
 
+### IT-SEC-02 — Secondo Audit e Fix Funzionali ✅
+**Data**: 18 giugno 2026 — **Branch**: `feature/achievements-fix`
+
+Secondo audit di sicurezza approfondito con focus su bug funzionali (avatar/achievement non visibili) e hardening backend.
+
+**Fix applicati nel codice:**
+
+| # | Severità | Fix | File |
+|---|----------|-----|------|
+| 1 | CRIT | `GetFileUrl()` ora include `?token=` per autenticare le richieste file PocketBase | `PocketBaseService.cs:39-45` |
+| 2 | CRIT | Icone achievement: rimosso prefisso `achievements/` per compatibilità MAUI | `Achievement.cs` (48 righe) |
+| 3 | HIGH | `.env` copiato nell'APK solo in Debug, non in Release | `Forge.csproj:65` |
+| 4 | HIGH | `TryAutoLoginAsync`: migrazione Preferences→SecureStorage one-shot, poi solo SecureStorage | `PocketBaseService.cs:356-385` |
+| 5 | HIGH | Foto workout: limite raw ridotto a 3MB per evitare overflow base64 su PocketBase | `ActiveWorkoutViewModel.cs:127-138` |
+| 6 | MEDIUM | Auto-refresh token JWT su risposta 401 in `GetFollowedWorkoutsAsync` e `TryFetchWorkoutsAsync` | `PocketBaseService.cs` |
+| 7 | MEDIUM | Ricerca utenti con CancellationToken per prevenire race condition | `FeedViewModel.cs:56-110` |
+| 8 | MEDIUM | Ricerca esercizi con CancellationToken per cancellare richieste obsolete | `ActiveWorkoutViewModel.cs:149-167` |
+| 9 | MEDIUM | CSV import: validazione dimensione (2MB) e numero righe (1000 max) | `CsvImportService.cs:18-32` |
+| 10 | MEDIUM | CSV export: escape virgolette doppie nei valori | `CsvExportService.cs:34-35` |
+
+**Da configurare sul server (PocketBase Admin UI):**
+
+| # | Azione |
+|---|--------|
+| 1 | Aggiornare API Rules `logged_workouts` con row-level ownership (`user = @request.auth.id`) |
+| 2 | Aggiornare API Rules `social_graph` con controllo `from_user`/`to_user` |
+| 3 | Impostare API Rules `excercise`: solo admin può Update/Delete |
+| 4 | Impostare API Rules `users`: solo admin può Delete, solo owner può Update |
+| 5 | Configurare Nginx: bloccare `/_/`, rate limit auth 5r/m, security headers |
+
+**Da configurare sul server (Nginx):**
+Vedi la sezione "Backend Hardening" qui sotto per la configurazione completa.
+
+---
+
+### IT-SEC-03 — Certificate Pinning e Pulizia Finale ✅
+**Data**: 18 giugno 2026 — **Branch**: `feature/achievements-fix`
+
+Terzo audit: implementato certificate pinning e corretti dati obsoleti nei documenti.
+
+**Fix applicati:**
+
+| # | Fix | File |
+|---|-----|------|
+| 1 | Certificate pinning: validazione catena Let's Encrypt per HttpClient PocketBase | `CertificatePinningHandler.cs` (nuovo) |
+| 2 | Dominio reale rimosso da `CHANGELOG.md` | `CHANGELOG.md:16` |
+| 3 | `FORGE.apk` rimosso da Git, aggiunto a `.gitignore` | `.gitignore`, staging |
+| 4 | Metriche README corrette: 27 test, 1 converter, link APK→Releases | `README.md` |
+| 5 | `architecture.md`: service names aggiornati (`PlanService`, `ExerciseDbApiService`) | `docs/architecture.md` |
+| 6 | Badge DuckDNS aggiunto nei README | `README.md` |
+| 7 | Tabella stato funzionalità (✅🟡🔴🚧) aggiunta | `README.md` |
+
+**Certificate Pinning — come funziona:**
+- `CertificatePinningHandler` estende `HttpClientHandler`
+- Valida che il certificato server sia emesso da Let's Encrypt (root ISRG Root X1/X2 o intermediate R3-R10, E5-E10)
+- Rifiuta certificati auto-firmati, scaduti, o emessi da altre CA
+- Protegge da MITM su Wi-Fi pubblici compromessi
+
+---
+
 ### Push Notifications (parziale) ⚠️
 **Data**: Giugno 2026 — **Branch**: `feature/test-import-fcm`
 
@@ -420,62 +480,179 @@ Login → Dashboard → Start Session → Active Workout → Finish → Stats/Pr
 
 | Metrica | Valore |
 |---------|--------|
-| Iterazioni completate | 12 |
+| Iterazioni completate | 15 |
 | Pagine XAML | 10 |
 | ViewModel | 12 |
-| Services | 11 |
+| Services | 13 |
 | Modelli/DTO | 6 |
 | Tabelle SQLite | 4 |
 | Collezioni PocketBase | 4 |
 | Achievement | 48 (38 con badge Canva) |
-| Test automatici | 36 (100% passati) |
+| Test automatici | 27 (100% passati) |
 | Font | 5 (Inter, Lexend, Space Grotesk, OpenSans Regular+Semibold) |
-| Converter | 3 |
+| Converter | 1 |
 
 ---
 
 ## 6. Sicurezza e Hardening
 
-Abbiamo condotto un audit di sicurezza con 18 vulnerabilità identificate. Ecco lo stato attuale:
+Due audit di sicurezza completati (IT-SEC-01 e IT-SEC-02). Totale 28 vulnerabilità identificate, tutte risolte lato codice. Ecco lo stato attuale:
 
 ### Fix Applicati nel Codice ✅
 
 | # | Severità | Fix |
 |---|----------|-----|
 | 1 | CRIT | API key ExerciseDB rimossa da APK e file sorgente |
-| 2 | HIGH | URL hardcoded rimosso → eccezione se non configurato |
-| 3 | HIGH | Password: solo SecureStorage, nessun fallback Preferences |
-| 4 | HIGH | Token JWT rimosso da URL query parameter |
-| 5 | HIGH | `android:allowBackup=false` (blocca backup automatico) |
-| 6 | MED | Logout pulisce anche vecchie password in Preferences |
+| 2 | CRIT | Avatar e file PocketBase: `GetFileUrl()` include `?token=` per autenticazione |
+| 3 | CRIT | Icone achievement: rimosso prefisso `achievements/` per compatibilità MAUI |
+| 4 | HIGH | URL hardcoded rimosso → eccezione se non configurato |
+| 5 | HIGH | Password: solo SecureStorage, migrazione one-shot da Preferences |
+| 6 | HIGH | `.env` NON copiato nell'APK in Release (solo Debug) |
+| 7 | HIGH | Token JWT non più esposto in URL non necessari |
+| 8 | HIGH | `android:allowBackup=false` (blocca backup automatico) |
+| 9 | HIGH | Foto workout: limite ridotto a 3MB per prevenire overflow JSON PocketBase |
+| 10 | MEDIUM | Auto-refresh token JWT su risposta 401 in endpoint critici |
+| 11 | MEDIUM | Ricerca utenti ed esercizi con CancellationToken (no race condition) |
+| 12 | MEDIUM | CSV import: validazione dimensione (2MB) e righe (1000 max) |
+| 13 | MEDIUM | CSV export: escape virgolette doppie nei valori |
+| 14 | MEDIUM | Logout pulisce anche vecchie password in Preferences |
 
 ### Da Applicare sul Server 📋
 
-| # | Severità | Azione | File di riferimento |
-|---|----------|--------|---------------------|
-| 11 | LOW | Ruotare chiave ExerciseDB su RapidAPI (se ancora attiva) | rapidapi.com |
+**Per istruzioni complete, vedi la sezione [#backend-hardening](#backend-hardening-pocketbase--nginx) in fondo a questo documento.**
+
+| # | Azione | Dove |
+|---|--------|------|
+| 1 | API Rules `logged_workouts`: `user = @request.auth.id` | PocketBase Admin UI |
+| 2 | API Rules `social_graph`: controllo `from_user`/`to_user` | PocketBase Admin UI |
+| 3 | API Rules `excercise`: solo admin Update/Delete | PocketBase Admin UI |
+| 4 | API Rules `users`: solo owner Update, solo admin Delete | PocketBase Admin UI |
+| 5 | Nginx: bloccare `/_/`, rate limit auth, security headers | Nginx Proxy Manager |
 
 ---
 
 ## 7. Prossimi Passi
 
 ### Immediato (questa settimana)
-2. Configurare Nginx per bloccare admin panel e aggiungere rate limiting
+1. ~~**Configurare backend**: API Rules PocketBase + Nginx hardening~~ ✅ COMPLETATO (18 giugno 2026)
 
 ### Breve termine
-3. Body tracking (peso e misure corporee) — IT-04
-4. Leaderboard settimanale tra amici
-5. Compressione foto workout (limite dimensione upload)
-6. Feedback visivo per language selection in Settings
+2. Body tracking (peso e misure corporee) — IT-04
+3. Leaderboard settimanale tra amici
+4. Compressione foto workout lato server
+5. Feedback visivo per language selection in Settings
 
 ### Medio termine
-7. Token refresh automatico PocketBase
-8. Confronto diretto statistiche con amico
-9. PDF export report allenamenti
+6. Certificate pinning per HttpClient PocketBase
+7. Confronto diretto statistiche con amico
+8. PDF export report allenamenti
 
 ### Lungo termine (bloccato da dipendenze esterne)
-10. Notifiche push FCM (in attesa di supporto .NET 10 per Firebase SDK)
-11. Pubblicazione su Google Play Store
+9. Notifiche push FCM (in attesa di supporto .NET 10 per Firebase SDK)
+10. Pubblicazione su Google Play Store
+
+---
+
+## 8. Backend Hardening — PocketBase + Nginx
+
+Configurazioni da applicare sul server per completare la messa in sicurezza.
+
+### API Rules PocketBase
+
+Apri **PocketBase Admin UI → Collections → [collezione] → Edit → API Rules** e imposta:
+
+#### logged_workouts
+
+```
+List/Search: @request.auth.id != "" && user = @request.auth.id
+View:        @request.auth.id != ""
+Create:      @request.auth.id != "" && user = @request.auth.id
+Update:      @request.auth.id != "" && (user = @request.auth.id || @request.auth.id ?= liked_by)
+Delete:      @request.auth.id != "" && user = @request.auth.id
+```
+
+#### social_graph
+
+```
+List/Search: @request.auth.id != "" && (from_user = @request.auth.id || to_user = @request.auth.id)
+View:        @request.auth.id != "" && (from_user = @request.auth.id || to_user = @request.auth.id)
+Create:      @request.auth.id != "" && from_user = @request.auth.id
+Update:      @request.auth.id != "" && (from_user = @request.auth.id || to_user = @request.auth.id)
+Delete:      @request.auth.id != "" && (from_user = @request.auth.id || to_user = @request.auth.id)
+```
+
+#### excercise (catalogo pubblico)
+
+```
+List/Search: @request.auth.id != ""
+View:        @request.auth.id != ""
+Create:      @request.auth.id != ""
+Update:      @request.auth.id = ""
+Delete:      @request.auth.id = ""
+```
+
+#### users
+
+```
+List/Search: @request.auth.id != ""
+View:        @request.auth.id != ""
+Update:      @request.auth.id != "" && id = @request.auth.id
+Delete:      @request.auth.id = ""
+```
+
+### Configurazione Nginx
+
+Aggiungi al file di configurazione Nginx (Nginx Proxy Manager → Edit Proxy Host → Advanced):
+
+```nginx
+# Blocca PocketBase Admin Panel da accesso esterno
+location /_/ {
+    deny all;
+    return 403;
+}
+
+# Rate limiting per auth endpoint
+limit_req_zone $binary_remote_addr zone=auth:10m rate=5r/m;
+
+location /api/collections/users/auth-with-password {
+    limit_req zone=auth burst=3 nodelay;
+    proxy_pass http://pocketbase:8090;
+}
+
+# Rate limiting per API generica
+limit_req_zone $binary_remote_addr zone=api:10m rate=60r/m;
+
+location /api/ {
+    limit_req zone=api burst=20 nodelay;
+    proxy_pass http://pocketbase:8090;
+}
+
+# Security headers globali
+add_header Strict-Transport-Security "max-age=63072000; includeSubDomains" always;
+add_header X-Content-Type-Options "nosniff" always;
+add_header X-Frame-Options "DENY" always;
+add_header X-XSS-Protection "1; mode=block" always;
+
+# Limite dimensione upload (foto, avatar)
+client_max_body_size 5m;
+
+# Nascondi versione server
+server_tokens off;
+```
+
+### PocketBase serve HTTPS
+
+Assicurati che PocketBase sia avviato solo su HTTPS:
+
+```bash
+./pocketbase serve --https=0.0.0.0:8090
+```
+
+NON usare `--http` in produzione. Blocca la porta HTTP nel firewall:
+
+```bash
+ufw deny 8080
+```
 
 ---
 

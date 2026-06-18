@@ -125,9 +125,9 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
     private async Task AddPhotoFromFileAsync(FileResult file)
     {
         using var stream = await file.OpenReadAsync();
-        if (stream.Length > 5 * 1024 * 1024) // 5MB max
+        if (stream.Length > 3 * 1024 * 1024) // 3MB raw max
         {
-            ShowNotification("Foto troppo grande (max 5MB).");
+            ShowNotification("Foto troppo grande (max 3MB).");
             return;
         }
         using var ms = new MemoryStream();
@@ -157,7 +157,7 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
             {
                 await Task.Delay(400, token);
                 if (!token.IsCancellationRequested)
-                    MainThread.BeginInvokeOnMainThread(() => _ = SearchExercisesAsync());
+                    MainThread.BeginInvokeOnMainThread(() => _ = SearchExercisesWithCancellationAsync(token));
             }, token).ContinueWith(t =>
             {
                 if (t.IsFaulted && t.Exception != null)
@@ -387,17 +387,24 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
     [RelayCommand]
     private async Task SearchExercisesAsync()
     {
+        await SearchExercisesWithCancellationAsync(CancellationToken.None);
+    }
+
+    private async Task SearchExercisesWithCancellationAsync(CancellationToken ct)
+    {
         if (string.IsNullOrWhiteSpace(SearchQuery) || SearchQuery.Length < 2)
         {
             SearchError = "Digita almeno 2 caratteri.";
             return;
         }
 
+        if (ct.IsCancellationRequested) return;
         SearchError = string.Empty;
         IsSearchingApi = true;
         try
         {
             var results = await exerciseDbApi.SearchAsync(SearchQuery);
+            if (ct.IsCancellationRequested) return;
 
             SearchResults.Clear();
             if (results.Count == 0)
@@ -408,6 +415,7 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
             {
                 foreach (var r in results.Take(10))
                 {
+                    if (ct.IsCancellationRequested) break;
                     SearchResults.Add(new ExerciseSearchResult
                     {
                         Id = r.Id,

@@ -75,7 +75,7 @@
  	</ItemGroup>
 
 	<!-- Build-time secrets injection: copy .env to Resources/Raw/forge.env -->
-	<Target Name="CopyEnvFile" BeforeTargets="BeforeBuild">
+	<Target Name="CopyEnvFile" BeforeTargets="BeforeBuild" Condition="'$(Configuration)' == 'Debug'">
 		<Copy SourceFiles="..\..\.env" DestinationFiles="Resources\Raw\forge.env" Condition="Exists('..\..\.env')" SkipUnchangedFiles="true" />
 	</Target>
 

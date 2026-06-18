@@ -16,9 +16,10 @@
 
 [![.NET MAUI](https://img.shields.io/badge/.NET%20MAUI-Android--first-512BD4?logo=dotnet)](https://learn.microsoft.com/dotnet/maui/)
 [![PocketBase](https://img.shields.io/badge/PocketBase-Backend-000000?logo=pocketbase)](https://pocketbase.io/)
+[![DuckDNS](https://img.shields.io/badge/DuckDNS-DDNS-FF5722?logo=duckdns)](https://duckdns.org)
 [![ExerciseDB](https://img.shields.io/badge/ExerciseDB-1.500%2B%20esercizi-22C55E)](https://oss.exercisedb.dev)
 [![MVVM](https://img.shields.io/badge/Architecture-MVVM%20%7C%20CommunityToolkit-7C3AED)](https://learn.microsoft.com/dotnet/communitytoolkit/mvvm/)
-[![Tests](https://img.shields.io/badge/Tests-36%20passed-brightgreen)](tests/)
+[![Tests](https://img.shields.io/badge/Tests-27%20passed-brightgreen)](tests/)
 [![License](https://img.shields.io/badge/License-MIT-blue)](LICENSE)
 
 **Trasforma ogni ripetizione in progresso. Sfida i tuoi amici. Supera i tuoi limiti.**
@@ -39,19 +40,25 @@ FORGE è un'app Android per il tracking degli allenamenti in palestra, con un'an
 
 ---
 
-## Funzionalità
+## Stato del Progetto
 
-| Categoria | Feature |
-|-----------|---------|
-| 🏋️ **Allenamento** | Ricerca esercizi (1.500+ con GIF), serie kg×reps, checkmark completamento, rest timer, foto progresso, minimize/draft |
-| 📊 **Statistiche** | Grafico volume, top lifts, calendario mensile, filtri WEEK/MONTH/3M/YEAR/ALL |
-| 👥 **Social** | Feed amici, like ♥, follow/unfollow, ricerca utenti live, richieste di amicizia |
-| 🏆 **Achievement** | 48 badge da sbloccare, tracking automatico, vetrina nel profilo |
-| 👤 **Profilo** | Avatar, bio, statistiche, storico allenamenti, badge sbloccati |
-| 🎨 **UI** | Doppio tema chiaro/scuro, font Inter/Lexend/Space Grotesk, design Stitch |
-| 📱 **Offline** | SQLite locale con sync automatico quando torna la connessione |
-| 📁 **CSV** | Import/export allenamenti per backup |
-| 🔒 **Sicurezza** | SecureStorage per password, HTTPS, API rules row-level, admin panel bloccato |
+| Stato | Categoria | Dettaglio |
+|:-----:|-----------|-----------|
+| ✅ | 🏋️ Allenamento | Ricerca 1.500+ esercizi con GIF, serie kg×reps, checkmark, rest timer, minimize/draft |
+| ✅ | 📊 Statistiche | Grafico volume, top lifts, calendario, filtri WEEK/MONTH/3M/YEAR/ALL |
+| ✅ | 👥 Social | Feed amici, like ♥, follow/unfollow, ricerca utenti live, richieste amicizia |
+| ✅ | 🏆 Achievement | 48 badge con tracking automatico, vetrina profilo |
+| ✅ | 👤 Profilo | Avatar con upload, bio, storico allenamenti, badge sbloccati |
+| ✅ | 🎨 Tema | Doppio tema chiaro/scuro, font Inter/Lexend/SpaceGrotesk |
+| ✅ | 📱 Offline | SQLite locale + sync automatico quando torna la connessione |
+| ✅ | 📁 CSV | Import/export allenamenti con validazione |
+| ✅ | 🔒 Sicurezza | Certificate pinning, HTTPS, SecureStorage, API rules row-level, rate limiting, admin bloccato |
+| 🟡 | 🖼️ Foto workout | Supportate (max 3MB, base64 nel record). Nessuna compressione server-side |
+| 🟡 | 📡 Connessione | L'app richiede rete per login e ricerca nuovi esercizi. Cache locale per esercizi già visti |
+| 🔴 | 🔔 Notifiche push | Non ancora implementate (Firebase SDK non supporta .NET 10). Le notifiche sono pull (apri l'app per vederle) |
+| 🔴 | ⚖️ Body tracking | Peso corporeo e misure non ancora implementati |
+| 🔴 | 🏅 Leaderboard | Classifica tra amici non implementata (sostituita da feed + like) |
+| 🚧 | 🛡️ Cert pinning | Implementato lato client; da testare sul server reale |
 
 ---
 
@@ -101,16 +108,19 @@ FORGE è un'app Android per il tracking degli allenamenti in palestra, con un'an
 | Backend | PocketBase self-hosted (auth, social, storage) |
 | API | ExerciseDB v1 (1.500+ esercizi, gratuito) |
 | Persistenza | SQLite (sqlite-net-pcl) |
-| Test | xUnit (36 test) |
+| Test | xUnit (27 test) |
 | Font | Inter, Lexend, Space Grotesk (Google Fonts) |
 
 ---
 
 ## Download APK
 
-L'APK Release compilato è disponibile nella root del repository:
+L'APK Release è disponibile nella sezione [Releases](https://github.com/USERNAME/FORGE/releases) di GitHub.
 
-📦 **[FORGE.apk](FORGE.apk)**
+Per compilare l'APK da sorgente:
+```bash
+dotnet publish src/Forge/Forge.csproj -f net10.0-android -c Release /p:AndroidPackageFormats=apk
+```
 
 > Richiede Android 7.0+ e connessione Internet per le API.
 
@@ -151,15 +161,14 @@ dotnet publish src/Forge/Forge.csproj -f net10.0-android -c Release /p:AndroidPa
 │   ├── Models/                  # Entità dominio + DTO
 │   ├── ViewModels/              # MVVM ViewModels (12)
 │   ├── Views/                   # XAML Views (10)
-│   ├── Services/                # Business logic (11)
-│   ├── Converters/              # Value converters (3)
+│   ├── Services/                # Business logic (13)
+│   ├── Converters/              # Value converters (1)
 │   └── Resources/               # Stili, font, immagini
 ├── tests/Forge.Tests/  # Test xUnit (36)
 ├── tools/
 │   ├── ExerciseImporter/        # Import esercizi su PocketBase
 │   └── pb_hooks/                # Hook PocketBase (FCM)
-├── docs/                        # Documentazione
-└── FORGE.apk                    # APK Release
+└── docs/                        # Documentazione
 ```
 
 ### Branch
@@ -198,10 +207,10 @@ Vedi [`PRIVACY.md`](PRIVACY.md) per i dettagli completi.
 | Misura | Dettaglio |
 |--------|-----------|
 | Password | Cifrata con SecureStorage (Android Keystore) |
-| Connessione | HTTPS con Let's Encrypt |
+| Connessione | HTTPS con Let's Encrypt + certificate pinning |
 | Database remoto | API rules row-level (ogni utente vede solo i propri dati) |
-| Admin panel | Bloccato da accesso esterno |
-| Rate limiting | 5 tentativi login/minuto |
+| Admin panel | Bloccato da accesso esterno (403) |
+| Rate limiting | 5 tentativi login/minuto, 60 req/min API |
 | Backup Android | Disabilitato (`allowBackup=false`) |
 
 ## Disclaimer
