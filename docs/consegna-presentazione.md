@@ -233,7 +233,7 @@ Crea una **presentazione professionale** in formato Google Slides (o PowerPoint)
 ### Slide 16 — Chiusura
 **Titolo:** FORGE — Costruisci il tuo fisico. Sfida i tuoi amici. Forgia la tua leggenda.
 **Contenuto:**
-- Link al repository: `github.com/Leonardo-Lalli/FORGE`
+- Link al repository: `github.com/USERNAME/FORGE`
 - Stack: .NET MAUI + PocketBase + ExerciseDB v1 + SQLite
 - Metodo: Man-in-the-Loop con AI (OpenCode + Gemini)
 - Ringraziamenti
@@ -263,13 +263,13 @@ Crea una **presentazione professionale** in formato Google Slides (o PowerPoint)
 FORGE — Il tuo diario di allenamento sociale
 
 ### Repository
-github.com/Leonardo-Lalli/FORGE (privato)
+github.com/USERNAME/FORGE (privato)
 
 ### Framework
 .NET MAUI 10, Android-first, MVVM con CommunityToolkit.Mvvm, Shell navigation
 
 ### Backend
-PocketBase self-hosted (https://pocketbase.server-casa-leo.duckdns.org) per auth, social graph, workout storage
+PocketBase self-hosted (https://YOUR_SERVER.duckdns.org) per auth, social graph, workout storage
 
 ### API
 ExerciseDB v1 free (oss.exercisedb.dev) — 1.500+ esercizi con GIF, filtri per muscolo/attrezzatura, senza API key

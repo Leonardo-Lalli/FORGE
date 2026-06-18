@@ -95,9 +95,10 @@ public class CsvImportService
                     sets = new[] { new { setNumber = 1, weightKg, reps, isCompleted = true } }
                 });
             }
-            catch (Exception ex)
-            {
-                errors.Add($"Riga {i + 1}: {ex.Message}");
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"[CsvImport] Row {i + 1} failed: {ex}");
+                    errors.Add($"Riga {i + 1}: Errore durante l'importazione.");
             }
         }
 

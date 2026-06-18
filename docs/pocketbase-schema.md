@@ -4,7 +4,7 @@
 
 ### Passaggi (Admin UI PocketBase)
 
-1. Apri PocketBase Admin: `https://pocketbase.server-casa-leo.duckdns.org/_/`
+1. Apri PocketBase Admin: `https://YOUR_SERVER.duckdns.org/_/`
 2. Autenticati con email/password admin
 3. Vai su **Collections** → **logged_workouts**
 4. Clicca **Edit collection** (icona matita)

@@ -17,7 +17,7 @@ App .NET MAUI Android-first per tracciare allenamenti in palestra, con catalogo 
 ### Dipendenze esterne
 
 - ExerciseDB API (RapidAPI key via `.env`)
-- PocketBase self-hosted (`https://pocketbase.server-casa-leo.duckdns.org`)
+- PocketBase self-hosted (`https://YOUR_SERVER.duckdns.org`)
 - Google Fonts (Inter, Lexend, Space Grotesk — inclusi nell'app)
 
 ## 2. Sequenza delle iterazioni

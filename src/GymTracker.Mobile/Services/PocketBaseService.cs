@@ -34,7 +34,7 @@ public class PocketBaseService
 
     public bool IsLoggedIn => !string.IsNullOrWhiteSpace(token);
     public PocketBaseUserRecord? CurrentUser => currentUser;
-    public string? Token => token;
+    internal string? Token => token;
 
     public string GetFileUrl(string collectionId, string recordId, string fileName)
     {
@@ -92,7 +92,7 @@ public class PocketBaseService
         }
         catch (Exception ex)
         {
-            return (false, $"Errore: {ex.Message}");
+            System.Diagnostics.Debug.WriteLine($"[PB Login] ex: {ex.Message}"); return (false, "Errore di autenticazione.");
         }
     }
 
@@ -125,7 +125,7 @@ public class PocketBaseService
         }
         catch (Exception ex)
         {
-            return (false, $"Errore: {ex.Message}");
+            System.Diagnostics.Debug.WriteLine($"[PB Login] ex: {ex.Message}"); return (false, "Errore di autenticazione.");
         }
     }
 
@@ -136,7 +136,7 @@ public class PocketBaseService
         Preferences.Remove("pb_email");
         Preferences.Remove("pb_password");
         try { SecureStorage.Remove("pb_password"); } catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[PB Logout] SecureStorage remove err: {ex.Message}"); }
-        _ = SecureStorage.Remove("pb_email");
+        try { SecureStorage.Remove("pb_email"); } catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[PB Logout] SecureStorage email err: {ex.Message}"); }
     }
 
     public async Task<(bool Success, string Error)> RefreshUserAsync()
@@ -161,7 +161,7 @@ public class PocketBaseService
         }
         catch (Exception ex)
         {
-            return (false, ex.Message);
+            System.Diagnostics.Debug.WriteLine($"[PB] ex: {ex.Message}"); return (false, "Errore del server.");
         }
     }
 
@@ -221,7 +221,7 @@ public class PocketBaseService
         }
         catch (Exception ex)
         {
-            return (false, ex.Message);
+            System.Diagnostics.Debug.WriteLine($"[PB] ex: {ex.Message}"); return (false, "Errore del server.");
         }
     }
 
@@ -289,7 +289,7 @@ public class PocketBaseService
         }
         catch (Exception ex)
         {
-            return (false, ex.Message);
+            System.Diagnostics.Debug.WriteLine($"[PB] ex: {ex.Message}"); return (false, "Errore del server.");
         }
     }
 
@@ -327,13 +327,17 @@ public class PocketBaseService
 #if DEBUG
             System.Diagnostics.Debug.WriteLine($"[PB Create] EX: {ex.Message}");
 #endif
-            return (false, ex.Message);
+            System.Diagnostics.Debug.WriteLine($"[PB] ex: {ex.Message}"); return (false, "Errore del server.");
         }
     }
 
     public async Task<bool> TryAutoLoginAsync()
     {
-        var email = Preferences.Get("pb_email", string.Empty);
+        string? email;
+        try { email = await SecureStorage.GetAsync("pb_email"); }
+        catch { email = null; }
+        if (string.IsNullOrWhiteSpace(email))
+            email = Preferences.Get("pb_email", string.Empty); // migration from old version
         if (string.IsNullOrWhiteSpace(email)) return false;
 
         string? password;
@@ -352,7 +356,8 @@ public class PocketBaseService
 
     private async Task SaveCredentialsAsync(string email, string password)
     {
-        Preferences.Set("pb_email", email);
+        try { await SecureStorage.SetAsync("pb_email", email); }
+        catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[PB] SecureStorage email err: {ex.Message}"); }
         try
         {
             await SecureStorage.SetAsync("pb_password", password);
@@ -764,7 +769,7 @@ public class PocketBaseService
             if (!getRes.IsSuccessStatusCode)
             {
                 System.Diagnostics.Debug.WriteLine($"[PB Like] GET fail {getRes.StatusCode}");
-                return (false, "Impossibile leggere il workout. Verifica API Rule 'View' su PocketBase.");
+                return (false, "Impossibile leggere il workout.");
             }
 
             var body = await getRes.Content.ReadAsStringAsync();
@@ -792,7 +797,7 @@ public class PocketBaseService
             System.Diagnostics.Debug.WriteLine($"[PB Like] OK, likes={likedBy.Count}");
             return (true, string.Empty);
         }
-        catch (Exception ex) { return (false, ex.Message); }
+        catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[PB] ex: {ex.Message}"); return (false, "Errore del server."); }
     }
 
     public async Task<(bool Success, string Error)> UnlikeWorkoutAsync(string workoutId)
@@ -820,7 +825,7 @@ public class PocketBaseService
             var response = await GetHttp().SendAsync(request);
             return response.IsSuccessStatusCode ? (true, string.Empty) : (false, "Errore unlike.");
         }
-        catch (Exception ex) { return (false, ex.Message); }
+        catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[PB] ex: {ex.Message}"); return (false, "Errore del server."); }
     }
 
     private static (List<string> LikedBy, int Likes) ParseLikesFromResponse(string body)
@@ -892,7 +897,7 @@ public class PocketBaseService
         if (!IsLoggedIn) return null;
         try
         {
-            var filter = $"name=\"{exerciseName}\"";
+            var filter = $"name=\"{exerciseName.Replace("\"", "\\\"")}\"";
             var url = $"collections/excercise/records?filter={Uri.EscapeDataString(filter)}&perPage=1";
             var request = new HttpRequestMessage(HttpMethod.Get, url);
             request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
@@ -947,6 +952,6 @@ public class PocketBaseService
             System.Diagnostics.Debug.WriteLine($"[PB ParseErr] ex: {ex.Message}");
         }
 
-        return body.Length > 200 ? body[..200] : body;
+        return "Errore dal server. Riprova più tardi.";
     }
 }

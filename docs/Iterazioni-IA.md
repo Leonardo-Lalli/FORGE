@@ -417,7 +417,7 @@ Sostituire Firebase con PocketBase self-hosted per auth, dati social e persisten
 | ProfileViewModel real data | `ViewModels/ProfileViewModel.cs` | Iniettato `PocketBaseService`. Mostra `Username`, `Bio`, `AvatarInitials` da `pb.CurrentUser`. Fallback a dati mock se offline |
 | ProfilePage avatar/bio | `Views/ProfilePage.xaml` | Avatar mostra iniziali utente (`AvatarInitials`), bio visibile sotto il tier |
 | MauiProgram registrazioni | `MauiProgram.cs` | PocketBaseService con HttpClient, LoginViewModel, LoginPage |
-| .env PocketBase URL | `.env` | Aggiunto `POCKETBASE_URL=http://192.168.1.23:8080` |
+| .env PocketBase URL | `.env` | Aggiunto `POCKETBASE_URL=http://192.168.x.x` |
 
 #### Collezioni PocketBase remote
 | Collezione | Stato | Campi |
@@ -480,9 +480,9 @@ Sostituire Firebase con PocketBase self-hosted per auth, dati social e persisten
 ### PocketBase HTTPS proxato
 | Modifica | Descrizione |
 |----------|-------------|
-| Nuovo URL | `https://pocketbase.server-casa-leo.duckdns.org` via Nginx Proxy Manager + Let's Encrypt |
+| Nuovo URL | `https://YOUR_SERVER.duckdns.org` via Nginx Proxy Manager + Let's Encrypt |
 | `usesCleartextTraffic` rimosso | Non più necessario — il traffico è HTTPS nativo |
-| `.env` aggiornato | `POCKETBASE_URL=https://pocketbase.server-casa-leo.duckdns.org` |
+| `.env` aggiornato | `POCKETBASE_URL=https://YOUR_SERVER.duckdns.org` |
 | Test OK | Auth, health check, collections tutte raggiungibili via HTTPS |
 
 ### Stato implementazione mockup
@@ -547,7 +547,7 @@ Ricostruita interamente basandosi su `allenamento_attivo_minimal_bianco` e `alle
 #### PocketBase HTTPS
 | Modifica | Descrizione |
 |----------|-------------|
-| URL | `https://pocketbase.server-casa-leo.duckdns.org` via Nginx Proxy Manager + Let's Encrypt |
+| URL | `https://YOUR_SERVER.duckdns.org` via Nginx Proxy Manager + Let's Encrypt |
 | `usesCleartextTraffic` | Rimosso da AndroidManifest — HTTPS nativo |
 | Test | Auth, health check OK via HTTPS |
 
@@ -567,7 +567,7 @@ Ricostruita interamente basandosi su `allenamento_attivo_minimal_bianco` e `alle
 #### Fix crash `JavaProxyThrowable`
 | Problema | Causa | Fix |
 |----------|-------|-----|
-| `HttpClient.BaseAddress` dopo prima richiesta | Race condition: `LoginViewModel.TryAutoLoginAsync()` chiamava `LoginAsync()` prima che `App.InitializeAsync` settasse `BaseAddress` su PocketBase. La prima richiesta falliva ma "avviava" l'HttpClient, poi `Set BaseAddress` crashava | `BaseAddress` impostato direttamente nel costruttore `HttpClient` in `MauiProgram.cs`: `new HttpClient { BaseAddress = new Uri("https://pocketbase.server-casa-leo.duckdns.org/api/") }`. `EnsureInitialized` e `Initialize` diventati no-op |
+| `HttpClient.BaseAddress` dopo prima richiesta | Race condition: `LoginViewModel.TryAutoLoginAsync()` chiamava `LoginAsync()` prima che `App.InitializeAsync` settasse `BaseAddress` su PocketBase. La prima richiesta falliva ma "avviava" l'HttpClient, poi `Set BaseAddress` crashava | `BaseAddress` impostato direttamente nel costruttore `HttpClient` in `MauiProgram.cs`: `new HttpClient { BaseAddress = new Uri("https://YOUR_SERVER.duckdns.org/api/") }`. `EnsureInitialized` e `Initialize` diventati no-op |
 | `CollectionView` annidate | Inner `CollectionView` (sets) dentro outer (exercises) causava crash su Android | Sostituito con `BindableLayout` su `VerticalStackLayout` |
 | `Entry Mode=TwoWay` su `double`/`int` | Binding non riusciva a convertire valori vuoti | Sostituito con `Label` read-only + pulsanti `−`/`+` ai lati per peso e reps |
 

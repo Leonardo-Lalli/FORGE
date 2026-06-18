@@ -134,7 +134,7 @@
                                HorizontalTextAlignment="Center"
                                CharacterSpacing="2" Margin="0,-8,0,0" />
 
-                        <Label Text="You are crushing it. Keep the momentum going for another week."
+                        <Label Text="{Binding StreakDescription}"
                                FontFamily="OpenSansRegular" FontSize="18"
                                TextColor="{DynamicResource OnSurfaceVariant}"
                                HorizontalTextAlignment="Center"

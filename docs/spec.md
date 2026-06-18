@@ -291,7 +291,7 @@ Realizzare una applicazione `.NET MAUI` Android-first per:
 ### Dipendenze
 
 - **ExerciseDB API** (RapidAPI): `exercise-db-fitness-workout-gym.p.rapidapi.com` — endpoint per esercizi.
-- **PocketBase**: self-hosted su `https://pocketbase.server-casa-leo.duckdns.org` per auth, storage e social.
+- **PocketBase**: self-hosted su `https://YOUR_SERVER.duckdns.org` per auth, storage e social.
 - **Google Fonts**: Inter, Lexend, Space Grotesk (inclusi nell'app).
 - **Stitch** (Google): strumento di design UI per mockup.
 

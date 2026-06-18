@@ -119,7 +119,7 @@ L'APK Release compilato è disponibile nella root del repository:
 
 ```bash
 # 1. Clona
-git clone https://github.com/Leonardo-Lalli/FORGE.git
+git clone https://github.com/USERNAME/FORGE.git
 cd FORGE
 
 # 2. Configura
@@ -175,6 +175,37 @@ dotnet publish src/GymTracker.Mobile/GymTracker.Mobile.csproj -f net10.0-android
 | [`docs/security-hardening.md`](docs/security-hardening.md) | Guida sicurezza PocketBase + Nginx |
 | [`docs/test-matrix.md`](docs/test-matrix.md) | Matrice 42 test manuali |
 | [`docs/api-notes.md`](docs/api-notes.md) | Note tecniche API |
+
+---
+
+## Privacy
+
+I dati sono salvati in due posti:
+- **Sul tuo telefono**: database SQLite locale (workout, esercizi, achievement, piani)
+- **Sul server FORGE**: autenticazione, workout completati, like, follower, commenti
+
+Le **foto** degli allenamenti sono salvate come parte del workout. Solo chi ha accesso al dettaglio del workout può vederle.
+
+Lo sviluppatore, in quanto amministratore del server, ha accesso tecnico ai dati. I dati **non** sono condivisi con terze parti. Per cancellare i tuoi dati, usa Logout nelle Impostazioni.
+
+## Sicurezza
+
+| Misura | Dettaglio |
+|--------|-----------|
+| Password | Cifrata con SecureStorage (Android Keystore) |
+| Connessione | HTTPS con Let's Encrypt |
+| Database remoto | API rules row-level (ogni utente vede solo i propri dati) |
+| Admin panel | Bloccato da accesso esterno |
+| Rate limiting | 5 tentativi login/minuto |
+| Backup Android | Disabilitato (`allowBackup=false`) |
+
+## Disclaimer
+
+**FORGE è un progetto didattico** sviluppato come parte di un percorso di studi in informatica. Non è un prodotto commerciale. Il server è self-hosted su hardware casalingo e potrebbe non essere sempre disponibile. L'API ExerciseDB è un servizio gratuito di terze parti con limitazioni di utilizzo.
+
+## Licenza
+
+MIT License — vedi il file [LICENSE](LICENSE) per i dettagli.
 
 ---
 

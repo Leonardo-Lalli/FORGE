@@ -45,7 +45,7 @@ Delete:      @request.auth.id = ""         (solo admin/superuser)
 
 ## 2. Nginx — Bloccare Admin Panel
 
-Aggiungi questo al file di configurazione Nginx (Proxy Manager o /etc/nginx/):
+Aggiungi questo al file di configurazione Nginx (Proxy Manager o &lt;NGINX_PATH&gt;/):
 
 ```nginx
 # Blocca PocketBase Admin Panel da accesso esterno
@@ -88,7 +88,7 @@ server_tokens off;
 Assicurati che PocketBase sia configurato solo su HTTPS:
 
 ```bash
-# /opt/pocketbase/pocketbase serve --https=0.0.0.0:8090
+# &lt;PB_INSTALL_PATH&gt;/pocketbase serve --https=0.0.0.0:8090
 # NON usare --http in produzione
 ```
 
