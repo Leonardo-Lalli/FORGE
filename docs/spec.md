@@ -268,7 +268,7 @@ Realizzare una applicazione `.NET MAUI` Android-first per:
 - Componenti UI: `CollectionView`, `BindableLayout`, `ScrollView`, `Grid`, `Label`, `Button`, `Entry`, `Border`, `Image`.
 - Design System Stitch: doppio tema "Cyber-Athletic Elite" / "Fitness Core".
 - Font Google Fonts: Inter (body), Lexend (label), Space Grotesk (headline).
-- Build secrets injection: `.env` → `Resources/Raw/gymtracker.env` via MSBuild.
+- Build secrets injection: `.env` → `Resources/Raw/forge.env` via MSBuild.
 
 ## 8. Metriche di successo
 

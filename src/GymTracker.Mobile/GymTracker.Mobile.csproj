@@ -31,7 +31,7 @@
 		<ApplicationTitle>FORGE</ApplicationTitle>
 
 		<!-- App Identifier -->
-		<ApplicationId>com.companyname.gymtracker.mobile</ApplicationId>
+		<ApplicationId>com.leoforge.forge</ApplicationId>
 
 		<!-- Versions -->
 		<ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
@@ -74,9 +74,9 @@
 		<PackageReference Include="Microsoft.Extensions.Http" Version="10.0.0" />
  	</ItemGroup>
 
-	<!-- Build-time secrets injection: copy .env to Resources/Raw/gymtracker.env -->
+	<!-- Build-time secrets injection: copy .env to Resources/Raw/forge.env -->
 	<Target Name="CopyEnvFile" BeforeTargets="BeforeBuild">
-		<Copy SourceFiles="..\..\.env" DestinationFiles="Resources\Raw\gymtracker.env" Condition="Exists('..\..\.env')" SkipUnchangedFiles="true" />
+		<Copy SourceFiles="..\..\.env" DestinationFiles="Resources\Raw\forge.env" Condition="Exists('..\..\.env')" SkipUnchangedFiles="true" />
 	</Target>
 
 </Project>

@@ -10,7 +10,7 @@ public class BuildSecrets
     {
         try
         {
-            using var stream = await FileSystem.OpenAppPackageFileAsync("gymtracker.env");
+            using var stream = await FileSystem.OpenAppPackageFileAsync("forge.env");
             using var reader = new StreamReader(stream);
 
             while (await reader.ReadLineAsync() is { } line)
@@ -30,7 +30,7 @@ public class BuildSecrets
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"[BuildSecrets] Failed to load gymtracker.env: {ex.Message}");
+            System.Diagnostics.Debug.WriteLine($"[BuildSecrets] Failed to load forge.env: {ex.Message}");
         }
     }
 

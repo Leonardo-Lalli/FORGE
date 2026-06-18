@@ -1,4 +1,4 @@
-# Architettura — FORGE (GymTracker Mobile)
+# Architettura — FORGE
 
 ## 1. Obiettivo architetturale
 
@@ -63,7 +63,7 @@ src/GymTracker.Mobile/
     ├── Fonts/                      # Inter, Lexend, Space Grotesk, OpenSans
     ├── AppIcon/                    # appicon.png
     ├── Images/
-    └── Raw/                        # gymtracker.env (da .env al build)
+    └── Raw/                        # forge.env (da .env al build)
 ```
 
 ## 3. Pattern applicativi
@@ -157,7 +157,7 @@ public class ThemeService
 ## 7. Build Secrets
 
 ```
-.env (root) → MSBuild Copy → Resources/Raw/gymtracker.env → FileSystem.OpenAppPackageFileAsync → Dictionary
+.env (root) → MSBuild Copy → Resources/Raw/forge.env → FileSystem.OpenAppPackageFileAsync → Dictionary
 ```
 
 - `ConcurrentDictionary<string, string>` per thread safety

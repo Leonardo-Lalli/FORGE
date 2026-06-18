@@ -254,7 +254,7 @@ Abbiamo risolto un problema UX critico: chiudere un allenamento senza finire lo 
 Abbiamo condotto un audit di sicurezza completo (18 vulnerabilità identificate) e applicato fix critici.
 
 **Fix applicati nel codice:**
-- Rimossa `EXERCISEDB_API_KEY` da `.env`, `.env.example` e `gymtracker.env` (chiave inutilizzata embedded nell'APK)
+- Rimossa `EXERCISEDB_API_KEY` da `.env`, `.env.example` e `forge.env` (chiave inutilizzata embedded nell'APK)
 - Rimosso fallback URL hardcoded → eccezione se non configurato
 - Password: rimosso fallback `Preferences` (solo `SecureStorage`)
 - Token JWT: rimosso da URL query parameter (`?token=...`)

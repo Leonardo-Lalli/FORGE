@@ -79,4 +79,4 @@
 ### Added
 - Bootstrap .NET MAUI con Shell 3-tab
 - ThemeService: doppio tema Cyber-Athletic Elite / Fitness Core
-- BuildSecrets: `.env` → `gymtracker.env` via MSBuild
+- BuildSecrets: `.env` → `forge.env` via MSBuild
