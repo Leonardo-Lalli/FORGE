@@ -192,6 +192,14 @@
                         HeightRequest="52" CornerRadius="12"
                         Command="{Binding LogoutCommand}" />
 
+                <!-- Attributions -->
+                <Label Text="Exercise data by ExerciseDB (free-exercise-db)"
+                       FontFamily="Inter" FontSize="10"
+                       TextColor="{DynamicResource TextSecondary}"
+                       HorizontalTextAlignment="Center"
+                       Margin="0,24,0,0"
+                       Opacity="0.5" />
+
             </VerticalStackLayout>
         </ScrollView>
     </Grid>

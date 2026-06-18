@@ -202,6 +202,14 @@ MIT License — see the [LICENSE](LICENSE) file for details.
 
 ---
 
+## Attributions
+
+- **ExerciseDB API**: Exercise data and GIFs provided by [ExerciseDB](https://github.com/yuhonas/free-exercise-db) (free, non-commercial use)
+- **Badge icons**: created with Canva Pro
+- **Fonts**: Inter, Lexend, Space Grotesk by Google Fonts (SIL Open Font License)
+
+---
+
 <div align="center">
 
 **FORGE** — Build your physique. Challenge your friends. Forge your legend.
