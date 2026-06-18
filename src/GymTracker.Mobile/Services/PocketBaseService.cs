@@ -54,6 +54,28 @@ public class PocketBaseService
         await TryAutoLoginAsync();
     }
 
+    private async Task<bool> RefreshTokenAsync()
+    {
+        if (string.IsNullOrWhiteSpace(token)) return false;
+        try
+        {
+            var payload = new { };
+            var response = await GetHttp().PostAsJsonAsync("collections/users/auth-refresh", payload, JsonOptions);
+            if (!response.IsSuccessStatusCode) return false;
+            var auth = await response.Content.ReadFromJsonAsync<PocketBaseAuthResponse>(JsonOptions);
+            if (auth == null || string.IsNullOrWhiteSpace(auth.Token)) return false;
+            token = auth.Token;
+            if (auth.Record != null) currentUser = auth.Record;
+            System.Diagnostics.Debug.WriteLine("[PB] Token refreshed");
+            return true;
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[PB RefreshToken] ex: {ex.Message}");
+            return false;
+        }
+    }
+
     public async Task<(bool Success, string Error)> LoginAsync(string email, string password)
     {
         

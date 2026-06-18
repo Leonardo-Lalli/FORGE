@@ -34,7 +34,11 @@ public partial class App : Application
     private async Task InitializeAsync()
     {
         try { await buildSecrets.LoadAsync(); }
-        catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[App] Secrets failed: {ex.Message}"); }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[App] BuildSecrets failed: {ex.Message}");
+            // App will show 'POCKETBASE_URL not configured' error on first PocketBase access
+        }
 
         var sync = services.GetRequiredService<SyncService>();
         _ = sync.SyncPendingWorkoutsAsync().ContinueWith(t =>

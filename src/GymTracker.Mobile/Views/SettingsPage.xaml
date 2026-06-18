@@ -73,9 +73,21 @@
                         <FlexLayout Wrap="Wrap">
                             <Border Padding="12,8" Margin="0,0,8,0"
                                     StrokeShape="RoundRectangle 999"
-                                    Stroke="{DynamicResource Outline}" StrokeThickness="1">
+                                    Stroke="{DynamicResource Outline}" StrokeThickness="1"
+                                    BackgroundColor="Transparent">
+                                <Border.Triggers>
+                                    <DataTrigger TargetType="Border" Binding="{Binding IsItalian}" Value="True">
+                                        <Setter Property="BackgroundColor" Value="{DynamicResource Primary}" />
+                                        <Setter Property="Stroke" Value="{DynamicResource Primary}" />
+                                    </DataTrigger>
+                                </Border.Triggers>
                                 <Label Text="🇮🇹 Italiano" FontFamily="Lexend" FontSize="14"
                                        TextColor="{DynamicResource OnSurface}">
+                                    <Label.Triggers>
+                                        <DataTrigger TargetType="Label" Binding="{Binding IsItalian}" Value="True">
+                                            <Setter Property="TextColor" Value="{DynamicResource OnPrimary}" />
+                                        </DataTrigger>
+                                    </Label.Triggers>
                                     <Label.GestureRecognizers>
                                         <TapGestureRecognizer Command="{Binding SetItalianCommand}" />
                                     </Label.GestureRecognizers>
@@ -83,9 +95,21 @@
                             </Border>
                             <Border Padding="12,8"
                                     StrokeShape="RoundRectangle 999"
-                                    Stroke="{DynamicResource Outline}" StrokeThickness="1">
+                                    Stroke="{DynamicResource Outline}" StrokeThickness="1"
+                                    BackgroundColor="Transparent">
+                                <Border.Triggers>
+                                    <DataTrigger TargetType="Border" Binding="{Binding IsEnglish}" Value="True">
+                                        <Setter Property="BackgroundColor" Value="{DynamicResource Primary}" />
+                                        <Setter Property="Stroke" Value="{DynamicResource Primary}" />
+                                    </DataTrigger>
+                                </Border.Triggers>
                                 <Label Text="🇬🇧 English" FontFamily="Lexend" FontSize="14"
                                        TextColor="{DynamicResource OnSurface}">
+                                    <Label.Triggers>
+                                        <DataTrigger TargetType="Label" Binding="{Binding IsEnglish}" Value="True">
+                                            <Setter Property="TextColor" Value="{DynamicResource OnPrimary}" />
+                                        </DataTrigger>
+                                    </Label.Triggers>
                                     <Label.GestureRecognizers>
                                         <TapGestureRecognizer Command="{Binding SetEnglishCommand}" />
                                     </Label.GestureRecognizers>

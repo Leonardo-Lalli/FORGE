@@ -204,7 +204,9 @@ public class ExerciseDbApiService
                     await pb.CreateRecordAsync("excercise", payload);
                     synced++;
                 }
-                catch { }
+                catch (Exception exc) {
+                    System.Diagnostics.Debug.WriteLine($"[ExerciseDB Sync] skip: {exc.Message}");
+                }
             }
             System.Diagnostics.Debug.WriteLine($"[ExerciseDB Sync] synced {synced} to PocketBase");
         }

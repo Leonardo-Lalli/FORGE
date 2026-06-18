@@ -125,6 +125,11 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
     private async Task AddPhotoFromFileAsync(FileResult file)
     {
         using var stream = await file.OpenReadAsync();
+        if (stream.Length > 5 * 1024 * 1024) // 5MB max
+        {
+            ShowNotification("Foto troppo grande (max 5MB).");
+            return;
+        }
         using var ms = new MemoryStream();
         await stream.CopyToAsync(ms);
         var bytes = ms.ToArray();
