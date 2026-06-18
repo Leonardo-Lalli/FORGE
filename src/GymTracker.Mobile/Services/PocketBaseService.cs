@@ -17,7 +17,9 @@ public class PocketBaseService
     {
         if (_http != null) return _http;
         var client = httpFactory.CreateClient("pocketbase");
-        var pbUrl = secrets.Get("POCKETBASE_URL") ?? "https://leoforge.duckdns.org";
+        var pbUrl = secrets.Get("POCKETBASE_URL");
+        if (string.IsNullOrWhiteSpace(pbUrl))
+            throw new InvalidOperationException("POCKETBASE_URL not configured. Set it in .env file.");
         client.BaseAddress = new Uri($"{pbUrl}/api/");
         client.Timeout = TimeSpan.FromSeconds(15);
         _http = client;
@@ -36,13 +38,8 @@ public class PocketBaseService
 
     public string GetFileUrl(string collectionId, string recordId, string fileName)
     {
-        var baseUrl = secrets.Get("POCKETBASE_URL")?.TrimEnd('/') ?? "";
-        var tokenParam = !string.IsNullOrWhiteSpace(token) ? $"?token={token}" : "";
-        var url = $"{baseUrl}/api/files/{collectionId}/{recordId}/{fileName}{tokenParam}";
-#if DEBUG
-        System.Diagnostics.Debug.WriteLine($"[PB FileUrl] hasToken={!string.IsNullOrWhiteSpace(token)}");
-#endif
-        return url;
+        var pbUrl = secrets.Get("POCKETBASE_URL")?.TrimEnd('/') ?? "";
+        return $"{pbUrl}/api/files/{collectionId}/{recordId}/{fileName}";
     }
 
     public PocketBaseService(IHttpClientFactory httpFactory, BuildSecrets secrets)
@@ -137,6 +134,7 @@ public class PocketBaseService
         token = null;
         currentUser = null;
         Preferences.Remove("pb_email");
+        Preferences.Remove("pb_password");
         try { SecureStorage.Remove("pb_password"); } catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[PB Logout] SecureStorage remove err: {ex.Message}"); }
         _ = SecureStorage.Remove("pb_email");
     }
@@ -336,9 +334,17 @@ public class PocketBaseService
     public async Task<bool> TryAutoLoginAsync()
     {
         var email = Preferences.Get("pb_email", string.Empty);
-        var password = await SecureStorage.GetAsync("pb_password") ?? Preferences.Get("pb_password", string.Empty);
-        if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
-            return false;
+        if (string.IsNullOrWhiteSpace(email)) return false;
+
+        string? password;
+        try { password = await SecureStorage.GetAsync("pb_password"); }
+        catch { password = null; }
+
+        // Clean up old Preferences fallback if it exists (previous version bug)
+        if (!string.IsNullOrWhiteSpace(Preferences.Get("pb_password", string.Empty)))
+            Preferences.Remove("pb_password");
+
+        if (string.IsNullOrWhiteSpace(password)) return false;
 
         var (success, _) = await LoginAsync(email, password);
         return success;
@@ -353,8 +359,7 @@ public class PocketBaseService
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"[PB] SecureStorage fallback: {ex.Message}");
-            Preferences.Set("pb_password", password);
+            System.Diagnostics.Debug.WriteLine($"[PB] SecureStorage unavailable: {ex.Message}. Auto-login disabled.");
         }
     }
 

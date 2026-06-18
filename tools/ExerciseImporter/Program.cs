@@ -4,7 +4,14 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 
 // Config
-const string PB_URL = "https://leoforge.duckdns.org/api/";
+var PB_URL = Environment.GetEnvironmentVariable("FORGE_PB_URL");
+if (string.IsNullOrWhiteSpace(PB_URL))
+{
+    Console.WriteLine("ERRORE: FORGE_PB_URL non impostata.");
+    Console.WriteLine("  $env:FORGE_PB_URL='https://tuo-server.duckdns.org/api/'");
+    return;
+}
+
 var PB_EMAIL = Environment.GetEnvironmentVariable("FORGE_PB_EMAIL") ?? "";
 var PB_PASSWORD = Environment.GetEnvironmentVariable("FORGE_PB_PASSWORD") ?? "";
 var PB_IS_ADMIN = Environment.GetEnvironmentVariable("FORGE_PB_ADMIN") == "1";
