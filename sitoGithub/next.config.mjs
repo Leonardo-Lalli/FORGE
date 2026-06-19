@@ -1,8 +1,9 @@
 /** @type {import('next').NextConfig} */
+const isProd = process.env.NODE_ENV === 'production'
 const nextConfig = {
   output: 'export',
-  basePath: '/FORGE',
-  assetPrefix: '/FORGE',
+  basePath: isProd ? '/FORGE' : '',
+  assetPrefix: isProd ? '/FORGE' : '',
   typescript: {
     ignoreBuildErrors: true,
   },
