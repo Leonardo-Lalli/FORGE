@@ -35,16 +35,16 @@
                    TextColor="{DynamicResource Primary}"
                    HorizontalOptions="Center" VerticalOptions="Center"
                    CharacterSpacing="-1" />
-            <!-- Right: Friend Requests -->
+            <!-- Right: Settings -->
             <Border Grid.Column="2" BackgroundColor="{DynamicResource SurfaceContainer}"
-                    StrokeShape="RoundRectangle 999" WidthRequest="40" HeightRequest="40" Padding="0"
-                    Stroke="{DynamicResource OutlineVariant}" StrokeThickness="0.5">
-                <Label Text="♥" FontSize="20" TextColor="{DynamicResource Primary}"
+                     StrokeShape="RoundRectangle 999" WidthRequest="40" HeightRequest="40" Padding="0"
+                     Stroke="{DynamicResource OutlineVariant}" StrokeThickness="0.5">
+                <Image Source="settings.jpg" WidthRequest="22" HeightRequest="22"
                        HorizontalOptions="Center" VerticalOptions="Center">
-                    <Label.GestureRecognizers>
-                        <TapGestureRecognizer Command="{Binding OpenFriendRequestsCommand}" />
-                    </Label.GestureRecognizers>
-                </Label>
+                    <Image.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding OpenSettingsCommand}" />
+                    </Image.GestureRecognizers>
+                </Image>
             </Border>
         </Grid>
 

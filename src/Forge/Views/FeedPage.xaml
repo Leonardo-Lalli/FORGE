@@ -34,12 +34,12 @@
                    HorizontalOptions="Center" VerticalOptions="Center"
                    CharacterSpacing="-1" />
             <Border Grid.Column="2" BackgroundColor="{DynamicResource SurfaceContainer}"
-                    StrokeShape="RoundRectangle 999" WidthRequest="40" HeightRequest="40" Padding="0"
-                    Stroke="{DynamicResource OutlineVariant}" StrokeThickness="0.5">
-                <Image Source="settings.jpg" WidthRequest="22" HeightRequest="22"
+                     StrokeShape="RoundRectangle 999" WidthRequest="40" HeightRequest="40" Padding="0"
+                     Stroke="{DynamicResource OutlineVariant}" StrokeThickness="0.5">
+                <Image Source="like_follow.jpg" WidthRequest="22" HeightRequest="22"
                        HorizontalOptions="Center" VerticalOptions="Center">
                     <Image.GestureRecognizers>
-                        <TapGestureRecognizer Command="{Binding OpenSettingsCommand}" />
+                        <TapGestureRecognizer Command="{Binding OpenFriendRequestsCommand}" />
                     </Image.GestureRecognizers>
                 </Image>
             </Border>

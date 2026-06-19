@@ -237,6 +237,9 @@ public partial class FeedViewModel : BaseViewModel
     private async Task OpenSettingsAsync() => await Shell.Current.GoToAsync("settings");
 
     [RelayCommand]
+    private async Task OpenFriendRequestsAsync() => await Shell.Current.GoToAsync("friendRequests");
+
+    [RelayCommand]
     private async Task OpenProfileAsync() => await Shell.Current.GoToAsync("profile");
 
     private void LoadUserInfo()
