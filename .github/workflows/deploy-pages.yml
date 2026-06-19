@@ -35,6 +35,8 @@ jobs:
 
       - name: Build
         run: npx next build
+        env:
+          NEXT_PUBLIC_BASE_PATH: /FORGE
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
