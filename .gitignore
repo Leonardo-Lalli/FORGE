@@ -491,6 +491,7 @@ tools/pb_hooks/
 docs/iterations/
 docs/method/
 AGENTS.md
+skills-lock.json
 docs/security-hardening.md
 
 # Build output (APK/AAB)
