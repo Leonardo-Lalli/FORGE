@@ -16,6 +16,7 @@ public partial class SettingsViewModel : BaseViewModel
     public static string LanguageCode => Preferences.Get("exercise_language", "2");
 
     [ObservableProperty] private bool isDarkMode;
+    [ObservableProperty] private string themeLabel = "Scuro";
     [ObservableProperty] private string importStatus = string.Empty;
     [ObservableProperty] private bool hasImportStatus;
     [ObservableProperty] private bool isItalian = LanguageCode == "13";
@@ -33,6 +34,7 @@ public partial class SettingsViewModel : BaseViewModel
         this.csvExport = csvExport;
         suppressChange = true;
         IsDarkMode = themeService.IsDarkMode;
+        ThemeLabel = themeService.ThemeMode switch { 0 => "Chiaro", 1 => "Scuro", _ => "Auto" };
         suppressChange = false;
         ServerUrl = Preferences.Get("pb_server_url", string.Empty);
         HasData = true;
@@ -41,7 +43,22 @@ public partial class SettingsViewModel : BaseViewModel
     partial void OnIsDarkModeChanged(bool value)
     {
         if (suppressChange) return;
-        themeService.IsDarkMode = value;
+        // Cycle: Light -> Dark -> Auto -> Light
+        var next = themeService.ThemeMode switch
+        {
+            0 => 1,  // Light -> Dark
+            1 => 2,  // Dark -> Auto
+            _ => 0   // Auto -> Light
+        };
+        themeService.ThemeMode = next;
+        ThemeLabel = next switch { 0 => "Chiaro", 1 => "Scuro", _ => "Auto" };
+        IsDarkMode = themeService.IsDarkMode;
+    }
+
+    [RelayCommand]
+    private void CycleTheme()
+    {
+        OnIsDarkModeChanged(IsDarkMode);
     }
 
     [RelayCommand]

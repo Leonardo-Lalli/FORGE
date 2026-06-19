@@ -94,6 +94,8 @@ public partial class FeedViewModel : BaseViewModel
                 System.Diagnostics.Debug.WriteLine($"[FeedSearch] user={user.Name} id={user.Id}");
                 var isFollowing = followingIds.Contains(user.Id);
                 var avatarUrl = string.IsNullOrWhiteSpace(user.Avatar) ? "" : pb.GetFileUrl(user.CollectionId, user.Id, user.Avatar);
+                var avatarSrc = !string.IsNullOrWhiteSpace(user.Avatar)
+                    ? await pb.DownloadAvatarAsync(user.CollectionId, user.Id, user.Avatar) : null;
                 SearchResults.Add(new UserSearchResult
                 {
                     UserId = user.Id,
@@ -102,8 +104,7 @@ public partial class FeedViewModel : BaseViewModel
                     IsFollowing = isFollowing,
                     FollowLabel = isFollowing ? "Following" : "Follow",
                     AvatarUrl = avatarUrl,
-                    AvatarSource = !string.IsNullOrWhiteSpace(avatarUrl)
-                        ? ImageSource.FromUri(new Uri(avatarUrl)) : null,
+                    AvatarSource = avatarSrc,
                     HasAvatar = !string.IsNullOrWhiteSpace(user.Avatar)
                 });
             }
@@ -250,7 +251,7 @@ public partial class FeedViewModel : BaseViewModel
     [RelayCommand]
     private async Task OpenProfileAsync() => await Shell.Current.GoToAsync("profile");
 
-    private void LoadUserInfo()
+    private async void LoadUserInfo()
     {
         if (pb.IsLoggedIn && pb.CurrentUser != null)
         {
@@ -258,9 +259,8 @@ public partial class FeedViewModel : BaseViewModel
             UserInitials = (u.Name?.Length >= 2) ? u.Name[..2].ToUpper() : (u.Email?.Length >= 2 ? u.Email[..2].ToUpper() : "GT");
             if (!string.IsNullOrWhiteSpace(u.Avatar))
             {
-                UserAvatarUrl = pb.GetFileUrl(u.CollectionId, u.Id, u.Avatar);
-                UserAvatarSource = ImageSource.FromUri(new Uri(UserAvatarUrl));
-                HasUserAvatar = true;
+                UserAvatarSource = await pb.DownloadAvatarAsync(u.CollectionId, u.Id, u.Avatar);
+                HasUserAvatar = UserAvatarSource != null;
             }
             else { UserAvatarSource = null; HasUserAvatar = false; }
         }

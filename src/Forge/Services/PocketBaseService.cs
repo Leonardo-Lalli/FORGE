@@ -63,6 +63,41 @@ public class PocketBaseService
         return url;
     }
 
+    public async Task<ImageSource?> DownloadAvatarAsync(string collectionId, string recordId, string fileName)
+    {
+        await EnsureAuthAsync();
+        if (string.IsNullOrWhiteSpace(token))
+            return null;
+
+        try
+        {
+            var coll = string.IsNullOrWhiteSpace(collectionId) ? "users" : collectionId;
+            var url = $"{GetPbBaseUrl()}/api/files/{coll}/{recordId}/{fileName}";
+
+            var request = new HttpRequestMessage(HttpMethod.Get, url);
+            request.Headers.Authorization =
+                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+            var response = await GetHttp().SendAsync(request);
+            if (!response.IsSuccessStatusCode)
+            {
+                System.Diagnostics.Debug.WriteLine($"[PB DownloadAvatar] HTTP {response.StatusCode} for {url}");
+                return null;
+            }
+
+            var bytes = await response.Content.ReadAsByteArrayAsync();
+            if (bytes.Length == 0) return null;
+
+            System.Diagnostics.Debug.WriteLine($"[PB DownloadAvatar] OK {bytes.Length} bytes from {fileName}");
+            return ImageSource.FromStream(() => new MemoryStream(bytes));
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[PB DownloadAvatar] ex: {ex.Message}");
+            return null;
+        }
+    }
+
     public PocketBaseService(IHttpClientFactory httpFactory, BuildSecrets secrets)
     {
         this.httpFactory = httpFactory;

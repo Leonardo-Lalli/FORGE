@@ -42,18 +42,25 @@
                         StrokeShape="RoundRectangle 12"
                         Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1"
                         Padding="16">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding CycleThemeCommand}" />
+                    </Border.GestureRecognizers>
                     <Grid ColumnDefinitions="*,Auto">
                         <VerticalStackLayout Grid.Column="0" VerticalOptions="Center" Spacing="4">
-                            <Label Text="Modalità Scura"
+                            <Label Text="Tema"
                                    FontFamily="OpenSansSemibold" FontSize="16" FontAttributes="Bold"
                                    TextColor="{DynamicResource OnSurface}" />
-                            <Label Text="Attiva il tema Cyber-Athletic Elite"
+                            <Label Text="Chiaro / Scuro / Auto (segue sistema)"
                                    FontFamily="OpenSansRegular" FontSize="13"
                                    TextColor="{DynamicResource TextSecondary}" />
                         </VerticalStackLayout>
-                        <Switch Grid.Column="1" IsToggled="{Binding IsDarkMode}"
-                                OnColor="{DynamicResource Primary}"
-                                VerticalOptions="Center" />
+                        <Border Grid.Column="1" BackgroundColor="{DynamicResource PrimaryContainer}"
+                                StrokeShape="RoundRectangle 8" Padding="12,6"
+                                VerticalOptions="Center">
+                            <Label Text="{Binding ThemeLabel}"
+                                   FontFamily="OpenSansSemibold" FontSize="12"
+                                   TextColor="{DynamicResource Primary}" />
+                        </Border>
                     </Grid>
                 </Border>
 

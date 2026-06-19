@@ -4,13 +4,28 @@ public class ThemeService
 {
     private const string ThemeKey = "app_theme";
     private bool isInitialized;
+    private int themeMode; // 0=Light, 1=Dark, 2=Auto
 
     public bool IsDarkMode
     {
-        get => Preferences.Get(ThemeKey, 1) == 1;
+        get
+        {
+            if (themeMode == 2) // Auto
+            {
+                var sysTheme = Application.Current?.RequestedTheme ?? AppTheme.Dark;
+                return sysTheme == AppTheme.Dark;
+            }
+            return themeMode == 1;
+        }
+    }
+
+    public int ThemeMode
+    {
+        get => themeMode;
         set
         {
-            Preferences.Set(ThemeKey, value ? 1 : 0);
+            themeMode = value;
+            Preferences.Set(ThemeKey, value);
             Apply();
         }
     }
@@ -20,9 +35,21 @@ public class ThemeService
         if (isInitialized) return;
         isInitialized = true;
 
-        var isDark = Preferences.Get(ThemeKey, 1) == 1;
-        var palette = isDark ? DarkPalette : LightPalette;
-        WriteResources(palette);
+        themeMode = Preferences.Get(ThemeKey, 1);
+        if (themeMode < 0 || themeMode > 2) themeMode = 1;
+
+        ApplyTheme(IsDarkMode);
+
+        Application.Current!.RequestedThemeChanged += (_, _) =>
+        {
+            if (themeMode == 2) // Auto: follow system
+            {
+                MainThread.BeginInvokeOnMainThread(() =>
+                {
+                    ApplyTheme(Application.Current?.RequestedTheme == AppTheme.Dark);
+                });
+            }
+        };
     }
 
     public void Apply()
@@ -34,16 +61,21 @@ public class ThemeService
                 var app = Application.Current;
                 if (app == null) return;
 
-                var palette = IsDarkMode ? DarkPalette : LightPalette;
-                WriteResources(palette);
-
-                app.UserAppTheme = IsDarkMode ? AppTheme.Dark : AppTheme.Light;
+                var isDark = IsDarkMode;
+                ApplyTheme(isDark);
+                app.UserAppTheme = isDark ? AppTheme.Dark : AppTheme.Light;
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"[ThemeService] Apply failed: {ex.Message}");
             }
         });
+    }
+
+    private static void ApplyTheme(bool isDark)
+    {
+        var palette = isDark ? DarkPalette : LightPalette;
+        WriteResources(palette);
     }
 
     private static void WriteResources(Dictionary<string, string> palette)

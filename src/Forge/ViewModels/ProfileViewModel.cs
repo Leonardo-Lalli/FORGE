@@ -84,10 +84,9 @@ public partial class ProfileViewModel : BaseViewModel
 
             if (!string.IsNullOrWhiteSpace(user.Avatar))
             {
-                AvatarUrl = pb.GetFileUrl(user.CollectionId, user.Id, user.Avatar);
-                AvatarSource = ImageSource.FromUri(new Uri(AvatarUrl));
-                HasAvatar = true;
-                System.Diagnostics.Debug.WriteLine($"[Profile] AvatarUrl={AvatarUrl}");
+                AvatarSource = await pb.DownloadAvatarAsync(user.CollectionId, user.Id, user.Avatar);
+                HasAvatar = AvatarSource != null;
+                System.Diagnostics.Debug.WriteLine($"[Profile] Avatar downloaded: {HasAvatar}");
             }
             else
             {
@@ -296,10 +295,9 @@ public partial class ProfileViewModel : BaseViewModel
                 var user = pb.CurrentUser;
                 if (user != null && !string.IsNullOrWhiteSpace(user.Avatar))
                 {
-                    AvatarUrl = pb.GetFileUrl(user.CollectionId, user.Id, user.Avatar);
-                    AvatarSource = ImageSource.FromUri(new Uri(AvatarUrl));
-                    HasAvatar = true;
-                    System.Diagnostics.Debug.WriteLine($"[Profile] New AvatarUrl={AvatarUrl}");
+                    AvatarSource = await pb.DownloadAvatarAsync(user.CollectionId, user.Id, user.Avatar);
+                    HasAvatar = AvatarSource != null;
+                    System.Diagnostics.Debug.WriteLine($"[Profile] New avatar downloaded: {HasAvatar}");
                 }
                 else
                 {

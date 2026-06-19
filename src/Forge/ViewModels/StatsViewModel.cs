@@ -277,7 +277,7 @@ public partial class StatsViewModel : BaseViewModel
     [RelayCommand]
     private async Task OpenProfileAsync() => await Shell.Current.GoToAsync("profile");
 
-    private void LoadUserInfo()
+    private async void LoadUserInfo()
     {
         if (pb.IsLoggedIn && pb.CurrentUser != null)
         {
@@ -285,9 +285,8 @@ public partial class StatsViewModel : BaseViewModel
             UserInitials = (u.Name?.Length >= 2) ? u.Name[..2].ToUpper() : (u.Email?.Length >= 2 ? u.Email[..2].ToUpper() : "GT");
             if (!string.IsNullOrWhiteSpace(u.Avatar))
             {
-                UserAvatarUrl = pb.GetFileUrl(u.CollectionId, u.Id, u.Avatar);
-                UserAvatarSource = ImageSource.FromUri(new Uri(UserAvatarUrl));
-                HasUserAvatar = true;
+                UserAvatarSource = await pb.DownloadAvatarAsync(u.CollectionId, u.Id, u.Avatar);
+                HasUserAvatar = UserAvatarSource != null;
             }
             else { UserAvatarSource = null; HasUserAvatar = false; }
         }
