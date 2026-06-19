@@ -17,8 +17,8 @@ export function SiteHeader() {
         </Link>
 
         <nav className="hidden items-center gap-8 sm:flex">
-          <Link href="/#funzionalita" className="text-sm text-forge-muted transition-colors hover:text-forge-fg">{t.nav.features}</Link>
-          <Link href="/#self-hosting" className="text-sm text-forge-muted transition-colors hover:text-forge-fg">{t.nav.selfHosting}</Link>
+          <Link href="/features" className="text-sm text-forge-muted transition-colors hover:text-forge-fg">{t.nav.features}</Link>
+          <Link href="/self-hosting" className="text-sm text-forge-muted transition-colors hover:text-forge-fg">{t.nav.selfHosting}</Link>
           <Link href="/docs" className="text-sm text-forge-muted transition-colors hover:text-forge-fg">{t.nav.docs}</Link>
           <Link href="/roadmap" className="text-sm text-forge-muted transition-colors hover:text-forge-fg">{t.nav.roadmap}</Link>
           <Link href="/#download" className="text-sm text-forge-muted transition-colors hover:text-forge-fg">{t.nav.download}</Link>
