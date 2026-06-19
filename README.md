@@ -9,6 +9,8 @@ https://github.com/user-attachments/assets/28498cc5-b1e4-4de4-bce0-1627f3fb002d
 
 <div align="center">
 
+> 🌐 **[Visita il sito ufficiale](https://leonardo-lalli.github.io/FORGE/)** — multilingua, documentazione completa, download diretto
+
 > ⚠️ **PROGETTO AMATORIALE A SCOPO DIDATTICO** ⚠️  
 > Questa app è sviluppata da uno studente come progetto scolastico.  
 > **Non è un prodotto commerciale.** Il server è self-hosted su hardware casalingo.  
