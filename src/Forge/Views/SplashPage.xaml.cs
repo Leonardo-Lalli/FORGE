@@ -14,8 +14,8 @@ public partial class SplashPage : ContentPage
         await Task.Delay(400);
 
         await Task.WhenAll(
-            TitleLabel.FadeTo(1, 600, Easing.CubicOut),
-            SubtitleLabel.FadeTo(1, 600, Easing.CubicOut)
+            TitleLabel.FadeToAsync(1, 600, Easing.CubicOut),
+            SubtitleLabel.FadeToAsync(1, 600, Easing.CubicOut)
         );
 
         await Task.Delay(1400);

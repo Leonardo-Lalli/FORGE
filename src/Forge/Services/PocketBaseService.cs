@@ -343,16 +343,18 @@ public class PocketBaseService
 
             var response = await GetHttp().SendAsync(request);
             if (!response.IsSuccessStatusCode)
+            {
+                var errBody = await response.Content.ReadAsStringAsync();
+                System.Diagnostics.Debug.WriteLine($"[PB UploadAvatar] FAIL {response.StatusCode}: {errBody[..Math.Min(errBody.Length, 200)]}");
                 return false;
+            }
 
             currentUser = await response.Content.ReadFromJsonAsync<PocketBaseUserRecord>(JsonOptions);
             return true;
         }
         catch (Exception ex)
         {
-#if DEBUG
             System.Diagnostics.Debug.WriteLine($"[PB UploadAvatar] ex: {ex.Message}");
-#endif
             return false;
         }
     }

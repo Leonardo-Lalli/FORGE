@@ -24,6 +24,13 @@
 
 **Trasforma ogni ripetizione in progresso. Sfida i tuoi amici. Supera i tuoi limiti.**
 
+### 🔗 Link Rapidi
+[📦 Download APK](#download-apk) · [🐳 Self-Hosting Docker](#self-hosting-docker) · [📱 Screenshot](#screenshot) · [🛠️ Sviluppo](#sviluppo) · [✅ Stato Progetto](#stato-del-progetto) · [🔒 Sicurezza](#sicurezza)
+
+---
+
+🎬 **[Guarda il video demo](assets/Videos/hailuo-2_3_sculptural_clay_art_Create_a_premium_mobile_app_splash_screen_for_a_fitness_and_-0.mp4)**
+
 </div>
 
 ---

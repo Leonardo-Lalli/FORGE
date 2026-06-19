@@ -6,7 +6,7 @@ Costruire una app `.NET MAUI` Android-first per il tracking degli allenamenti ch
 
 - **ExerciseDB API** (RapidAPI): catalogo esercizi remoto con 1300+ esercizi;
 - **PocketBase** (self-hosted): autenticazione, database, file storage e dati social;
-- **Preferences / PlanStore**: credenziali, token e piani di allenamento locali.
+- **Preferences / SQLite**: credenziali, piani di allenamento, cache esercizi, achievement.
 
 L'architettura supporta l'uso online per la registrazione allenamenti e la sincronizzazione immediata con PocketBase. Il design dell'interfaccia segue i mockup Stitch con tema scuro "Cyber-Athletic Elite" (ciano #00E5FF) e chiaro "Fitness Core" (blu #003ec7), font Inter / Lexend / Space Grotesk.
 
@@ -174,11 +174,12 @@ public class ThemeService
 ```
 App.CreateWindow()
   ├── ThemeService.Initialize()
-  ├── Mostra LoginPage
+  ├── Mostra SplashPage (2s animazione fade-in)
   └── window.Created → InitializeAsync()
         ├── BuildSecrets.LoadAsync()
-        ├── PocketBaseService.Initialize()
-        └── ExerciseApiService.Initialize()
+        └── SyncService.SyncPendingWorkoutsAsync()
+  └── Se primo avvio → SetupPage (configura URL server)
+  └── Altrimenti → LoginPage
 
 LoginViewModel costruttore:
   └── Task.Run → TryAutoLoginAsync()
