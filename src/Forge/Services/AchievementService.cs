@@ -107,7 +107,7 @@ public class AchievementService
                     SetProgress("encyclopedia", exList.Distinct().Count());
                 }
             }
-            catch { }
+            catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[Achievement] Deserialize exList err: {ex.Message}"); }
         }
 
         // Time-based achievements
@@ -221,7 +221,7 @@ public class AchievementService
         {
             states = await db.GetAchievementsAsync();
         }
-        catch { states = new(); }
+        catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[Achievement] LoadStates err: {ex.Message}"); states = new(); }
     }
 
     private async Task SaveStatesAsync()

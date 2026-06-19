@@ -402,7 +402,7 @@ public class PocketBaseService
             if (!string.IsNullOrWhiteSpace(email))
             {
                 try { await SecureStorage.SetAsync("pb_email", email); }
-                catch { }
+                catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[PB AutoLogin] SecureStorage email save err: {ex.Message}"); }
                 Preferences.Remove("pb_email");
             }
         }
@@ -418,7 +418,7 @@ public class PocketBaseService
             if (!string.IsNullOrWhiteSpace(password))
             {
                 try { await SecureStorage.SetAsync("pb_password", password); }
-                catch { }
+                catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[PB AutoLogin] SecureStorage pw save err: {ex.Message}"); }
                 Preferences.Remove("pb_password");
             }
         }
