@@ -134,7 +134,7 @@ FORGE è privacy-first: puoi far girare il backend **su un tuo server** (Raspber
 
 ```bash
 # 1. Clona la repo
-git clone https://github.com/USERNAME/FORGE.git
+git clone https://github.com/Leonardo-Lalli/FORGE.git
 cd FORGE
 
 # 2. Avvia PocketBase con Docker
@@ -147,7 +147,7 @@ PocketBase è ora in ascolto su `http://<IP-DEL-TUO-SERVER>:8090`.
 
 1. Installa l'APK sul telefono
 2. Apri FORGE → Impostazioni → **URL PocketBase**
-3. Inserisci `http://192.168.1.50:8090` (l'IP del tuo server)
+3. Inserisci `http://<IP-DEL-TUO-SERVER>:8090` 
 4. Tocca **SALVA**
 
 L'app userà il tuo server invece di quello predefinito. Funziona anche in LAN senza dominio pubblico — ti registri, ti alleni, e quando torni a casa sul Wi-Fi i workout si sincronizzano automaticamente.
