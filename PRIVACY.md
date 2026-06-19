@@ -18,9 +18,11 @@ Quando usi FORGE, vengono raccolti i seguenti dati:
 
 I dati risiedono in due posti:
 - **Sul tuo telefono**: database SQLite locale (workout, esercizi, achievement, piani)
-- **Sul server FORGE**: un server self-hosted su hardware casalingo che esegue PocketBase
+- **Sul server**: in base a come configuri l'app:
+  - **Server predefinito**: un server self-hosted gestito dallo sviluppatore in Italia
+  - **Self-hosting**: puoi usare il TUO server Docker (Raspberry Pi, NAS, Proxmox). In questo caso i dati restano dentro casa tua e lo sviluppatore non ha alcun accesso
 
-Il server si trova in Italia ed è gestito dallo sviluppatore del progetto.
+Il server PocketBase predefinito si trova in Italia ed è gestito dallo sviluppatore del progetto.
 
 ## Chi Può Vedere i Tuoi Dati
 

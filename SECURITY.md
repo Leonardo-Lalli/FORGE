@@ -34,7 +34,9 @@ FORGE adotta comunque le seguenti misure di sicurezza:
 
 - **Autenticazione**: password cifrate con SecureStorage (Android Keystore)
 - **HTTPS**: tutte le comunicazioni sono cifrate (Let's Encrypt)
+- **Certificate pinning**: l'app verifica che il server usi un certificato Let's Encrypt valido
 - **API**: regole row-level ownership (ogni utente vede solo i propri dati)
-- **Rate limiting**: 5 tentativi di login al minuto
+- **Rate limiting**: 5 tentativi di login al minuto, 60 richieste API al minuto
 - **Admin panel**: bloccato da accesso esterno (403)
 - **Backup Android**: disabilitato (`allowBackup=false`)
+- **Self-hosting**: gli utenti possono usare il proprio server, senza passare dal server predefinito

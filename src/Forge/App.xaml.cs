@@ -24,6 +24,10 @@ public partial class App : Application
         var window = new Window(new ContentPage { BackgroundColor = Colors.Black });
         window.Created += async (_, _) =>
         {
+            var splashPage = new SplashPage();
+            window.Page = splashPage;
+            await Task.Delay(2000);
+
             await InitializeAsync();
             var setupCompleted = Preferences.Get("setup_completed", false);
             if (!setupCompleted)

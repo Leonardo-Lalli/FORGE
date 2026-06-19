@@ -1,0 +1,36 @@
+<ContentPage
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    x:Class="Forge.Views.SplashPage"
+    BackgroundColor="#131313"
+    Shell.NavBarIsVisible="False">
+
+    <Grid VerticalOptions="Center" HorizontalOptions="Center" RowDefinitions="Auto,Auto" RowSpacing="24">
+        <Image Grid.Row="0"
+               Source="appicon.png"
+               WidthRequest="120" HeightRequest="120"
+               HorizontalOptions="Center"
+               x:Name="LogoImage" />
+
+        <VerticalStackLayout Grid.Row="1" Spacing="8" HorizontalOptions="Center">
+            <Label Text="FORGE"
+                   FontFamily="SpaceGrotesk" FontSize="36" FontAttributes="Bold"
+                   TextColor="#00E5FF"
+                   HorizontalTextAlignment="Center"
+                   x:Name="TitleLabel" Opacity="0" />
+
+            <Label Text="Forgia la tua leggenda"
+                   FontFamily="Inter" FontSize="14"
+                   TextColor="#BAC9CC"
+                   HorizontalTextAlignment="Center"
+                   x:Name="SubtitleLabel" Opacity="0" />
+
+            <ActivityIndicator IsRunning="True"
+                               Color="#00E5FF"
+                               HorizontalOptions="Center"
+                               Margin="0,24,0,0"
+                               x:Name="Spinner" />
+        </VerticalStackLayout>
+    </Grid>
+
+</ContentPage>
