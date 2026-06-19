@@ -36,12 +36,12 @@
             <Border Grid.Column="2" BackgroundColor="{DynamicResource SurfaceContainer}"
                     StrokeShape="RoundRectangle 999" WidthRequest="40" HeightRequest="40" Padding="0"
                     Stroke="{DynamicResource OutlineVariant}" StrokeThickness="0.5">
-                <Label Text="⚙" FontSize="16" TextColor="{DynamicResource OnSurfaceVariant}"
+                <Image Source="settings.jpg" WidthRequest="22" HeightRequest="22"
                        HorizontalOptions="Center" VerticalOptions="Center">
-                    <Label.GestureRecognizers>
+                    <Image.GestureRecognizers>
                         <TapGestureRecognizer Command="{Binding OpenSettingsCommand}" />
-                    </Label.GestureRecognizers>
-                </Label>
+                    </Image.GestureRecognizers>
+                </Image>
             </Border>
         </Grid>
 

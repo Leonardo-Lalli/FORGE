@@ -34,12 +34,12 @@
                     StrokeShape="RoundRectangle 999" WidthRequest="40" HeightRequest="40" Padding="0"
                     Stroke="{DynamicResource OutlineVariant}" StrokeThickness="0.5"
                     IsVisible="{Binding IsLoggedIn}">
-                <Label Text="✏" FontSize="18" TextColor="{DynamicResource OnSurfaceVariant}"
+                <Image Source="edit_profile.jpg" WidthRequest="22" HeightRequest="22"
                        HorizontalOptions="Center" VerticalOptions="Center">
-                    <Label.GestureRecognizers>
+                    <Image.GestureRecognizers>
                         <TapGestureRecognizer Command="{Binding EditProfileCommand}" />
-                    </Label.GestureRecognizers>
-                </Label>
+                    </Image.GestureRecognizers>
+                </Image>
             </Border>
         </Grid>
 
