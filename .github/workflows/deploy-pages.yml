@@ -26,6 +26,8 @@ jobs:
 
       - name: Build
         run: npx next build
+        env:
+          NEXT_PUBLIC_BASE_PATH: /FORGE
 
       - name: Deploy to gh-pages
         uses: peaceiris/actions-gh-pages@v4
