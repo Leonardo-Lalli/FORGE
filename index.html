@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FORGE — Allenati. Traccia. Progredisci.</title>
+  <meta name="description" content="FORGE è l'app di palestra open-source, privacy-first e self-hostable. Traccia i tuoi volumi, gestisci i tempi di recupero e mantieni i tuoi dati al sicuro." />
+  <meta name="theme-color" content="#0d0d0d" />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="FORGE — App di palestra open-source" />
+  <meta property="og:description" content="Privacy-first, self-hostable, e completamente tua. Traccia volumi, timer e progressi." />
+  <meta property="og:type" content="website" />
+
+  <style>
+    :root {
+      --bg: #0d0d0d;
+      --bg-elev: #141414;
+      --bg-code: #0a0a0a;
+      --fg: #f5f5f5;
+      --fg-muted: #9a9a9a;
+      --fg-dim: #6b6b6b;
+      --border: #232323;
+      --cyan: #00e5ff;
+      --cyan-dim: #0a3a40;
+      --glow: 0 0 12px rgba(0, 229, 255, 0.55), 0 0 28px rgba(0, 229, 255, 0.25);
+      --glow-soft: 0 0 40px rgba(0, 229, 255, 0.12);
+      --radius: 14px;
+      --max: 1120px;
+      --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --mono: "SF Mono", "JetBrains Mono", "Fira Code", ui-monospace, Menlo, Consolas, monospace;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; background: var(--bg); }
+
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: var(--font);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+      overflow-x: hidden;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    .wrap {
+      width: 100%;
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* ---------- Background ambience ---------- */
+    .ambient {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(60% 50% at 50% -5%, rgba(0, 229, 255, 0.10), transparent 70%),
+        radial-gradient(40% 40% at 85% 20%, rgba(0, 229, 255, 0.05), transparent 70%);
+    }
+
+    .grid-lines {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+      background-size: 56px 56px;
+      mask-image: radial-gradient(circle at 50% 0%, #000 0%, transparent 75%);
+      -webkit-mask-image: radial-gradient(circle at 50% 0%, #000 0%, transparent 75%);
+    }
+
+    main, header, footer { position: relative; z-index: 1; }
+
+    /* ---------- Header ---------- */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      background: rgba(13, 13, 13, 0.72);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 68px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-mark {
+      width: 36px;
+      height: 36px;
+      border-radius: 9px;
+      border: 1px solid var(--cyan);
+      display: grid;
+      place-items: center;
+      color: var(--cyan);
+      box-shadow: var(--glow);
+      font-weight: 800;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    .brand-name {
+      font-weight: 800;
+      letter-spacing: 0.22em;
+      font-size: 20px;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+    }
+
+    .nav-links a {
+      color: var(--fg-muted);
+      font-size: 14px;
+      letter-spacing: 0.02em;
+      transition: color 0.2s ease;
+    }
+
+    .nav-links a:hover { color: var(--fg); }
+
+    .nav-links .gh {
+      color: var(--fg);
+      border: 1px solid var(--border);
+      padding: 8px 16px;
+      border-radius: 999px;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .nav-links .gh:hover {
+      border-color: var(--cyan);
+      box-shadow: var(--glow-soft);
+    }
+
+    @media (max-width: 720px) {
+      .nav-links a:not(.gh) { display: none; }
+    }
+
+    /* ---------- Buttons ---------- */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 600;
+      font-size: 15px;
+      padding: 14px 26px;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.25s ease, background 0.2s ease;
+      border: 1px solid transparent;
+    }
+
+    .btn-primary {
+      background: var(--cyan);
+      color: #001417;
+      box-shadow: var(--glow);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 18px rgba(0, 229, 255, 0.75), 0 0 42px rgba(0, 229, 255, 0.35);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--fg);
+      border: 1px solid var(--border);
+    }
+
+    .btn-ghost:hover {
+      border-color: var(--cyan);
+      color: var(--cyan);
+    }
+
+    /* ---------- Hero ---------- */
+    .hero {
+      padding: 110px 0 90px;
+      text-align: center;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      letter-spacing: 0.04em;
+      color: var(--cyan);
+      border: 1px solid var(--cyan-dim);
+      background: rgba(0, 229, 255, 0.05);
+      padding: 6px 14px;
+      border-radius: 999px;
+      margin-bottom: 28px;
+    }
+
+    .dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--cyan);
+      box-shadow: var(--glow);
+    }
+
+    .hero h1 {
+      font-size: clamp(44px, 8vw, 86px);
+      line-height: 1.02;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 24px;
+      text-wrap: balance;
+    }
+
+    .hero h1 .accent {
+      color: var(--cyan);
+      text-shadow: var(--glow);
+    }
+
+    .hero p.lead {
+      max-width: 600px;
+      margin: 0 auto 40px;
+      font-size: clamp(16px, 2.4vw, 19px);
+      color: var(--fg-muted);
+      text-wrap: pretty;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .hero-meta {
+      margin-top: 22px;
+      font-size: 13px;
+      color: var(--fg-dim);
+      font-family: var(--mono);
+    }
+
+    /* ---------- Section shell ---------- */
+    section { padding: 80px 0; }
+
+    .section-head {
+      max-width: 640px;
+      margin-bottom: 56px;
+    }
+
+    .eyebrow {
+      font-family: var(--mono);
+      font-size: 13px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--cyan);
+      margin-bottom: 14px;
+    }
+
+    .section-head h2 {
+      font-size: clamp(30px, 5vw, 44px);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+      margin-bottom: 16px;
+      text-wrap: balance;
+    }
+
+    .section-head p {
+      color: var(--fg-muted);
+      font-size: 17px;
+      text-wrap: pretty;
+    }
+
+    /* ---------- Features ---------- */
+    .features {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    @media (max-width: 860px) { .features { grid-template-columns: 1fr; } }
+
+    .card {
+      background: var(--bg-elev);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 32px 28px;
+      transition: border-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .card:hover {
+      border-color: var(--cyan-dim);
+      transform: translateY(-4px);
+      box-shadow: var(--glow-soft);
+    }
+
+    .icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      margin-bottom: 22px;
+      border: 1px solid var(--cyan-dim);
+      background: rgba(0, 229, 255, 0.06);
+      color: var(--cyan);
+    }
+
+    .icon svg { width: 24px; height: 24px; }
+
+    .card h3 {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .card p {
+      color: var(--fg-muted);
+      font-size: 15px;
+    }
+
+    /* ---------- Self-hosting ---------- */
+    .selfhost {
+      display: grid;
+      grid-template-columns: 1fr 1.15fr;
+      gap: 48px;
+      align-items: center;
+    }
+
+    @media (max-width: 900px) { .selfhost { grid-template-columns: 1fr; gap: 32px; } }
+
+    .selfhost ul {
+      list-style: none;
+      margin-top: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .selfhost li {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      color: var(--fg-muted);
+      font-size: 15px;
+    }
+
+    .check {
+      color: var(--cyan);
+      flex-shrink: 0;
+      margin-top: 3px;
+    }
+
+    .terminal {
+      background: var(--bg-code);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5), var(--glow-soft);
+    }
+
+    .terminal-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border);
+      background: #101010;
+    }
+
+    .tdot { width: 12px; height: 12px; border-radius: 50%; background: #2c2c2c; }
+
+    .terminal-title {
+      margin-left: 10px;
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--fg-dim);
+    }
+
+    .terminal pre {
+      padding: 24px 22px;
+      overflow-x: auto;
+      font-family: var(--mono);
+      font-size: 13.5px;
+      line-height: 1.85;
+    }
+
+    .terminal code { white-space: pre; }
+
+    .c-comment { color: var(--fg-dim); }
+    .c-prompt { color: var(--cyan); }
+    .c-cmd { color: var(--fg); }
+    .c-flag { color: #7fdce6; }
+    .c-out { color: var(--fg-dim); }
+
+    /* ---------- CTA band ---------- */
+    .cta-band {
+      text-align: center;
+      border: 1px solid var(--cyan-dim);
+      background: linear-gradient(180deg, rgba(0,229,255,0.06), rgba(0,229,255,0.01));
+      border-radius: 20px;
+      padding: 64px 24px;
+      box-shadow: var(--glow-soft);
+    }
+
+    .cta-band h2 {
+      font-size: clamp(28px, 5vw, 40px);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 14px;
+      text-wrap: balance;
+    }
+
+    .cta-band p {
+      color: var(--fg-muted);
+      max-width: 460px;
+      margin: 0 auto 32px;
+    }
+
+    /* ---------- Footer ---------- */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 40px 0;
+      margin-top: 40px;
+    }
+
+    .foot {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .foot .brand-name { font-size: 16px; }
+
+    .foot p {
+      color: var(--fg-dim);
+      font-size: 13px;
+    }
+
+    .foot-links { display: flex; gap: 24px; }
+    .foot-links a { color: var(--fg-muted); font-size: 13px; transition: color 0.2s; }
+    .foot-links a:hover { color: var(--cyan); }
+  </style>
+</head>
+<body>
+  <div class="ambient" aria-hidden="true"></div>
+  <div class="grid-lines" aria-hidden="true"></div>
+
+  <!-- ===================== HEADER ===================== -->
+  <header>
+    <div class="wrap nav">
+      <a href="#top" class="brand" aria-label="FORGE — home">
+        <!-- Spazio logo (placeholder): sostituisci con il tuo SVG/PNG -->
+        <span class="logo-mark" aria-hidden="true">F</span>
+        <span class="brand-name">FORGE</span>
+      </a>
+      <nav class="nav-links" aria-label="Navigazione principale">
+        <a href="#funzionalita">Funzionalità</a>
+        <a href="#self-hosting">Self-Hosting</a>
+        <a href="#download">Download</a>
+        <a class="gh" href="https://github.com" target="_blank" rel="noopener">GitHub ★</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="top">
+    <!-- ===================== HERO ===================== -->
+    <section class="hero">
+      <div class="wrap">
+        <span class="pill"><span class="dot" aria-hidden="true"></span> Open-source · Privacy-first · Self-hostable</span>
+        <h1>Forgia la tua forza.<br /><span class="accent">I tuoi dati restano tuoi.</span></h1>
+        <p class="lead">FORGE è l'app di palestra open-source per tracciare volumi, gestire i recuperi e progredire ad ogni sessione — senza account cloud, senza pubblicità, senza compromessi.</p>
+        <div class="hero-actions" id="download">
+          <a class="btn btn-primary" href="#" aria-label="Scarica l'APK per Android">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 11 5 5 5-5"/><path d="M5 21h14"/></svg>
+            Scarica l'APK Android
+          </a>
+          <a class="btn btn-ghost" href="#self-hosting">Configura il backend</a>
+        </div>
+        <p class="hero-meta">v1.0.0 · APK ~9 MB · Android 8.0+ · Licenza MIT</p>
+      </div>
+    </section>
+
+    <!-- ===================== FUNZIONALITÀ ===================== -->
+    <section id="funzionalita">
+      <div class="wrap">
+        <div class="section-head">
+          <p class="eyebrow">// Funzionalità</p>
+          <h2>Tutto il necessario. Niente di superfluo.</h2>
+          <p>Uno strumento essenziale costruito per chi si allena sul serio e tiene alla propria privacy.</p>
+        </div>
+        <div class="features">
+          <article class="card">
+            <div class="icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><rect x="7" y="11" width="3" height="6"/><rect x="12" y="7" width="3" height="10"/><rect x="17" y="13" width="3" height="4"/></svg>
+            </div>
+            <h3>Tracciamento volumi</h3>
+            <p>Registra serie, ripetizioni e carichi. FORGE calcola il volume totale per gruppo muscolare e ti mostra i trend nel tempo.</p>
+          </article>
+          <article class="card">
+            <div class="icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
+            <h3>Privacy totale</h3>
+            <p>I dati vivono sul tuo dispositivo o sul tuo server. Nessun tracker, nessuna telemetria, nessun account obbligatorio.</p>
+          </article>
+          <article class="card">
+            <div class="icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2"/><path d="M9 2h6"/></svg>
+            </div>
+            <h3>Timer di recupero</h3>
+            <p>Timer di riposo intelligenti tra le serie, con notifiche e preset personalizzabili per ogni esercizio.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== SELF-HOSTING ===================== -->
+    <section id="self-hosting">
+      <div class="wrap selfhost">
+        <div>
+          <p class="eyebrow">// Self-Hosting</p>
+          <h2>Il tuo server, le tue regole.</h2>
+          <p style="color: var(--fg-muted); font-size: 17px;">Avvia il backend FORGE in pochi secondi con Docker e PocketBase. Un singolo comando per sincronizzare i tuoi allenamenti tra dispositivi — completamente self-hosted.</p>
+          <ul>
+            <li><span class="check" aria-hidden="true">▸</span> Backend leggero basato su <strong>PocketBase</strong> (SQLite integrato)</li>
+            <li><span class="check" aria-hidden="true">▸</span> Setup con un solo comando tramite <strong>Docker Compose</strong></li>
+            <li><span class="check" aria-hidden="true">▸</span> Sincronizzazione multi-dispositivo opzionale e crittografata</li>
+            <li><span class="check" aria-hidden="true">▸</span> Zero costi ricorrenti, zero vendor lock-in</li>
+          </ul>
+        </div>
+
+        <div class="terminal" role="img" aria-label="Esempio di comandi per avviare il backend FORGE con Docker Compose e PocketBase">
+          <div class="terminal-bar">
+            <span class="tdot" aria-hidden="true"></span>
+            <span class="tdot" aria-hidden="true"></span>
+            <span class="tdot" aria-hidden="true"></span>
+            <span class="terminal-title">forge — backend setup</span>
+          </div>
+          <pre><code><span class="c-comment"># 1. Clona il repository ufficiale</span>
+<span class="c-prompt">$</span> <span class="c-cmd">git clone https://github.com/forge-app/backend.git</span>
+<span class="c-prompt">$</span> <span class="c-cmd">cd backend</span>
+
+<span class="c-comment"># 2. Avvia PocketBase in background</span>
+<span class="c-prompt">$</span> <span class="c-cmd">docker compose up <span class="c-flag">-d</span></span>
+
+<span class="c-out">[+] Running 2/2</span>
+<span class="c-out"> ✔ Network forge_default     Created</span>
+<span class="c-out"> ✔ Container forge-pocketbase  Started</span>
+
+<span class="c-comment"># 3. Backend pronto su http://localhost:8090</span>
+<span class="c-prompt">$</span> <span class="c-cmd">docker compose ps</span></code></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== CTA BAND ===================== -->
+    <section>
+      <div class="wrap">
+        <div class="cta-band">
+          <h2>Inizia ad allenarti con FORGE oggi.</h2>
+          <p>Gratis, open-source e per sempre tuo. Scarica l'app e prendi il controllo dei tuoi progressi.</p>
+          <a class="btn btn-primary" href="#">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 11 5 5 5-5"/><path d="M5 21h14"/></svg>
+            Scarica l'APK Android
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ===================== FOOTER ===================== -->
+  <footer>
+    <div class="wrap foot">
+      <div class="brand">
+        <span class="logo-mark" aria-hidden="true">F</span>
+        <span class="brand-name">FORGE</span>
+      </div>
+      <p>Costruito con dedizione · Licenza MIT · {'© 2026 FORGE'}</p>
+      <nav class="foot-links" aria-label="Link footer">
+        <a href="https://github.com" target="_blank" rel="noopener">GitHub</a>
+        <a href="#funzionalita">Funzionalità</a>
+        <a href="#self-hosting">Self-Hosting</a>
+      </nav>
+    </div>
+  </footer>
+</body>
+</html>
