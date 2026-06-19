@@ -39,5 +39,12 @@ jobs:
       - name: Create .env
         run: echo "POCKETBASE_URL=https://placeholder.duckdns.org" > .env
 
-      - name: Build Android
-        run: dotnet build src/Forge/Forge.csproj -f net10.0-android -c Release
+      - name: Publish APK
+        run: dotnet publish src/Forge/Forge.csproj -f net10.0-android -c Release /p:AndroidPackageFormats=apk
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: FORGE-Android-APK
+          path: src/Forge/bin/Release/net10.0-android/publish/*-Signed.apk
+          if-no-files-found: error

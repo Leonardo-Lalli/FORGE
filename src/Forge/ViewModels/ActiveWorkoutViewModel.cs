@@ -254,13 +254,74 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
         foreach (var ex in plan.Exercises)
         {
             ex.Order = Exercises.Count + 1;
-            // Clone sets to avoid modifying the saved plan
             var clonedSets = new ObservableCollection<ExerciseSet>();
             foreach (var s in ex.Sets)
                 clonedSets.Add(new ExerciseSet { SetNumber = s.SetNumber, WeightKg = s.WeightKg, Reps = s.Reps, IsCompleted = false });
             ex.Sets = clonedSets;
             ex.IsCompleted = false;
             Exercises.Add(ex);
+        }
+
+        _ = LoadPreviousSessionDataAsync().ContinueWith(t =>
+        {
+            if (t.IsFaulted)
+                System.Diagnostics.Debug.WriteLine($"[GhostWt] ex: {t.Exception?.InnerException?.Message}");
+        }, TaskContinuationOptions.OnlyOnFaulted);
+    }
+
+    private async Task LoadPreviousSessionDataAsync()
+    {
+        try
+        {
+            var recent = await pb.GetMyWorkoutsAsync(5);
+            if (recent.Count == 0) return;
+
+            var lastWorkout = recent.FirstOrDefault(w =>
+                !string.IsNullOrWhiteSpace(w.ExerciseData) && w.Exercises.Count > 0);
+            if (lastWorkout == null) return;
+
+            using var doc = System.Text.Json.JsonDocument.Parse(lastWorkout.ExerciseData);
+            var root = doc.RootElement;
+            if (root.ValueKind != System.Text.Json.JsonValueKind.Array) return;
+
+            var lastExercises = new Dictionary<string, List<(double kg, int reps)>>();
+            foreach (var item in root.EnumerateArray())
+            {
+                var name = item.TryGetProperty("name", out var n) ? n.GetString() ?? "" : "";
+                var sets = new List<(double, int)>();
+                if (item.TryGetProperty("sets", out var setsArr) && setsArr.ValueKind == System.Text.Json.JsonValueKind.Array)
+                {
+                    foreach (var s in setsArr.EnumerateArray())
+                    {
+                        var kg = s.TryGetProperty("weightKg", out var w) && w.TryGetDouble(out var wv) ? wv : 0;
+                        var rp = s.TryGetProperty("reps", out var r) && r.TryGetInt32(out var rv) ? rv : 0;
+                        sets.Add((kg, rp));
+                    }
+                }
+                if (!string.IsNullOrWhiteSpace(name))
+                    lastExercises[name] = sets;
+            }
+
+            await MainThread.InvokeOnMainThreadAsync(() =>
+            {
+                foreach (var ex in Exercises)
+                {
+                    if (lastExercises.TryGetValue(ex.ExerciseName, out var prevSets) && prevSets.Count > 0)
+                    {
+                        for (int i = 0; i < Math.Min(ex.Sets.Count, prevSets.Count); i++)
+                        {
+                            ex.Sets[i].WeightKg = prevSets[i].kg;
+                            ex.Sets[i].Reps = prevSets[i].reps;
+                        }
+                    }
+                }
+            });
+
+            System.Diagnostics.Debug.WriteLine($"[GhostWt] loaded prev session data for {lastExercises.Count} exercises");
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[GhostWt] ex: {ex.Message}");
         }
     }
 
