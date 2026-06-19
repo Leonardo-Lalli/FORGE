@@ -178,6 +178,53 @@
                        IsVisible="{Binding HasImportStatus}"
                        HorizontalTextAlignment="Center" />
 
+                <!-- Server Section -->
+                <Label Text="SERVER"
+                       FontFamily="OpenSansSemibold" FontSize="11" FontAttributes="Bold"
+                       TextColor="{DynamicResource TextSecondary}"
+                       CharacterSpacing="0.8" Margin="0,8,0,0" />
+
+                <Border BackgroundColor="{DynamicResource SurfaceContainerHigh}"
+                        StrokeShape="RoundRectangle 12"
+                        Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1"
+                        Padding="16">
+                    <VerticalStackLayout Spacing="10">
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="URL PocketBase"
+                                   FontFamily="OpenSansSemibold" FontSize="16" FontAttributes="Bold"
+                                   TextColor="{DynamicResource OnSurface}" />
+                            <Label Text="Inserisci l'URL del tuo server PocketBase (es. http://192.168.1.50:8090). Lascia vuoto per usare il server predefinito."
+                                   FontFamily="OpenSansRegular" FontSize="12"
+                                   TextColor="{DynamicResource TextSecondary}" />
+                        </VerticalStackLayout>
+                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                            <Border Grid.Column="0"
+                                    BackgroundColor="{DynamicResource SurfaceContainer}"
+                                    StrokeShape="RoundRectangle 8"
+                                    Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1"
+                                    Padding="12,4">
+                                <Entry Text="{Binding ServerUrl}"
+                                       Placeholder="http://192.168.1.50:8090"
+                                       FontFamily="Inter" FontSize="14"
+                                       TextColor="{DynamicResource OnSurface}"
+                                       PlaceholderColor="{DynamicResource Outline}"
+                                       BackgroundColor="Transparent"
+                                       Keyboard="Url" />
+                            </Border>
+                            <Button Grid.Column="1" Text="SALVA"
+                                    BackgroundColor="{DynamicResource Primary}"
+                                    TextColor="{DynamicResource OnPrimary}"
+                                    FontFamily="OpenSansSemibold" FontSize="13"
+                                    HeightRequest="44" CornerRadius="8" Padding="16,0"
+                                    Command="{Binding SaveServerUrlCommand}" />
+                        </Grid>
+                        <Label Text="{Binding ServerStatus}"
+                               FontFamily="OpenSansRegular" FontSize="12"
+                               TextColor="{DynamicResource LimeGreen}"
+                               IsVisible="{Binding HasServerStatus}" />
+                    </VerticalStackLayout>
+                </Border>
+
                 <!-- Account Section -->
                 <Label Text="ACCOUNT"
                        FontFamily="OpenSansSemibold" FontSize="11" FontAttributes="Bold"

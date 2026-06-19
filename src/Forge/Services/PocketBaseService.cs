@@ -13,17 +13,34 @@ public class PocketBaseService
     private PocketBaseUserRecord? currentUser;
     private HttpClient? _http;
 
+    private string GetPbBaseUrl()
+    {
+        var configured = Preferences.Get("pb_server_url", string.Empty);
+        if (!string.IsNullOrWhiteSpace(configured))
+            return configured.TrimEnd('/');
+
+        return secrets.Get("POCKETBASE_URL")?.TrimEnd('/') ?? "";
+    }
+
     private HttpClient GetHttp()
     {
         if (_http != null) return _http;
         var client = httpFactory.CreateClient("pocketbase");
-        var pbUrl = secrets.Get("POCKETBASE_URL");
+        var pbUrl = GetPbBaseUrl();
         if (string.IsNullOrWhiteSpace(pbUrl))
-            throw new InvalidOperationException("POCKETBASE_URL not configured. Set it in .env file.");
+            throw new InvalidOperationException("Server URL not configured. Go to Impostazioni and set the PocketBase URL.");
         client.BaseAddress = new Uri($"{pbUrl}/api/");
         client.Timeout = TimeSpan.FromSeconds(15);
         _http = client;
         return _http;
+    }
+
+    public void InvalidateClient()
+    {
+        _http?.Dispose();
+        _http = null;
+        token = null;
+        currentUser = null;
     }
 
     private static readonly JsonSerializerOptions JsonOptions = new()
@@ -38,7 +55,7 @@ public class PocketBaseService
 
     public string GetFileUrl(string collectionId, string recordId, string fileName)
     {
-        var pbUrl = secrets.Get("POCKETBASE_URL")?.TrimEnd('/') ?? "";
+        var pbUrl = GetPbBaseUrl();
         var url = $"{pbUrl}/api/files/{collectionId}/{recordId}/{fileName}";
         if (!string.IsNullOrWhiteSpace(token))
             url += $"?token={Uri.EscapeDataString(token)}";

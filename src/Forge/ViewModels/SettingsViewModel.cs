@@ -20,6 +20,9 @@ public partial class SettingsViewModel : BaseViewModel
     [ObservableProperty] private bool hasImportStatus;
     [ObservableProperty] private bool isItalian = LanguageCode == "13";
     [ObservableProperty] private bool isEnglish = LanguageCode == "2";
+    [ObservableProperty] private string serverUrl = string.Empty;
+    [ObservableProperty] private string serverStatus = string.Empty;
+    [ObservableProperty] private bool hasServerStatus;
 
     public SettingsViewModel(ThemeService themeService, PocketBaseService pb,
         CsvImportService csvImport, CsvExportService csvExport)
@@ -31,6 +34,7 @@ public partial class SettingsViewModel : BaseViewModel
         suppressChange = true;
         IsDarkMode = themeService.IsDarkMode;
         suppressChange = false;
+        ServerUrl = Preferences.Get("pb_server_url", string.Empty);
         HasData = true;
     }
 
@@ -115,6 +119,29 @@ public partial class SettingsViewModel : BaseViewModel
     {
         ImportStatus = msg;
         HasImportStatus = true;
+    }
+
+    [RelayCommand]
+    private void SaveServerUrl()
+    {
+        var url = (ServerUrl ?? "").Trim();
+        if (string.IsNullOrWhiteSpace(url))
+        {
+            Preferences.Remove("pb_server_url");
+            pb.InvalidateClient();
+            ServerStatus = "URL rimosso. Usa il valore da .env.";
+            HasServerStatus = true;
+            return;
+        }
+
+        if (!url.StartsWith("http://") && !url.StartsWith("https://"))
+            url = "http://" + url;
+
+        ServerUrl = url;
+        Preferences.Set("pb_server_url", url);
+        pb.InvalidateClient();
+        ServerStatus = "URL salvato. L'app userà questo server.";
+        HasServerStatus = true;
     }
 
     [RelayCommand]

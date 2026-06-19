@@ -484,6 +484,7 @@ $RECYCLE.BIN/
 
 # Study guide (personal notes, not to commit)
 studio.md
+STUDIO_ARCHITETTURA.md
 docs/private/
 
 tools/pb_hooks/

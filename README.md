@@ -126,12 +126,44 @@ dotnet publish src/Forge/Forge.csproj -f net10.0-android -c Release /p:AndroidPa
 
 ---
 
+## Self-Hosting (Docker)
+
+FORGE è privacy-first: puoi far girare il backend **su un tuo server** (Raspberry Pi, NAS, Proxmox, vecchio PC). I tuoi dati restano dentro casa tua.
+
+### Avvia il backend (30 secondi)
+
+```bash
+# 1. Clona la repo
+git clone https://github.com/USERNAME/FORGE.git
+cd FORGE
+
+# 2. Avvia PocketBase con Docker
+docker compose up -d
+```
+
+PocketBase è ora in ascolto su `http://<IP-DEL-TUO-SERVER>:8090`.
+
+### Configura l'app
+
+1. Installa l'APK sul telefono
+2. Apri FORGE → Impostazioni → **URL PocketBase**
+3. Inserisci `http://192.168.1.50:8090` (l'IP del tuo server)
+4. Tocca **SALVA**
+
+L'app userà il tuo server invece di quello predefinito. Funziona anche in LAN senza dominio pubblico — ti registri, ti alleni, e quando torni a casa sul Wi-Fi i workout si sincronizzano automaticamente.
+
+### Admin panel (opzionale)
+
+Apri `http://<IP-SERVER>:8090/_/`, crea un account admin, e configura le API rules (vedi `docs/project-journal.md` sezione 8).
+
+---
+
 ## Sviluppo
 
 ### Prerequisiti
 - .NET 10 SDK + MAUI workload
 - Dispositivo Android o emulatore (Android 7+)
-- Server PocketBase (configurabile via `.env`)
+- Server PocketBase (`docker compose up` o configurabile via `.env`)
 
 ### Setup rapido
 
@@ -164,7 +196,8 @@ dotnet publish src/Forge/Forge.csproj -f net10.0-android -c Release /p:AndroidPa
 │   ├── Services/                # Business logic (13)
 │   ├── Converters/              # Value converters (1)
 │   └── Resources/               # Stili, font, immagini
-├── tests/Forge.Tests/  # Test xUnit (36)
+├── tests/Forge.Tests/  # Test xUnit (27)
+├── docker-compose.yml           # Backend PocketBase self-hosted
 ├── tools/
 │   ├── ExerciseImporter/        # Import esercizi su PocketBase
 │   └── pb_hooks/                # Hook PocketBase (FCM)
