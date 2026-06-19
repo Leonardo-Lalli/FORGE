@@ -81,6 +81,7 @@ public static class MauiProgram
         builder.Services.AddTransient<ProfilePage>();
         builder.Services.AddTransient<SettingsPage>();
         builder.Services.AddTransient<StartSessionPage>();
+        builder.Services.AddTransient<SetupPage>();
         builder.Services.AddTransient<LoginPage>();
         builder.Services.AddTransient<FriendRequestsPage>();
         builder.Services.AddTransient<WorkoutDetailPage>();
