@@ -56,7 +56,8 @@ public class PocketBaseService
     public string GetFileUrl(string collectionId, string recordId, string fileName)
     {
         var pbUrl = GetPbBaseUrl();
-        var url = $"{pbUrl}/api/files/{collectionId}/{recordId}/{fileName}";
+        var coll = string.IsNullOrWhiteSpace(collectionId) ? "users" : collectionId;
+        var url = $"{pbUrl}/api/files/{coll}/{recordId}/{fileName}";
         if (!string.IsNullOrWhiteSpace(token))
             url += $"?token={Uri.EscapeDataString(token)}";
         return url;

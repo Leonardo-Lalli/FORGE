@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:vm="clr-namespace:Forge.ViewModels"
+    x:Class="Forge.Views.SetupPage"
+    x:DataType="vm:SetupViewModel"
+    Shell.NavBarIsVisible="False"
+    BackgroundColor="{DynamicResource Surface}">
+
+    <Grid RowDefinitions="*" Padding="32">
+        <VerticalStackLayout Spacing="24" VerticalOptions="Center" MaximumWidthRequest="420"
+                             HorizontalOptions="Center">
+
+            <VerticalStackLayout Spacing="8" HorizontalOptions="Center">
+                <Label Text="FORGE"
+                       FontFamily="SpaceGrotesk" FontSize="48" FontAttributes="Bold"
+                       TextColor="{DynamicResource Primary}"
+                       HorizontalTextAlignment="Center" />
+                <Label Text="Self-Hosting Setup"
+                       FontFamily="Lexend" FontSize="14"
+                       TextColor="{DynamicResource OnSurfaceVariant}"
+                       HorizontalTextAlignment="Center" />
+            </VerticalStackLayout>
+
+            <BoxView HeightRequest="1" Color="{DynamicResource OutlineVariant}" Margin="0,8" />
+
+            <VerticalStackLayout Spacing="6">
+                <Label Text="Hai un server PocketBase?"
+                       FontFamily="SpaceGrotesk" FontSize="18" FontAttributes="Bold"
+                       TextColor="{DynamicResource OnSurface}" />
+                <Label Text="Inserisci l'URL del tuo server (es. http://192.168.1.50:8090) oppure usa il server predefinito."
+                       FontFamily="Inter" FontSize="14"
+                       TextColor="{DynamicResource TextSecondary}"
+                       LineBreakMode="WordWrap" />
+            </VerticalStackLayout>
+
+            <Border BackgroundColor="{DynamicResource SurfaceContainerHigh}"
+                    StrokeShape="RoundRectangle 12"
+                    Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1"
+                    Padding="16,6">
+                <Entry Text="{Binding ServerUrl}"
+                       Placeholder="http://192.168.1.50:8090"
+                       FontFamily="Inter" FontSize="16"
+                       TextColor="{DynamicResource OnSurface}"
+                       PlaceholderColor="{DynamicResource Outline}"
+                       BackgroundColor="Transparent"
+                       Keyboard="Url"
+                       ReturnType="Done" />
+            </Border>
+
+            <Label Text="{Binding StatusMessage}"
+                   IsVisible="{Binding HasStatus}"
+                   FontFamily="Inter" FontSize="13"
+                   TextColor="{DynamicResource LimeGreen}"
+                   HorizontalTextAlignment="Center" />
+
+            <Button Text="SALVA E CONTINUA"
+                    FontFamily="Lexend" FontSize="14" FontAttributes="Bold"
+                    CharacterSpacing="1"
+                    BackgroundColor="{DynamicResource Primary}"
+                    TextColor="{DynamicResource OnPrimary}"
+                    HeightRequest="52" CornerRadius="12"
+                    Command="{Binding SaveAndContinueCommand}" />
+
+            <Button Text="Usa server predefinito"
+                    FontFamily="Inter" FontSize="14"
+                    BackgroundColor="Transparent"
+                    TextColor="{DynamicResource OnSurfaceVariant}"
+                    Command="{Binding UseDefaultCommand}" />
+
+        </VerticalStackLayout>
+    </Grid>
+
+</ContentPage>

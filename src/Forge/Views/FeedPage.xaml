@@ -181,8 +181,24 @@
                                            TextColor="{DynamicResource Primary}" />
 
                                     <Label Text="{Binding ExercisesList}" FontFamily="Inter" FontSize="13"
-                                           TextColor="{DynamicResource OnSurfaceVariant}" LineBreakMode="TailTruncation"
-                                           MaxLines="2" />
+                                            TextColor="{DynamicResource OnSurfaceVariant}" LineBreakMode="TailTruncation"
+                                            MaxLines="2" />
+
+                                    <!-- Photo thumbnail -->
+                                    <Border IsVisible="{Binding HasPhotos}"
+                                            StrokeShape="RoundRectangle 10"
+                                            WidthRequest="80" HeightRequest="80"
+                                            BackgroundColor="{DynamicResource SurfaceContainer}">
+                                        <Image Source="{Binding FirstPhoto}" Aspect="AspectFill"
+                                               WidthRequest="80" HeightRequest="80" />
+                                    </Border>
+
+                                    <!-- Notes -->
+                                    <Label Text="{Binding Notes}"
+                                           IsVisible="{Binding HasNotes}"
+                                           FontFamily="Inter" FontSize="13"
+                                           TextColor="{DynamicResource TextSecondary}"
+                                           LineBreakMode="TailTruncation" MaxLines="3" />
 
                                     <Grid ColumnDefinitions="*,12,*">
                                         <Border Grid.Column="0" BackgroundColor="{DynamicResource SurfaceContainer}"

@@ -25,8 +25,17 @@ public partial class App : Application
         window.Created += async (_, _) =>
         {
             await InitializeAsync();
-            var loginPage = services.GetRequiredService<LoginPage>();
-            window.Page = loginPage;
+            var setupCompleted = Preferences.Get("setup_completed", false);
+            if (!setupCompleted)
+            {
+                var setupPage = services.GetRequiredService<SetupPage>();
+                window.Page = setupPage;
+            }
+            else
+            {
+                var loginPage = services.GetRequiredService<LoginPage>();
+                window.Page = loginPage;
+            }
         };
         return window;
     }

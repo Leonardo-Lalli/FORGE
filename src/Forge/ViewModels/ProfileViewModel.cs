@@ -18,6 +18,10 @@ public partial class ProfileWorkout : ObservableObject
     public string Volume { get; set; } = string.Empty;
     public int Likes { get; set; }
     public string BorderColor { get; set; } = "#ffb4ab";
+    public string Notes { get; set; } = string.Empty;
+    public bool HasNotes { get; set; }
+    public string FirstPhoto { get; set; } = string.Empty;
+    public bool HasPhotos { get; set; }
 }
 
 public partial class ProfileViewModel : BaseViewModel
@@ -142,7 +146,11 @@ public partial class ProfileViewModel : BaseViewModel
                     Duration = $"{w.Duration} min",
                     Volume = $"{w.Volume:0.#} kg",
                     Likes = w.Likes,
-                    BorderColor = colors[ci % colors.Length]
+                    BorderColor = colors[ci % colors.Length],
+                    Notes = w.Notes ?? "",
+                    HasNotes = !string.IsNullOrWhiteSpace(w.Notes),
+                    FirstPhoto = w.Photos.FirstOrDefault() ?? "",
+                    HasPhotos = w.Photos.Count > 0
                 });
                 ci++;
             }

@@ -24,6 +24,10 @@ public partial class FeedPost : ObservableObject
     [ObservableProperty] private string avatarUrl = string.Empty;
     [ObservableProperty] private ImageSource? avatarSource;
     [ObservableProperty] private bool hasAvatar;
+    public string Notes { get; set; } = string.Empty;
+    public bool HasNotes { get; set; }
+    public string FirstPhoto { get; set; } = string.Empty;
+    public bool HasPhotos { get; set; }
 }
 
 public partial class UserSearchResult : ObservableObject
@@ -169,7 +173,11 @@ public partial class FeedViewModel : BaseViewModel
                     AvatarUrl = w.AvatarUrl ?? "",
                     AvatarSource = !string.IsNullOrWhiteSpace(w.AvatarUrl)
                         ? ImageSource.FromUri(new Uri(w.AvatarUrl)) : null,
-                    HasAvatar = !string.IsNullOrWhiteSpace(w.AvatarUrl)
+                    HasAvatar = !string.IsNullOrWhiteSpace(w.AvatarUrl),
+                    Notes = w.Notes ?? "",
+                    HasNotes = !string.IsNullOrWhiteSpace(w.Notes),
+                    FirstPhoto = w.Photos.FirstOrDefault() ?? "",
+                    HasPhotos = w.Photos.Count > 0
                 });
             }
             HasFeed = Posts.Count > 0;
