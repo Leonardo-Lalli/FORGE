@@ -4,6 +4,7 @@ import { Star } from "lucide-react"
 import Link from "next/link"
 import { ThemeToggle } from "@/components/forge/theme-toggle"
 import { LanguageToggle } from "@/components/forge/language-toggle"
+import { VersionBadge } from "@/components/forge/version-badge"
 import { useI18n } from "@/lib/i18n"
 
 export function SiteHeader() {
@@ -14,6 +15,7 @@ export function SiteHeader() {
         <Link href="/" className="flex items-center gap-3" aria-label="FORGE — home">
           <span className="grid size-9 flex-shrink-0 place-items-center rounded-[9px] border border-forge-cyan text-lg font-extrabold text-forge-cyan glow-cyan" aria-hidden="true">F</span>
           <span className="text-xl font-extrabold tracking-[0.22em]">FORGE</span>
+          <VersionBadge />
         </Link>
 
         <nav className="hidden items-center gap-8 sm:flex">
