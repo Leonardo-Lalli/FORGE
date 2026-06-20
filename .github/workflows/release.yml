@@ -32,14 +32,37 @@ jobs:
       - name: Publish APK
         run: dotnet publish src/Forge/Forge.csproj -f net10.0-android -c Release /p:AndroidPackageFormats=apk
 
+      - name: Copy APK for release
+        shell: pwsh
+        run: |
+          $apk = Get-ChildItem -Path "src/Forge/bin/Release/net10.0-android/publish/" -Filter "*-Signed.apk" | Select-Object -First 1
+          Copy-Item $apk.FullName -Destination "FORGE.apk"
+
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ inputs.version }}
           name: ${{ inputs.name }}
-          files: src/Forge/bin/Release/net10.0-android/publish/*-Signed.apk
+          files: |
+            FORGE.apk
+            docker-compose.yml
           draft: false
           prerelease: true
           generate_release_notes: true
+          body: |
+            ## 📦 Download
+            **FORGE.apk** — installa su Android 7.0+
+
+            ## 🐳 Self-Hosting
+            ```bash
+            wget https://github.com/Leonardo-Lalli/FORGE/releases/download/${{ inputs.version }}/docker-compose.yml
+            docker compose up -d
+            ```
+            Oppure clona la repo e fai checkout del tag:
+            ```bash
+            git clone https://github.com/Leonardo-Lalli/FORGE.git
+            cd FORGE && git checkout ${{ inputs.version }}
+            docker compose up -d
+            ```
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
