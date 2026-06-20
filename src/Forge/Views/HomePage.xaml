@@ -154,9 +154,9 @@
                         <!-- Header -->
                         <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
                             <Border Grid.Column="0" StrokeShape="RoundRectangle 16"
-                                    BackgroundColor="{DynamicResource PrimaryContainer}"
+                                    BackgroundColor="#1a2a30"
                                     WidthRequest="44" HeightRequest="44">
-                                <Image Source="achievements/legend.png" WidthRequest="30" HeightRequest="30"
+                                <Image Source="legend.jpg" WidthRequest="30" HeightRequest="30"
                                        HorizontalOptions="Center" VerticalOptions="Center" Aspect="AspectFit" />
                             </Border>
                             <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">

@@ -43,22 +43,23 @@ public partial class SettingsViewModel : BaseViewModel
     partial void OnIsDarkModeChanged(bool value)
     {
         if (suppressChange) return;
-        // Cycle: Light -> Dark -> Auto -> Light
-        var next = themeService.ThemeMode switch
-        {
-            0 => 1,  // Light -> Dark
-            1 => 2,  // Dark -> Auto
-            _ => 0   // Auto -> Light
-        };
+        suppressChange = true;
+        var next = themeService.ThemeMode switch { 0 => 1, 1 => 2, _ => 0 };
         themeService.ThemeMode = next;
         ThemeLabel = next switch { 0 => "Chiaro", 1 => "Scuro", _ => "Auto" };
         IsDarkMode = themeService.IsDarkMode;
+        suppressChange = false;
     }
 
     [RelayCommand]
     private void CycleTheme()
     {
-        OnIsDarkModeChanged(IsDarkMode);
+        suppressChange = true;
+        var next = themeService.ThemeMode switch { 0 => 1, 1 => 2, _ => 0 };
+        themeService.ThemeMode = next;
+        ThemeLabel = next switch { 0 => "Chiaro", 1 => "Scuro", _ => "Auto" };
+        IsDarkMode = themeService.IsDarkMode;
+        suppressChange = false;
     }
 
     [RelayCommand]

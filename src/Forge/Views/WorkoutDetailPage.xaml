@@ -49,40 +49,51 @@
                 <!-- Header Card -->
                 <Border StrokeShape="RoundRectangle 16" Padding="20"
                         BackgroundColor="{DynamicResource SurfaceContainer}"
-                        Stroke="{DynamicResource Outline}">
-                    <VerticalStackLayout Spacing="6">
+                        Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1">
+                    <VerticalStackLayout Spacing="8">
                         <Label Text="{Binding WorkoutName}" FontFamily="SpaceGrotesk"
                                FontSize="22" FontAttributes="Bold"
-                               TextColor="{DynamicResource Primary}" />
-                        <Label Text="{Binding WorkoutDate}" FontFamily="Inter" FontSize="13"
+                               TextColor="{DynamicResource Primary}"
+                               LineBreakMode="WordWrap" />
+                        <Label Text="{Binding WorkoutDate}" FontFamily="Inter" FontSize="14"
                                TextColor="{DynamicResource OnSurfaceVariant}" />
-                        <HorizontalStackLayout Spacing="16" Margin="0,4,0,0">
-                            <Label FontFamily="Inter" FontSize="13"
-                                   TextColor="{DynamicResource OnSurfaceVariant}">
-                                <Label.FormattedText>
-                                    <FormattedString>
-                                        <Span Text="&#x23F1; " FontFamily="Inter" />
-                                        <Span Text="{Binding Duration}" />
-                                    </FormattedString>
-                                </Label.FormattedText>
-                            </Label>
-                            <Label FontFamily="Inter" FontSize="13"
-                                   TextColor="{DynamicResource OnSurfaceVariant}">
-                                <Label.FormattedText>
-                                    <FormattedString>
-                                        <Span Text="&#x2696; " FontFamily="Inter" />
-                                        <Span Text="{Binding Volume}" />
-                                    </FormattedString>
-                                </Label.FormattedText>
-                            </Label>
-                        </HorizontalStackLayout>
-                        <HorizontalStackLayout IsVisible="{Binding HasLikes}"
-                                               Spacing="4" Margin="0,4,0,0">
-                            <Label Text="&#x2665;" FontSize="14" TextColor="{DynamicResource Primary}" />
-                            <Label Text="{Binding Likes, StringFormat='{0}'}"
-                                   FontFamily="Inter" FontSize="13"
-                                   TextColor="{DynamicResource OnSurfaceVariant}" />
-                        </HorizontalStackLayout>
+                        <BoxView HeightRequest="1" Color="{DynamicResource OutlineVariant}" Margin="0,4" />
+                        <Grid ColumnDefinitions="*,*,*">
+                            <VerticalStackLayout Grid.Column="0" HorizontalOptions="Center" Spacing="2">
+                                <Label Text="{Binding Duration}" FontFamily="SpaceGrotesk"
+                                       FontSize="20" FontAttributes="Bold"
+                                       TextColor="{DynamicResource OnSurface}"
+                                       HorizontalTextAlignment="Center" />
+                                <Label Text="DURATA" FontFamily="Lexend" FontSize="9"
+                                       TextColor="{DynamicResource TextSecondary}"
+                                       CharacterSpacing="1" HorizontalTextAlignment="Center" />
+                            </VerticalStackLayout>
+                            <VerticalStackLayout Grid.Column="1" HorizontalOptions="Center" Spacing="2">
+                                <Label Text="{Binding Volume}" FontFamily="SpaceGrotesk"
+                                       FontSize="20" FontAttributes="Bold"
+                                       TextColor="{DynamicResource LimeGreen}"
+                                       HorizontalTextAlignment="Center" />
+                                <Label Text="VOLUME" FontFamily="Lexend" FontSize="9"
+                                       TextColor="{DynamicResource TextSecondary}"
+                                       CharacterSpacing="1" HorizontalTextAlignment="Center" />
+                            </VerticalStackLayout>
+                            <VerticalStackLayout Grid.Column="2" HorizontalOptions="Center" Spacing="2"
+                                                 IsVisible="{Binding HasLikes}">
+                                <Label FontFamily="SpaceGrotesk" FontSize="20" FontAttributes="Bold"
+                                       TextColor="{DynamicResource Primary}"
+                                       HorizontalTextAlignment="Center">
+                                    <Label.FormattedText>
+                                        <FormattedString>
+                                            <Span Text="{Binding Likes}" />
+                                            <Span Text=" ♥" FontSize="14" />
+                                        </FormattedString>
+                                    </Label.FormattedText>
+                                </Label>
+                                <Label Text="LIKES" FontFamily="Lexend" FontSize="9"
+                                       TextColor="{DynamicResource TextSecondary}"
+                                       CharacterSpacing="1" HorizontalTextAlignment="Center" />
+                            </VerticalStackLayout>
+                        </Grid>
                     </VerticalStackLayout>
                 </Border>
 
