@@ -94,8 +94,21 @@ public class PocketBaseService
         catch (Exception ex)
         {
             System.Diagnostics.Debug.WriteLine($"[PB DownloadAvatar] ex: {ex.Message}");
-            return null;
         }
+
+        // Fallback: try URL-based approach
+        try
+        {
+            var fallbackUrl = GetFileUrl(collectionId, recordId, fileName);
+            System.Diagnostics.Debug.WriteLine($"[PB DownloadAvatar] Fallback URL: {fallbackUrl}");
+            return ImageSource.FromUri(new Uri(fallbackUrl));
+        }
+        catch (Exception ex2)
+        {
+            System.Diagnostics.Debug.WriteLine($"[PB DownloadAvatar] Fallback ex: {ex2.Message}");
+        }
+
+        return null;
     }
 
     public PocketBaseService(IHttpClientFactory httpFactory, BuildSecrets secrets)
