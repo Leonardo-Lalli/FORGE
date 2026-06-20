@@ -153,6 +153,10 @@ public class PocketBaseService
         
         try
         {
+            var pbUrl = GetPbBaseUrl();
+            if (string.IsNullOrWhiteSpace(pbUrl))
+                return (false, "Server non configurato. Vai su Impostazioni e inserisci l'URL del server.");
+
             var payload = new { identity = email, password };
             var response = await GetHttp().PostAsJsonAsync("collections/users/auth-with-password", payload, JsonOptions);
 
@@ -278,7 +282,8 @@ public class PocketBaseService
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"[PB FcmToken] ex: {ex.Message}");
+            System.Diagnostics.Debug.WriteLine($"[PB Login] ex: {ex.GetType().Name}: {ex.Message}");
+            return (false, $"Errore di autenticazione: {ex.Message}");
         }
     }
 
@@ -475,7 +480,7 @@ public class PocketBaseService
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"[PB] SecureStorage unavailable: {ex.Message}. Auto-login disabled.");
+            System.Diagnostics.Debug.WriteLine($"[PB Reg] ex: {ex.GetType().Name}: {ex.Message}"); return (false, $"Errore: {ex.Message}");
         }
     }
 

@@ -16,6 +16,8 @@ public partial class SetupViewModel : BaseViewModel
     {
         Preferences.Set("setup_completed", true);
         Preferences.Remove("pb_server_url");
+        StatusMessage = "Nessun server configurato. Potrai farlo dalle Impostazioni.";
+        HasStatus = true;
         GoToLogin();
     }
 
