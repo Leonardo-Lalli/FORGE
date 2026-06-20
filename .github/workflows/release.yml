@@ -12,6 +12,9 @@ on:
         required: true
         type: string
 
+permissions:
+  contents: write
+
 jobs:
   release:
     runs-on: windows-latest
@@ -48,7 +51,6 @@ jobs:
             docker-compose.yml
           draft: false
           prerelease: true
-          generate_release_notes: true
           body: |
             ## 📦 Download
             **FORGE.apk** — installa su Android 7.0+
