@@ -96,4 +96,34 @@ public partial class LoginViewModel : BaseViewModel
         IsRegistering = !IsRegistering;
         ErrorMessage = null;
     }
+
+    [RelayCommand]
+    private async Task OpenServerConfigAsync()
+    {
+        var current = Preferences.Get("pb_server_url", string.Empty);
+        var result = await Shell.Current.DisplayPromptAsync(
+            "Server PocketBase",
+            "Inserisci l'URL del tuo server (es. http://192.168.1.50:8090)",
+            "Salva",
+            "Annulla",
+            placeholder: "https://tuo-server.duckdns.org",
+            initialValue: current);
+
+        if (result == null) return;
+
+        var url = result.Trim();
+        if (string.IsNullOrWhiteSpace(url))
+        {
+            Preferences.Remove("pb_server_url");
+            pb.InvalidateClient();
+            return;
+        }
+
+        if (!url.StartsWith("http://") && !url.StartsWith("https://"))
+            url = "https://" + url;
+
+        Preferences.Set("pb_server_url", url);
+        pb.InvalidateClient();
+        SetError(null);
+    }
 }

@@ -204,18 +204,21 @@
                     </Label>
                 </HorizontalStackLayout>
 
-                <!-- Footer links -->
-                <Grid ColumnDefinitions="Auto,*,Auto" HorizontalOptions="Center" Margin="0,20,0,0">
-                    <Label Grid.Column="0" Text="Protocols"
+                <!-- Server config link -->
+                <HorizontalStackLayout Spacing="4" HorizontalOptions="Center"
+                                       Margin="0,20,0,0">
+                    <Label Text="⚙"
                            FontFamily="OpenSansRegular" FontSize="12"
-                           TextColor="{DynamicResource TextSecondary}" />
-                    <Label Grid.Column="1" Text="·" FontSize="12"
                            TextColor="{DynamicResource TextSecondary}"
-                           HorizontalTextAlignment="Center" Margin="12,0" />
-                    <Label Grid.Column="2" Text="Directives"
-                           FontFamily="OpenSansRegular" FontSize="12"
-                           TextColor="{DynamicResource TextSecondary}" />
-                </Grid>
+                           VerticalOptions="Center" />
+                    <Label Text="Configura server"
+                           FontFamily="OpenSansSemibold" FontSize="12"
+                           TextColor="{DynamicResource Primary}" VerticalOptions="Center">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding OpenServerConfigCommand}" />
+                        </Label.GestureRecognizers>
+                    </Label>
+                </HorizontalStackLayout>
 
             </VerticalStackLayout>
         </ScrollView>

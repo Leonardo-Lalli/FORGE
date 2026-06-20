@@ -282,8 +282,7 @@ public class PocketBaseService
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"[PB Login] ex: {ex.GetType().Name}: {ex.Message}");
-            return (false, $"Errore di autenticazione: {ex.Message}");
+            System.Diagnostics.Debug.WriteLine($"[PB FcmToken] ex: {ex.Message}");
         }
     }
 
@@ -480,7 +479,7 @@ public class PocketBaseService
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"[PB Reg] ex: {ex.GetType().Name}: {ex.Message}"); return (false, $"Errore: {ex.Message}");
+            System.Diagnostics.Debug.WriteLine($"[PB] SecureStorage unavailable: {ex.Message}. Auto-login disabled.");
         }
     }
 
