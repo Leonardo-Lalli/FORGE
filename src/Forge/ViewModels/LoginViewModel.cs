@@ -101,7 +101,10 @@ public partial class LoginViewModel : BaseViewModel
     private async Task OpenServerConfigAsync()
     {
         var current = Preferences.Get("pb_server_url", string.Empty);
-        var result = await Shell.Current.DisplayPromptAsync(
+        var page = Application.Current?.Windows[0].Page;
+        if (page == null) return;
+
+        var result = await page.DisplayPromptAsync(
             "Server PocketBase",
             "Inserisci l'URL del tuo server (es. http://192.168.1.50:8090)",
             "Salva",
