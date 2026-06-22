@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Domanda o discussione
+    url: https://github.com/Leonardo-Lalli/FORGE/discussions
+    about: Apri una discussione per idee, domande o supporto generale
+  - name: Sito ufficiale
+    url: https://leonardo-lalli.github.io/FORGE/
+    about: Documentazione, screenshot e download sul sito ufficiale

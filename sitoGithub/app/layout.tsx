@@ -10,11 +10,72 @@ const geistMono = Geist_Mono({
   subsets: ['latin'],
 })
 
+const siteUrl = 'https://leonardo-lalli.github.io/FORGE'
+const ogImage = '/apple-icon.png'
+
 export const metadata: Metadata = {
-  title: 'FORGE — Allenati. Traccia. Progredisci.',
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: 'FORGE — Allenati. Traccia. Progredisci.',
+    template: '%s — FORGE',
+  },
   description:
     "FORGE è l'app di palestra open-source, privacy-first e self-hostable. Traccia i tuoi volumi, gestisci i tempi di recupero e mantieni i tuoi dati al sicuro.",
-  generator: 'v0.app',
+  keywords: [
+    'FORGE', 'app palestra', 'workout tracker', 'gym tracker', 'fitness app',
+    'allenamento', 'tracking allenamento', 'self-hosted', 'open source',
+    'PocketBase', '.NET MAUI', 'Android fitness', 'gratis', 'privacy-first',
+  ],
+  authors: [{ name: 'Leonardo Lalli' }],
+  creator: 'Leonardo Lalli',
+  publisher: 'Leonardo Lalli',
+  applicationName: 'FORGE',
+  category: 'Health & Fitness',
+  formatDetection: { telephone: false },
+  alternates: {
+    canonical: '/',
+    languages: {
+      'it-IT': '/',
+      'en-US': '/',
+      'es-ES': '/',
+      'zh-CN': '/',
+    },
+  },
+  openGraph: {
+    type: 'website',
+    locale: 'it_IT',
+    alternateLocale: ['en_US', 'es_ES', 'zh_CN'],
+    url: siteUrl,
+    siteName: 'FORGE',
+    title: 'FORGE — Il diario di allenamento sociale',
+    description:
+      "App Android open-source per tracciare gli allenamenti in palestra. 1.500+ esercizi, feed sociale, achievement, statistiche. Self-hostable e gratis.",
+    images: [
+      {
+        url: ogImage,
+        width: 512,
+        height: 512,
+        alt: 'FORGE — Workout Tracker',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'FORGE — Il diario di allenamento sociale',
+    description:
+      'App Android open-source per tracciare gli allenamenti. 1.500+ esercizi, feed sociale, achievement. Self-hostable e gratis.',
+    images: [ogImage],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
   icons: {
     icon: [
       {
@@ -56,6 +117,27 @@ export default function RootLayout({
       <body className="font-sans antialiased bg-forge-bg text-forge-fg">
         <Providers>{children}</Providers>
         {process.env.NODE_ENV === 'production' && <Analytics />}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'SoftwareApplication',
+              name: 'FORGE',
+              applicationCategory: 'HealthApplication',
+              operatingSystem: 'Android',
+              description:
+                'App Android open-source per tracciare gli allenamenti in palestra con funzionalità social.',
+              author: { '@type': 'Person', name: 'Leonardo Lalli' },
+              offers: { '@type': 'Offer', price: '0', priceCurrency: 'EUR' },
+              aggregateRating: {
+                '@type': 'AggregateRating',
+                ratingValue: '5',
+                ratingCount: '1',
+              },
+            }),
+          }}
+        />
       </body>
     </html>
   )

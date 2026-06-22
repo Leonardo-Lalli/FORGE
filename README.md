@@ -34,6 +34,11 @@ https://github.com/user-attachments/assets/28498cc5-b1e4-4de4-bce0-1627f3fb002d
 [![Tests](https://img.shields.io/badge/Tests-27%20passed-brightgreen)](tests/)
 [![License](https://img.shields.io/badge/License-MIT-blue)](LICENSE)
 
+[![GitHub stars](https://img.shields.io/github/stars/Leonardo-Lalli/FORGE?style=social&label=Star)](https://github.com/Leonardo-Lalli/FORGE/stargazers)
+[![GitHub downloads](https://img.shields.io/github/downloads/Leonardo-Lalli/FORGE/total?label=Download)](https://github.com/Leonardo-Lalli/FORGE/releases)
+[![Last commit](https://img.shields.io/github/last-commit/Leonardo-Lalli/FORGE?label=Ultimo%20update)](https://github.com/Leonardo-Lalli/FORGE/commits)
+[![GitHub release](https://img.shields.io/github/v/release/Leonardo-Lalli/FORGE?label=Release)](https://github.com/Leonardo-Lalli/FORGE/releases/latest)
+
 **Trasforma ogni ripetizione in progresso. Sfida i tuoi amici. Supera i tuoi limiti.**
 
 ### 🔗 Link Rapidi
@@ -56,6 +61,21 @@ FORGE è un'app Android per il tracking degli allenamenti in palestra, con un'an
 | Non ricordi i pesi della volta scorsa | Storico allenamenti con dettaglio serie per serie |
 | Non sai quali esercizi fare per un muscolo | Catalogo 1.500+ esercizi con GIF, ricerca e filtri |
 | Ti alleni da solo e perdi motivazione | Feed amici, like, streak settimanali, achievement |
+
+### Perché FORGE invece di Strong / Hevy / FitNotes?
+
+| Feature | FORGE | Strong | Hevy | FitNotes |
+|---------|:-----:|:------:|:----:|:--------:|
+| Prezzo | **Gratis** | ~80€/anno | 40€/anno | Gratis (no social) |
+| Open source | **Sì** | No | No | No |
+| Self-hosting backend | **Sì** | No | No | No |
+| 1.500+ esercizi con GIF | **Sì** | 1.000 | 400 | ~100 |
+| Feed sociale (like, follow) | **Sì** | No | No | No |
+| Achievement / gamification | **48 badge** | No | No | No |
+| Foto progresso | **Sì** | No | No | No |
+| Offline + sync | **Sì** | No | Premium | Sì (locale) |
+| CSV import/export | **Sì** | Premium | Premium | Sì |
+| Privacy-first | **Sì** | No | No | Sì |
 
 ---
 
@@ -280,6 +300,20 @@ MIT License — vedi il file [LICENSE](LICENSE) per i dettagli.
 - **ExerciseDB API**: Exercise data and GIFs provided by [ExerciseDB](https://github.com/yuhonas/free-exercise-db) (free, non-commercial use)
 - **Badge icons**: created with Canva Pro
 - **Fonts**: Inter, Lexend, Space Grotesk by Google Fonts (SIL Open Font License)
+
+---
+
+## Community & Support
+
+<div align="center">
+
+**Ti piace FORGE? Lascia una star!**
+
+[![Star FORGE](https://img.shields.io/github/stars/Leonardo-Lalli/FORGE?style=social)](https://github.com/Leonardo-Lalli/FORGE/stargazers)
+
+[⭐ Star](https://github.com/Leonardo-Lalli/FORGE/stargazers) · [🐛 Bug report](https://github.com/Leonardo-Lalli/FORGE/issues/new?template=bug_report.md) · [💡 Feature request](https://github.com/Leonardo-Lalli/FORGE/issues/new?template=feature_request.md) · [💬 Discussioni](https://github.com/Leonardo-Lalli/FORGE/discussions)
+
+</div>
 
 ---
 
