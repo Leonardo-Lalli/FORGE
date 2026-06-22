@@ -38,7 +38,7 @@ jobs:
         run: |
           BANNER='<table style="width:100%;border-collapse:collapse;margin-bottom:16px"><tr><td style="background-color:#dc2626;color:white;padding:16px;text-align:center;font-weight:bold;font-size:16px;border-radius:8px">&#x26A0; SERVER OFFLINE &#x26A0; &mdash; Il server FORGE &egrave; temporaneamente irraggiungibile. Torner&agrave; online al pi&ugrave; presto.</td></tr></table>
 
-          '
+'
           for f in README.md README_en.md README_es.md README_zh.md; do
             if [ -f "$f" ]; then
               printf '%s' "$BANNER" | cat - "$f" > tmp && mv tmp "$f"
@@ -58,7 +58,7 @@ jobs:
               python3 -c "
 import re
 c = open('$f').read()
-c = re.sub(r'<table[^>]*>SERVER OFFLINE.*?</table>\n*', '', c, count=1, flags=re.DOTALL|re.IGNORECASE)
+c = re.sub(r'<table[^>]*>.*?SERVER OFFLINE.*?</table>\s*', '', c, count=1, flags=re.DOTALL)
 open('$f','w').write(c.lstrip('\n'))
 "
             fi
