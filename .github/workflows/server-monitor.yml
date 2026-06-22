@@ -53,14 +53,16 @@ jobs:
       - name: Remove OFFLINE banner
         if: steps.health.outputs.status == 'up' && steps.check.outputs.has_banner == 'true'
         run: |
+          cat > remove_banner.py << 'PYEOF'
+          import re, sys
+          for f in sys.argv[1:]:
+              c = open(f).read()
+              c = re.sub(r'<table[^>]*>.*?SERVER OFFLINE.*?</table>\s*', '', c, count=1, flags=re.DOTALL)
+              open(f, 'w').write(c.lstrip('\n'))
+          PYEOF
           for f in README.md README_en.md README_es.md README_zh.md; do
             if [ -f "$f" ]; then
-              python3 -c "
-import re
-c = open('$f').read()
-c = re.sub(r'<table[^>]*>.*?SERVER OFFLINE.*?</table>\s*', '', c, count=1, flags=re.DOTALL)
-open('$f','w').write(c.lstrip('\n'))
-"
+              python3 remove_banner.py "$f"
             fi
           done
           git config user.name "github-actions[bot]"
