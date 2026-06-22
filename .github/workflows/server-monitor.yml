@@ -1,0 +1,70 @@
+name: Monitor Server Status
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  check-server:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check PocketBase health
+        id: health
+        run: |
+          if curl -f -s -o /dev/null -w "%{http_code}" --max-time 10 \
+            "${{ secrets.POCKETBASE_URL }}/api/health" | grep -q "200"; then
+            echo "status=up" >> $GITHUB_OUTPUT
+          else
+            echo "status=down" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Check if banner already present
+        id: check
+        run: |
+          if grep -q "SERVER OFFLINE" README.md; then
+            echo "has_banner=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_banner=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Add OFFLINE banner
+        if: steps.health.outputs.status == 'down' && steps.check.outputs.has_banner == 'false'
+        run: |
+          BANNER='<table style="width:100%;border-collapse:collapse;margin-bottom:16px"><tr><td style="background-color:#dc2626;color:white;padding:16px;text-align:center;font-weight:bold;font-size:16px;border-radius:8px">&#x26A0; SERVER OFFLINE &#x26A0; &mdash; Il server FORGE &egrave; temporaneamente irraggiungibile. Torner&agrave; online al pi&ugrave; presto.</td></tr></table>
+
+          '
+          for f in README.md README_en.md README_es.md README_zh.md; do
+            if [ -f "$f" ]; then
+              printf '%s' "$BANNER" | cat - "$f" > tmp && mv tmp "$f"
+            fi
+          done
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add README.md README_en.md README_es.md README_zh.md 2>/dev/null || true
+          git diff --staged --quiet || git commit -m "server: add OFFLINE banner"
+          git push
+
+      - name: Remove OFFLINE banner
+        if: steps.health.outputs.status == 'up' && steps.check.outputs.has_banner == 'true'
+        run: |
+          for f in README.md README_en.md README_es.md README_zh.md; do
+            if [ -f "$f" ]; then
+              python3 -c "
+import re
+c = open('$f').read()
+c = re.sub(r'<table[^>]*>SERVER OFFLINE.*?</table>\n*', '', c, count=1, flags=re.DOTALL|re.IGNORECASE)
+open('$f','w').write(c.lstrip('\n'))
+"
+            fi
+          done
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add README.md README_en.md README_es.md README_zh.md 2>/dev/null || true
+          git diff --staged --quiet || git commit -m "server: remove OFFLINE banner (back online)"
+          git push
