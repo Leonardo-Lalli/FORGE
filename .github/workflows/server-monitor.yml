@@ -1,4 +1,4 @@
-name: Monitor Server Status
+name: Server Monitor
 
 on:
   schedule:
@@ -36,12 +36,12 @@ jobs:
       - name: Add OFFLINE banner
         if: steps.health.outputs.status == 'down' && steps.check.outputs.has_banner == 'false'
         run: |
-          BANNER='<table style="width:100%;border-collapse:collapse;margin-bottom:16px"><tr><td style="background-color:#dc2626;color:white;padding:16px;text-align:center;font-weight:bold;font-size:16px;border-radius:8px">&#x26A0; SERVER OFFLINE &#x26A0; &mdash; Il server FORGE &egrave; temporaneamente irraggiungibile. Torner&agrave; online al pi&ugrave; presto.</td></tr></table>
-
-'
+          cat > banner.html << 'ENDOFBANNER'
+          <table style="width:100%;border-collapse:collapse;margin-bottom:16px"><tr><td style="background-color:#dc2626;color:white;padding:16px;text-align:center;font-weight:bold;font-size:16px;border-radius:8px">&#x26A0; SERVER OFFLINE &#x26A0; &mdash; Il server FORGE &egrave; temporaneamente irraggiungibile. Torner&agrave; online al pi&ugrave; presto.</td></tr></table>
+          ENDOFBANNER
           for f in README.md README_en.md README_es.md README_zh.md; do
             if [ -f "$f" ]; then
-              printf '%s' "$BANNER" | cat - "$f" > tmp && mv tmp "$f"
+              cat banner.html "$f" > tmp && mv tmp "$f"
             fi
           done
           git config user.name "github-actions[bot]"
