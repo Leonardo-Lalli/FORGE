@@ -1,0 +1,12 @@
+1:"$Sreact.fragment"
+2:I[27655,["/FORGE/_next/static/chunks/0cwycld_zkdr6.js","/FORGE/_next/static/chunks/0d3shmwh5_nmn.js","/FORGE/_next/static/chunks/0_k8ch90stx5o.js"],"SiteHeader"]
+3:I[38359,["/FORGE/_next/static/chunks/0cwycld_zkdr6.js","/FORGE/_next/static/chunks/0d3shmwh5_nmn.js","/FORGE/_next/static/chunks/0_k8ch90stx5o.js"],"HeroSection"]
+4:I[83274,["/FORGE/_next/static/chunks/0cwycld_zkdr6.js","/FORGE/_next/static/chunks/0d3shmwh5_nmn.js","/FORGE/_next/static/chunks/0_k8ch90stx5o.js"],"FeaturesSection"]
+5:I[8327,["/FORGE/_next/static/chunks/0cwycld_zkdr6.js","/FORGE/_next/static/chunks/0d3shmwh5_nmn.js","/FORGE/_next/static/chunks/0_k8ch90stx5o.js"],"SelfHostingSection"]
+6:I[76607,["/FORGE/_next/static/chunks/0cwycld_zkdr6.js","/FORGE/_next/static/chunks/0d3shmwh5_nmn.js","/FORGE/_next/static/chunks/0_k8ch90stx5o.js"],"DocsSection"]
+7:I[13813,["/FORGE/_next/static/chunks/0cwycld_zkdr6.js","/FORGE/_next/static/chunks/0d3shmwh5_nmn.js","/FORGE/_next/static/chunks/0_k8ch90stx5o.js"],"CtaBand"]
+8:I[13813,["/FORGE/_next/static/chunks/0cwycld_zkdr6.js","/FORGE/_next/static/chunks/0d3shmwh5_nmn.js","/FORGE/_next/static/chunks/0_k8ch90stx5o.js"],"SiteFooter"]
+9:I[97367,["/FORGE/_next/static/chunks/0cwycld_zkdr6.js","/FORGE/_next/static/chunks/0d3shmwh5_nmn.js"],"OutletBoundary"]
+a:"$Sreact.suspense"
+0:{"rsc":["$","$1","c",{"children":[["$","div",null,{"className":"relative min-h-screen overflow-x-hidden bg-forge-bg text-forge-fg","children":[["$","div",null,{"className":"pointer-events-none fixed inset-0 z-0 forge-ambient","aria-hidden":"true"}],["$","div",null,{"className":"pointer-events-none fixed inset-0 z-0 forge-grid","aria-hidden":"true"}],["$","div",null,{"className":"relative z-10","children":[["$","$L2",null,{}],["$","main",null,{"id":"top","children":[["$","$L3",null,{}],["$","$L4",null,{}],["$","$L5",null,{}],["$","$L6",null,{}],["$","$L7",null,{}]]}],["$","$L8",null,{}]]}]]}],[["$","script","script-0",{"src":"/FORGE/_next/static/chunks/0_k8ch90stx5o.js","async":true}]],["$","$L9",null,{"children":["$","$a",null,{"name":"Next.MetadataOutlet","children":"$@b"}]}]]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"Ycyc6SSuGMgtB6lXRXjX9"}
+b:null

@@ -1,0 +1,5 @@
+User-Agent: *
+Allow: /
+
+Host: https://leonardo-lalli.github.io/FORGE
+Sitemap: https://leonardo-lalli.github.io/FORGE/sitemap.xml
