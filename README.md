@@ -167,11 +167,20 @@ FORGE è privacy-first: puoi far girare il backend **su un tuo server**. I tuoi 
 
 ### One-liner (scegli il tuo OS)
 
-| OS | Comando |
-|----|---------|
-| **Linux** / **macOS** / **Git Bash** | `bash <(curl -sSL https://raw.githubusercontent.com/Leonardo-Lalli/FORGE/main/tools/community-install.sh)` |
-| **Windows PowerShell** | `Invoke-Expression (Invoke-WebRequest -Uri https://raw.githubusercontent.com/Leonardo-Lalli/FORGE/main/tools/setup.ps1).Content` |
-| **Proxmox LXC** (Debian/Alpine) | `bash <(curl -sSL https://raw.githubusercontent.com/Leonardo-Lalli/FORGE/main/tools/proxmox-install.sh)` |
+```bash
+# Linux / macOS / Git Bash
+bash <(curl -sSL https://raw.githubusercontent.com/Leonardo-Lalli/FORGE/main/tools/community-install.sh)
+```
+
+```powershell
+# Windows PowerShell
+Invoke-Expression (Invoke-WebRequest -Uri https://raw.githubusercontent.com/Leonardo-Lalli/FORGE/main/tools/setup.ps1).Content
+```
+
+```bash
+# Proxmox LXC (Debian/Alpine) — installa PocketBase nativamente, no Docker
+bash <(curl -sSL https://raw.githubusercontent.com/Leonardo-Lalli/FORGE/main/tools/proxmox-install.sh)
+```
 
 > Ogni script è autonomo e fa tutto: scarica, installa, configura admin e collezioni, mostra l'IP.
 > Quelli Linux/Windows usano **Docker**. Quello Proxmox installa PocketBase **nativamente** (no Docker
