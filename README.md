@@ -178,6 +178,9 @@ Invoke-Expression (Invoke-WebRequest -Uri https://raw.githubusercontent.com/Leon
 ```
 
 > Un comando solo. Clona, avvia, crea admin e collezioni, mostra l'IP. Zero passaggi manuali.
+> Stile [Proxmox Community Scripts](https://community-scripts.github.io/ProxmoxVE/).
+
+**Quanto consuma?** PocketBase occupa ~25 MB di RAM a riposo e ~30 MB di disco. Con 100 utenti attivi arriva a ~80 MB di RAM. Gira su qualsiasi cosa: Raspberry Pi 4, vecchio PC, VPS da 1 GB.
 
 ### Avvia il backend (passo passo)
 

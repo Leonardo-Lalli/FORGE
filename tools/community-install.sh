@@ -18,6 +18,27 @@
 
 set -euo pipefail
 
+FORGE_VERSION="v0.8.0-beta"
+
+# ── Header ────────────────────────────────────
+echo ""
+echo -e "${CYAN}   ███████╗ ██████╗ ██████╗  ██████╗ ███████╗${NC}"
+echo -e "${CYAN}   ██╔════╝██╔═══██╗██╔══██╗██╔════╝ ██╔════╝${NC}"
+echo -e "${CYAN}   █████╗  ██║   ██║██████╔╝██║  ███╗█████╗  ${NC}"
+echo -e "${CYAN}   ██╔══╝  ██║   ██║██╔══██╗██║   ██║██╔══╝  ${NC}"
+echo -e "${CYAN}   ██║     ╚██████╔╝██║  ██║╚██████╔╝███████╗${NC}"
+echo -e "${CYAN}   ╚═╝      ╚═════╝ ╚═╝  ╚═╝ ╚═════╝ ╚════════╝${NC}"
+echo ""
+echo -e "           ${BOLD}Il diario di allenamento sociale${NC}"
+echo -e "           ${FORGE_VERSION} — Self-Hosted Setup"
+echo ""
+echo -e "  ${CYAN}PocketBase ~25 MB RAM${NC} | ~30 MB disco | Docker"
+echo -e "  1.500+ esercizi | Feed social | Achievement | Offline"
+echo ""
+echo -e "  ${YELLOW}Stile Proxmox Community Scripts${NC}"
+echo -e "  ${YELLOW}https://community-scripts.github.io/ProxmoxVE/${NC}"
+echo ""
+
 # ── Colori ────────────────────────────────────
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -121,10 +142,11 @@ msg_ok "IP server: $HOST_IP"
 echo ""
 echo -e "${BOLD}╔══════════════════════════════════════════════════════════╗${NC}"
 echo -e "${BOLD}║${NC}                                                          ${BOLD}║${NC}"
-echo -e "${BOLD}║${NC}     ${GREEN}FORGE PocketBase è online!${NC}                            ${BOLD}║${NC}"
+echo -e "${BOLD}║${NC}     ${GREEN}FORGE e online!${NC}                                    ${BOLD}║${NC}"
 echo -e "${BOLD}║${NC}                                                          ${BOLD}║${NC}"
-echo -e "${BOLD}║${NC}     Connetti l'app al server:                            ${BOLD}║${NC}"
-echo -e "${BOLD}║${NC}     ${CYAN}→ http://${HOST_IP}:8090${NC}                                     ${BOLD}║${NC}"
+echo -e "${BOLD}║${NC}     Nell'app FORGE, vai su Impostazioni >                ${BOLD}║${NC}"
+echo -e "${BOLD}║${NC}     URL PocketBase e incolla:                             ${BOLD}║${NC}"
+echo -e "${BOLD}║${NC}     ${CYAN}http://${HOST_IP}:8090${NC}                                     ${BOLD}║${NC}"
 echo -e "${BOLD}║${NC}                                                          ${BOLD}║${NC}"
 echo -e "${BOLD}║${NC}     Admin Panel:                                         ${BOLD}║${NC}"
 echo -e "${BOLD}║${NC}     ${CYAN}→ http://${HOST_IP}:8090/_/${NC}                                 ${BOLD}║${NC}"

@@ -13,9 +13,22 @@
 
 $ErrorActionPreference = "Stop"
 
+$forgeVersion = "v0.8.0-beta"
+
 Write-Host ""
-Write-Host "========================================" -ForegroundColor Cyan
-Write-Host "  FORGE — Self-Hosted Setup" -ForegroundColor Cyan
+Write-Host "   ███████╗ ██████╗ ██████╗  ██████╗ ███████╗" -ForegroundColor Cyan
+Write-Host "   ██╔════╝██╔═══██╗██╔══██╗██╔════╝ ██╔════╝" -ForegroundColor Cyan
+Write-Host "   █████╗  ██║   ██║██████╔╝██║  ███╗█████╗  " -ForegroundColor Cyan
+Write-Host "   ██╔══╝  ██║   ██║██╔══██╗██║   ██║██╔══╝  " -ForegroundColor Cyan
+Write-Host "   ██║     ╚██████╔╝██║  ██║╚██████╔╝███████╗" -ForegroundColor Cyan
+Write-Host "   ╚═╝      ╚═════╝ ╚═╝  ╚═╝ ╚═════╝ ╚════════╝" -ForegroundColor Cyan
+Write-Host ""
+Write-Host "           Il diario di allenamento sociale" -ForegroundColor White
+Write-Host "           ${forgeVersion} — Self-Hosted Setup" -ForegroundColor DarkGray
+Write-Host ""
+Write-Host "  PocketBase ~25 MB RAM | ~30 MB disco | Docker"  -ForegroundColor DarkGray
+Write-Host "  1.500+ esercizi | Feed social | Achievement | Offline" -ForegroundColor DarkGray
+Write-Host ""
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host ""
 
@@ -84,11 +97,14 @@ docker compose logs show-ip 2>$null | Out-String -Stream | ForEach-Object { Writ
 # --- Summary ---
 Write-Host ""
 Write-Host "========================================" -ForegroundColor Cyan
-Write-Host "  FORGE PocketBase e online!" -ForegroundColor Green
+Write-Host "  FORGE e online!" -ForegroundColor Green
 Write-Host ""
-Write-Host "  App URL:  http://${hostIp}:8090" -ForegroundColor Cyan
-Write-Host "  Admin:    http://localhost:8090/_/" -ForegroundColor White
-Write-Host "  Login:    admin@forge.local / forgeadmin123" -ForegroundColor White
+Write-Host "  Nell'app FORGE, vai su Impostazioni > URL PocketBase" -ForegroundColor White
+Write-Host "  e incolla questo indirizzo:" -ForegroundColor White
+Write-Host "  http://${hostIp}:8090" -ForegroundColor Cyan
+Write-Host ""
+Write-Host "  Admin panel: http://localhost:8090/_/" -ForegroundColor DarkGray
+Write-Host "  Login:       admin@forge.local / forgeadmin123" -ForegroundColor DarkGray
 Write-Host ""
 Write-Host "  CAMBIA SUBITO LA PASSWORD ADMIN!" -ForegroundColor Red
 Write-Host "========================================" -ForegroundColor Cyan
