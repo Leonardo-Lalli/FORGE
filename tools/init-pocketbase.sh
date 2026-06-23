@@ -3,7 +3,7 @@
 # Crea admin, collezioni e API rules al primo avvio.
 # Idempotente: se le collection esistono gia, non le ricrea.
 
-PB_URL="http://localhost:8090"
+PB_URL="${PB_URL:-http://localhost:8090}"
 PB_ADMIN_EMAIL="${PB_ADMIN_EMAIL:-admin@forge.local}"
 PB_ADMIN_PASSWORD="${PB_ADMIN_PASSWORD:-forgeadmin123}"
 
@@ -22,7 +22,7 @@ curl -sf -X POST "${PB_URL}/api/admins" \
 ADMIN_TOKEN=$(curl -sf -X POST "${PB_URL}/api/admins/auth-with-password" \
   -H "Content-Type: application/json" \
   -d "{\"email\":\"${PB_ADMIN_EMAIL}\",\"password\":\"${PB_ADMIN_PASSWORD}\"}" \
-  | sed 's/.*"token":"\([^"]*\)".*/\1/')
+  | grep -o '"token":"[^"]*"' | head -1 | cut -d'"' -f4)
 
 if [ -z "$ADMIN_TOKEN" ] || [ "$ADMIN_TOKEN" = "null" ]; then
   echo "[FORGE Init] ERROR: Cannot authenticate as admin!"
@@ -34,7 +34,8 @@ AUTH="Authorization: Bearer ${ADMIN_TOKEN}"
 CT="Content-Type: application/json"
 
 # --- Get users collection ID ---
-USERS_ID=$(curl -sf "${PB_URL}/api/collections" -H "$AUTH" | sed 's/.*"id":"\([^"]*\)","name":"users".*/\1/')
+USERS_ID=$(curl -sf "${PB_URL}/api/collections" -H "$AUTH" \
+  | grep -o '"id":"[^"]*","name":"users"' | head -1 | cut -d'"' -f4)
 if [ -z "$USERS_ID" ]; then
   echo "[FORGE Init] ERROR: Cannot find users collection!"
   exit 1
