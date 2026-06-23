@@ -43,9 +43,6 @@ echo ""
 echo -e "  ${CYAN}PocketBase ~25 MB RAM${NC} | ~30 MB disco | Docker"
 echo -e "  1.500+ esercizi | Feed social | Achievement | Offline"
 echo ""
-echo -e "  ${YELLOW}Stile Proxmox Community Scripts${NC}"
-echo -e "  ${YELLOW}https://community-scripts.github.io/ProxmoxVE/${NC}"
-echo ""
 
 # ── Funzioni helper (stile community-scripts) ──
 msg_info()    { echo -e "${CYAN}[INFO]${NC}  $*"; }
