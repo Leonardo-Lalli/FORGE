@@ -89,14 +89,17 @@ public class PocketBaseService
             if (bytes.Length == 0) return null;
 
             System.Diagnostics.Debug.WriteLine($"[PB DownloadAvatar] OK {bytes.Length} bytes from {fileName}");
-            return ImageSource.FromStream(() => new MemoryStream(bytes));
+
+            var cacheDir = FileSystem.CacheDirectory;
+            var cacheFile = Path.Combine(cacheDir, $"avatar_{recordId}.jpg");
+            await File.WriteAllBytesAsync(cacheFile, bytes);
+            return ImageSource.FromFile(cacheFile);
         }
         catch (Exception ex)
         {
             System.Diagnostics.Debug.WriteLine($"[PB DownloadAvatar] ex: {ex.Message}");
         }
 
-        // Fallback: try URL-based approach
         try
         {
             var fallbackUrl = GetFileUrl(collectionId, recordId, fileName);
@@ -1100,4 +1103,36 @@ public class PocketBaseService
 
         return "Errore dal server. Riprova più tardi.";
     }
+
+    public async Task<List<ExcerciseRecord>?> FetchExcercisePageAsync(int page, int perPage)
+    {
+        if (!IsLoggedIn) return null;
+        try
+        {
+            var response = await GetHttp().GetAsync($"collections/excercise/records?page={page}&perPage={perPage}&sort=name");
+            if (!response.IsSuccessStatusCode) return null;
+            var json = await response.Content.ReadAsStringAsync();
+            var result = JsonSerializer.Deserialize<ExcerciseListResponse>(json, JsonOptions);
+            return result?.Items;
+        }
+        catch { return null; }
+    }
+}
+
+public class ExcerciseRecord
+{
+    public string? Id { get; set; }
+    public string? Name { get; set; }
+    public string? BodyPart { get; set; }
+    public string? Equipment { get; set; }
+    public List<string>? Instructions { get; set; }
+    public string? ImageUrl { get; set; }
+    public string? Category { get; set; }
+    public string? TargetMuscles { get; set; }
+    public string? SecondaryMuscles { get; set; }
+}
+
+public class ExcerciseListResponse
+{
+    public List<ExcerciseRecord> Items { get; set; } = new();
 }

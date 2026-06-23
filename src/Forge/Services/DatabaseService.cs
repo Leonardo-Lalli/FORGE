@@ -85,6 +85,12 @@ public class DatabaseService
         return await d.Table<CachedExercise>().Where(e => e.Name == name).FirstOrDefaultAsync();
     }
 
+    public async Task<CachedExercise?> GetCachedExerciseByIdAsync(string id)
+    {
+        var d = await GetDbAsync();
+        return await d.FindAsync<CachedExercise>(id);
+    }
+
     public async Task SaveCachedExerciseAsync(CachedExercise exercise)
     {
         var d = await GetDbAsync();
@@ -115,6 +121,12 @@ public class DatabaseService
     {
         var d = await GetDbAsync();
         await d.ExecuteAsync("DELETE FROM cached_exercises WHERE Id LIKE ?", $"{prefix}%");
+    }
+
+    public async Task DeleteAllExercisesAsync()
+    {
+        var d = await GetDbAsync();
+        await d.DeleteAllAsync<CachedExercise>();
     }
 
     public async Task DeletePlanAsync(string planId)

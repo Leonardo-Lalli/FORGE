@@ -21,7 +21,7 @@ https://github.com/user-attachments/assets/28498cc5-b1e4-4de4-bce0-1627f3fb002d
 [![.NET MAUI](https://img.shields.io/badge/.NET%20MAUI-Android--first-512BD4?logo=dotnet)](https://learn.microsoft.com/dotnet/maui/)
 [![PocketBase](https://img.shields.io/badge/PocketBase-Backend-000000?logo=pocketbase)](https://pocketbase.io/)
 [![DuckDNS](https://img.shields.io/badge/DuckDNS-DDNS-FF5722?logo=duckdns)](https://duckdns.org)
-[![ExerciseDB](https://img.shields.io/badge/ExerciseDB-1.500%2B%20exercises-22C55E)](https://oss.exercisedb.dev)
+[![ExerciseDB](https://img.shields.io/badge/ExerciseDB-750%2B%20exercises-22C55E)](https://oss.exercisedb.dev)
 [![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)](#self-hosting)
 [![MVVM](https://img.shields.io/badge/Architecture-MVVM%20%7C%20CommunityToolkit-7C3AED)](https://learn.microsoft.com/dotnet/communitytoolkit/mvvm/)
 [![Tests](https://img.shields.io/badge/Tests-27%20passed-brightgreen)](tests/)

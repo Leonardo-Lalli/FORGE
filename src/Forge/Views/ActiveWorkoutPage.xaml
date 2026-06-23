@@ -427,12 +427,25 @@
                         <DataTemplate x:DataType="vm:FilterChip">
                             <Border StrokeShape="RoundRectangle 14"
                                     Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1"
-                                    Padding="12,5" HeightRequest="30">
+                                    Padding="12,5" HeightRequest="30"
+                                    BackgroundColor="Transparent">
+                                <Border.Triggers>
+                                    <DataTrigger TargetType="Border" Binding="{Binding IsSelected}" Value="True">
+                                        <Setter Property="BackgroundColor" Value="{DynamicResource Primary}" />
+                                        <Setter Property="Stroke" Value="{DynamicResource Primary}" />
+                                    </DataTrigger>
+                                </Border.Triggers>
                                 <Border.GestureRecognizers>
                                     <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ActiveWorkoutViewModel}}, Path=SelectMuscleFilterCommand}" CommandParameter="{Binding .}" />
                                 </Border.GestureRecognizers>
                                 <Label Text="{Binding Label}" FontFamily="Inter" FontSize="12"
-                                       TextColor="{DynamicResource OnSurface}" VerticalOptions="Center" />
+                                       TextColor="{DynamicResource OnSurface}" VerticalOptions="Center">
+                                    <Label.Triggers>
+                                        <DataTrigger TargetType="Label" Binding="{Binding IsSelected}" Value="True">
+                                            <Setter Property="TextColor" Value="White" />
+                                        </DataTrigger>
+                                    </Label.Triggers>
+                                </Label>
                             </Border>
                         </DataTemplate>
                     </BindableLayout.ItemTemplate>
@@ -448,12 +461,25 @@
                         <DataTemplate x:DataType="vm:FilterChip">
                             <Border StrokeShape="RoundRectangle 14"
                                     Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1"
-                                    Padding="12,5" HeightRequest="30">
+                                    Padding="12,5" HeightRequest="30"
+                                    BackgroundColor="Transparent">
+                                <Border.Triggers>
+                                    <DataTrigger TargetType="Border" Binding="{Binding IsSelected}" Value="True">
+                                        <Setter Property="BackgroundColor" Value="{DynamicResource Primary}" />
+                                        <Setter Property="Stroke" Value="{DynamicResource Primary}" />
+                                    </DataTrigger>
+                                </Border.Triggers>
                                 <Border.GestureRecognizers>
                                     <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ActiveWorkoutViewModel}}, Path=SelectEquipmentFilterCommand}" CommandParameter="{Binding .}" />
                                 </Border.GestureRecognizers>
                                 <Label Text="{Binding Label}" FontFamily="Inter" FontSize="12"
-                                       TextColor="{DynamicResource OnSurface}" VerticalOptions="Center" />
+                                       TextColor="{DynamicResource OnSurface}" VerticalOptions="Center">
+                                    <Label.Triggers>
+                                        <DataTrigger TargetType="Label" Binding="{Binding IsSelected}" Value="True">
+                                            <Setter Property="TextColor" Value="White" />
+                                        </DataTrigger>
+                                    </Label.Triggers>
+                                </Label>
                             </Border>
                         </DataTemplate>
                     </BindableLayout.ItemTemplate>
