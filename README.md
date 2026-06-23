@@ -134,7 +134,8 @@ bash <(curl -sSL https://raw.githubusercontent.com/Leonardo-Lalli/FORGE/main/too
 
 ```bash
 # Proxmox VE — run on the HYPERVISOR (creates a new LXC container from scratch)
-# Interactive menu: choose Alpine/Debian/Ubuntu, auto-allocates RAM/disk/CPU
+# Allocates: 512 MB RAM | 4 GB disk | 2 CPU cores
+# Interactive menu lets you pick Alpine (~250 MB total), Debian 12 (~530 MB), or Ubuntu (~830 MB)
 bash <(curl -sSL https://raw.githubusercontent.com/Leonardo-Lalli/FORGE/main/tools/proxmox-create.sh)
 ```
 
