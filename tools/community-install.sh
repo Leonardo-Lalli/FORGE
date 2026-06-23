@@ -20,6 +20,14 @@ set -euo pipefail
 
 FORGE_VERSION="v0.8.0-beta"
 
+# ── Colori ────────────────────────────────────
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+CYAN='\033[0;36m'
+BOLD='\033[1m'
+NC='\033[0m'
+
 # ── Header ────────────────────────────────────
 echo ""
 echo -e "${CYAN}   ███████╗ ██████╗ ██████╗  ██████╗ ███████╗${NC}"
@@ -38,14 +46,6 @@ echo ""
 echo -e "  ${YELLOW}Stile Proxmox Community Scripts${NC}"
 echo -e "  ${YELLOW}https://community-scripts.github.io/ProxmoxVE/${NC}"
 echo ""
-
-# ── Colori ────────────────────────────────────
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-CYAN='\033[0;36m'
-BOLD='\033[1m'
-NC='\033[0m'
 
 # ── Funzioni helper (stile community-scripts) ──
 msg_info()    { echo -e "${CYAN}[INFO]${NC}  $*"; }
