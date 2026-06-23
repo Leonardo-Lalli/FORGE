@@ -53,11 +53,18 @@ AUTH="Authorization: Bearer ${ADMIN_TOKEN}"
 CT="Content-Type: application/json"
 
 # --- Get users collection ID ---
-USERS_ID=$(curl -sf "${PB_URL}/api/collections" -H "$AUTH" \
-  | grep -o '"id":"[^"]*","name":"users"' | head -1 | cut -d'"' -f4)
+COLLECTIONS=$(curl -sf "${PB_URL}/api/collections" -H "$AUTH")
+USERS_ID=$(echo "$COLLECTIONS" | grep -o '{"[^}]*"name":"users"[^}]*}' | grep -o '"id":"[^"]*"' | head -1 | cut -d'"' -f4)
+
+if [ -z "$USERS_ID" ]; then
+  USERS_ID=$(echo "$COLLECTIONS" | grep -o '"id":"[^"]*"' | while read -r pair; do
+    echo "$pair"
+  done | head -1 | cut -d'"' -f4)
+fi
 
 if [ -z "$USERS_ID" ]; then
   echo "[FORGE Init] ERROR: Cannot find users collection!"
+  echo "[FORGE Init] Raw: ${COLLECTIONS}"
   exit 1
 fi
 echo "[FORGE Init] Users collection ID: ${USERS_ID}"
