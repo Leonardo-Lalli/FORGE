@@ -16,7 +16,7 @@
 #   • Nessuna configurazione manuale necessaria
 # ──────────────────────────────────────────────
 
-set -euo pipefail
+set -uo pipefail
 
 FORGE_VERSION="v0.8.0-beta"
 
@@ -99,8 +99,8 @@ section "Avvio PocketBase"
 msg_info "Avvio container Docker..."
 cd "$FORGE_DIR"
 docker compose down --remove-orphans 2>&1 | tail -1
-docker compose up -d
-msg_ok "Container avviati"
+docker compose up -d pocketbase
+msg_ok "PocketBase avviato"
 
 # ── Attesa servizi ────────────────────────────
 msg_info "Attesa PocketBase (max 60s)..."
@@ -122,6 +122,7 @@ msg_info "Inizializzazione collezioni..."
 docker compose up -d init
 sleep 5
 docker compose logs init 2>&1 | tail -12
+docker compose up -d show-ip
 msg_ok "Collezioni create"
 
 # ── IP del server ─────────────────────────────
