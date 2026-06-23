@@ -53,21 +53,8 @@ AUTH="Authorization: Bearer ${ADMIN_TOKEN}"
 CT="Content-Type: application/json"
 
 # --- Get users collection ID ---
-COLLECTIONS=$(curl -sf "${PB_URL}/api/collections" -H "$AUTH")
-USERS_ID=$(echo "$COLLECTIONS" | grep -o '{"[^}]*"name":"users"[^}]*}' | grep -o '"id":"[^"]*"' | head -1 | cut -d'"' -f4)
-
-if [ -z "$USERS_ID" ]; then
-  USERS_ID=$(echo "$COLLECTIONS" | grep -o '"id":"[^"]*"' | while read -r pair; do
-    echo "$pair"
-  done | head -1 | cut -d'"' -f4)
-fi
-
-if [ -z "$USERS_ID" ]; then
-  echo "[FORGE Init] ERROR: Cannot find users collection!"
-  echo "[FORGE Init] Raw: ${COLLECTIONS}"
-  exit 1
-fi
-echo "[FORGE Init] Users collection ID: ${USERS_ID}"
+# PocketBase accepts collection name or system name in collectionId
+USERS_REF="users"
 
 # --- Helper: create collection if not exists ---
 create_if_missing() {
@@ -85,7 +72,7 @@ create_if_missing "logged_workouts" "{
   \"name\":\"logged_workouts\",
   \"type\":\"base\",
   \"schema\":[
-    {\"name\":\"user\",\"type\":\"relation\",\"required\":true,\"options\":{\"collectionId\":\"${USERS_ID}\",\"cascadeDelete\":false}},
+    {\"name\":\"user\",\"type\":\"relation\",\"required\":true,\"options\":{\"collectionId\":\"${USERS_REF}\",\"cascadeDelete\":false}},
     {\"name\":\"user_name\",\"type\":\"text\",\"required\":false},
     {\"name\":\"name\",\"type\":\"text\",\"required\":true},
     {\"name\":\"date\",\"type\":\"date\",\"required\":true},
@@ -109,9 +96,9 @@ create_if_missing "social_graph" "{
   \"name\":\"social_graph\",
   \"type\":\"base\",
   \"schema\":[
-    {\"name\":\"from_user\",\"type\":\"relation\",\"required\":true,\"options\":{\"collectionId\":\"${USERS_ID}\",\"cascadeDelete\":false}},
+    {\"name\":\"from_user\",\"type\":\"relation\",\"required\":true,\"options\":{\"collectionId\":\"${USERS_REF}\",\"cascadeDelete\":false}},
     {\"name\":\"from_name\",\"type\":\"text\",\"required\":false},
-    {\"name\":\"to_user\",\"type\":\"relation\",\"required\":true,\"options\":{\"collectionId\":\"${USERS_ID}\",\"cascadeDelete\":false}},
+    {\"name\":\"to_user\",\"type\":\"relation\",\"required\":true,\"options\":{\"collectionId\":\"${USERS_REF}\",\"cascadeDelete\":false}},
     {\"name\":\"status\",\"type\":\"text\",\"required\":true}
   ],
   \"listRule\":\"@request.auth.id != '' && (from_user = @request.auth.id || to_user = @request.auth.id)\",
