@@ -167,7 +167,7 @@ FORGE è privacy-first: puoi far girare il backend **su un tuo server** (Raspber
 
 ### Avvia il backend (one-liner)
 
-**Linux / macOS (Bash):**
+**Linux (Bash, incluso Git Bash su Windows):**
 ```bash
 bash <(curl -sSL https://raw.githubusercontent.com/Leonardo-Lalli/FORGE/main/tools/community-install.sh)
 ```
@@ -177,8 +177,14 @@ bash <(curl -sSL https://raw.githubusercontent.com/Leonardo-Lalli/FORGE/main/too
 Invoke-Expression (Invoke-WebRequest -Uri https://raw.githubusercontent.com/Leonardo-Lalli/FORGE/main/tools/setup.ps1).Content
 ```
 
+**Proxmox LXC (Debian/Alpine):**
+```bash
+bash <(curl -sSL https://raw.githubusercontent.com/Leonardo-Lalli/FORGE/main/tools/proxmox-install.sh)
+```
+
 > Un comando solo. Clona, avvia, crea admin e collezioni, mostra l'IP. Zero passaggi manuali.
-> Stile [Proxmox Community Scripts](https://community-scripts.github.io/ProxmoxVE/).
+> Gli script Linux/PowerShell usano Docker. Lo script Proxmox installa PocketBase **nativamente** (no Docker
+> dentro LXC), formato [Proxmox Community Scripts](https://community-scripts.github.io/ProxmoxVE/).
 
 **Quanto consuma?** PocketBase occupa ~25 MB di RAM a riposo e ~30 MB di disco. Con 100 utenti attivi arriva a ~80 MB di RAM. Gira su qualsiasi cosa: Raspberry Pi 4, vecchio PC, VPS da 1 GB.
 

@@ -91,9 +91,6 @@ if ($IsLinux -or $IsMacOS) {
 if (-not $hostIp) { $hostIp = "INDIRIZZO-NON-TROVATO" }
 Write-Host "[ OK ]  IP server: $hostIp" -ForegroundColor Green
 
-# --- Show IP ---
-docker compose logs show-ip 2>$null | Out-String -Stream | ForEach-Object { Write-Host $_ }
-
 # --- Summary ---
 Write-Host ""
 Write-Host "========================================" -ForegroundColor Cyan
