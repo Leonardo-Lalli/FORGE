@@ -30,7 +30,7 @@ https://github.com/user-attachments/assets/28498cc5-b1e4-4de4-bce0-1627f3fb002d
 [![PocketBase](https://img.shields.io/badge/PocketBase-Backend-000000?logo=pocketbase)](https://pocketbase.io/)
 [![DuckDNS](https://img.shields.io/badge/DuckDNS-DDNS-FF5722?logo=duckdns)](https://duckdns.org)
 [![ExerciseDB](https://img.shields.io/badge/ExerciseDB-1.500%2B%20esercizi-22C55E)](https://oss.exercisedb.dev)
-[![Docker](https://img.shields.io/badge/ghcr.io-forge--server-2496ED?logo=docker&logoColor=white)](https://github.com/Leonardo-Lalli/FORGE/pkgs/container/forge-server)
+[![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)](#self-hosting-docker)
 [![MVVM](https://img.shields.io/badge/Architecture-MVVM%20%7C%20CommunityToolkit-7C3AED)](https://learn.microsoft.com/dotnet/communitytoolkit/mvvm/)
 [![Tests](https://img.shields.io/badge/Tests-27%20passed-brightgreen)](tests/)
 [![License](https://img.shields.io/badge/License-MIT-blue)](LICENSE)
@@ -177,16 +177,11 @@ FORGE è privacy-first: puoi far girare il backend **su un tuo server** (Raspber
 git clone https://github.com/Leonardo-Lalli/FORGE.git
 cd FORGE
 
-# 2. Avvia PocketBase con Docker
+# 2. Avvia PocketBase con Docker (auto-configura tutto: admin, collezioni, API rules)
 docker compose up -d
 
 # 3. L'IP del server ti viene mostrato automaticamente!
 docker compose logs show-ip
-```
-
-Oppure usa l'immagine Docker ufficiale dal GitHub Container Registry:
-```bash
-docker pull ghcr.io/leonardo-lalli/forge-server:latest
 ```
 
 Dopo qualche secondo vedrai un box come questo:
@@ -194,13 +189,18 @@ Dopo qualche secondo vedrai un box come questo:
 ╔══════════════════════════════════════════╗
 ║     FORGE PocketBase è online!           ║
 ║                                          ║
-║     Connetti l'app al server:            ║
+║     Connetti la app al server:           ║
 ║     → http://192.168.1.50:8090           ║
 ║                                          ║
 ║     Admin Panel (solo locale):           ║
 ║     → http://localhost:8090/_/           ║
 ╚══════════════════════════════════════════╝
 ```
+
+E questo è tutto. PocketBase è già configurato con:
+- **Admin** precreato (`admin@forge.local` / `forgeadmin123` — cambia subito la password!)
+- **Collezioni** `logged_workouts`, `social_graph`, `excercise` con API rules row-level
+- **Nessuna configurazione manuale** necessaria
 
 ### Configura l'app
 
@@ -213,7 +213,7 @@ L'app userà il tuo server invece di quello predefinito. Funziona anche in LAN s
 
 ### Admin panel (opzionale)
 
-Apri `http://localhost:8090/_/` dal browser del server, crea un account admin, e configura le API rules (vedi `docs/project-journal.md` sezione 8).
+Apri `http://localhost:8090/_/` dal browser del server. Login con le credenziali auto-create (admin@forge.local / forgeadmin123). Cambia subito la password! Da qui puoi gestire utenti, collezioni e API rules.
 
 ---
 

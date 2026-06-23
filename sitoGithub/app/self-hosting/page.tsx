@@ -171,14 +171,14 @@ export default function SelfHostingPage() {
                 <p><span className="text-forge-cyan">cd</span> FORGE</p>
                 <p className="mt-3 text-forge-dim"># 2. Crea il file .env (opzionale per encryption key)</p>
                 <p><span className="text-forge-cyan">echo</span> &quot;PB_ENCRYPTION_KEY=your_secret_key&quot; &gt; .env</p>
-                <p className="mt-3 text-forge-dim"># 3. Avvia PocketBase con Docker Compose</p>
+                <p className="mt-3 text-forge-dim"># 3. Avvia PocketBase con Docker Compose (auto-configura tutto)</p>
                 <p><span className="text-forge-cyan">docker compose</span> up -d</p>
                 <p className="mt-3 text-forge-dim"># 4. L&apos;IP del server viene mostrato automaticamente</p>
                 <p><span className="text-forge-cyan">docker compose</span> logs show-ip</p>
-                <p className="text-forge-dim" style={{ fontSize: '11px', opacity: 0.6, marginTop: '4px' }}>Vedrai un box con l&apos;URL esatto, es: http://192.168.1.50:8090</p>
-                <p className="mt-3 text-forge-dim"># 5. Crea un account admin (solo prima volta)</p>
-                <p>Apri http://localhost:8090/_/ nel browser del server</p>
-                <p>Crea il primo account admin</p>
+                <p className="text-forge-dim" style={{ fontSize: '11px', opacity: 0.6, marginTop: '4px' }}>Tutto preconfigurato: admin, collezioni, API rules, nessun setup manuale</p>
+                <p className="mt-3 text-forge-dim"># 5. Admin Panel gi&agrave; pronto</p>
+                <p>Apri http://localhost:8090/_/ → login con admin@forge.local / forgeadmin123</p>
+                <p className="text-forge-dim" style={{ fontSize: '11px', opacity: 0.6 }}>Cambia subito la password!</p>
                 <p className="mt-3 text-forge-dim"># 6. Configura l&apos;app sul telefono</p>
                 <p>Apri FORGE → Setup iniziale → Inserisci l&apos;URL mostrato dallo step 4</p>
               </div>
