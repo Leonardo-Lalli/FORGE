@@ -96,7 +96,7 @@ done
 
 # ── Creazione superuser e collezioni ───────────
 msg_info "Creazione admin superuser..."
-docker compose exec -T pocketbase /pocketbase superuser create admin@forge.local forgeadmin123 &>/dev/null 2>&1 && \
+docker compose exec -T pocketbase pocketbase superuser create admin@forge.local forgeadmin123 &>/dev/null 2>&1 && \
   msg_ok "Superuser creato (admin@forge.local)" || \
   msg_ok "Superuser gia esistente"
 

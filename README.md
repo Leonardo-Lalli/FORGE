@@ -176,19 +176,10 @@ Lo script fa tutto da solo — clona, avvia, crea admin e collezioni. Stile Prox
 ### Avvia il backend (passo passo, tutti gli OS)
 
 ```bash
-# 1. Clona
 git clone https://github.com/Leonardo-Lalli/FORGE.git && cd FORGE
-
-# 2. Avvia PocketBase
 docker compose up -d pocketbase
-
-# 3. Crea il superuser (CLI — funziona su Linux, Mac e Windows PowerShell)
-docker compose exec -T pocketbase /pocketbase superuser create admin@forge.local forgeadmin123
-
-# 4. Crea le collezioni
+docker compose exec -T pocketbase pocketbase superuser create admin@forge.local forgeadmin123
 docker compose up -d init && docker compose logs init
-
-# 5. Mostra IP del server
 docker compose logs show-ip
 ```
 

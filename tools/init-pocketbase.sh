@@ -37,7 +37,7 @@ if [ -z "$ADMIN_TOKEN" ]; then
   echo "[FORGE Init] ============================================"
   echo "[FORGE Init] Superuser non trovato. Creane uno prima:"
   echo "[FORGE Init]"
-  echo "[FORGE Init]   docker compose exec -T pocketbase /pocketbase superuser create ${PB_ADMIN_EMAIL} ${PB_ADMIN_PASSWORD}"
+  echo "[FORGE Init]   docker compose exec -T pocketbase pocketbase superuser create ${PB_ADMIN_EMAIL} ${PB_ADMIN_PASSWORD}"
   echo "[FORGE Init]"
   echo "[FORGE Init] Oppure apri http://localhost:8090/_/"
   echo "[FORGE Init] e crea l'admin da web UI."
