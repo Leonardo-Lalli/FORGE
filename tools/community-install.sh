@@ -132,7 +132,7 @@ if [ -z "$HOST_IP" ]; then
   HOST_IP=$(hostname -I 2>/dev/null | awk '{print $1}')
 fi
 if [ -z "$HOST_IP" ]; then
-  HOST_IP=$(ipconfig 2>/dev/null | grep -o "IPv4[^:]*: [0-9.]*" | head -1 | grep -o "[0-9.]*$")
+  HOST_IP=$(wmic nicconfig where IPEnabled=true get IPAddress 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+' | grep -vE "172\.|127\.|255\.|0\.0\.0\.0" | head -1)
 fi
 if [ -z "$HOST_IP" ]; then
   HOST_IP="INDIRIZZO-NON-TROVATO"
