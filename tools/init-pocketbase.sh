@@ -1,9 +1,9 @@
 #!/bin/sh
-# FORGE — PocketBase auto-init script
-# PocketBase v0.23+: admin → superuser, endpoint cambiati
+# FORGE — PocketBase collection initializer
+# Esegue dopo che il superuser e stato creato (via CLI o web UI)
 # Idempotente: se le collection esistono gia, non le ricrea.
 
-PB_URL="${PB_URL:-http://localhost:8090}"
+PB_URL="${PB_URL:-http://pocketbase:8090}"
 PB_ADMIN_EMAIL="${PB_ADMIN_EMAIL:-admin@forge.local}"
 PB_ADMIN_PASSWORD="${PB_ADMIN_PASSWORD:-forgeadmin123}"
 
@@ -11,27 +11,42 @@ echo "[FORGE Init] Waiting for PocketBase..."
 until curl -sf "${PB_URL}/api/health" >/dev/null 2>&1; do sleep 2; done
 echo "[FORGE Init] PocketBase is up."
 
-# --- Auth as superuser (try v0.22 /api/admins, then v0.23 /api/collections/_superusers) ---
-AUTH_RESPONSE=$(curl -s -X POST "${PB_URL}/api/admins/auth-with-password" \
-  -H "Content-Type: application/json" \
-  -d "{\"email\":\"${PB_ADMIN_EMAIL}\",\"password\":\"${PB_ADMIN_PASSWORD}\"}" 2>&1)
-ADMIN_TOKEN=$(echo "$AUTH_RESPONSE" | grep -o '"token":"[^"]*"' | head -1 | cut -d'"' -f4)
+# --- Auth as admin (try both old v0.22 and new v0.23+ endpoints) ---
+get_token() {
+  # v0.22 format: email+password
+  curl -sf -X POST "$1" -H "Content-Type: application/json" \
+    -d "$2" 2>/dev/null | grep -o '"token":"[^"]*"' | head -1 | cut -d'"' -f4
+}
 
-if [ -z "$ADMIN_TOKEN" ] || [ "$ADMIN_TOKEN" = "null" ]; then
-  AUTH_RESPONSE=$(curl -s -X POST "${PB_URL}/api/collections/_superusers/auth-with-password" \
-    -H "Content-Type: application/json" \
-    -d "{\"identity\":\"${PB_ADMIN_EMAIL}\",\"password\":\"${PB_ADMIN_PASSWORD}\"}" 2>&1)
-  ADMIN_TOKEN=$(echo "$AUTH_RESPONSE" | grep -o '"token":"[^"]*"' | head -1 | cut -d'"' -f4)
+ADMIN_TOKEN=$(get_token "${PB_URL}/api/admins/auth-with-password" \
+  "{\"email\":\"${PB_ADMIN_EMAIL}\",\"password\":\"${PB_ADMIN_PASSWORD}\"}")
+
+if [ -z "$ADMIN_TOKEN" ]; then
+  ADMIN_TOKEN=$(get_token "${PB_URL}/api/collections/_superusers/auth-with-password" \
+    "{\"identity\":\"${PB_ADMIN_EMAIL}\",\"password\":\"${PB_ADMIN_PASSWORD}\"}")
 fi
 
-if [ -z "$ADMIN_TOKEN" ] || [ "$ADMIN_TOKEN" = "null" ]; then
-  echo "[FORGE Init] ERROR: Cannot authenticate!"
-  echo "[FORGE Init] Create the admin first:"
-  echo "[FORGE Init]   1. Open http://localhost:8090/_/"
-  echo "[FORGE Init]   2. Create admin with: ${PB_ADMIN_EMAIL} / ${PB_ADMIN_PASSWORD}"
-  echo "[FORGE Init]   3. Run: docker compose up -d init"
+if [ -z "$ADMIN_TOKEN" ]; then
+  # v0.23+/v0.24+ might use email field still
+  ADMIN_TOKEN=$(get_token "${PB_URL}/api/collections/_superusers/auth-with-password" \
+    "{\"email\":\"${PB_ADMIN_EMAIL}\",\"password\":\"${PB_ADMIN_PASSWORD}\"}")
+fi
+
+if [ -z "$ADMIN_TOKEN" ]; then
+  echo ""
+  echo "[FORGE Init] ============================================"
+  echo "[FORGE Init] Superuser non trovato. Creane uno prima:"
+  echo "[FORGE Init]"
+  echo "[FORGE Init]   docker compose exec -T pocketbase /pocketbase superuser create ${PB_ADMIN_EMAIL} ${PB_ADMIN_PASSWORD}"
+  echo "[FORGE Init]"
+  echo "[FORGE Init] Oppure apri http://localhost:8090/_/"
+  echo "[FORGE Init] e crea l'admin da web UI."
+  echo "[FORGE Init] Poi rilancia: docker compose up -d init"
+  echo "[FORGE Init] ============================================"
+  echo ""
   exit 1
 fi
+
 echo "[FORGE Init] Authenticated."
 
 AUTH="Authorization: Bearer ${ADMIN_TOKEN}"
@@ -119,18 +134,5 @@ create_if_missing "excercise" "{
 }"
 
 echo ""
-echo "============================================"
-echo "  FORGE PocketBase INIT COMPLETE!"
-echo ""
-echo "  Admin panel:  http://localhost:8090/_/"
-echo "  Admin email:  ${PB_ADMIN_EMAIL}"
-echo ""
-echo "  Collections ready:"
-echo "    - logged_workouts (with API rules)"
-echo "    - social_graph (with API rules)"
-echo "    - excercise (public read, admin write)"
-echo ""
-echo "  CAMBIA la password admin subito:"
-echo "  http://localhost:8090/_/"
-echo "============================================"
-echo ""
+echo "[FORGE Init] Collections ready: logged_workouts, social_graph, excercise"
+echo "[FORGE Init] DONE."

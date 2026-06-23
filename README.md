@@ -171,38 +171,29 @@ FORGE è privacy-first: puoi far girare il backend **su un tuo server** (Raspber
 bash <(curl -sSL https://raw.githubusercontent.com/Leonardo-Lalli/FORGE/main/tools/community-install.sh)
 ```
 
-Lo script fa tutto da solo: installa le dipendenze, clona la repo, avvia PocketBase con Docker,
-crea admin e collezioni, e ti mostra l'IP a cui collegarti. Stile Proxmox Community Scripts.
+Lo script fa tutto da solo — clona, avvia, crea admin e collezioni. Stile Proxmox Community Scripts.
 
-Oppure passaggio per passaggio:
+### Avvia il backend (passo passo, tutti gli OS)
 
 ```bash
-# 1. Clona la repo
-git clone https://github.com/Leonardo-Lalli/FORGE.git
-cd FORGE
+# 1. Clona
+git clone https://github.com/Leonardo-Lalli/FORGE.git && cd FORGE
 
-# 2. Avvia PocketBase con Docker (auto-configura tutto: admin, collezioni, API rules)
-docker compose up -d
+# 2. Avvia PocketBase
+docker compose up -d pocketbase
 
-# 3. L'IP del server ti viene mostrato automaticamente!
+# 3. Crea il superuser (CLI — funziona su Linux, Mac e Windows PowerShell)
+docker compose exec -T pocketbase /pocketbase superuser create admin@forge.local forgeadmin123
+
+# 4. Crea le collezioni
+docker compose up -d init && docker compose logs init
+
+# 5. Mostra IP del server
 docker compose logs show-ip
 ```
 
-Dopo qualche secondo vedrai un box come questo:
-```
-╔══════════════════════════════════════════╗
-║     FORGE PocketBase è online!           ║
-║                                          ║
-║     Connetti la app al server:           ║
-║     → http://192.168.1.50:8090           ║
-║                                          ║
-║     Admin Panel (solo locale):           ║
-║     → http://localhost:8090/_/           ║
-╚══════════════════════════════════════════╝
-```
-
 E questo è tutto. PocketBase è già configurato con:
-- **Admin** precreato (`admin@forge.local` / `forgeadmin123` — cambia subito la password!)
+- **Superuser** precreato (`admin@forge.local` / `forgeadmin123` — cambia subito la password!)
 - **Collezioni** `logged_workouts`, `social_graph`, `excercise` con API rules row-level
 - **Nessuna configurazione manuale** necessaria
 
