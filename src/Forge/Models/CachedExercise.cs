@@ -13,6 +13,8 @@ public class CachedExercise
     public string InstructionsJson { get; set; } = "[]";
     public string ImageUrl { get; set; } = string.Empty;
     public string Category { get; set; } = string.Empty;
+    public string TargetMuscles { get; set; } = string.Empty;
+    public string SecondaryMuscles { get; set; } = string.Empty;
     public string Level { get; set; } = string.Empty;
     public string Force { get; set; } = string.Empty;
     public string Mechanic { get; set; } = string.Empty;

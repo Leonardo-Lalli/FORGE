@@ -188,13 +188,13 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
         MuscleFilters = new ObservableCollection<FilterChip>
         {
             new() { Label = "Tutti", Value = "", IsSelected = true },
-            new() { Label = "Petto", Value = "chest" },
-            new() { Label = "Schiena", Value = "back" },
-            new() { Label = "Spalle", Value = "shoulders" },
-            new() { Label = "Braccia", Value = "upper arms" },
-            new() { Label = "Gambe", Value = "legs" },
-            new() { Label = "Addominali", Value = "waist" },
-            new() { Label = "Cardio", Value = "cardio" }
+            new() { Label = "Petto", Value = "chest,pectorals" },
+            new() { Label = "Schiena", Value = "back,lats,upper back,spine" },
+            new() { Label = "Spalle", Value = "shoulders,delts,deltoids" },
+            new() { Label = "Braccia", Value = "upper arms,biceps,triceps,forearms" },
+            new() { Label = "Gambe", Value = "upper legs,lower legs,glutes,hamstrings,quads,quadriceps,calves,abductors,hip flexors" },
+            new() { Label = "Addominali", Value = "waist,abs,core" },
+            new() { Label = "Cardio", Value = "cardio,cardiovascular system" }
         };
 
         EquipmentFilters = new ObservableCollection<FilterChip>
@@ -320,8 +320,15 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
             var all = await db.GetCachedExercisesAsync();
             if (all.Count == 0) { await exerciseDbApi.WarmCacheAsync(); all = await db.GetCachedExercisesAsync(); }
             var results = all
-                .Where(e => e.BodyPart.Contains(chip.Value, StringComparison.OrdinalIgnoreCase)
-                         || e.Category.Contains(chip.Value, StringComparison.OrdinalIgnoreCase))
+                .Where(e =>
+                {
+                    var vals = chip.GetValues();
+                    return vals.Any(v =>
+                        e.BodyPart.Contains(v, StringComparison.OrdinalIgnoreCase)
+                     || e.TargetMuscles.Contains(v, StringComparison.OrdinalIgnoreCase)
+                     || e.SecondaryMuscles.Contains(v, StringComparison.OrdinalIgnoreCase)
+                     || e.Category.Contains(v, StringComparison.OrdinalIgnoreCase));
+                })
                 .Take(20)
                 .ToList();
 
@@ -894,6 +901,7 @@ public partial class FilterChip : ObservableObject
 {
     public string Label { get; set; } = string.Empty;
     public string Value { get; set; } = string.Empty;
+    public string[] GetValues() => Value.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
 
     [ObservableProperty] private bool isSelected;
 }

@@ -66,7 +66,9 @@ public class ExerciseDbApiService
                         Equipment = string.Join(", ", ex.GetEquipments()),
                         InstructionsJson = JsonSerializer.Serialize(ex.GetInstructions()),
                         ImageUrl = ex.GifUrl,
-                        Category = ex.GetBodyParts().FirstOrDefault() ?? ""
+                        Category = ex.GetBodyParts().FirstOrDefault() ?? "",
+                        TargetMuscles = string.Join(", ", ex.GetTargetMuscles()),
+                        SecondaryMuscles = string.Join(", ", ex.GetSecondaryMuscles())
                     };
                     await db.SaveCachedExerciseAsync(cachedEx);
                     fetched++;
@@ -130,7 +132,9 @@ public class ExerciseDbApiService
                         Equipment = string.Join(", ", ex.GetEquipments()),
                         InstructionsJson = JsonSerializer.Serialize(ex.GetInstructions()),
                         ImageUrl = ex.GifUrl,
-                        Category = ex.GetBodyParts().FirstOrDefault() ?? ""
+                        Category = ex.GetBodyParts().FirstOrDefault() ?? "",
+                        TargetMuscles = string.Join(", ", ex.GetTargetMuscles()),
+                        SecondaryMuscles = string.Join(", ", ex.GetSecondaryMuscles())
                     };
                     await db.SaveCachedExerciseAsync(cachedEx);
                     if (!matches.Any(m => m.Id == ex.ExerciseId))
