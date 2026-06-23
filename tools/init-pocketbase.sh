@@ -1,6 +1,6 @@
 #!/bin/sh
 # FORGE — PocketBase auto-init script
-# Crea admin, collezioni e API rules al primo avvio.
+# PocketBase v0.23+: admin → superuser, endpoint cambiati
 # Idempotente: se le collection esistono gia, non le ricrea.
 
 PB_URL="${PB_URL:-http://localhost:8090}"
@@ -11,29 +11,28 @@ echo "[FORGE Init] Waiting for PocketBase..."
 until curl -sf "${PB_URL}/api/health" >/dev/null 2>&1; do sleep 2; done
 echo "[FORGE Init] PocketBase is up."
 
-# --- Create admin if none exists ---
-ADMIN_RESPONSE=$(curl -s -w "\n%{http_code}" -X POST "${PB_URL}/api/admins" \
-  -H "Content-Type: application/json" \
-  -d "{\"email\":\"${PB_ADMIN_EMAIL}\",\"password\":\"${PB_ADMIN_PASSWORD}\",\"passwordConfirm\":\"${PB_ADMIN_PASSWORD}\"}" 2>&1)
-HTTP_CODE=$(echo "$ADMIN_RESPONSE" | tail -1)
-if [ "$HTTP_CODE" = "200" ]; then
-  echo "[FORGE Init] Admin created: ${PB_ADMIN_EMAIL}"
-else
-  echo "[FORGE Init] Admin already exists or creation failed (HTTP ${HTTP_CODE}), using existing credentials."
-fi
-
-# --- Auth as admin ---
+# --- Auth as superuser (try v0.22 /api/admins, then v0.23 /api/collections/_superusers) ---
 AUTH_RESPONSE=$(curl -s -X POST "${PB_URL}/api/admins/auth-with-password" \
   -H "Content-Type: application/json" \
-  -d "{\"email\":\"${PB_ADMIN_EMAIL}\",\"password\":\"${PB_ADMIN_PASSWORD}\"}")
+  -d "{\"email\":\"${PB_ADMIN_EMAIL}\",\"password\":\"${PB_ADMIN_PASSWORD}\"}" 2>&1)
 ADMIN_TOKEN=$(echo "$AUTH_RESPONSE" | grep -o '"token":"[^"]*"' | head -1 | cut -d'"' -f4)
 
 if [ -z "$ADMIN_TOKEN" ] || [ "$ADMIN_TOKEN" = "null" ]; then
-  echo "[FORGE Init] ERROR: Cannot authenticate as admin!"
-  echo "[FORGE Init] API Response: ${AUTH_RESPONSE}"
-  echo "[FORGE Init] Check PB_ADMIN_EMAIL / PB_ADMIN_PASSWORD in .env"
+  AUTH_RESPONSE=$(curl -s -X POST "${PB_URL}/api/collections/_superusers/auth-with-password" \
+    -H "Content-Type: application/json" \
+    -d "{\"identity\":\"${PB_ADMIN_EMAIL}\",\"password\":\"${PB_ADMIN_PASSWORD}\"}" 2>&1)
+  ADMIN_TOKEN=$(echo "$AUTH_RESPONSE" | grep -o '"token":"[^"]*"' | head -1 | cut -d'"' -f4)
+fi
+
+if [ -z "$ADMIN_TOKEN" ] || [ "$ADMIN_TOKEN" = "null" ]; then
+  echo "[FORGE Init] ERROR: Cannot authenticate!"
+  echo "[FORGE Init] Create the admin first:"
+  echo "[FORGE Init]   1. Open http://localhost:8090/_/"
+  echo "[FORGE Init]   2. Create admin with: ${PB_ADMIN_EMAIL} / ${PB_ADMIN_PASSWORD}"
+  echo "[FORGE Init]   3. Run: docker compose up -d init"
   exit 1
 fi
+echo "[FORGE Init] Authenticated."
 
 AUTH="Authorization: Bearer ${ADMIN_TOKEN}"
 CT="Content-Type: application/json"
@@ -41,6 +40,7 @@ CT="Content-Type: application/json"
 # --- Get users collection ID ---
 USERS_ID=$(curl -sf "${PB_URL}/api/collections" -H "$AUTH" \
   | grep -o '"id":"[^"]*","name":"users"' | head -1 | cut -d'"' -f4)
+
 if [ -z "$USERS_ID" ]; then
   echo "[FORGE Init] ERROR: Cannot find users collection!"
   exit 1
@@ -124,7 +124,6 @@ echo "  FORGE PocketBase INIT COMPLETE!"
 echo ""
 echo "  Admin panel:  http://localhost:8090/_/"
 echo "  Admin email:  ${PB_ADMIN_EMAIL}"
-echo "  Admin pass:   ${PB_ADMIN_PASSWORD}"
 echo ""
 echo "  Collections ready:"
 echo "    - logged_workouts (with API rules)"

@@ -88,17 +88,23 @@ msg_ok "Container avviati"
 msg_info "Attesa PocketBase (max 60s)..."
 for i in $(seq 1 30); do
   if curl -sf http://localhost:8090/api/health &>/dev/null 2>&1; then
-    msg_ok "PocketBase è online"
+    msg_ok "PocketBase e online"
     break
   fi
   sleep 2
 done
 
-# ── Inizializzazione ──────────────────────────
-msg_info "Inizializzazione database (admin, collezioni, API rules)..."
-sleep 3  # dai tempo all'init container
-docker compose logs init 2>/dev/null | tail -20
-msg_ok "Database inizializzato"
+# ── Creazione superuser e collezioni ───────────
+msg_info "Creazione admin superuser..."
+docker compose exec -T pocketbase /pocketbase superuser create admin@forge.local forgeadmin123 &>/dev/null 2>&1 && \
+  msg_ok "Superuser creato (admin@forge.local)" || \
+  msg_ok "Superuser gia esistente"
+
+msg_info "Inizializzazione collezioni..."
+docker compose up -d init 2>/dev/null
+sleep 5
+docker compose logs init 2>/dev/null | tail -10
+msg_ok "Collezioni create"
 
 # ── IP del server ─────────────────────────────
 msg_info "Rilevamento IP del server..."
