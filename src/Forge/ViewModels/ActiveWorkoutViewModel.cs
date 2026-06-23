@@ -188,28 +188,25 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
         MuscleFilters = new ObservableCollection<FilterChip>
         {
             new() { Label = "Tutti", Value = "", IsSelected = true },
-            new() { Label = "Petto", Value = "pectorals" },
-            new() { Label = "Dorsali", Value = "lats" },
-            new() { Label = "Spalle", Value = "delts" },
-            new() { Label = "Bicipiti", Value = "biceps" },
-            new() { Label = "Tricipiti", Value = "triceps" },
-            new() { Label = "Addominali", Value = "abs" },
-            new() { Label = "Quadricipiti", Value = "quadriceps" },
-            new() { Label = "Femorali", Value = "hamstrings" },
-            new() { Label = "Glutei", Value = "glutes" },
-            new() { Label = "Polpacci", Value = "calves" }
+            new() { Label = "Petto", Value = "chest" },
+            new() { Label = "Schiena", Value = "back" },
+            new() { Label = "Spalle", Value = "shoulders" },
+            new() { Label = "Braccia", Value = "upper arms" },
+            new() { Label = "Gambe", Value = "legs" },
+            new() { Label = "Addominali", Value = "waist" },
+            new() { Label = "Cardio", Value = "cardio" }
         };
 
         EquipmentFilters = new ObservableCollection<FilterChip>
         {
             new() { Label = "Tutti", Value = "", IsSelected = true },
-            new() { Label = "Bilanciere", Value = "barbell" },
+            new() { Label = "Corpo libero", Value = "body weight" },
             new() { Label = "Manubri", Value = "dumbbell" },
+            new() { Label = "Bilanciere", Value = "barbell" },
             new() { Label = "Cavi", Value = "cable" },
             new() { Label = "Macchinari", Value = "machine" },
-            new() { Label = "Corpo libero", Value = "body weight" },
             new() { Label = "Elastico", Value = "band" },
-            new() { Label = "Kettlebell", Value = "kettlebells" }
+            new() { Label = "Kettlebell", Value = "kettlebell" }
         };
     }
 
@@ -321,6 +318,7 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
         try
         {
             var all = await db.GetCachedExercisesAsync();
+            if (all.Count == 0) { await exerciseDbApi.WarmCacheAsync(); all = await db.GetCachedExercisesAsync(); }
             var results = all
                 .Where(e => e.BodyPart.Contains(chip.Value, StringComparison.OrdinalIgnoreCase)
                          || e.Category.Contains(chip.Value, StringComparison.OrdinalIgnoreCase))
@@ -362,6 +360,7 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
         try
         {
             var all = await db.GetCachedExercisesAsync();
+            if (all.Count == 0) { await exerciseDbApi.WarmCacheAsync(); all = await db.GetCachedExercisesAsync(); }
             var results = all
                 .Where(e => e.Equipment.Contains(chip.Value, StringComparison.OrdinalIgnoreCase))
                 .Take(20)
