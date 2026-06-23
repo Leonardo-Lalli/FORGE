@@ -127,12 +127,14 @@ Invoke-Expression (Invoke-WebRequest -Uri https://raw.githubusercontent.com/Leon
 ```
 
 ```bash
-# Proxmox LXC — installs PocketBase natively, no Docker inside LXC
+# Proxmox VE — run INSIDE an existing LXC container (Debian/Alpine)
+# Installs PocketBase natively as a systemd service, no Docker
 bash <(curl -sSL https://raw.githubusercontent.com/Leonardo-Lalli/FORGE/main/tools/proxmox-install.sh)
 ```
 
 ```bash
-# Proxmox Hypervisor — creates the LXC container from scratch with OS selection menu
+# Proxmox VE — run on the HYPERVISOR (creates a new LXC container from scratch)
+# Interactive menu: choose Alpine/Debian/Ubuntu, auto-allocates RAM/disk/CPU
 bash <(curl -sSL https://raw.githubusercontent.com/Leonardo-Lalli/FORGE/main/tools/proxmox-create.sh)
 ```
 
