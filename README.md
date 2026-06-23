@@ -163,32 +163,24 @@ dotnet publish src/Forge/Forge.csproj -f net10.0-android -c Release /p:AndroidPa
 
 ## Self-Hosting (Docker)
 
-FORGE è privacy-first: puoi far girare il backend **su un tuo server** (Raspberry Pi, NAS, Proxmox, vecchio PC). I tuoi dati restano dentro casa tua.
+FORGE è privacy-first: puoi far girare il backend **su un tuo server**. I tuoi dati restano dentro casa tua.
 
-### Avvia il backend (one-liner)
+### One-liner (scegli il tuo OS)
 
-**Linux (Bash, incluso Git Bash su Windows):**
-```bash
-bash <(curl -sSL https://raw.githubusercontent.com/Leonardo-Lalli/FORGE/main/tools/community-install.sh)
-```
+| OS | Comando |
+|----|---------|
+| **Linux** / **macOS** / **Git Bash** | `bash <(curl -sSL https://raw.githubusercontent.com/Leonardo-Lalli/FORGE/main/tools/community-install.sh)` |
+| **Windows PowerShell** | `Invoke-Expression (Invoke-WebRequest -Uri https://raw.githubusercontent.com/Leonardo-Lalli/FORGE/main/tools/setup.ps1).Content` |
+| **Proxmox LXC** (Debian/Alpine) | `bash <(curl -sSL https://raw.githubusercontent.com/Leonardo-Lalli/FORGE/main/tools/proxmox-install.sh)` |
 
-**Windows (PowerShell):**
-```powershell
-Invoke-Expression (Invoke-WebRequest -Uri https://raw.githubusercontent.com/Leonardo-Lalli/FORGE/main/tools/setup.ps1).Content
-```
-
-**Proxmox LXC (Debian/Alpine):**
-```bash
-bash <(curl -sSL https://raw.githubusercontent.com/Leonardo-Lalli/FORGE/main/tools/proxmox-install.sh)
-```
-
-> Un comando solo. Clona, avvia, crea admin e collezioni, mostra l'IP. Zero passaggi manuali.
-> Gli script Linux/PowerShell usano Docker. Lo script Proxmox installa PocketBase **nativamente** (no Docker
+> Ogni script è autonomo e fa tutto: scarica, installa, configura admin e collezioni, mostra l'IP.
+> Quelli Linux/Windows usano **Docker**. Quello Proxmox installa PocketBase **nativamente** (no Docker
 > dentro LXC), formato [Proxmox Community Scripts](https://community-scripts.github.io/ProxmoxVE/).
 
-**Quanto consuma?** PocketBase occupa ~25 MB di RAM a riposo e ~30 MB di disco. Con 100 utenti attivi arriva a ~80 MB di RAM. Gira su qualsiasi cosa: Raspberry Pi 4, vecchio PC, VPS da 1 GB.
+**Quanto consuma?** PocketBase occupa ~25 MB di RAM a riposo e ~30 MB di disco.
+Con 100 utenti attivi arriva a ~80 MB di RAM. Gira su Raspberry Pi 4, vecchio PC, VPS da 1 GB.
 
-### Avvia il backend (passo passo)
+### Passo passo (tutti gli OS)
 
 ```bash
 git clone https://github.com/Leonardo-Lalli/FORGE.git && cd FORGE

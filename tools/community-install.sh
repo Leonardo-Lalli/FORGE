@@ -70,7 +70,7 @@ msg_ok "Docker Compose disponibile"
 # ── Setup FORGE ───────────────────────────────
 section "Setup FORGE"
 
-FORGE_DIR="/opt/forge"
+FORGE_DIR="$HOME/forge-server"
 REPO_URL="https://github.com/Leonardo-Lalli/FORGE.git"
 
 if [ -d "$FORGE_DIR" ]; then
