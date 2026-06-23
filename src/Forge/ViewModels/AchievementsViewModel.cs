@@ -104,7 +104,11 @@ public partial class AchievementsViewModel : BaseViewModel
     private void FilterCategory(string category)
     {
         SelectedCategory = category;
-        _ = LoadAsync();
+        _ = LoadAsync().ContinueWith(t =>
+        {
+            if (t.IsFaulted)
+                System.Diagnostics.Debug.WriteLine($"[Achievements Load] ex: {t.Exception?.InnerException?.Message}");
+        }, TaskContinuationOptions.OnlyOnFaulted);
     }
 
     [RelayCommand]

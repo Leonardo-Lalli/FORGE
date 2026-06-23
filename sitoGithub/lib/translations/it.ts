@@ -226,7 +226,7 @@ export const it = {
     releases: [
       {
         version: "v0.9.0-beta",
-        date: "Settembre 2026",
+        date: "",
         theme: "QoL & Usabilità",
         features: [
           { name: "Incremento rapido pesi (+/-)", desc: "Pulsanti +2.5kg accanto al campo peso. Press-and-hold = +5kg", diff: "low" },
@@ -238,7 +238,7 @@ export const it = {
       },
       {
         version: "v1.0.0",
-        date: "Ottobre 2026",
+        date: "",
         theme: "Release Stabile",
         features: [
           { name: "Notifiche push FCM", desc: "Notifica quando un amico ti segue, mette like o accetta una richiesta", diff: "high" },
@@ -250,7 +250,7 @@ export const it = {
       },
       {
         version: "v1.1.0",
-        date: "Novembre 2026",
+        date: "",
         theme: "Social & Community",
         features: [
           { name: "Commenti ai workout", desc: "Gli amici possono commentare i tuoi allenamenti nel feed", diff: "med" },
@@ -262,7 +262,7 @@ export const it = {
       },
       {
         version: "v1.2.0",
-        date: "Dicembre 2026",
+        date: "",
         theme: "Health & Wear OS",
         features: [
           { name: "Widget Android", desc: '"START WORKOUT" direttamente dalla home screen del telefono', diff: "med" },
@@ -274,7 +274,7 @@ export const it = {
       },
       {
         version: "v1.3.0",
-        date: "Gennaio 2027",
+        date: "",
         theme: "Advanced Features",
         features: [
           { name: "PDF report", desc: "Export report allenamento con grafici, tabelle e foto", diff: "med" },
@@ -287,7 +287,7 @@ export const it = {
       },
       {
         version: "v1.4.0",
-        date: "Febbraio 2027",
+        date: "",
         theme: "Platform & Infrastruttura",
         features: [
           { name: "Google Play Store", desc: "Pubblicazione ufficiale con keystore di produzione", diff: "med" },

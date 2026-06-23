@@ -228,7 +228,7 @@ export const en: typeof it = {
     releases: [
       {
         version: "v0.9.0-beta",
-        date: "September 2026",
+        date: "",
         theme: "QoL & Usability",
         features: [
           { name: "Quick weight increment (+/-)", desc: "+2.5kg buttons next to the weight field. Press-and-hold = +5kg", diff: "low" },
@@ -240,7 +240,7 @@ export const en: typeof it = {
       },
       {
         version: "v1.0.0",
-        date: "October 2026",
+        date: "",
         theme: "Stable Release",
         features: [
           { name: "FCM push notifications", desc: "Notify when a friend follows you, likes, or accepts a request", diff: "high" },
@@ -252,7 +252,7 @@ export const en: typeof it = {
       },
       {
         version: "v1.1.0",
-        date: "November 2026",
+        date: "",
         theme: "Social & Community",
         features: [
           { name: "Workout comments", desc: "Friends can comment on your workouts in the feed", diff: "med" },
@@ -264,7 +264,7 @@ export const en: typeof it = {
       },
       {
         version: "v1.2.0",
-        date: "December 2026",
+        date: "",
         theme: "Health & Wear OS",
         features: [
           { name: "Android widget", desc: '"START WORKOUT" right from your phone home screen', diff: "med" },
@@ -276,7 +276,7 @@ export const en: typeof it = {
       },
       {
         version: "v1.3.0",
-        date: "January 2027",
+        date: "",
         theme: "Advanced Features",
         features: [
           { name: "PDF report", desc: "Export a workout report with charts, tables, and photos", diff: "med" },
@@ -289,7 +289,7 @@ export const en: typeof it = {
       },
       {
         version: "v1.4.0",
-        date: "February 2027",
+        date: "",
         theme: "Platform & Infrastructure",
         features: [
           { name: "Google Play Store", desc: "Official publication with a production keystore", diff: "med" },

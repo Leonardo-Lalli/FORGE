@@ -30,6 +30,7 @@ https://github.com/user-attachments/assets/28498cc5-b1e4-4de4-bce0-1627f3fb002d
 [![PocketBase](https://img.shields.io/badge/PocketBase-Backend-000000?logo=pocketbase)](https://pocketbase.io/)
 [![DuckDNS](https://img.shields.io/badge/DuckDNS-DDNS-FF5722?logo=duckdns)](https://duckdns.org)
 [![ExerciseDB](https://img.shields.io/badge/ExerciseDB-1.500%2B%20esercizi-22C55E)](https://oss.exercisedb.dev)
+[![Docker](https://img.shields.io/badge/ghcr.io-forge--server-2496ED?logo=docker&logoColor=white)](https://github.com/Leonardo-Lalli/FORGE/pkgs/container/forge-server)
 [![MVVM](https://img.shields.io/badge/Architecture-MVVM%20%7C%20CommunityToolkit-7C3AED)](https://learn.microsoft.com/dotnet/communitytoolkit/mvvm/)
 [![Tests](https://img.shields.io/badge/Tests-27%20passed-brightgreen)](tests/)
 [![License](https://img.shields.io/badge/License-MIT-blue)](LICENSE)
@@ -67,15 +68,15 @@ FORGE è un'app Android per il tracking degli allenamenti in palestra, con un'an
 | Feature | FORGE | Strong | Hevy | FitNotes |
 |---------|:-----:|:------:|:----:|:--------:|
 | Prezzo | **Gratis** | ~80€/anno | 40€/anno | Gratis (no social) |
-| Open source | **Sì** | No | No | No |
-| Self-hosting backend | **Sì** | No | No | No |
-| 1.500+ esercizi con GIF | **Sì** | 1.000 | 400 | ~100 |
-| Feed sociale (like, follow) | **Sì** | No | No | No |
-| Achievement / gamification | **48 badge** | No | No | No |
-| Foto progresso | **Sì** | No | No | No |
-| Offline + sync | **Sì** | No | Premium | Sì (locale) |
-| CSV import/export | **Sì** | Premium | Premium | Sì |
-| Privacy-first | **Sì** | No | No | Sì |
+| Open source | **✅** | ❌ | ❌ | ❌ |
+| Self-hosting backend | **✅** | ❌ | ❌ | ❌ |
+| 1.500+ esercizi con GIF | **✅** | ~1.000 | ~400 | ~100 |
+| Feed sociale (like, follow) | **✅** | ❌ | ✅ | ❌ |
+| Achievement / gamification | **48 badge** | ❌ | ❌ | ❌ |
+| Foto progresso | **✅** | ❌ | ✅ | ❌ |
+| Offline + sync | **✅** | ❌ | Premium | ✅ (locale) |
+| CSV import/export | **✅** | Premium | Premium | ✅ |
+| Privacy-first | **✅** | ❌ | ❌ | ✅ |
 
 ---
 
@@ -178,22 +179,41 @@ cd FORGE
 
 # 2. Avvia PocketBase con Docker
 docker compose up -d
+
+# 3. L'IP del server ti viene mostrato automaticamente!
+docker compose logs show-ip
 ```
 
-PocketBase è ora in ascolto su `http://<IP-DEL-TUO-SERVER>:8090`.
+Oppure usa l'immagine Docker ufficiale dal GitHub Container Registry:
+```bash
+docker pull ghcr.io/leonardo-lalli/forge-server:latest
+```
+
+Dopo qualche secondo vedrai un box come questo:
+```
+╔══════════════════════════════════════════╗
+║     FORGE PocketBase è online!           ║
+║                                          ║
+║     Connetti l'app al server:            ║
+║     → http://192.168.1.50:8090           ║
+║                                          ║
+║     Admin Panel (solo locale):           ║
+║     → http://localhost:8090/_/           ║
+╚══════════════════════════════════════════╝
+```
 
 ### Configura l'app
 
 1. Installa l'APK sul telefono
 2. Apri FORGE → Impostazioni → **URL PocketBase**
-3. Inserisci `http://<IP-DEL-TUO-SERVER>:8090` 
+3. Inserisci l'URL mostrato nel box (es. `http://192.168.1.50:8090`) 
 4. Tocca **SALVA**
 
 L'app userà il tuo server invece di quello predefinito. Funziona anche in LAN senza dominio pubblico — ti registri, ti alleni, e quando torni a casa sul Wi-Fi i workout si sincronizzano automaticamente.
 
 ### Admin panel (opzionale)
 
-Apri `http://<IP-SERVER>:8090/_/`, crea un account admin, e configura le API rules (vedi `docs/project-journal.md` sezione 8).
+Apri `http://localhost:8090/_/` dal browser del server, crea un account admin, e configura le API rules (vedi `docs/project-journal.md` sezione 8).
 
 ---
 

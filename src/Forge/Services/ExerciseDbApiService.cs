@@ -40,7 +40,7 @@ public class ExerciseDbApiService
 
         await db.DeleteExercisesByPrefixAsync("wger-");
         var count = (await db.GetCachedExercisesAsync()).Count;
-        if (count >= 100) return;
+        if (count >= 500) return;
 
         try
         {
@@ -72,10 +72,12 @@ public class ExerciseDbApiService
                     fetched++;
                 }
 
-                if (!result.Meta?.HasNextPage == true)
-                    cursor = result.Meta!.NextCursor;
+                if (result.Meta?.HasNextPage == true)
+                    cursor = result.Meta.NextCursor;
                 else
                     break;
+
+                if (fetched >= 500) break;
             }
             System.Diagnostics.Debug.WriteLine($"[ExerciseDB WarmCache] cached {fetched} exercises");
         }
@@ -120,8 +122,8 @@ public class ExerciseDbApiService
                     {
                         Id = ex.ExerciseId,
                         Name = Capitalize(ex.Name),
-                        BodyPart = ex.GetBodyParts().FirstOrDefault() ?? "",
-                        Equipment = ex.GetEquipments().FirstOrDefault() ?? "",
+                        BodyPart = string.Join(", ", ex.GetBodyParts()),
+                        Equipment = string.Join(", ", ex.GetEquipments()),
                         InstructionsJson = JsonSerializer.Serialize(ex.GetInstructions()),
                         ImageUrl = ex.GifUrl,
                         Category = ex.GetBodyParts().FirstOrDefault() ?? ""

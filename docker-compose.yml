@@ -24,20 +24,28 @@ services:
         condition: service_healthy
     command: >
       sh -c "
+      apk add --no-cache --quiet iproute2 >/dev/null 2>&1;
+      HOST_IP=\$(ip -o -4 addr show scope global | head -1 | awk '{print \$4}' | sed 's/\/.*//');
+      if [ -z \"\$HOST_IP\" ]; then
+        HOST_IP=\$(ip route get 1.1.1.1 2>/dev/null | grep -oP 'src \\K\\S+');
+      fi;
+      if [ -z \"\$HOST_IP\" ]; then
+        HOST_IP='[esegui: ip addr show]';
+      fi;
       echo '';
-      echo '============================================';
-      echo '  FORGE PocketBase is running!';
       echo '';
-      echo '  Connect your app to:';
-      echo '  http://YOUR-HOST-IP:8090';
+      echo '╔══════════════════════════════════════════════════════════╗';
+      echo '║                                                          ║';
+      echo '║     FORGE PocketBase è online!                            ║';
+      echo '║                                                          ║';
+      echo '║     Connetti l'\''app al server:                          ║';
+      echo '║     → http://'\$HOST_IP':8090                                     ║';
+      echo '║                                                          ║';
+      echo '║     Admin Panel (solo da questa macchina):               ║';
+      echo '║     → http://localhost:8090/_/                                     ║';
+      echo '║                                                          ║';
+      echo '╚══════════════════════════════════════════════════════════╝';
       echo '';
-      echo '  Find your IP with:';
-      echo '    ip addr show | grep inet';
-      echo '    (or ipconfig on Windows, ifconfig on Mac)';
-      echo '';
-      echo '  Admin panel (only from this machine):';
-      echo '  http://localhost:8090/_/';
-      echo '============================================';
       echo '';
       "
     network_mode: host

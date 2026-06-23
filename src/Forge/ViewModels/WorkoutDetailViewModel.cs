@@ -61,7 +61,11 @@ public partial class WorkoutDetailViewModel : BaseViewModel
     partial void OnWorkoutIdChanged(string value)
     {
         if (!string.IsNullOrWhiteSpace(value))
-            _ = LoadAsync();
+            _ = LoadAsync().ContinueWith(t =>
+            {
+                if (t.IsFaulted)
+                    System.Diagnostics.Debug.WriteLine($"[WorkoutDetail Load] ex: {t.Exception?.InnerException?.Message}");
+            }, TaskContinuationOptions.OnlyOnFaulted);
     }
 
     [RelayCommand]

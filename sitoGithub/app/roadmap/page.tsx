@@ -53,7 +53,7 @@ export default function RoadmapPage() {
                       </span>
                       <div className="flex flex-wrap items-baseline gap-3 mb-2">
                         <span className="font-mono text-sm font-bold text-forge-cyan">{rel.version}</span>
-                        <span className="font-mono text-xs text-forge-dim">{rel.date}</span>
+                        {rel.date ? <span className="font-mono text-xs text-forge-dim">{rel.date}</span> : null}
                         <span className="rounded-full border border-forge-border px-2.5 py-0.5 text-xs text-forge-muted">{rel.theme}</span>
                       </div>
                       <div className="mt-4 space-y-3">
