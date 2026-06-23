@@ -77,12 +77,12 @@ FORGE_DIR="/opt/forge"
 REPO_URL="https://github.com/Leonardo-Lalli/FORGE.git"
 
 if [ -d "$FORGE_DIR" ]; then
-  msg_info "Directory $FORGE_DIR esiste già, aggiorno..."
+  msg_info "Directory $FORGE_DIR esiste gia, aggiorno..."
   cd "$FORGE_DIR"
-  git pull --ff-only &>/dev/null
+  git pull --ff-only --quiet
 else
   msg_info "Clonando $REPO_URL..."
-  git clone "$REPO_URL" "$FORGE_DIR" &>/dev/null
+  git clone --quiet "$REPO_URL" "$FORGE_DIR"
   cd "$FORGE_DIR"
 fi
 msg_ok "Repository pronta in $FORGE_DIR"
@@ -101,8 +101,8 @@ section "Avvio PocketBase"
 
 msg_info "Avvio container Docker..."
 cd "$FORGE_DIR"
-docker compose down --remove-orphans &>/dev/null 2>&1
-docker compose up -d &>/dev/null
+docker compose down --remove-orphans 2>&1 | tail -1
+docker compose up -d
 msg_ok "Container avviati"
 
 # ── Attesa servizi ────────────────────────────
@@ -117,14 +117,14 @@ done
 
 # ── Creazione superuser e collezioni ───────────
 msg_info "Creazione admin superuser..."
-docker compose exec -T pocketbase pocketbase superuser create admin@forge.local forgeadmin123 &>/dev/null 2>&1 && \
+docker compose exec -T pocketbase pocketbase superuser create admin@forge.local forgeadmin123 2>&1 | tail -1 && \
   msg_ok "Superuser creato (admin@forge.local)" || \
   msg_ok "Superuser gia esistente"
 
 msg_info "Inizializzazione collezioni..."
-docker compose up -d init 2>/dev/null
+docker compose up -d init
 sleep 5
-docker compose logs init 2>/dev/null | tail -10
+docker compose logs init 2>&1 | tail -12
 msg_ok "Collezioni create"
 
 # ── IP del server ─────────────────────────────
