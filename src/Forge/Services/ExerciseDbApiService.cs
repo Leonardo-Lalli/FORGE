@@ -40,7 +40,7 @@ public class ExerciseDbApiService
 
         await db.DeleteExercisesByPrefixAsync("wger-");
         var count = (await db.GetCachedExercisesAsync()).Count;
-        if (count >= 500) return;
+        if (count >= 1000) return;
 
         try
         {
@@ -77,7 +77,7 @@ public class ExerciseDbApiService
                 else
                     break;
 
-                if (fetched >= 500) break;
+                if (fetched >= 1000) break;
             }
             System.Diagnostics.Debug.WriteLine($"[ExerciseDB WarmCache] cached {fetched} exercises");
         }
@@ -193,7 +193,7 @@ public class ExerciseDbApiService
         {
             var cached = await db.GetCachedExercisesAsync();
             var synced = 0;
-            foreach (var ex in cached.Take(500))
+            foreach (var ex in cached.Take(1000))
             {
                 try
                 {
