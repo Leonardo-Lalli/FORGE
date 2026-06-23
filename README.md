@@ -165,15 +165,21 @@ dotnet publish src/Forge/Forge.csproj -f net10.0-android -c Release /p:AndroidPa
 
 FORGE è privacy-first: puoi far girare il backend **su un tuo server** (Raspberry Pi, NAS, Proxmox, vecchio PC). I tuoi dati restano dentro casa tua.
 
-### Avvia il backend (one-liner per Linux)
+### Avvia il backend (one-liner)
 
+**Linux / macOS (Bash):**
 ```bash
 bash <(curl -sSL https://raw.githubusercontent.com/Leonardo-Lalli/FORGE/main/tools/community-install.sh)
 ```
 
-Lo script fa tutto da solo — clona, avvia, crea admin e collezioni. Stile Proxmox Community Scripts.
+**Windows (PowerShell):**
+```powershell
+Invoke-Expression (Invoke-WebRequest -Uri https://raw.githubusercontent.com/Leonardo-Lalli/FORGE/main/tools/setup.ps1).Content
+```
 
-### Avvia il backend (passo passo, tutti gli OS)
+> Un comando solo. Clona, avvia, crea admin e collezioni, mostra l'IP. Zero passaggi manuali.
+
+### Avvia il backend (passo passo)
 
 ```bash
 git clone https://github.com/Leonardo-Lalli/FORGE.git && cd FORGE
