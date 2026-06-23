@@ -95,11 +95,15 @@ public class ExerciseDbApiService
 
     public async Task<List<ExerciseSearchResultDto>> SearchAsync(string name)
     {
-        var searchTerm = name.ToLowerInvariant();
+        var searchTerm = TranslateSearchTerm(name.ToLowerInvariant());
+        var originalTerm = name.ToLowerInvariant();
 
         var cached = await db.GetCachedExercisesAsync();
         var matches = cached
-            .Where(e => e.Name.ToLowerInvariant().Contains(searchTerm))
+            .Where(e => e.Name.ToLowerInvariant().Contains(searchTerm)
+                     || e.Name.ToLowerInvariant().Contains(originalTerm)
+                     || e.BodyPart.ToLowerInvariant().Contains(originalTerm)
+                     || e.Equipment.ToLowerInvariant().Contains(originalTerm))
             .Take(20)
             .ToList();
 
@@ -108,7 +112,7 @@ public class ExerciseDbApiService
 
         try
         {
-            var url = $"exercises?name={Uri.EscapeDataString(name)}&limit=20";
+            var url = $"exercises?name={Uri.EscapeDataString(searchTerm)}&limit=20";
             var response = await GetHttp().GetAsync(url);
             response.EnsureSuccessStatusCode();
             var json = await response.Content.ReadAsStringAsync();
@@ -231,6 +235,47 @@ public class ExerciseDbApiService
     private static string Capitalize(string name) =>
         string.Join(" ", name.Split(' ').Where(w => w.Length > 0).Select(w =>
             w.Length > 2 ? char.ToUpper(w[0]) + w[1..] : w.ToUpperInvariant()));
+
+    private static readonly Dictionary<string, string> ItalianToEnglish = new(StringComparer.OrdinalIgnoreCase)
+    {
+        ["panca"] = "bench", ["panche"] = "bench",
+        ["squat"] = "squat", ["stacco"] = "deadlift",
+        ["trazioni"] = "pull up", ["trazione"] = "pull up",
+        ["flessioni"] = "push up", ["flessione"] = "push up",
+        ["curl"] = "curl", ["spinte"] = "press",
+        ["spinta"] = "press", ["rematore"] = "row",
+        ["alzate"] = "raise", ["alzata"] = "raise",
+        ["addominali"] = "abs", ["addome"] = "abs",
+        ["gambe"] = "leg", ["gamba"] = "leg",
+        ["braccia"] = "arm", ["braccio"] = "arm",
+        ["petto"] = "chest", ["pettorali"] = "pectorals",
+        ["schiena"] = "back", ["dorsali"] = "lats", ["dorso"] = "back",
+        ["spalle"] = "shoulder", ["spalla"] = "shoulder",
+        ["bicipiti"] = "biceps", ["bicipite"] = "biceps",
+        ["tricipiti"] = "triceps", ["tricipite"] = "triceps",
+        ["quadricipiti"] = "quadriceps", ["quadricipite"] = "quadriceps",
+        ["femorali"] = "hamstring", ["polpacci"] = "calves",
+        ["glutei"] = "glutes", ["gluteo"] = "glutes",
+        ["manubri"] = "dumbbell", ["manubrio"] = "dumbbell",
+        ["bilanciere"] = "barbell", ["elastico"] = "band",
+        ["cavi"] = "cable", ["macchinari"] = "machine",
+        ["macchinario"] = "machine", ["corpo libero"] = "body weight",
+        ["kettlebell"] = "kettlebell", ["affondi"] = "lunge",
+        ["affondo"] = "lunge", ["ponte"] = "bridge",
+        ["plank"] = "plank", ["crunch"] = "crunch",
+        ["tirate"] = "pull", ["tirata"] = "pull",
+    };
+
+    private static string TranslateSearchTerm(string term)
+    {
+        var words = term.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        for (int i = 0; i < words.Length; i++)
+        {
+            if (ItalianToEnglish.TryGetValue(words[i], out var translated))
+                words[i] = translated;
+        }
+        return string.Join(" ", words);
+    }
 }
 
 public class ExerciseSearchResultDto

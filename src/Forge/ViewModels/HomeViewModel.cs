@@ -25,6 +25,7 @@ public partial class HomeViewModel : BaseViewModel
     private readonly PocketBaseService pb;
     private readonly PlanService planService;
     private readonly AchievementService achievementService;
+    private readonly ExerciseDbApiService exerciseDbApi;
 
     [ObservableProperty] private string streakCount = "0";
     [ObservableProperty] private string streakLabel = "Week streak";
@@ -48,12 +49,19 @@ public partial class HomeViewModel : BaseViewModel
     [ObservableProperty] private string nextAchievementText = string.Empty;
     [ObservableProperty] private bool hasNextAchievement;
 
-    public HomeViewModel(PocketBaseService pb, PlanService planService, AchievementService achievementService)
+    public HomeViewModel(PocketBaseService pb, PlanService planService, AchievementService achievementService, ExerciseDbApiService exerciseDbApi)
     {
         this.pb = pb;
         this.planService = planService;
         this.achievementService = achievementService;
+        this.exerciseDbApi = exerciseDbApi;
         HasData = true;
+
+        _ = exerciseDbApi.WarmCacheAsync().ContinueWith(t =>
+        {
+            if (t.IsFaulted)
+                System.Diagnostics.Debug.WriteLine($"[HomeVM WarmCache] ex: {t.Exception?.InnerException?.Message}");
+        }, TaskContinuationOptions.OnlyOnFaulted);
 
         WeakReferenceMessenger.Default.Register<WorkoutSavedMessage>(this, async (_, _) =>
         {
