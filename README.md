@@ -179,23 +179,30 @@ Lo script fa tutto da solo — clona, avvia, crea admin e collezioni. Stile Prox
 git clone https://github.com/Leonardo-Lalli/FORGE.git && cd FORGE
 docker compose up -d pocketbase
 docker compose exec -T pocketbase pocketbase superuser create admin@forge.local forgeadmin123
-docker compose up -d init && docker compose logs init
+docker compose up -d
+docker compose logs init
 docker compose logs show-ip
 ```
 
-E questo è tutto. PocketBase è già configurato con:
-- **Superuser** precreato (`admin@forge.local` / `forgeadmin123` — cambia subito la password!)
-- **Collezioni** `logged_workouts`, `social_graph`, `excercise` con API rules row-level
-- **Nessuna configurazione manuale** necessaria
+> **Windows**: l'IP mostrato da `show-ip` è quello interno di Docker. Per collegare l'app
+> usa l'IP reale del PC (apri `ipconfig` in PowerShell e cerca `Indirizzo IPv4`).
 
 ### Configura l'app
 
 1. Installa l'APK sul telefono
 2. Apri FORGE → Impostazioni → **URL PocketBase**
-3. Inserisci l'URL mostrato nel box (es. `http://192.168.1.50:8090`) 
+3. Inserisci `http://<IP-DEL-TUO-PC>:8090` (es. `http://192.168.1.50:8090`)
 4. Tocca **SALVA**
 
-L'app userà il tuo server invece di quello predefinito. Funziona anche in LAN senza dominio pubblico — ti registri, ti alleni, e quando torni a casa sul Wi-Fi i workout si sincronizzano automaticamente.
+L'app userà il tuo server invece di quello predefinito. Funziona anche in LAN senza dominio pubblico.
+
+PocketBase è già configurato con:
+- **Superuser** precreato (`admin@forge.local` / `forgeadmin123` — cambia subito!)
+- **Collezioni** `logged_workouts`, `social_graph`, `excercise` con API rules row-level
+
+### Admin panel
+
+`http://localhost:8090/_/` — login con admin@forge.local / forgeadmin123
 
 ### Admin panel (opzionale)
 
