@@ -1,4 +1,3 @@
-<table style="width:100%;border-collapse:collapse;margin-bottom:16px"><tr><td style="background-color:#dc2626;color:white;padding:16px;text-align:center;font-weight:bold;font-size:16px;border-radius:8px">&#x26A0; SERVER OFFLINE &#x26A0; &mdash; Il server FORGE &egrave; temporaneamente irraggiungibile. Torner&agrave; online al pi&ugrave; presto.</td></tr></table>
 <div align="center">
 
 > ⚠️ **HOBBY PROJECT FOR EDUCATIONAL PURPOSES** ⚠️  
