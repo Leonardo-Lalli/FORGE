@@ -96,7 +96,7 @@ done
 
 # ── Create superuser ───────────────────────────
 msg_info "Creating superuser..."
-if docker compose exec -T pocketbase pocketbase superuser create "$PB_EMAIL" "$PB_PASS" >/dev/null 2>&1; then
+if docker compose exec -T pocketbase pocketbase superuser create "$PB_EMAIL" "$PB_PASS" --dir=/pb_data >/dev/null 2>&1; then
   msg_ok "Superuser created ($PB_EMAIL)"
 else
   msg_warn "Creation failed; the initializer will verify the existing credentials."
@@ -106,6 +106,9 @@ fi
 msg_info "Initializing collections..."
 docker compose run --rm init
 msg_ok "Collections ready"
+msg_info "Profile/privacy and shared exercise cache require the reviewed migration:"
+echo '  sudo bash tools/apply-docker-profile-migration.sh'
+echo 'See docs/pocketbase-profile-migration.md. GIF files are referenced by URL, not stored locally.'
 
 # ── Detect IP ──────────────────────────────────
 msg_info "Detecting server IP..."

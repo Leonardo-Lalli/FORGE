@@ -3,6 +3,7 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:vm="clr-namespace:Forge.ViewModels"
+    xmlns:controls="clr-namespace:Forge.Controls"
     xmlns:models="clr-namespace:Forge.Models"
     x:Class="Forge.Views.ActiveWorkoutPage"
     x:Name="workoutPage"
@@ -94,28 +95,18 @@
             </Grid>
         </Border>
 
-        <!-- Rest Timer Settings -->
-        <HorizontalStackLayout Grid.Row="1" Spacing="8" Padding="20,4" HorizontalOptions="Center"
-                                IsVisible="{Binding IsRestTimerActive, Converter={StaticResource InverseBoolConverter}}">
-            <Label Text="Rest:" FontFamily="Lexend" FontSize="11"
-                   TextColor="{DynamicResource TextSecondary}" VerticalOptions="Center" />
-            <Border BackgroundColor="{DynamicResource SurfaceContainer}" StrokeShape="RoundRectangle 6"
-                    Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1" Padding="8,4" WidthRequest="60">
-                <Entry Text="{Binding RestDuration}" Keyboard="Numeric"
-                       FontFamily="SpaceGrotesk" FontSize="13" FontAttributes="Bold"
-                       TextColor="{DynamicResource Primary}"
-                       BackgroundColor="Transparent"
-                       HorizontalTextAlignment="Center" />
-            </Border>
-            <Label Text="s" FontFamily="Lexend" FontSize="11"
-                   TextColor="{DynamicResource TextSecondary}" VerticalOptions="Center" />
+        <HorizontalStackLayout Grid.Row="1" Padding="16,4" Spacing="6" IsVisible="{Binding IsRestTimerActive, Converter={StaticResource InverseBoolConverter}}">
+            <Label Text="Recupero per esercizio · 0–5 min" FontSize="11" TextColor="{DynamicResource TextSecondary}" VerticalOptions="Center" />
+            <Button Text="Salva note / recuperi" Command="{Binding SavePlanPreferencesCommand}" FontSize="11" BackgroundColor="Transparent" TextColor="{DynamicResource Primary}" IsVisible="{Binding IsPlanWorkout}" />
         </HorizontalStackLayout>
 
         <!-- Content -->
-        <Grid Grid.Row="2">
+        <Grid Grid.Row="2" RowDefinitions="Auto,*">
 
             <!-- Foto Progresso -->
             <VerticalStackLayout Spacing="4" Padding="20,6,20,0">
+                <Editor Text="{Binding WorkoutNotes}" Placeholder="Note dell’allenamento" HeightRequest="48"
+                        TextColor="{DynamicResource OnSurface}" PlaceholderColor="{DynamicResource TextSecondary}" />
                 <HorizontalStackLayout Spacing="8" HorizontalOptions="Center">
                     <Border StrokeShape="RoundRectangle 8" BackgroundColor="{DynamicResource SurfaceContainer}"
                             Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1"
@@ -171,6 +162,7 @@
 
             <!-- Creating mode: start button overlay -->
             <VerticalStackLayout IsVisible="{Binding IsCreating}"
+                                 Grid.Row="1"
                                  VerticalOptions="End" HorizontalOptions="Center" Spacing="12" Padding="20"
                                  Margin="0,0,0,20">
                 <Button Text="START WORKOUT" FontFamily="Lexend" FontSize="14" FontAttributes="Bold"
@@ -182,7 +174,7 @@
             </VerticalStackLayout>
 
             <!-- Exercise list -->
-            <CollectionView ItemsSource="{Binding Exercises}" Margin="0,4,0,0">
+            <CollectionView Grid.Row="1" ItemsSource="{Binding Exercises}" Margin="0,4,0,0">
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="models:WorkoutExercise">
                         <Border BackgroundColor="{DynamicResource SurfaceContainerLowest}" Margin="16,4"
@@ -231,30 +223,18 @@
                                 </Border>
 
                                 <!-- Exercise Notes -->
-                                <Border Padding="14,6" BackgroundColor="{DynamicResource PrimaryContainer}"
-                                        Opacity="0.2">
+                                <Border Padding="14,6" BackgroundColor="{DynamicResource SurfaceContainer}">
                                     <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
                                         <Entry Grid.Column="0" Placeholder="Note su questo esercizio..."
                                                Text="{Binding Notes}"
                                                FontFamily="Inter" FontSize="12"
-                                               TextColor="White"
-                                               PlaceholderColor="#99ffffff"
+                                               TextColor="{DynamicResource OnSurface}"
+                                               PlaceholderColor="{DynamicResource TextSecondary}"
                                                BackgroundColor="Transparent" />
-                                        <HorizontalStackLayout Grid.Column="1" Spacing="4" VerticalOptions="Center">
-                                            <Label Text="⏱" FontSize="12" TextColor="{DynamicResource TextSecondary}"
-                                                   VerticalOptions="Center" />
-                                            <Border BackgroundColor="{DynamicResource SurfaceContainer}"
-                                                    StrokeShape="RoundRectangle 4" Padding="6,2" WidthRequest="48">
-                                                <Entry Text="{Binding RestSeconds}" Keyboard="Numeric"
-                                                       FontFamily="Lexend" FontSize="10" FontAttributes="Bold"
-                                                       TextColor="{DynamicResource Primary}"
-                                                       BackgroundColor="Transparent"
-                                                       HorizontalTextAlignment="Center" />
-                                            </Border>
-                                            <Label Text="s" FontFamily="Lexend" FontSize="10"
-                                                   TextColor="{DynamicResource TextSecondary}"
-                                                   VerticalOptions="Center" />
-                                        </HorizontalStackLayout>
+                                        <VerticalStackLayout Grid.Column="1" Spacing="0">
+                                            <Label Text="RECUPERO · MIN / SEC" FontSize="9" TextColor="{DynamicResource TextSecondary}" HorizontalTextAlignment="Center" />
+                                            <controls:RestDurationPicker Seconds="{Binding RestSeconds}" TextColor="{DynamicResource Primary}" WidthRequest="130" HeightRequest="110" />
+                                        </VerticalStackLayout>
                                     </Grid>
                                 </Border>
 
@@ -302,7 +282,7 @@
                                                            PlaceholderColor="{DynamicResource Outline}"
                                                            Placeholder="KG"
                                                            BackgroundColor="Transparent"
-                                                           HorizontalTextAlignment="Center" />
+                                                           HorizontalTextAlignment="Center"><Entry.Triggers><DataTrigger TargetType="Entry" Binding="{Binding IsSuggested}" Value="True"><Setter Property="TextColor" Value="{DynamicResource TextSecondary}" /></DataTrigger></Entry.Triggers></Entry>
                                                 </Border>
 
                                                 <!-- Reps Entry -->
@@ -317,7 +297,7 @@
                                                            PlaceholderColor="{DynamicResource Outline}"
                                                            Placeholder="REPS"
                                                            BackgroundColor="Transparent"
-                                                           HorizontalTextAlignment="Center" />
+                                                           HorizontalTextAlignment="Center"><Entry.Triggers><DataTrigger TargetType="Entry" Binding="{Binding IsSuggested}" Value="True"><Setter Property="TextColor" Value="{DynamicResource TextSecondary}" /></DataTrigger></Entry.Triggers></Entry>
                                                 </Border>
 
                                                 <!-- Checkmark -->
@@ -490,6 +470,11 @@
             <VerticalStackLayout Grid.Row="5" Spacing="4">
                 <ActivityIndicator IsRunning="{Binding IsSearchingApi}" IsVisible="{Binding IsSearchingApi}"
                                    HorizontalOptions="Center" Color="{DynamicResource Primary}" />
+                <Label Text="Caricamento catalogo: la prima apertura può richiedere qualche minuto."
+                       IsVisible="{Binding IsSearchingApi}" FontSize="11" TextColor="{DynamicResource TextSecondary}" HorizontalTextAlignment="Center" />
+                <Label Text="{Binding SearchResults.Count, StringFormat='{0} esercizi trovati'}"
+                       IsVisible="{Binding IsSearchingApi, Converter={StaticResource InverseBoolConverter}}"
+                       FontSize="11" TextColor="{DynamicResource TextSecondary}" HorizontalTextAlignment="Center" />
                 <Label Text="{Binding SearchError}" IsVisible="{Binding HasSearchError}"
                        FontFamily="Inter" FontSize="13" TextColor="{DynamicResource Error}"
                        HorizontalTextAlignment="Center" Margin="0,2" />
@@ -563,7 +548,7 @@
                         <Border BackgroundColor="{DynamicResource SurfaceContainerLowest}"
                                 StrokeShape="RoundRectangle 16" Stroke="{DynamicResource OutlineVariant}"
                                 StrokeThickness="1" Padding="0" HeightRequest="240">
-                            <Image Source="{Binding SelectedExercise.GifUrl}" Aspect="AspectFit" />
+                            <Image Source="{Binding SelectedExercise.GifUrl}" Aspect="AspectFit" IsAnimationPlaying="True" />
                         </Border>
 
                         <Grid ColumnDefinitions="*,Auto,*,Auto,*" ColumnSpacing="0">
@@ -604,17 +589,17 @@
 
                         <Label Text="INSTRUCTIONS" FontFamily="Lexend" FontSize="10" FontAttributes="Bold"
                                TextColor="{DynamicResource TextSecondary}" CharacterSpacing="0.8" />
-                        <CollectionView ItemsSource="{Binding SelectedExercise.Instructions}">
-                            <CollectionView.ItemTemplate>
+                        <VerticalStackLayout BindableLayout.ItemsSource="{Binding SelectedExercise.Instructions}">
+                            <BindableLayout.ItemTemplate>
                                 <DataTemplate x:DataType="x:String">
-                                    <HorizontalStackLayout Spacing="8" Padding="0,4">
-                                        <Label Text="•" FontSize="14" TextColor="{DynamicResource Primary}" VerticalOptions="Start" />
-                                        <Label Text="{Binding .}" FontFamily="Inter" FontSize="14"
+                                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8" Padding="0,4">
+                                        <Label Grid.Column="0" Text="•" FontSize="14" TextColor="{DynamicResource Primary}" VerticalOptions="Start" />
+                                        <Label Grid.Column="1" Text="{Binding .}" FontFamily="Inter" FontSize="14"
                                                TextColor="{DynamicResource OnSurface}" LineBreakMode="WordWrap" />
-                                    </HorizontalStackLayout>
+                                    </Grid>
                                 </DataTemplate>
-                            </CollectionView.ItemTemplate>
-                        </CollectionView>
+                            </BindableLayout.ItemTemplate>
+                        </VerticalStackLayout>
                     </VerticalStackLayout>
                 </ScrollView>
 

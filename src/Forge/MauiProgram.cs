@@ -22,6 +22,7 @@ public static class MauiProgram
             });
 
 #if ANDROID
+        builder.ConfigureMauiHandlers(handlers => handlers.AddHandler<Forge.Controls.RestDurationPicker, Forge.Controls.RestDurationPickerHandler>());
         Microsoft.Maui.Handlers.EntryHandler.Mapper.AppendToMapping("NoUnderline", (handler, view) =>
         {
             handler.PlatformView.BackgroundTintList =

@@ -8,6 +8,9 @@ services:
     volumes:
       - ./pb_data:/pb_data
       - ./pb_public:/pb_public
+      - ./tools/pocketbase/pb_hooks:/pb_hooks:ro
+      # Installed explicitly after collection initialization; do not auto-migrate an empty database.
+      - ./tools/pocketbase/pb_migrations:/forge_migrations:ro
     environment:
       - PB_ENCRYPTION_KEY=${PB_ENCRYPTION_KEY:-}
     healthcheck:

@@ -90,7 +90,7 @@ public partial class WorkoutDetailViewModel : BaseViewModel
 
     private async Task LoadFromLocalAsync()
     {
-        var workouts = await db.GetWorkoutsAsync();
+        var workouts = await db.GetWorkoutsAsync(pb.CurrentUser?.Id ?? "");
         var w = workouts.FirstOrDefault(x => x.Id == WorkoutId);
         if (w == null)
         {
@@ -132,7 +132,7 @@ public partial class WorkoutDetailViewModel : BaseViewModel
         UserName = record.UserName;
 
         ParseExerciseData(record.ExerciseData);
-        Photos = new ObservableCollection<string>(record.Photos);
+        Photos = new ObservableCollection<string>(await pb.GetWorkoutPhotoUrlsAsync(record));
         HasPhotos = Photos.Count > 0;
 
         SetSuccess(true);

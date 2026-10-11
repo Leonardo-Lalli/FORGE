@@ -498,3 +498,4 @@ docs/security-hardening.md
 *.apk
 *.aab
 *.apks
+*.tsbuildinfo

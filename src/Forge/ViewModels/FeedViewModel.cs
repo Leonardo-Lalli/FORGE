@@ -37,6 +37,9 @@ public partial class UserSearchResult : ObservableObject
     public string Initial { get; set; } = string.Empty;
     public string AvatarUrl { get; set; } = string.Empty;
 
+    public bool CanFollow { get; set; } = true;
+    public string PublicWorkoutId { get; set; } = "";
+    public bool HasPublicWorkout => !string.IsNullOrEmpty(PublicWorkoutId);
     [ObservableProperty] private bool isFollowing;
     [ObservableProperty] private string followLabel = "Follow";
     [ObservableProperty] private ImageSource? avatarSource;
@@ -105,7 +108,7 @@ public partial class FeedViewModel : BaseViewModel
                     FollowLabel = isFollowing ? "Following" : "Follow",
                     AvatarUrl = avatarUrl,
                     AvatarSource = avatarSrc,
-                    HasAvatar = !string.IsNullOrWhiteSpace(user.Avatar)
+                    HasAvatar = avatarSrc != null
                 });
             }
             HasSearchResults = SearchResults.Count > 0;
@@ -135,6 +138,9 @@ public partial class FeedViewModel : BaseViewModel
             await MainThread.InvokeOnMainThreadAsync(async () => await LoadFeedAsync());
         });
     }
+
+    [RelayCommand]
+    private async Task OpenUserProfileAsync(UserSearchResult user) => await Shell.Current.GoToAsync($"profile?userId={Uri.EscapeDataString(user.UserId)}");
 
     [RelayCommand]
     private async Task LoadFeedAsync()
@@ -177,7 +183,7 @@ public partial class FeedViewModel : BaseViewModel
                     HasAvatar = !string.IsNullOrWhiteSpace(w.AvatarUrl),
                     Notes = w.Notes ?? "",
                     HasNotes = !string.IsNullOrWhiteSpace(w.Notes),
-                    FirstPhoto = w.Photos.FirstOrDefault() ?? "",
+                    FirstPhoto = (await pb.GetWorkoutPhotoUrlsAsync(w)).FirstOrDefault() ?? "",
                     HasPhotos = w.Photos.Count > 0
                 });
             }

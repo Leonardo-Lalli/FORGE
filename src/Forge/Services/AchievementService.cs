@@ -23,6 +23,7 @@ public class AchievementService
             if (string.IsNullOrEmpty(userId))
                 return AchievementsCatalog.All.Select(d => (d, new AchievementState { Id = d.Id, MaxProgress = d.MaxProgress })).ToList();
 
+            await ImportOwnHistoryAsync(userId);
             var progress = AchievementEvaluator.Evaluate(await db.GetWorkoutsAsync(userId));
             var saved = (await db.GetAchievementsAsync()).ToDictionary(s => s.Id);
             var result = new List<(AchievementDefinition Def, AchievementState State)>();
@@ -65,6 +66,29 @@ public class AchievementService
 
     public async Task<TrainingProgress> GetTrainingProgressAsync() =>
         TrainingProgress.FromWorkouts(string.IsNullOrEmpty(pb.CurrentUser?.Id) ? [] : await db.GetWorkoutsAsync(pb.CurrentUser.Id));
+
+    private async Task ImportOwnHistoryAsync(string userId)
+    {
+        try
+        {
+            var local = (await db.GetWorkoutsAsync(userId)).ToDictionary(w => w.Id);
+            foreach (var w in await pb.GetUserWorkoutsAsync(userId))
+            {
+                if (pb.CurrentUser?.Id != userId) return;
+                if (local.TryGetValue(w.Id, out var existing) && existing.PendingSync) continue;
+                await db.SaveWorkoutAsync(new LocalWorkout {
+                    Id = w.Id, UserId = userId, Name = w.Name, Date = w.Date,
+                    Duration = w.Duration, Volume = w.Volume, Notes = w.Notes,
+                    ExercisesJson = System.Text.Json.JsonSerializer.Serialize(w.Exercises),
+                    ExerciseDataJson = w.ExerciseData, PhotosJson = System.Text.Json.JsonSerializer.Serialize(w.Photos),
+                    Likes = w.Likes, LikedByJson = System.Text.Json.JsonSerializer.Serialize(w.LikedBy),
+                    UserName = w.UserName, LastSynced = DateTime.UtcNow
+                });
+            }
+        }
+        catch (Exception ex) when (ex is HttpRequestException or System.Text.Json.JsonException or TaskCanceledException)
+        { System.Diagnostics.Debug.WriteLine($"[Achievements History] {ex.GetType().Name}"); }
+    }
 
     public Task CheckLikeAchievementsAsync() => Task.CompletedTask;
 

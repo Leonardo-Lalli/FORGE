@@ -21,13 +21,13 @@
                 <Border.GestureRecognizers>
                     <TapGestureRecognizer Command="{Binding OpenProfileCommand}" />
                 </Border.GestureRecognizers>
-                <Image Source="{Binding UserAvatarSource}" Aspect="AspectFill"
+                <Grid><Image Source="{Binding UserAvatarSource}" Aspect="AspectFill"
                        WidthRequest="40" HeightRequest="40"
                        IsVisible="{Binding HasUserAvatar}" />
-                <Label Text="{Binding UserInitials}" FontFamily="OpenSansSemibold" FontSize="14"
+<Label Text="{Binding UserInitials}" FontFamily="OpenSansSemibold" FontSize="14"
                        TextColor="{DynamicResource Primary}" InputTransparent="True"
                        HorizontalOptions="Center" VerticalOptions="Center"
-                       IsVisible="{Binding HasUserAvatar, Converter={StaticResource InverseBoolConverter}}" />
+                       IsVisible="{Binding HasUserAvatar, Converter={StaticResource InverseBoolConverter}}" /></Grid>
             </Border>
             <!-- Center: FORGE title -->
             <Label Grid.Column="1" Text="FORGE"
@@ -181,33 +181,21 @@
                     <VerticalStackLayout Spacing="12">
                         <Label Text="Volume Over Time" FontFamily="SpaceGrotesk" FontSize="18" FontAttributes="Bold"
                                TextColor="{DynamicResource OnSurface}" />
-                        <Grid HeightRequest="160" ColumnSpacing="2" VerticalOptions="End"
-                              BindableLayout.ItemsSource="{Binding BarHeights}">
-                            <BindableLayout.ItemTemplate>
-                                <DataTemplate x:DataType="vm:BarEntry">
-                                    <BoxView Color="{DynamicResource Primary}" CornerRadius="3,3,0,0"
-                                             VerticalOptions="End"
-                                             HeightRequest="{Binding Height}" Opacity="0.8" />
-                                </DataTemplate>
-                            </BindableLayout.ItemTemplate>
-                        </Grid>
-                        <Grid BindableLayout.ItemsSource="{Binding BarLabels}" ColumnSpacing="2">
-                            <BindableLayout.ItemTemplate>
-                                <DataTemplate x:DataType="vm:LabelEntry">
-                                    <Label Text="{Binding Text}" FontFamily="Lexend" FontSize="9"
-                                           TextColor="{DynamicResource TextSecondary}"
-                                           HorizontalTextAlignment="Center" VerticalOptions="Center">
-                                        <Label.Triggers>
-                                            <DataTrigger TargetType="Label" Binding="{Binding IsMonthLabel}" Value="True">
-                                                <Setter Property="FontAttributes" Value="Bold" />
-                                                <Setter Property="FontSize" Value="8" />
-                                                <Setter Property="TextColor" Value="{DynamicResource Primary}" />
-                                            </DataTrigger>
-                                        </Label.Triggers>
-                                    </Label>
-                                </DataTemplate>
-                            </BindableLayout.ItemTemplate>
-                        </Grid>
+                        <ScrollView Orientation="Horizontal" HorizontalScrollBarVisibility="Default">
+                            <HorizontalStackLayout Spacing="12" BindableLayout.ItemsSource="{Binding VolumeBars}">
+                                <BindableLayout.ItemTemplate>
+                                    <DataTemplate x:DataType="vm:VolumeBar">
+                                        <VerticalStackLayout WidthRequest="48" Spacing="6">
+                                            <Label Text="{Binding VolumeLabel}" FontSize="10" TextColor="{DynamicResource TextSecondary}" HorizontalTextAlignment="Center" />
+                                            <Grid HeightRequest="140">
+                                                <BoxView Color="{DynamicResource Primary}" HeightRequest="{Binding Height}" WidthRequest="26" VerticalOptions="End" HorizontalOptions="Center" />
+                                            </Grid>
+                                            <Label Text="{Binding Label}" FontSize="10" TextColor="{DynamicResource OnSurfaceVariant}" HorizontalTextAlignment="Center" />
+                                        </VerticalStackLayout>
+                                    </DataTemplate>
+                                </BindableLayout.ItemTemplate>
+                            </HorizontalStackLayout>
+                        </ScrollView>
                     </VerticalStackLayout>
                 </Border>
 

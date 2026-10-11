@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Forge.Messages;
 using Forge.Services;
+using Forge.Models;
 
 namespace Forge.ViewModels;
 
@@ -28,6 +29,7 @@ public class LabelEntry
 public partial class StatsViewModel : BaseViewModel
 {
     private readonly PocketBaseService pb;
+    public ObservableCollection<VolumeBar> VolumeBars { get; } = new();
     private List<Models.Dto.LoggedWorkoutRecord> allWorkouts = new();
     private DateTime lastCalendarDate = DateTime.MinValue;
 
@@ -81,7 +83,7 @@ public partial class StatsViewModel : BaseViewModel
         try
         {
             System.Diagnostics.Debug.WriteLine("[Stats] LoadAsync fetching workouts...");
-            allWorkouts = await pb.GetMyWorkoutsAsync(365);
+            allWorkouts = await pb.GetMyWorkoutsAsync(0);
             System.Diagnostics.Debug.WriteLine($"[Stats] GetMyWorkoutsAsync returned {allWorkouts.Count} items");
             if (allWorkouts.Count == 0)
             {
@@ -118,7 +120,7 @@ public partial class StatsViewModel : BaseViewModel
 
     private void ApplyFilter(string filter)
     {
-        if (allWorkouts.Count == 0) return;
+        if (allWorkouts.Count == 0) { VolumeBars.Clear(); TopLifts.Clear(); TotalHours = "0h"; TotalVolume = "0 kg"; Workouts = "0"; return; }
 
         var cutoff = filter switch
         {
@@ -152,66 +154,9 @@ public partial class StatsViewModel : BaseViewModel
 
     private void BuildBarChart(List<Models.Dto.LoggedWorkoutRecord> workouts, string filter)
     {
-        BarHeights.Clear();
-        BarLabels.Clear();
-
-        var workoutDates = workouts
-            .Select(w => { DateTime.TryParse(w.Date, out var d); return d; })
-            .Where(d => d != default)
-            .ToList();
-
-        if (workoutDates.Count == 0) return;
-
-        var allDays = workoutDates
-            .GroupBy(d => d.Date)
-            .ToDictionary(g => g.Key, g => g.Sum(w => workouts
-                .Where(x => DateTime.TryParse(x.Date, out var xd) && xd.Date == g.Key)
-                .Sum(x => x.Volume)));
-
-        var minDate = workoutDates.Min().Date;
-        var maxDate = DateTime.Now.Date;
-
-        // Build week buckets (Mon-Sun)
-        var weeks = new List<(DateTime WeekStart, double Volume, string Label)>();
-        var cursor = minDate;
-        while (cursor.DayOfWeek != DayOfWeek.Monday && cursor > minDate.AddDays(-7))
-            cursor = cursor.AddDays(-1);
-        cursor = minDate.AddDays(-(int)minDate.DayOfWeek + 1);
-        if (cursor > minDate) cursor = cursor.AddDays(-7);
-
-        var end = maxDate.AddDays(7);
-        while (cursor <= end)
-        {
-            var weekEnd = cursor.AddDays(6);
-            double vol = 0;
-            for (var d = cursor; d <= weekEnd && d <= maxDate; d = d.AddDays(1))
-            {
-                if (allDays.TryGetValue(d.Date, out var v))
-                    vol += v;
-            }
-            weeks.Add((cursor, vol, $"{cursor:dd/MM}"));
-            cursor = cursor.AddDays(7);
-        }
-
-        // Keep only weeks from the last 4 months for clarity
-        var cutoff = maxDate.AddMonths(-4);
-        weeks = weeks.Where(w => w.WeekStart >= cutoff).ToList();
-
-        double maxVol = weeks.Any() ? weeks.Max(w => w.Volume) : 1;
-        string currentMonth = "";
-
-        foreach (var w in weeks)
-        {
-            var monthName = w.WeekStart.ToString("MMM").ToUpper();
-            if (monthName != currentMonth)
-            {
-                currentMonth = monthName;
-                BarLabels.Add(new LabelEntry { Text = monthName, IsMonthLabel = true });
-                BarHeights.Add(new BarEntry { Height = 0 });
-            }
-            BarLabels.Add(new LabelEntry { Text = w.Label });
-            BarHeights.Add(new BarEntry { Height = maxVol > 0 ? (w.Volume / maxVol) * 140 : 0 });
-        }
+        VolumeBars.Clear();
+        foreach (var bar in VolumeChart.Build(workouts, filter, DateTime.Now.Date))
+            VolumeBars.Add(new VolumeBar { Height = bar.Height, Label = bar.Label, VolumeLabel = $"{bar.Volume:0.#}" });
     }
 
     private void BuildTopLifts(List<Models.Dto.LoggedWorkoutRecord> workouts)
@@ -363,3 +308,5 @@ public partial class CalendarDay : ObservableObject
     [ObservableProperty] private bool hasWorkout;
     [ObservableProperty] private bool isToday;
 }
+
+public class VolumeBar { public double Height { get; set; } public string Label { get; set; } = ""; public string VolumeLabel { get; set; } = ""; }

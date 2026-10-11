@@ -3,7 +3,7 @@ import type { Metadata } from 'next'
 export const metadata: Metadata = {
   title: 'Roadmap',
   description:
-    'La roadmap di FORGE: QoL & usabilità v0.9.0, release stabile v1.0.0 con notifiche push e localizzazione, social & community v1.1.0, health & Wear OS v1.2.0, advanced features v1.3.0, piattaforma & infrastruttura v1.4.0.',
+    'Roadmap FORGE: stabilità e privacy prima, poi flusso allenamento, social, analytics, wearable e infrastruttura.',
   alternates: { canonical: '/roadmap' },
   openGraph: {
     title: 'FORGE — Roadmap',

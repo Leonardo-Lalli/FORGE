@@ -13,6 +13,13 @@ public class PocketBaseAuthResponse
 
 public class PocketBaseUserRecord
 {
+    private List<string> featuredAchievements = new();
+    [JsonPropertyName("workout_visibility")]
+    public string WorkoutVisibility { get; set; } = "";
+    [JsonPropertyName("connections_visibility")]
+    public string ConnectionsVisibility { get; set; } = "";
+    [JsonPropertyName("featured_achievements")]
+    public List<string> FeaturedAchievements { get => featuredAchievements; set => featuredAchievements = value ?? new(); }
     [JsonPropertyName("id")]
     public string Id { get; set; } = string.Empty;
 
@@ -43,8 +50,9 @@ public class PocketBaseUserRecord
 
 public class PocketBaseListResponse<T>
 {
+    private List<T> items = new();
     [JsonPropertyName("items")]
-    public List<T> Items { get; set; } = new();
+    public List<T> Items { get => items; set => items = value ?? new(); }
 
     [JsonPropertyName("page")]
     public int Page { get; set; }
@@ -86,6 +94,7 @@ public class SocialGraphRecord
 
 public class LoggedWorkoutRecord
 {
+    private List<string> exercises = new(), likedBy = new(), photos = new();
     [JsonPropertyName("id")]
     public string Id { get; set; } = string.Empty;
 
@@ -99,7 +108,7 @@ public class LoggedWorkoutRecord
     public string Date { get; set; } = string.Empty;
 
     [JsonPropertyName("exercises")]
-    public List<string> Exercises { get; set; } = new();
+    public List<string> Exercises { get => exercises; set => exercises = value ?? new(); }
 
     [JsonPropertyName("volume")]
     public double Volume { get; set; }
@@ -111,13 +120,14 @@ public class LoggedWorkoutRecord
     public string Notes { get; set; } = string.Empty;
 
     [JsonPropertyName("exercise_data")]
+    [JsonConverter(typeof(JsonTextConverter))]
     public string ExerciseData { get; set; } = string.Empty;
 
     [JsonPropertyName("likes")]
     public int Likes { get; set; }
 
     [JsonPropertyName("liked_by")]
-    public List<string> LikedBy { get; set; } = new();
+    public List<string> LikedBy { get => likedBy; set => likedBy = value ?? new(); }
 
     [JsonPropertyName("user_name")]
     public string UserName { get; set; } = string.Empty;
@@ -126,5 +136,16 @@ public class LoggedWorkoutRecord
     public string AvatarUrl { get; set; } = string.Empty;
 
     [JsonPropertyName("photos")]
-    public List<string> Photos { get; set; } = new();
+    public List<string> Photos { get => photos; set => photos = value ?? new(); }
+}
+
+public class JsonTextConverter : JsonConverter<string>
+{
+    public override string Read(ref System.Text.Json.Utf8JsonReader reader, Type typeToConvert, System.Text.Json.JsonSerializerOptions options)
+    {
+        if (reader.TokenType == System.Text.Json.JsonTokenType.String) return reader.GetString() ?? "[]";
+        using var doc = System.Text.Json.JsonDocument.ParseValue(ref reader);
+        return doc.RootElement.GetRawText();
+    }
+    public override void Write(System.Text.Json.Utf8JsonWriter writer, string value, System.Text.Json.JsonSerializerOptions options) => writer.WriteStringValue(value);
 }

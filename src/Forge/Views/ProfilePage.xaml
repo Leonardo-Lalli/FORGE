@@ -3,6 +3,7 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:vm="clr-namespace:Forge.ViewModels"
+    x:Name="profilePage"
     x:Class="Forge.Views.ProfilePage"
     x:DataType="vm:ProfileViewModel"
     Title="Profile"
@@ -33,7 +34,7 @@
             <Border Grid.Column="2" BackgroundColor="{DynamicResource SurfaceContainer}"
                     StrokeShape="RoundRectangle 999" WidthRequest="40" HeightRequest="40" Padding="0"
                     Stroke="{DynamicResource OutlineVariant}" StrokeThickness="0.5"
-                    IsVisible="{Binding IsLoggedIn}">
+                    IsVisible="{Binding IsOwnProfile}">
                 <Image Source="edit_profile.jpg" WidthRequest="22" HeightRequest="22"
                        HorizontalOptions="Center" VerticalOptions="Center">
                     <Image.GestureRecognizers>
@@ -57,14 +58,14 @@
                         <Border.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding ChangeAvatarCommand}" />
                         </Border.GestureRecognizers>
-                        <Image Source="{Binding AvatarSource}" Aspect="AspectFill"
+                        <Grid><Image Source="{Binding AvatarSource}" Aspect="AspectFill"
                                 WidthRequest="128" HeightRequest="128"
                                 IsVisible="{Binding HasAvatar}" />
-                        <Label Text="{Binding AvatarInitials}"
+<Label Text="{Binding AvatarInitials}"
                                FontFamily="OpenSansSemibold" FontSize="40"
                                TextColor="{DynamicResource OnSurface}"
                                HorizontalOptions="Center" VerticalOptions="Center"
-                               IsVisible="{Binding HasAvatar, Converter={StaticResource InverseBoolConverter}}" />
+                               IsVisible="{Binding HasAvatar, Converter={StaticResource InverseBoolConverter}}" /></Grid>
                     </Border>
 
                     <!-- Name -->
@@ -89,8 +90,19 @@
                            FontFamily="OpenSansRegular" FontSize="14"
                            TextColor="{DynamicResource TextSecondary}"
                            HorizontalTextAlignment="Center" />
+                    <Button Text="{Binding ProfileFollowLabel}" Command="{Binding FollowProfileCommand}"
+                            IsVisible="{Binding IsOwnProfile, Converter={StaticResource InverseBoolConverter}}"
+                            FontFamily="Lexend" FontAttributes="Bold" CornerRadius="16" HeightRequest="48" MinimumWidthRequest="160"
+                            BackgroundColor="{DynamicResource Primary}" TextColor="{DynamicResource OnPrimary}" />
                 </VerticalStackLayout>
 
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="16" IsVisible="{Binding CanViewConnections}">
+                    <Button Text="{Binding FollowersCount, StringFormat='{0} follower'}" Command="{Binding ShowFollowersCommand}" BackgroundColor="{DynamicResource SurfaceContainer}" TextColor="{DynamicResource OnSurface}" />
+                    <Button Grid.Column="1" Text="{Binding FollowingCount, StringFormat='{0} seguiti'}" Command="{Binding ShowFollowingCommand}" BackgroundColor="{DynamicResource SurfaceContainer}" TextColor="{DynamicResource OnSurface}" />
+                </Grid>
+                <Label Text="Follower e seguiti sono privati." IsVisible="{Binding CanViewConnections, Converter={StaticResource InverseBoolConverter}}"
+                       FontFamily="Inter" HorizontalTextAlignment="Center" TextColor="{DynamicResource TextSecondary}" />
+                <Label Text="{Binding ErrorMessage}" IsVisible="{Binding HasError}" TextColor="{DynamicResource Error}" />
                 <!-- Stats Grid 2x2 -->
                 <Grid ColumnDefinitions="*,16,*" RowDefinitions="Auto,16,Auto">
                     <!-- Total Workouts -->
@@ -173,7 +185,7 @@
                 <!-- Achievement Badges -->
                 <VerticalStackLayout IsVisible="{Binding HasUnlockedBadges}" Spacing="8">
                     <Grid ColumnDefinitions="*,Auto" Padding="0,0,0,4">
-                        <Label Grid.Column="0" Text="Badge Sbloccati" FontFamily="Lexend"
+                        <Label Grid.Column="0" Text="Achievement in evidenza" FontFamily="Lexend"
                                FontSize="13" FontAttributes="Bold"
                                TextColor="{DynamicResource OnSurfaceVariant}" />
                         <Label Grid.Column="1" Text="{Binding AchievementSummary}"
@@ -328,7 +340,7 @@
         <!-- Edit Profile Overlay -->
         <Grid Grid.RowSpan="2" IsVisible="{Binding IsEditing}"
               BackgroundColor="{DynamicResource Surface}" Padding="24">
-            <VerticalStackLayout Spacing="24" VerticalOptions="Center" MaximumWidthRequest="400"
+            <ScrollView><VerticalStackLayout Spacing="16" VerticalOptions="Center" MaximumWidthRequest="400"
                                  HorizontalOptions="Center">
 
                 <VerticalStackLayout Spacing="4" HorizontalOptions="Center">
@@ -343,13 +355,13 @@
                         StrokeShape="RoundRectangle 48" WidthRequest="96" HeightRequest="96" Padding="0"
                         Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1"
                         HorizontalOptions="Center">
-                    <Image Source="{Binding AvatarSource}" Aspect="AspectFill"
+                    <Grid><Image Source="{Binding AvatarSource}" Aspect="AspectFill"
                            WidthRequest="96" HeightRequest="96"
                            IsVisible="{Binding HasAvatar}" />
-                    <Label Text="{Binding AvatarInitials}" FontFamily="SpaceGrotesk" FontSize="32" FontAttributes="Bold"
+<Label Text="{Binding AvatarInitials}" FontFamily="SpaceGrotesk" FontSize="32" FontAttributes="Bold"
                            TextColor="{DynamicResource OnSurface}"
                            HorizontalOptions="Center" VerticalOptions="Center"
-                           IsVisible="{Binding HasAvatar, Converter={StaticResource InverseBoolConverter}}" />
+                           IsVisible="{Binding HasAvatar, Converter={StaticResource InverseBoolConverter}}" /></Grid>
                 </Border>
 
                 <!-- Name -->
@@ -371,6 +383,26 @@
                             BackgroundColor="Transparent" AutoSize="TextChanges" />
                 </Border>
 
+                <Button Text="Cambia foto profilo" Command="{Binding ChangeAvatarCommand}" BackgroundColor="Transparent" TextColor="{DynamicResource Primary}" />
+                <Label Text="Visibilità di tutti i tuoi allenamenti" FontSize="13" TextColor="{DynamicResource OnSurface}" />
+                <Picker ItemsSource="{Binding VisibilityChoices}" SelectedIndex="{Binding VisibilityIndex}" TextColor="{DynamicResource OnSurface}" BackgroundColor="{DynamicResource SurfaceContainer}" />
+                <Label Text="Visibilità di follower e seguiti" FontFamily="Lexend" TextColor="{DynamicResource OnSurface}" />
+                <Picker ItemsSource="{Binding VisibilityChoices}" SelectedIndex="{Binding ConnectionsVisibilityIndex}" TextColor="{DynamicResource OnSurface}" BackgroundColor="{DynamicResource SurfaceContainer}" />
+                <Label Text="Gli amici sono le persone con cui vi seguite a vicenda, con entrambe le richieste accettate." FontFamily="Inter" FontSize="12" TextColor="{DynamicResource TextSecondary}" />
+                <Label Text="Gli amici sono gli utenti con cui ti scambi il follow: vi seguite entrambi." FontSize="12" TextColor="{DynamicResource TextSecondary}" />
+                <Label Text="Scegli fino a 3 achievement sbloccati" TextColor="{DynamicResource OnSurface}" />
+                <CollectionView ItemsSource="{Binding BadgeChoices}" HeightRequest="180" SelectionMode="None">
+                    <CollectionView.ItemsLayout><LinearItemsLayout Orientation="Vertical" ItemSpacing="6" /></CollectionView.ItemsLayout>
+                    <CollectionView.EmptyView><Label Text="Completa un allenamento per sbloccare i primi achievement." TextColor="{DynamicResource TextSecondary}" /></CollectionView.EmptyView>
+                    <CollectionView.ItemTemplate><DataTemplate x:DataType="vm:BadgeChoice">
+                        <Grid ColumnDefinitions="44,*,32" ColumnSpacing="8" Padding="4">
+                            <Grid.GestureRecognizers><TapGestureRecognizer Command="{Binding Source={x:Reference profilePage}, Path=BindingContext.ToggleBadgeCommand}" CommandParameter="{Binding .}" /></Grid.GestureRecognizers>
+                            <Image Source="{Binding Icon}" HeightRequest="40" WidthRequest="40" />
+                            <Label Grid.Column="1" Text="{Binding Name}" TextColor="{DynamicResource OnSurface}" VerticalOptions="Center" />
+                            <Label Grid.Column="2" Text="✓" IsVisible="{Binding IsSelected}" TextColor="{DynamicResource Primary}" VerticalOptions="Center" />
+                        </Grid>
+                    </DataTemplate></CollectionView.ItemTemplate>
+                </CollectionView>
                 <!-- Save -->
                 <Button Text="SAVE CHANGES" FontFamily="Lexend" FontSize="14" FontAttributes="Bold"
                         CharacterSpacing="1"
@@ -389,7 +421,62 @@
                 <Label Text="{Binding ErrorMessage}" IsVisible="{Binding HasError}"
                        FontFamily="Inter" FontSize="13" TextColor="{DynamicResource Error}"
                        HorizontalTextAlignment="Center" />
+            </VerticalStackLayout></ScrollView>
+        </Grid>
+        <Grid Grid.RowSpan="2" IsVisible="{Binding IsConnectionsVisible}" BackgroundColor="{DynamicResource Surface}" RowDefinitions="Auto,Auto,Auto,*" RowSpacing="16">
+            <Grid ColumnDefinitions="48,*,48" Padding="24,16" ColumnSpacing="12">
+                <Button Text="←" Command="{Binding CloseConnectionsCommand}" CornerRadius="24" HeightRequest="48" Padding="0"
+                        BackgroundColor="{DynamicResource SurfaceContainer}" TextColor="{DynamicResource OnSurface}" FontSize="24" />
+                <VerticalStackLayout Grid.Column="1" Spacing="3" VerticalOptions="Center">
+                    <Label Text="{Binding ConnectionsTitle}" FontFamily="Lexend" FontAttributes="Bold" FontSize="24" TextColor="{DynamicResource OnSurface}" />
+                    <Label Text="{Binding Username}" FontFamily="Inter" FontSize="12" TextColor="{DynamicResource TextSecondary}" />
+                </VerticalStackLayout>
+            </Grid>
+            <Label Grid.Row="1" Margin="24,0" Text="Gli amici sono le persone che ricambiano il follow. Il cerchio blu apre l’ultimo allenamento pubblico."
+                   FontFamily="Inter" FontSize="12" TextColor="{DynamicResource TextSecondary}" />
+            <VerticalStackLayout Grid.Row="2" Margin="24,0" Spacing="8">
+                <ActivityIndicator IsVisible="{Binding IsConnectionsLoading}" IsRunning="{Binding IsConnectionsLoading}" Color="{DynamicResource Primary}" />
+                <Label Text="{Binding ConnectionsError}" FontFamily="Inter" FontSize="13" TextColor="{DynamicResource Error}" />
             </VerticalStackLayout>
+            <CollectionView Grid.Row="3" Margin="20,0,20,24" ItemsSource="{Binding Connections}" SelectionMode="None">
+                <CollectionView.EmptyView><Label Text="{Binding ConnectionsMessage}" Margin="24" FontFamily="Inter" HorizontalTextAlignment="Center" TextColor="{DynamicResource TextSecondary}" /></CollectionView.EmptyView>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="vm:UserSearchResult">
+                        <Border Margin="0,0,0,12" Padding="14" StrokeShape="RoundRectangle 22" Stroke="{DynamicResource OutlineVariant}" StrokeThickness="0.5" BackgroundColor="{DynamicResource SurfaceContainer}">
+                            <Grid ColumnDefinitions="60,*,Auto" ColumnSpacing="12">
+                                <Border WidthRequest="60" HeightRequest="60" Padding="3" StrokeShape="RoundRectangle 30" Stroke="{DynamicResource OutlineVariant}" StrokeThickness="2" VerticalOptions="Center">
+                                    <Border.Triggers><DataTrigger TargetType="Border" Binding="{Binding HasPublicWorkout}" Value="True"><Setter Property="Stroke" Value="{DynamicResource ElectricBlue}" /></DataTrigger></Border.Triggers>
+                                    <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding Source={x:Reference profilePage}, Path=BindingContext.OpenConnectionStoryCommand}" CommandParameter="{Binding .}" /></Border.GestureRecognizers>
+                                    <Border StrokeShape="RoundRectangle 26" StrokeThickness="0" BackgroundColor="{DynamicResource SurfaceContainerHigh}" Padding="0">
+                                        <Grid>
+                                            <Image Source="{Binding AvatarSource}" Aspect="AspectFill" IsVisible="{Binding HasAvatar}" />
+                                            <Label Text="{Binding Initial}" IsVisible="{Binding HasAvatar, Converter={StaticResource InverseBoolConverter}}" FontFamily="Lexend" FontSize="18" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center" TextColor="{DynamicResource OnSurface}" />
+                                        </Grid>
+                                    </Border>
+                                </Border>
+                                <Label Grid.Column="1" Text="{Binding Name}" FontFamily="Lexend" FontSize="15" FontAttributes="Bold" LineBreakMode="TailTruncation" VerticalOptions="Center" TextColor="{DynamicResource OnSurface}">
+                                    <Label.GestureRecognizers><TapGestureRecognizer Command="{Binding Source={x:Reference profilePage}, Path=BindingContext.OpenUserProfileCommand}" CommandParameter="{Binding .}" /></Label.GestureRecognizers>
+                                </Label>
+                                <Button Grid.Column="2" Text="{Binding FollowLabel}" IsVisible="{Binding CanFollow}" Command="{Binding Source={x:Reference profilePage}, Path=BindingContext.FollowConnectionCommand}" CommandParameter="{Binding .}"
+                                        FontFamily="Inter" FontSize="11" FontAttributes="Bold" CornerRadius="14" Padding="12,0" HeightRequest="40" VerticalOptions="Center" BackgroundColor="{DynamicResource Primary}" TextColor="{DynamicResource OnPrimary}" />
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </Grid>
+        <Grid Grid.RowSpan="2" IsVisible="{Binding IsUnfollowConfirmationVisible}" BackgroundColor="#99000000" Padding="24">
+            <Border StrokeShape="RoundRectangle 28" Padding="24" BackgroundColor="{DynamicResource SurfaceContainer}" Stroke="{DynamicResource OutlineVariant}" VerticalOptions="Center" MaximumWidthRequest="420" HorizontalOptions="Fill">
+                <VerticalStackLayout Spacing="18">
+                    <Label Text="Smettere di seguire?" FontFamily="Lexend" FontSize="22" FontAttributes="Bold" TextColor="{DynamicResource OnSurface}" />
+                    <Label Text="{Binding UnfollowName}" FontFamily="Lexend" FontSize="16" TextColor="{DynamicResource Primary}" />
+                    <Label Text="Confermando smetterai di seguire questo account." FontFamily="Inter" FontSize="14" TextColor="{DynamicResource TextSecondary}" />
+                    <Button Text="Smetti di seguire" Command="{Binding ConfirmUnfollowCommand}" CornerRadius="16" HeightRequest="48" FontFamily="Lexend" FontAttributes="Bold" BackgroundColor="{DynamicResource Primary}" TextColor="{DynamicResource OnPrimary}" />
+                    <Button Text="Annulla" Command="{Binding CancelUnfollowCommand}" CornerRadius="16" HeightRequest="44" FontFamily="Inter" BackgroundColor="{DynamicResource SurfaceContainerHigh}" TextColor="{DynamicResource OnSurface}" />
+                    <ActivityIndicator IsVisible="{Binding IsFollowBusy}" IsRunning="{Binding IsFollowBusy}" Color="{DynamicResource Primary}" />
+                    <Label Text="{Binding ErrorMessage}" IsVisible="{Binding HasError}" TextColor="{DynamicResource Error}" FontFamily="Inter" FontSize="12" />
+                </VerticalStackLayout>
+            </Border>
         </Grid>
     </Grid>
 

@@ -216,9 +216,13 @@ L'utente può registrare peso e misure corporee e visualizzarne l'andamento nel 
 
 ## 5. Prossimi passi
 
+Priorità aggiornate al 11 ottobre 2026: migrazione PocketBase per privacy e integrità social, prova Android dei profili/badge/recuperi e salvataggi, poi rilasci della nuova `ROADMAP.md`. Implementazione su develop; baseline main `2159d4c`. Test automatici e build documentati in `docs/test-matrix.md`. Nessun deployment o push effettuato. Le proposte storiche sotto sono subordinate a queste priorità.
+
 2. Configurare Nginx per bloccare admin panel `/_/` dall'esterno
 3. Valutare se implementare IT-04 (body tracking) in una nuova iterazione
 4. Aggiungere leaderboard settimanale tra amici
 5. Implementare confronto diretto statistiche tra amici
 6. Integrare Firebase SDK per push notification quando supporterà .NET 10
 7. Pubblicazione su Google Play Store
+
+Aggiornamento profili: pagina completa follower/seguiti, foto, allenamenti pubblici e conferma unfollow implementati. Migrazioni 1791676800/1791676900 applicate nel LXC dall’utente; nuova migrazione 1791677000 privacy elenchi pronta e da applicare.

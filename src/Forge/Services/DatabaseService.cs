@@ -120,10 +120,10 @@ public class DatabaseService
             await d.InsertAsync(exercise);
     }
 
-    public async Task<List<SavedPlan>> GetPlansAsync()
+    public async Task<List<SavedPlan>> GetPlansAsync(string? userId = null)
     {
         var d = await GetDbAsync();
-        return await d.Table<SavedPlan>().OrderByDescending(p => p.UpdatedAt).ToListAsync();
+        return userId == null ? await d.Table<SavedPlan>().OrderByDescending(p => p.UpdatedAt).ToListAsync() : await d.Table<SavedPlan>().Where(p => p.UserId == userId).OrderByDescending(p => p.UpdatedAt).ToListAsync();
     }
 
     public async Task SavePlanAsync(SavedPlan plan)

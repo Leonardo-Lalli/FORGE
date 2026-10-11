@@ -6,7 +6,7 @@ using Forge.Models;
 
 namespace Forge.Services;
 
-public class PocketBaseService
+public partial class PocketBaseService
 {
     private readonly IHttpClientFactory httpFactory;
     private readonly BuildSecrets secrets;
@@ -69,13 +69,30 @@ public class PocketBaseService
         try
         {
             var coll = string.IsNullOrWhiteSpace(collectionId) ? "users" : collectionId;
-            var url = $"{GetPbBaseUrl()}/api/files/{coll}/{recordId}/{fileName}";
+            var url = GetFileUrl(coll, recordId, fileName);
 
             var request = new HttpRequestMessage(HttpMethod.Get, url);
             request.Headers.Authorization =
                 new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
             var response = await GetHttp().SendAsync(request);
+            if (response.StatusCode is System.Net.HttpStatusCode.Unauthorized or System.Net.HttpStatusCode.Forbidden or System.Net.HttpStatusCode.NotFound)
+            {
+                using var fileTokenRequest = new HttpRequestMessage(HttpMethod.Post, "files/token")
+                { Content = JsonContent.Create(new { }) };
+                fileTokenRequest.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                using var tokenResponse = await GetHttp().SendAsync(fileTokenRequest);
+                if (tokenResponse.IsSuccessStatusCode)
+                {
+                    using var tokenBody = JsonDocument.Parse(await tokenResponse.Content.ReadAsStringAsync());
+                    if (tokenBody.RootElement.TryGetProperty("token", out var fileToken))
+                    {
+                        response.Dispose();
+                        // Only the short-lived file token belongs in a file URL, never the auth JWT.
+                        response = await GetHttp().GetAsync(url + "?token=" + Uri.EscapeDataString(fileToken.GetString() ?? ""));
+                    }
+                }
+            }
             if (!response.IsSuccessStatusCode)
             {
                 System.Diagnostics.Debug.WriteLine($"[PB DownloadAvatar] HTTP {response.StatusCode} for {url}");
@@ -88,24 +105,14 @@ public class PocketBaseService
             System.Diagnostics.Debug.WriteLine($"[PB DownloadAvatar] OK {bytes.Length} bytes from {fileName}");
 
             var cacheDir = FileSystem.CacheDirectory;
-            var cacheFile = Path.Combine(cacheDir, $"avatar_{recordId}.jpg");
+            var key = Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(Encoding.UTF8.GetBytes(url)))[..24];
+            var cacheFile = Path.Combine(cacheDir, $"avatar_{key}{Path.GetExtension(fileName)}");
             await File.WriteAllBytesAsync(cacheFile, bytes);
             return ImageSource.FromFile(cacheFile);
         }
         catch (Exception ex)
         {
             System.Diagnostics.Debug.WriteLine($"[PB DownloadAvatar] ex: {ex.Message}");
-        }
-
-        try
-        {
-            var fallbackUrl = GetFileUrl(collectionId, recordId, fileName);
-            System.Diagnostics.Debug.WriteLine($"[PB DownloadAvatar] Fallback URL: {fallbackUrl}");
-            return ImageSource.FromUri(new Uri(fallbackUrl));
-        }
-        catch (Exception ex2)
-        {
-            System.Diagnostics.Debug.WriteLine($"[PB DownloadAvatar] Fallback ex: {ex2.Message}");
         }
 
         return null;
@@ -529,7 +536,8 @@ public class PocketBaseService
         if (!IsLoggedIn) return new();
         try
         {
-            var url = $"collections/users/records?search={Uri.EscapeDataString(query)}&perPage=20";
+            var filter = "name ~ " + FilterValue(query.Trim());
+            var url = $"collections/users/records?filter={Uri.EscapeDataString(filter)}&perPage=20";
             var request = new HttpRequestMessage(HttpMethod.Get, url);
             request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
             var response = await GetHttp().SendAsync(request);
@@ -560,6 +568,7 @@ public class PocketBaseService
             {
                 from_user = currentUser.Id,
                 from_name = currentUser.Name,
+                form_name = currentUser.Name,
                 to_user = targetUserId,
                 status = "pending"
             };
@@ -645,25 +654,8 @@ public class PocketBaseService
     public async Task<List<string>> GetFollowingUserIdsAsync()
     {
         await EnsureAuthAsync();
-        if (!IsLoggedIn || currentUser == null) return new();
-        try
-        {
-            var url = "collections/social_graph/records?perPage=200";
-            var request = new HttpRequestMessage(HttpMethod.Get, url);
-            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-            var response = await GetHttp().SendAsync(request);
-            if (!response.IsSuccessStatusCode) return new();
-            var list = await response.Content.ReadFromJsonAsync<PocketBaseListResponse<SocialGraphRecord>>(JsonOptions);
-            return list?.Items
-                .Where(r => r.FromUser == currentUser.Id && r.Status == "accepted")
-                .Select(r => r.ToUser)
-                .ToList() ?? new();
-        }
-        catch (Exception ex)
-        {
-            System.Diagnostics.Debug.WriteLine($"[PB FollowingIds] ex: {ex.Message}");
-            return new();
-        }
+        if (currentUser == null) return [];
+        return (await GetConnectionsAsync(currentUser.Id)).Where(r => r.FromUser == currentUser.Id).Select(r => r.ToUser).Distinct().ToList();
     }
 
     public async Task<List<LoggedWorkoutRecord>> GetMyWorkoutsAsync(int limit = 10)
@@ -677,9 +669,7 @@ public class PocketBaseService
         try
         {
             var userId = currentUser.Id;
-            var cappedLimit = Math.Min(limit, 200);
-
-            var result = await TryFetchWorkoutsAsync(cappedLimit, userId);
+            var result = await GetUserWorkoutsAsync(userId, limit);
             if (result != null)
             {
                 result = result.OrderByDescending(w =>
@@ -870,7 +860,8 @@ public class PocketBaseService
             System.Diagnostics.Debug.WriteLine($"[PB FollowedWorkouts] followingIds={string.Join(",", followingIds)}");
             if (followingIds.Count == 0) return new();
 
-            var url = $"collections/logged_workouts/records?perPage=30";
+            var filter = string.Join(" || ", followingIds.Select(id => "user = " + FilterValue(id)));
+            var url = $"collections/logged_workouts/records?perPage=30&sort=-date&filter={Uri.EscapeDataString(filter)}";
             var request = new HttpRequestMessage(HttpMethod.Get, url);
             request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
             var response = await GetHttp().SendAsync(request);
@@ -1151,6 +1142,8 @@ public class PocketBaseService
 
 public class ExcerciseRecord
 {
+    [System.Text.Json.Serialization.JsonPropertyName("exercise_id")]
+    public string? ExerciseId { get; set; }
     private List<string>? instructions;
     private string? imageUrl;
     public string? Id { get; set; }
@@ -1161,7 +1154,7 @@ public class ExcerciseRecord
     public JsonElement LegacyInstructions { get; set; }
     public List<string>? Instructions
     {
-        get => instructions ?? (LegacyInstructions.ValueKind switch
+        get => instructions is { Count: > 0 } ? instructions : (LegacyInstructions.ValueKind switch
         {
             JsonValueKind.Array => LegacyInstructions.EnumerateArray().Where(e => e.ValueKind == JsonValueKind.String)
                 .Select(e => e.GetString()!).ToList(),
@@ -1171,7 +1164,7 @@ public class ExcerciseRecord
         set => instructions = value;
     }
     public string? Image_url { get; set; }
-    public string? ImageUrl { get => imageUrl ?? Image_url; set => imageUrl = value; }
+    public string? ImageUrl { get => !string.IsNullOrWhiteSpace(imageUrl) ? imageUrl : Image_url; set => imageUrl = value; }
     public string? Category { get; set; }
     public string? TargetMuscles { get; set; }
     public string? SecondaryMuscles { get; set; }

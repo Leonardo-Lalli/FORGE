@@ -55,7 +55,7 @@ export const it = {
     ],
     terminalTitle: "terminal",
     terminalComment: "# Avvia il backend FORGE con PocketBase",
-    note: "Richiede Docker e Docker Compose. PocketBase espone la dashboard admin sulla porta 8090.",
+    note: "Richiede Docker e Docker Compose. Installa anche migrazioni e hook FORGE per privacy e cache condivisa degli esercizi: il server salva schede, istruzioni e URL GIF. I file GIF restano sul provider e richiedono connettività. Amministrazione da mantenere privata.",
     cta: "Guida al self-hosting",
   },
   docsTeaser: {
@@ -225,99 +225,192 @@ export const it = {
     difficulty: { low: "Bassa", med: "Media", high: "Alta", vhigh: "Molto alta" },
     releases: [
       {
-        version: "v0.9.0-beta",
-        date: "",
-        theme: "QoL & Usabilità",
-        features: [
-          { name: "Incremento rapido pesi (+/-)", desc: "Pulsanti +2.5kg accanto al campo peso. Press-and-hold = +5kg", diff: "low" },
-          { name: "Copia set precedente", desc: 'Tasto "Duplica" che clona kg×reps nella serie successiva', diff: "low" },
-          { name: "Calcolatore 1RM", desc: "Tap su un top lift → mostra massimale stimato (formula Epley)", diff: "low" },
-          { name: "Timer a voce", desc: 'TTS Android: "Serie completata, 90 secondi di pausa"', diff: "med" },
-          { name: "Filtro ricerca esercizi migliorato", desc: "Filtri combinabili (muscolo AND attrezzatura)", diff: "low" },
-        ],
+            "version": "v0.9.0-beta",
+            "date": "",
+            "theme": "Stabilità & Privacy",
+            "features": [
+                  {
+                        "name": "Accesso affidabile",
+                        "desc": "Login pubblico e server personali; avatar e recupero sessione verificati",
+                        "diff": "med"
+                  },
+                  {
+                        "name": "Privacy sul server",
+                        "desc": "Allenamenti pubblici, privati o per amici reciproci; test delle API Rules",
+                        "diff": "high"
+                  },
+                  {
+                        "name": "Schede per account",
+                        "desc": "Schede personali senza limiti; esempi una sola volta; note e recuperi persistenti",
+                        "diff": "med"
+                  },
+                  {
+                        "name": "Achievement retroattivi",
+                        "desc": "Ricalcolo dello storico e tre badge scelti nel profilo",
+                        "diff": "med"
+                  },
+                  {
+                        "name": "Regressioni e grafici",
+                        "desc": "Grafico volume corretto; build Android e test automatici",
+                        "diff": "med"
+                  }
+            ]
       },
       {
-        version: "v1.0.0",
-        date: "",
-        theme: "Release Stabile",
-        features: [
-          { name: "Notifiche push FCM", desc: "Notifica quando un amico ti segue, mette like o accetta una richiesta", diff: "high" },
-          { name: "Localizzazione completa", desc: "File .resx per IT/EN/ES/DE/ZH — tutte le stringhe tradotte", diff: "high" },
-          { name: "Body tracking", desc: "Registra peso corporeo, misure, %BF. Grafico nel tempo", diff: "med" },
-          { name: "Leaderboard settimanale", desc: "Classifica volume tra amici, reset ogni lunedì", diff: "med" },
-          { name: "Auto-build APK nelle Release", desc: "GitHub Action che crea release automatica a ogni tag", diff: "low" },
-        ],
+            "version": "v1.0.0",
+            "date": "",
+            "theme": "Flusso allenamento verificato",
+            "features": [
+                  {
+                        "name": "Recuperi per esercizio",
+                        "desc": "Selezione 0–5 minuti, salvata nelle schede",
+                        "diff": "med"
+                  },
+                  {
+                        "name": "Sessione precedente",
+                        "desc": "Pesi e ripetizioni suggeriti dallo storico, modificabili",
+                        "diff": "med"
+                  },
+                  {
+                        "name": "Offline e sincronizzazione",
+                        "desc": "Verifica su dispositivo di salvataggi, bozze e cambio account",
+                        "diff": "high"
+                  },
+                  {
+                        "name": "Catalogo esercizi",
+                        "desc": "Conteggio reale, GIF, istruzioni e paginazione completa",
+                        "diff": "med"
+                  },
+                  {
+                        "name": "Release Android",
+                        "desc": "Build APK riproducibile e validazione prima della release",
+                        "diff": "med"
+                  }
+            ]
       },
       {
-        version: "v1.1.0",
-        date: "",
-        theme: "Social & Community",
-        features: [
-          { name: "Commenti ai workout", desc: "Gli amici possono commentare i tuoi allenamenti nel feed", diff: "med" },
-          { name: "Sfide 1-vs-1", desc: '"Sfida Marco a volume totale questa settimana" → notifica + classifica', diff: "med" },
-          { name: "Condivisione workout", desc: "Share sheet Android: immagine riassuntiva dell'allenamento", diff: "med" },
-          { name: "Badge stagionali", desc: 'Achievement limitati nel tempo (es. "Allenati a Natale")', diff: "low" },
-          { name: "Storie workout", desc: "Foto del giorno visibili 24h nel feed (stile Instagram Stories)", diff: "high" },
-        ],
+            "version": "v1.1.0",
+            "date": "",
+            "theme": "Social & Community",
+            "features": [
+                  {
+                        "name": "Profili e follow",
+                        "desc": "Profili ricercabili, follower e seguiti; amici = follow reciproco",
+                        "diff": "med"
+                  },
+                  {
+                        "name": "Commenti e notifiche",
+                        "desc": "Commenti e notifiche push dopo il consolidamento della privacy",
+                        "diff": "high"
+                  },
+                  {
+                        "name": "Sfide e classifiche",
+                        "desc": "Sfide tra amici e leaderboard con consenso",
+                        "diff": "med"
+                  },
+                  {
+                        "name": "Condivisione",
+                        "desc": "Riepiloghi condivisibili senza esporre contenuti privati",
+                        "diff": "med"
+                  }
+            ]
       },
       {
-        version: "v1.2.0",
-        date: "",
-        theme: "Health & Wear OS",
-        features: [
-          { name: "Widget Android", desc: '"START WORKOUT" direttamente dalla home screen del telefono', diff: "med" },
-          { name: "Wear OS companion", desc: "Timer rest + tracking serie dallo smartwatch", diff: "vhigh" },
-          { name: "Integrazione Google Fit", desc: "Sincronizza durata allenamento + calorie con Google Fit", diff: "med" },
-          { name: "Heart rate display", desc: "Mostra battito cardiaco durante l'allenamento (se supportato)", diff: "high" },
-          { name: "Contatore passi", desc: "Widget passi giornalieri nella dashboard", diff: "low" },
-        ],
+            "version": "v1.2.0",
+            "date": "",
+            "theme": "Analytics & Localizzazione",
+            "features": [
+                  {
+                        "name": "Analytics avanzate",
+                        "desc": "1RM, volume per muscolo, calendario e storico",
+                        "diff": "med"
+                  },
+                  {
+                        "name": "Body tracking",
+                        "desc": "Misure e peso con scelte di riservatezza",
+                        "diff": "high"
+                  },
+                  {
+                        "name": "Lingue e accessibilità",
+                        "desc": "Traduzioni complete e test di contrasto e dimensioni testo",
+                        "diff": "high"
+                  },
+                  {
+                        "name": "Report e backup",
+                        "desc": "Export PDF e backup con ripristino verificato",
+                        "diff": "med"
+                  }
+            ]
       },
       {
-        version: "v1.3.0",
-        date: "",
-        theme: "Advanced Features",
-        features: [
-          { name: "PDF report", desc: "Export report allenamento con grafici, tabelle e foto", diff: "med" },
-          { name: "Allenamenti predefiniti", desc: 'Template "Push/Pull/Legs", "Full Body", "Upper/Lower"', diff: "low" },
-          { name: "Progressive overload tracker", desc: "L'app suggerisce quanto aumentare rispetto alla sessione precedente", diff: "med" },
-          { name: "Grafici avanzati", desc: "Volume per muscolo nel tempo, PR timeline, frequenza settimanale", diff: "med" },
-          { name: "Modifica workout post-salvataggio", desc: "Correggi un peso sbagliato dopo aver salvato", diff: "low" },
-          { name: "Ricerca workout nello storico", desc: "Cerca per nome esercizio, data, volume", diff: "low" },
-        ],
+            "version": "v1.3.0",
+            "date": "",
+            "theme": "Health & Wearables",
+            "features": [
+                  {
+                        "name": "Widget e Wear OS",
+                        "desc": "Accesso rapido e companion per timer e serie",
+                        "diff": "vhigh"
+                  },
+                  {
+                        "name": "Integrazioni salute",
+                        "desc": "Valutazione delle API supportate e autorizzazioni esplicite",
+                        "diff": "high"
+                  },
+                  {
+                        "name": "Sensori",
+                        "desc": "Battito e passi dove supportati dal dispositivo",
+                        "diff": "high"
+                  }
+            ]
       },
       {
-        version: "v1.4.0",
-        date: "",
-        theme: "Platform & Infrastruttura",
-        features: [
-          { name: "Google Play Store", desc: "Pubblicazione ufficiale con keystore di produzione", diff: "med" },
-          { name: "Backup automatico", desc: "Export automatico settimanale dei dati su Google Drive", diff: "med" },
-          { name: "SQLite encryption", desc: "Database cifrato con SQLCipher", diff: "med" },
-          { name: "Multi-server switch", desc: "Profili multipli: switch tra server self-hosted diversi", diff: "low" },
-          { name: "Web dashboard", desc: "Interfaccia web per visualizzare i dati da PC", diff: "high" },
-          { name: "REST API pubblica", desc: "API documentata per integrazioni di terze parti", diff: "high" },
-        ],
-      },
-    ],
+            "version": "v1.4.0",
+            "date": "",
+            "theme": "Infrastruttura & B2B",
+            "features": [
+                  {
+                        "name": "Origine protetta",
+                        "desc": "Proxy o tunnel con dominio dedicato; IP domestico fuori dal DNS pubblico",
+                        "diff": "high"
+                  },
+                  {
+                        "name": "Distribuzione",
+                        "desc": "Play Store e gestione chiavi di produzione",
+                        "diff": "med"
+                  },
+                  {
+                        "name": "Dashboard e API",
+                        "desc": "Web dashboard, API documentata e profili server",
+                        "diff": "high"
+                  },
+                  {
+                        "name": "Palestre",
+                        "desc": "Trainer dashboard, QR onboarding e isolamento tra palestre",
+                        "diff": "vhigh"
+                  }
+            ]
+      }
+],
     phasesEyebrow: "// Sintesi",
     phasesTitle: "I tre pilastri in arrivo",
     phases: [
       {
-        tag: "Fase 1",
-        title: "Smart Workout Flow",
-        body: "Timer di recupero automatico con vibrazione, pesi dell'ultima sessione già visibili come placeholder (Ghost Inputs) e tasti rapidi +/- per variare i carichi di 2.5kg senza tastiera.",
+            "tag": "Fase 1",
+            "title": "Stabilità & Privacy",
+            "body": "Login pubblico e server personali; avatar e recupero sessione verificati; Allenamenti pubblici, privati o per amici reciproci; test delle API Rules; Schede personali senza limiti; esempi una sola volta; note e recuperi persistenti"
       },
       {
-        tag: "Fase 2",
-        title: "Analytics Avanzate",
-        body: "Calcolo automatico del massimale stimato (1RM con formula Epley), grafici interattivi per la distribuzione del volume sui gruppi muscolari e calendario delle streak per la costanza.",
+            "tag": "Fase 2",
+            "title": "Flusso allenamento verificato",
+            "body": "Selezione 0–5 minuti, salvata nelle schede; Pesi e ripetizioni suggeriti dallo storico, modificabili; Verifica su dispositivo di salvataggi, bozze e cambio account"
       },
       {
-        tag: "Fase 3",
-        title: "Self-Hosting Pro & Social",
-        body: "Feed amici in tempo reale sullo stesso server PocketBase e modalità Offline First per salvare in palestra anche senza campo e sincronizzare al rientro a casa.",
-      },
-    ],
+            "tag": "Fase 3",
+            "title": "Social & Community",
+            "body": "Profili ricercabili, follower e seguiti; amici = follow reciproco; Commenti e notifiche push dopo il consolidamento della privacy; Sfide tra amici e leaderboard con consenso"
+      }
+],
     b2b: {
       eyebrow: "// FORGE Local Business",
       title: "Un modulo B2B per le palestre",
@@ -325,8 +418,8 @@ export const it = {
       advantages: [
         { title: "Zero costi SaaS", desc: "Niente abbonamenti o licenze per postazione. Da 50 a 5.000 iscritti, il costo software è 0€/mese." },
         { title: "Community locale", desc: "Chi si allena nella stessa sala vede i PR degli altri in tempo reale, con classifiche interne della palestra." },
-        { title: "Privacy e GDPR al 100%", desc: "I dati su salute e performance non lasciano mai l'edificio. Un vero punto di marketing." },
-        { title: "Offline / LAN First", desc: "Se internet si interrompe, l'app continua a funzionare via Wi-Fi locale. Zero downtime durante gli allenamenti." },
+        { title: "Controllo locale dei dati", desc: "La configurazione locale aiuta a controllare i dati. Privacy e conformità dipendono da accessi, consensi, backup e gestione del server." },
+        { title: "Offline / LAN First", desc: "Se internet si interrompe, l'app continua a funzionare via Wi-Fi locale. Il funzionamento locale dipende dalla rete e dal server della palestra." },
       ],
       future: [
         { title: "Trainer Dashboard", desc: "Interfaccia web dove i personal trainer assegnano schede e protocolli agli iscritti." },

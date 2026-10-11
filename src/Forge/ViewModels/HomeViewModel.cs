@@ -136,6 +136,7 @@ public partial class HomeViewModel : BaseViewModel
 
     private async Task LoadRandomPlanAsync()
     {
+        await planService.EnsureStarterPlansAsync();
         var plans = await planService.LoadPlansAsync();
         if (plans.Count > 0)
         {

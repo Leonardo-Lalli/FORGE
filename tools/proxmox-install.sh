@@ -92,6 +92,9 @@ msg_info "Creazione superuser..."
 msg_info "Configurazione collezioni + API rules..."
 
 PB_URL=http://127.0.0.1:8090 PB_ADMIN_EMAIL="$PB_EMAIL" PB_ADMIN_PASSWORD="$PB_PASS" sh "$FORGE_INIT_SCRIPT"
+msg_info 'Profile/privacy and shared exercise cache require the reviewed migration:'
+echo "  sudo bash tools/apply-profile-migration.sh $PB_DIR forge-pocketbase"
+echo 'See docs/pocketbase-profile-migration.md. GIF files remain referenced by URL.'
 
 # --- MOTD ---
 IP=$(hostname -I | awk '{print $1}')

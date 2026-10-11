@@ -12,7 +12,8 @@ import { en } from "@/lib/translations/en"
 
 export type Lang = "it" | "en"
 
-export type Dictionary = typeof it
+import type { Dictionary } from "@/lib/translations/types"
+export type { Dictionary } from "@/lib/translations/types"
 
 const dictionaries: Record<Lang, Dictionary> = { it, en }
 

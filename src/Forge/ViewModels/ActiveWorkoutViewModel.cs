@@ -22,8 +22,14 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
     private CancellationTokenSource? elapsedCts;
     private int restSecondsRemaining;
     private DateTime workoutStartTime;
+    private bool restoringDraft;
+    private int activeRestDuration;
+    private List<LocalWorkout> previousHistory = [];
+    public IReadOnlyList<int> RestMinuteOptions { get; } = Enumerable.Range(0, 6).ToList();
+    public IReadOnlyList<int> RestSecondOptions { get; } = Enumerable.Range(0, 60).ToList();
 
-    [ObservableProperty] private string mode = "free";
+    [ObservableProperty, NotifyPropertyChangedFor(nameof(IsPlanWorkout))] private string mode = "free";
+    public bool IsPlanWorkout => Mode == "plan";
     [ObservableProperty] private string planId = string.Empty;
     [ObservableProperty] private string planName = "Nuovo Allenamento";
     [ObservableProperty] private ObservableCollection<WorkoutExercise> exercises = new();
@@ -32,8 +38,8 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
 
     partial void OnRestDurationChanged(int value)
     {
-        if (value < 5) restDuration = 5;
-        if (value > 600) restDuration = 600;
+        if (value < 0) restDuration = 0;
+        if (value > 300) restDuration = 300;
         RestTimerLabel = $"pausa {value}s";
     }
     [ObservableProperty] private bool isRestTimerActive;
@@ -201,17 +207,18 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
         EquipmentFilters = new ObservableCollection<FilterChip>
         {
             new() { Label = "Tutti", Value = "", IsSelected = true },
-            new() { Label = "Corpo libero", Value = "body weight" },
-            new() { Label = "Manubri", Value = "dumbbell,weighted" },
+            new() { Label = "Corpo libero", Value = "body weight,bodyweight,body-weight" },
+            new() { Label = "Manubri", Value = "dumbbell" },
             new() { Label = "Bilanciere", Value = "barbell" },
             new() { Label = "Cavi", Value = "cable" },
-            new() { Label = "Macchinari", Value = "machine" },
+            new() { Label = "Macchinari", Value = "machine,leverage,assisted" },
             new() { Label = "Elastico", Value = "band" }
         };
     }
 
     partial void OnModeChanged(string value)
     {
+        if (restoringDraft) return;
         PlanName = value switch { "free" => "Allenamento Libero", "create" => "Nuova Scheda", _ => "Scheda Salvata" };
         IsCreating = (value == "create");
 
@@ -233,6 +240,7 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
 
     partial void OnPlanIdChanged(string value)
     {
+        if (restoringDraft) return;
         if (!string.IsNullOrWhiteSpace(value) && Mode == "plan")
             _ = LoadPlanAsync().ContinueWith(t => { if (t.IsFaulted) System.Diagnostics.Debug.WriteLine($"[ActiveWk LoadPlan2] ex: {t.Exception?.InnerException?.Message}"); }, TaskContinuationOptions.OnlyOnFaulted);
     }
@@ -245,6 +253,8 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
 
         PlanName = plan.Name;
         PlanNameInput = plan.Name;
+        WorkoutNotes = plan.Notes;
+        previousHistory = await db.GetWorkoutsAsync(pb.CurrentUser?.Id ?? "");
         RestDuration = plan.RestSeconds;
 
         Exercises.Clear();
@@ -257,6 +267,7 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
                 clonedSets.Add(new ExerciseSet { SetNumber = s.SetNumber, WeightKg = s.WeightKg, Reps = s.Reps, IsCompleted = false });
             ex.Sets = clonedSets;
             ex.IsCompleted = false;
+            PreviousPerformance.Apply(previousHistory, ex);
             Exercises.Add(ex);
         }
     }
@@ -286,12 +297,13 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
     }
 
     [RelayCommand]
-    private void AddExercise()
+    private async Task AddExerciseAsync()
     {
         IsSearchVisible = true;
         SearchQuery = string.Empty;
         SearchResults.Clear();
         SearchError = string.Empty;
+        await ApplyFiltersAsync();
     }
 
     [RelayCommand]
@@ -303,14 +315,14 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
     [RelayCommand]
     private async Task SelectMuscleFilterAsync(FilterChip chip)
     {
-        chip.IsSelected = !chip.IsSelected;
+        ToggleFilter(MuscleFilters, chip);
         await ApplyFiltersAsync();
     }
 
     [RelayCommand]
     private async Task SelectEquipmentFilterAsync(FilterChip chip)
     {
-        chip.IsSelected = !chip.IsSelected;
+        ToggleFilter(EquipmentFilters, chip);
         await ApplyFiltersAsync();
     }
 
@@ -319,18 +331,12 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
         var activeMuscles = MuscleFilters.Where(f => f.IsSelected && !string.IsNullOrWhiteSpace(f.Value)).ToList();
         var activeEquip = EquipmentFilters.Where(f => f.IsSelected && !string.IsNullOrWhiteSpace(f.Value)).ToList();
 
-        if (activeMuscles.Count == 0 && activeEquip.Count == 0)
-        {
-            SearchResults.Clear();
-            SearchError = "";
-            return;
-        }
-
         IsSearchingApi = true;
         try
         {
-            var all = await db.GetCachedExercisesAsync();
-            if (all.Count == 0) { await exerciseDbApi.WarmCacheAsync(); all = await db.GetCachedExercisesAsync(); }
+            await exerciseDbApi.WarmCacheAsync();
+            var all = await exerciseDbApi.GetCatalogAsync();
+            if (all.Count == 0) { SearchError = "Catalogo non disponibile. Controlla la connessione e riprova."; return; }
 
             var results = all.AsEnumerable();
 
@@ -361,6 +367,11 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
                     }));
             }
 
+            if (SearchQuery.Trim().Length >= 2)
+            {
+                var matchingIds = (await exerciseDbApi.SearchAsync(SearchQuery)).Select(e => e.Id).ToHashSet();
+                results = results.Where(e => matchingIds.Contains(e.Id));
+            }
             var final = results.ToList();
 
             SearchResults.Clear();
@@ -409,7 +420,7 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
             }
             else
             {
-                foreach (var r in results.Take(10))
+                foreach (var r in results.Where(PassesSelectedFilters))
                 {
                     if (ct.IsCancellationRequested) break;
                     SearchResults.Add(new ExerciseSearchResult
@@ -439,10 +450,30 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
         }
     }
 
-    [RelayCommand]
-    private void SelectExercise(ExerciseSearchResult result)
+    private static void ToggleFilter(ObservableCollection<FilterChip> filters, FilterChip chip)
     {
-        Exercises.Add(new WorkoutExercise
+        if (string.IsNullOrEmpty(chip.Value))
+        { foreach (var item in filters) item.IsSelected = item == chip; return; }
+        chip.IsSelected = !chip.IsSelected;
+        filters.First(f => string.IsNullOrEmpty(f.Value)).IsSelected = !filters.Any(f => f.IsSelected && !string.IsNullOrEmpty(f.Value));
+    }
+
+    private bool PassesSelectedFilters(ExerciseSearchResultDto exercise)
+    {
+        var muscles = MuscleFilters.Where(f => f.IsSelected && !string.IsNullOrEmpty(f.Value)).ToList();
+        var equipment = EquipmentFilters.Where(f => f.IsSelected && !string.IsNullOrEmpty(f.Value)).ToList();
+        return (muscles.Count == 0 || muscles.Any(f => f.GetValues().Any(v =>
+            exercise.BodyPart.Contains(v, StringComparison.OrdinalIgnoreCase) || exercise.TargetMuscles.Contains(v, StringComparison.OrdinalIgnoreCase) ||
+            exercise.SecondaryMuscles.Contains(v, StringComparison.OrdinalIgnoreCase) || exercise.Category.Contains(v, StringComparison.OrdinalIgnoreCase)))) &&
+            (equipment.Count == 0 || equipment.Any(f => f.GetValues().Any(v => exercise.Equipment.Contains(v, StringComparison.OrdinalIgnoreCase))));
+    }
+
+    [RelayCommand]
+    private async Task SelectExerciseAsync(ExerciseSearchResult result)
+    {
+        var cached = await db.GetCachedExerciseByIdAsync(result.Id);
+        previousHistory = await db.GetWorkoutsAsync(pb.CurrentUser?.Id ?? "");
+        var exercise = new WorkoutExercise
         {
             ExerciseId = result.Id,
             ExerciseName = result.Name,
@@ -450,9 +481,14 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
             Equipment = result.Equipment,
             ImageUrl = result.ImageUrl,
             GifUrl = result.ImageUrl,
-            Instructions = new List<string>(),
+            Instructions = cached == null ? [] : System.Text.Json.JsonSerializer.Deserialize<List<string>>(cached.InstructionsJson) ?? [],
+            RestSeconds = RestDuration,
             Order = Exercises.Count + 1
-        });
+        };
+        var previous = PreviousPerformance.Find(previousHistory, exercise);
+        foreach (var (weight, reps) in previous)
+            exercise.Sets.Add(new ExerciseSet { SetNumber = exercise.Sets.Count + 1, WeightKg = weight, Reps = reps, IsSuggested = true });
+        Exercises.Add(exercise);
         IsSearchVisible = false;
         SearchQuery = string.Empty;
         SearchResults.Clear();
@@ -469,7 +505,9 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
     private void AddSet(WorkoutExercise ex)
     {
         var last = ex.Sets.LastOrDefault();
-        ex.Sets.Add(new ExerciseSet { SetNumber = ex.Sets.Count + 1, WeightKg = last?.WeightKg ?? 20, Reps = last?.Reps ?? 10 });
+        var previous = PreviousPerformance.Find(previousHistory, ex);
+        var suggestion = ex.Sets.Count < previous.Count ? previous[ex.Sets.Count] : ((double Weight, int Reps)?)null;
+        ex.Sets.Add(new ExerciseSet { SetNumber = ex.Sets.Count + 1, WeightKg = suggestion?.Weight ?? last?.WeightKg ?? 0, Reps = suggestion?.Reps ?? last?.Reps ?? 10, IsSuggested = suggestion != null });
     }
 
     [RelayCommand]
@@ -488,9 +526,12 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
     [RelayCommand]
     private void CompleteSet(ExerciseSet set)
     {
+        if (set.IsCompleted) return;
         set.IsCompleted = true;
+        set.IsSuggested = false;
         TotalSetsCompleted++;
-        StartRestTimer();
+        var parent = Exercises.FirstOrDefault(e => e.Sets.Contains(set));
+        if (parent != null) StartExerciseRestTimer(parent);
     }
 
     [RelayCommand]
@@ -510,20 +551,22 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
     private void Renumber() { for (int i = 0; i < Exercises.Count; i++) Exercises[i].Order = i + 1; }
 
     [RelayCommand]
-    private void ReplaceExercise(WorkoutExercise ex)
+    private async Task ReplaceExerciseAsync(WorkoutExercise ex)
     {
         Exercises.Remove(ex);
         for (int i = 0; i < Exercises.Count; i++) Exercises[i].Order = i + 1;
-        AddExercise();
+        await AddExerciseAsync();
     }
 
     [RelayCommand]
     private void StartExerciseRestTimer(WorkoutExercise ex)
     {
         restCts?.Cancel();
+        activeRestDuration = Math.Clamp(ex.RestSeconds, 0, 300);
+        if (activeRestDuration == 0) { SkipRestTimer(); return; }
         restCts = new CancellationTokenSource();
         var token = restCts.Token;
-        restSecondsRemaining = RestDuration;
+        restSecondsRemaining = activeRestDuration;
         IsRestTimerActive = true;
         RestTimerLabel = $"pausa {ex.ExerciseName}";
         RestTimerProgress = 1.0;
@@ -532,50 +575,37 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
         RunTimerAsync(token);
     }
 
-    private void StartRestTimer()
-    {
-        restCts?.Cancel();
-        restCts = new CancellationTokenSource();
-        var token = restCts.Token;
-        restSecondsRemaining = RestDuration;
-        IsRestTimerActive = true;
-        RestTimerLabel = "pausa automatica";
-        RestTimerProgress = 1.0;
-        RefreshRestTimerUI();
-        workoutSession.UpdateRestTimer(true, RestTimerText);
-        RunTimerAsync(token);
-    }
-
     private void RunTimerAsync(CancellationToken token)
     {
-        Task.Run(async () =>
+        var duration = activeRestDuration;
+        _ = Task.Run(async () =>
         {
             try
             {
-                while (restSecondsRemaining > 0 && !token.IsCancellationRequested)
+                var remaining = duration;
+                while (remaining > 0)
                 {
                     await Task.Delay(1000, token);
-                    restSecondsRemaining--;
-                    RestTimerProgress = (double)restSecondsRemaining / RestDuration;
-                    RefreshRestTimerUI();
-                    workoutSession.UpdateRestTimer(true, RestTimerText);
-                    if (restSecondsRemaining is <= 5 and > 0)
-                        HapticFeedback.Default.Perform(HapticFeedbackType.Click);
-                }
-                if (!token.IsCancellationRequested)
-                {
-                    IsRestTimerActive = false;
-                    workoutSession.UpdateRestTimer(false, "");
-                    ShowNotification("⏰ Pausa finita! Tempo di spingere!");
-                    HapticFeedback.Default.Perform(HapticFeedbackType.LongPress);
+                    remaining--;
+                    await MainThread.InvokeOnMainThreadAsync(() =>
+                    {
+                        if (token.IsCancellationRequested) return;
+                        restSecondsRemaining = remaining;
+                        RestTimerProgress = (double)remaining / Math.Max(1, duration);
+                        RefreshRestTimerUI();
+                        workoutSession.UpdateRestTimer(remaining > 0, RestTimerText);
+                        if (remaining is <= 5 and > 0) HapticFeedback.Default.Perform(HapticFeedbackType.Click);
+                        if (remaining == 0)
+                        {
+                            IsRestTimerActive = false;
+                            ShowNotification("Pausa finita! Tempo di spingere!");
+                            HapticFeedback.Default.Perform(HapticFeedbackType.LongPress);
+                        }
+                    });
                 }
             }
-            catch (TaskCanceledException) { /* timer cancelled, expected */ }
-        }, token).ContinueWith(t =>
-        {
-            if (t.IsFaulted && t.Exception != null)
-                System.Diagnostics.Debug.WriteLine($"[ActiveWk RunTimer] ex: {t.Exception.InnerException?.Message}");
-        }, TaskContinuationOptions.OnlyOnFaulted);
+            catch (OperationCanceledException) { }
+        }, token);
     }
 
     private void RefreshRestTimerUI() => RestTimerText = $"{restSecondsRemaining}s";
@@ -587,11 +617,23 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
         IsRestTimerActive = false;
         RestTimerProgress = 0;
         RestTimerText = "0s";
+        workoutSession.UpdateRestTimer(false, "");
     }
 
     [RelayCommand]
-    private void OpenExerciseDetail(WorkoutExercise ex)
+    private async Task OpenExerciseDetailAsync(WorkoutExercise ex)
     {
+        // Old plans/drafts may predate saved media and instructions.
+        var catalog = await exerciseDbApi.GetCatalogAsync();
+        var cached = catalog.FirstOrDefault(e => e.Id == ex.ExerciseId) ??
+            catalog.FirstOrDefault(e => string.Equals(e.Name.Trim(), ex.ExerciseName.Trim(), StringComparison.OrdinalIgnoreCase));
+        if (cached != null)
+        {
+            if (string.IsNullOrWhiteSpace(ex.GifUrl)) ex.GifUrl = cached.ImageUrl;
+            if (string.IsNullOrWhiteSpace(ex.ImageUrl)) ex.ImageUrl = cached.ImageUrl;
+            if (ex.Instructions.Count == 0)
+                ex.Instructions = System.Text.Json.JsonSerializer.Deserialize<List<string>>(cached.InstructionsJson) ?? [];
+        }
         SelectedExercise = ex;
         IsExerciseDetailVisible = true;
     }
@@ -622,7 +664,9 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
 
         var plan = new WorkoutPlan
         {
+            Id = Mode == "plan" && !string.IsNullOrEmpty(PlanId) ? PlanId : Guid.NewGuid().ToString(),
             Name = name,
+            Notes = WorkoutNotes,
             RestSeconds = RestDuration,
             Exercises = Exercises.ToList(),
             CreatedAt = DateTime.Now,
@@ -648,6 +692,8 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
         {
             var exerciseData = Exercises.Select(e => new
             {
+                id = e.Id,
+                exerciseId = e.ExerciseId,
                 name = e.ExerciseName,
                 bodyPart = e.BodyPart,
                 equipment = e.Equipment,
@@ -704,32 +750,33 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
     [RelayCommand]
     private async Task MinimizeWorkoutAsync()
     {
-        elapsedCts?.Cancel();
-        restCts?.Cancel();
-
+        await SavePlanPreferencesAsync();
         if (Exercises.Count > 0)
         {
-            await SaveDraftAsync();
+            if (!await SaveDraftAsync()) return;
             workoutSession.Minimize();
         }
         else
         {
             workoutSession.End();
         }
+        elapsedCts?.Cancel();
+        restCts?.Cancel();
         await Shell.Current.GoToAsync("..");
     }
 
-    private async Task SaveDraftAsync()
+    private async Task<bool> SaveDraftAsync()
     {
         try
         {
-            // Delete old drafts first (keep only 1)
+            // Keep the previous draft until the replacement has been saved.
             var oldDrafts = await GetDraftsAsync();
-            foreach (var d in oldDrafts)
-                await db.DeleteWorkoutAsync(d.Id);
+
 
             var exerciseData = Exercises.Select(e => new
             {
+                id = e.Id,
+                exerciseId = e.ExerciseId,
                 name = e.ExerciseName,
                 bodyPart = e.BodyPart,
                 equipment = e.Equipment,
@@ -750,6 +797,7 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
             var draft = new Models.LocalWorkout
             {
                 Id = "draft_" + Guid.NewGuid().ToString()[..8],
+                PlanId = IsPlanWorkout ? PlanId : "",
                 UserId = pb.IsLoggedIn ? pb.CurrentUser?.Id ?? "" : "",
                 Name = string.IsNullOrWhiteSpace(PlanNameInput) ? PlanName : PlanNameInput,
                 Date = DateTime.UtcNow.ToString("o"),
@@ -763,11 +811,15 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
                 IsDraft = true
             };
             await db.SaveWorkoutAsync(draft);
+            foreach (var old in oldDrafts) await db.DeleteWorkoutAsync(old.Id);
             System.Diagnostics.Debug.WriteLine($"[Draft] saved id={draft.Id}");
+            return true;
         }
         catch (Exception ex)
         {
             System.Diagnostics.Debug.WriteLine($"[Draft] ex: {ex.Message}");
+            ShowNotification("Impossibile salvare la bozza. L’allenamento resta aperto: riprova.");
+            return false;
         }
     }
 
@@ -797,6 +849,8 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
                 var ed = exerciseData[i];
                 var ex = new WorkoutExercise
                 {
+                    Id = ed.TryGetProperty("id", out var originalId) ? originalId.GetString() ?? Guid.NewGuid().ToString() : Guid.NewGuid().ToString(),
+                    ExerciseId = ed.TryGetProperty("exerciseId", out var exerciseId) ? exerciseId.GetString() ?? "" : "",
                     ExerciseName = ed.TryGetProperty("name", out var n) ? n.GetString() ?? "" : "",
                     BodyPart = ed.TryGetProperty("bodyPart", out var bp) ? bp.GetString() ?? "" : "",
                     Equipment = ed.TryGetProperty("equipment", out var eq) ? eq.GetString() ?? "" : "",
@@ -822,6 +876,10 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
                 Exercises.Add(ex);
             }
 
+            restoringDraft = true;
+            PlanId = draft.PlanId;
+            Mode = string.IsNullOrEmpty(draft.PlanId) ? "free" : "plan";
+            restoringDraft = false;
             PlanName = draft.Name;
             PlanNameInput = draft.Name;
             WorkoutNotes = draft.Notes;
@@ -845,19 +903,36 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
     [RelayCommand]
     private async Task FinishWorkoutAsync()
     {
-        elapsedCts?.Cancel();
-        restCts?.Cancel();
-
         if (Exercises.Count > 0 && IsTimerRunning)
         {
+            await SavePlanPreferencesAsync();
             if (!await SaveToPocketBaseAsync(PlanName)) return;
             // Remove recovery data only after the finished workout is durable.
             var drafts = await GetDraftsAsync();
             foreach (var d in drafts) await db.DeleteWorkoutAsync(d.Id);
         }
 
+        elapsedCts?.Cancel();
+        restCts?.Cancel();
+
         workoutSession.End();
         await Shell.Current.GoToAsync("..");
+    }
+
+    [RelayCommand]
+    private async Task SavePlanPreferencesAsync()
+    {
+        if (Mode != "plan" || string.IsNullOrEmpty(PlanId)) return;
+        var plan = (await planService.LoadPlansAsync()).FirstOrDefault(p => p.Id == PlanId);
+        if (plan == null) return;
+        plan.Notes = WorkoutNotes;
+        foreach (var saved in plan.Exercises)
+        {
+            var current = Exercises.FirstOrDefault(e => e.Id == saved.Id);
+            if (current != null) { saved.Notes = current.Notes; saved.RestSeconds = current.RestSeconds; }
+        }
+        await planService.SavePlanAsync(plan);
+        ShowNotification("Note e recuperi salvati nella scheda.");
     }
 
     private void ShowNotification(string message) => NotificationMessage = message;

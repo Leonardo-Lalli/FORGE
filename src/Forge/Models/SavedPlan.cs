@@ -5,6 +5,9 @@ namespace Forge.Models;
 [Table("saved_plans")]
 public class SavedPlan
 {
+    [Indexed]
+    public string UserId { get; set; } = string.Empty;
+    public string Notes { get; set; } = string.Empty;
     [PrimaryKey]
     public string Id { get; set; } = Guid.NewGuid().ToString();
     public string Name { get; set; } = string.Empty;

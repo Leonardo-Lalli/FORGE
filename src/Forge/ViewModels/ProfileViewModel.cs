@@ -24,8 +24,32 @@ public partial class ProfileWorkout : ObservableObject
     public bool HasPhotos { get; set; }
 }
 
+[QueryProperty(nameof(ViewedUserId), "userId")]
 public partial class ProfileViewModel : BaseViewModel
 {
+    [ObservableProperty] private string viewedUserId = "";
+    [ObservableProperty] private bool isOwnProfile = true;
+    [ObservableProperty] private int followersCount;
+    [ObservableProperty] private int followingCount;
+    [ObservableProperty] private bool isConnectionsVisible;
+    [ObservableProperty] private string connectionsTitle = "";
+    [ObservableProperty] private int visibilityIndex;
+    [ObservableProperty] private int connectionsVisibilityIndex;
+    [ObservableProperty] private bool canViewConnections;
+    [ObservableProperty] private bool isConnectionsLoading;
+    [ObservableProperty] private string connectionsMessage = "Nessun utente nell’elenco.";
+    [ObservableProperty] private string connectionsError = "";
+    [ObservableProperty] private string profileFollowLabel = "Segui";
+    [ObservableProperty] private bool isUnfollowConfirmationVisible;
+    [ObservableProperty] private string unfollowName = "";
+    [ObservableProperty] private bool isFollowBusy;
+    private UserSearchResult? pendingUnfollow;
+    private List<Models.Dto.SocialGraphRecord> ownRelationships = [];
+    public IReadOnlyList<string> VisibilityChoices { get; } = new[] { "Pubblico", "Privato", "Solo amici" };
+    public ObservableCollection<UserSearchResult> Connections { get; } = new();
+    public ObservableCollection<BadgeChoice> BadgeChoices { get; } = new();
+    private Models.Dto.PocketBaseUserRecord? displayedUser;
+    private List<Models.Dto.SocialGraphRecord> relationships = [];
     private readonly PocketBaseService pb;
     private readonly AchievementService achievementService;
 
@@ -71,7 +95,13 @@ public partial class ProfileViewModel : BaseViewModel
 
         if (pb.IsLoggedIn && pb.CurrentUser != null)
         {
-            var user = pb.CurrentUser;
+            try
+            {
+            IsOwnProfile = string.IsNullOrEmpty(ViewedUserId) || ViewedUserId == pb.CurrentUser.Id;
+            if (IsOwnProfile) await pb.RefreshUserAsync();
+            var user = IsOwnProfile ? pb.CurrentUser : await pb.GetUserByIdAsync(ViewedUserId);
+            if (user == null) { SetError("Profilo non disponibile."); return; }
+            displayedUser = user;
             Username = string.IsNullOrWhiteSpace(user.Name) ? user.Email : user.Name;
             Bio = string.IsNullOrWhiteSpace(user.Bio) ? "" : user.Bio;
 
@@ -99,6 +129,16 @@ public partial class ProfileViewModel : BaseViewModel
 
             await LoadRealWorkouts();
             await LoadAchievementBadges();
+            var connections = await pb.GetVisibleConnectionsAsync(user.Id);
+            CanViewConnections = connections.Allowed;
+            relationships = connections.Items;
+            FollowersCount = relationships.Where(r => r.ToUser == user.Id).Select(r => r.FromUser).Distinct().Count();
+            FollowingCount = relationships.Where(r => r.FromUser == user.Id).Select(r => r.ToUser).Distinct().Count();
+            ownRelationships = await pb.GetOwnRelationshipsAsync();
+            ProfileFollowLabel = FollowLabelFor(user.Id);
+            }
+            catch (Exception ex) when (ex is HttpRequestException or System.Text.Json.JsonException or TaskCanceledException)
+            { SetError("Impossibile caricare il profilo. Riprova."); }
         }
         else
         {
@@ -116,7 +156,7 @@ public partial class ProfileViewModel : BaseViewModel
         try
         {
             System.Diagnostics.Debug.WriteLine("[Profile] LoadRealWorkouts starting...");
-            var workouts = await pb.GetMyWorkoutsAsync(10);
+            var workouts = await pb.GetUserWorkoutsAsync(displayedUser?.Id ?? pb.CurrentUser?.Id ?? "");
             System.Diagnostics.Debug.WriteLine($"[Profile] GetMyWorkoutsAsync returned {workouts.Count} items");
             TotalWorkouts = workouts.Count.ToString();
 
@@ -148,7 +188,7 @@ public partial class ProfileViewModel : BaseViewModel
                     BorderColor = colors[ci % colors.Length],
                     Notes = w.Notes ?? "",
                     HasNotes = !string.IsNullOrWhiteSpace(w.Notes),
-                    FirstPhoto = w.Photos.FirstOrDefault() ?? "",
+                    FirstPhoto = (await pb.GetWorkoutPhotoUrlsAsync(w)).FirstOrDefault() ?? "",
                     HasPhotos = w.Photos.Count > 0
                 });
                 ci++;
@@ -179,7 +219,7 @@ public partial class ProfileViewModel : BaseViewModel
     {
         try
         {
-            var workouts = await pb.GetMyWorkoutsAsync(365);
+            var workouts = await pb.GetUserWorkoutsAsync(displayedUser?.Id ?? "");
             if (workouts.Count == 0) { StreakDays = "0"; StreakLabel = "Week Streak"; return; }
 
             var dates = workouts
@@ -221,8 +261,12 @@ public partial class ProfileViewModel : BaseViewModel
     [RelayCommand]
     private void EditProfile()
     {
+        if (!IsOwnProfile) return;
         EditName = Username;
         EditBio = Bio;
+        VisibilityIndex = displayedUser?.WorkoutVisibility switch { "public" => 0, "friends" => 2, _ => 1 };
+        ConnectionsVisibilityIndex = displayedUser?.ConnectionsVisibility switch { "public" => 0, "friends" => 2, _ => 1 };
+        foreach (var badge in BadgeChoices) badge.IsSelected = displayedUser?.FeaturedAchievements.Contains(badge.Id) == true;
         IsEditing = true;
     }
 
@@ -250,7 +294,11 @@ public partial class ProfileViewModel : BaseViewModel
         }
 
         SetLoading();
-        var (success, error) = await pb.UpdateUserAsync(name: EditName, bio: EditBio);
+        var selected = BadgeChoices.Where(b => b.IsSelected).Select(b => b.Id).ToList();
+        if (selected.Count > 3) { SetError("Puoi mostrare al massimo 3 achievement."); return; }
+        try
+        {
+        var (success, error) = await pb.UpdateProfileOptionsAsync(EditName.Trim(), EditBio, VisibilityIndex switch { 1 => "private", 2 => "friends", _ => "public" }, selected, ConnectionsVisibilityIndex switch { 1 => "private", 2 => "friends", _ => "public" });
 
         if (success)
         {
@@ -258,11 +306,16 @@ public partial class ProfileViewModel : BaseViewModel
             Bio = EditBio;
             IsEditing = false;
             SetSuccess(true);
+            displayedUser = pb.CurrentUser;
+            await LoadAchievementBadges();
         }
         else
         {
             SetError(error);
         }
+        }
+        catch (Exception ex) when (ex is HttpRequestException or System.Text.Json.JsonException or TaskCanceledException)
+        { SetError("Salvataggio non riuscito. Controlla la connessione."); }
     }
 
     [RelayCommand]
@@ -274,7 +327,7 @@ public partial class ProfileViewModel : BaseViewModel
     [RelayCommand]
     private async Task ChangeAvatarAsync()
     {
-        if (!pb.IsLoggedIn) return;
+        if (!pb.IsLoggedIn || !IsOwnProfile) return;
 
         try
         {
@@ -304,6 +357,7 @@ public partial class ProfileViewModel : BaseViewModel
                     System.Diagnostics.Debug.WriteLine("[Profile] Avatar still empty after upload/refresh");
                 }
             }
+            else SetError("Caricamento foto non riuscito. Verifica formato, dimensione e connessione.");
         }
         catch (Exception ex)
         {
@@ -315,12 +369,138 @@ public partial class ProfileViewModel : BaseViewModel
     {
         try
         {
+            if (!IsOwnProfile)
+            {
+                UnlockedBadges = new(displayedUser?.FeaturedAchievements.Take(3).Select(id => AchievementsCatalog.All.FirstOrDefault(a => a.Id == id)?.Icon).OfType<string>() ?? []);
+                HasUnlockedBadges = UnlockedBadges.Count > 0;
+                AchievementSummary = "In evidenza";
+                BadgeChoices.Clear();
+                return;
+            }
             var all = await achievementService.GetAllAsync();
             var unlocked = all.Where(a => a.State.IsUnlocked).ToList();
-            UnlockedBadges = new ObservableCollection<string>(unlocked.Select(a => a.Def.Icon));
+            BadgeChoices.Clear();
+            foreach (var a in unlocked) BadgeChoices.Add(new BadgeChoice { Id = a.Def.Id, Name = a.Def.Name, Icon = a.Def.Icon, IsSelected = displayedUser?.FeaturedAchievements.Contains(a.Def.Id) == true });
+            UnlockedBadges = new ObservableCollection<string>(unlocked.Where(a => displayedUser?.FeaturedAchievements.Contains(a.Def.Id) == true).Take(3).Select(a => a.Def.Icon));
             HasUnlockedBadges = UnlockedBadges.Count > 0;
             AchievementSummary = $"{unlocked.Count}/{AchievementsCatalog.All.Count} sbloccati";
         }
         catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[Profile Badges] ex: {ex.Message}"); }
     }
+
+    [RelayCommand] private Task ShowFollowersAsync() => ShowConnectionsAsync(true);
+    [RelayCommand] private Task ShowFollowingAsync() => ShowConnectionsAsync(false);
+    [RelayCommand] private void CloseConnections() => IsConnectionsVisible = false;
+    private async Task ShowConnectionsAsync(bool followers)
+    {
+        var userId = displayedUser?.Id;
+        if (userId == null) return;
+        Connections.Clear();
+        ConnectionsError = "";
+        ConnectionsTitle = followers ? "Follower" : "Seguiti";
+        IsConnectionsVisible = true;
+        IsConnectionsLoading = true;
+        ConnectionsMessage = "Caricamento…";
+        try
+        {
+            var visible = await pb.GetVisibleConnectionsAsync(userId);
+            CanViewConnections = visible.Allowed;
+            relationships = visible.Items;
+            if (!visible.Allowed) { ConnectionsMessage = "Questo elenco è privato. Solo gli amici possono vedere gli elenchi impostati su Solo amici."; return; }
+            ownRelationships = await pb.GetOwnRelationshipsAsync();
+            var ids = followers ? relationships.Where(r => r.ToUser == userId).Select(r => r.FromUser) : relationships.Where(r => r.FromUser == userId).Select(r => r.ToUser);
+            foreach (var id in ids.Distinct())
+            {
+                var user = await pb.GetUserByIdAsync(id);
+                if (user == null) continue;
+                var item = new UserSearchResult { UserId = id, Name = user.Name, Initial = string.IsNullOrWhiteSpace(user.Name) ? "?" : user.Name[..Math.Min(2, user.Name.Length)].ToUpperInvariant(), CanFollow = id != pb.CurrentUser?.Id, FollowLabel = FollowLabelFor(id), IsFollowing = IsFollowingUser(id) };
+                if (!string.IsNullOrWhiteSpace(user.Avatar)) item.AvatarSource = await pb.DownloadAvatarAsync(user.CollectionId, id, user.Avatar);
+                item.HasAvatar = item.AvatarSource != null;
+                if (user.WorkoutVisibility == "public") item.PublicWorkoutId = await pb.GetLatestPublicWorkoutIdAsync(id);
+                Connections.Add(item);
+            }
+            ConnectionsMessage = "Nessun utente nell’elenco.";
+        }
+        catch (Exception ex) when (ex is HttpRequestException or System.Text.Json.JsonException or TaskCanceledException)
+        { ConnectionsMessage = "Elenco non disponibile. Chiudi e riprova."; ConnectionsError = ConnectionsMessage; }
+        finally { IsConnectionsLoading = false; }
+    }
+    private bool IsFollowingUser(string id) => ownRelationships.Any(r => r.FromUser == pb.CurrentUser?.Id && r.ToUser == id && r.Status == "accepted");
+    private string FollowLabelFor(string id) => IsFollowingUser(id) ? "Segui già" : ownRelationships.Any(r => r.FromUser == pb.CurrentUser?.Id && r.ToUser == id && r.Status == "pending") ? "Richiesta inviata" : "Segui";
+    [RelayCommand] private Task FollowProfileAsync() => displayedUser == null || IsOwnProfile ? Task.CompletedTask : FollowConnectionAsync(new UserSearchResult { UserId = displayedUser.Id, Name = Username });
+    [RelayCommand] private async Task FollowConnectionAsync(UserSearchResult user)
+    {
+        if (IsFollowBusy || user.UserId == pb.CurrentUser?.Id) return;
+        ConnectionsError = "";
+        try
+        {
+            ownRelationships = await pb.GetOwnRelationshipsAsync();
+            if (IsFollowingUser(user.UserId))
+            { pendingUnfollow = user; UnfollowName = user.Name; IsUnfollowConfirmationVisible = true; return; }
+            if (FollowLabelFor(user.UserId) == "Richiesta inviata") return;
+            IsFollowBusy = true;
+            if (!await pb.SendFollowRequestAsync(user.UserId)) { SetError("Richiesta non inviata. Riprova."); ConnectionsError = ErrorMessage ?? ""; return; }
+            await RefreshFollowStateAsync();
+        }
+        catch (Exception ex) when (ex is HttpRequestException or System.Text.Json.JsonException or TaskCanceledException)
+        { SetError("Impossibile aggiornare il follow."); ConnectionsError = ErrorMessage ?? ""; }
+        finally { IsFollowBusy = false; }
+    }
+    [RelayCommand] private void CancelUnfollow() { if (!IsFollowBusy) { IsUnfollowConfirmationVisible = false; pendingUnfollow = null; } }
+    [RelayCommand] private async Task ConfirmUnfollowAsync()
+    {
+        if (pendingUnfollow == null || IsFollowBusy) return;
+        IsFollowBusy = true;
+        try
+        {
+            if (!await pb.UnfollowUserAsync(pendingUnfollow.UserId)) { SetError("Follow non rimosso. Riprova."); ConnectionsError = ErrorMessage ?? ""; return; }
+            IsUnfollowConfirmationVisible = false;
+            pendingUnfollow = null;
+            await RefreshFollowStateAsync();
+            var visible = await pb.GetVisibleConnectionsAsync(displayedUser!.Id);
+            CanViewConnections = visible.Allowed;
+            relationships = visible.Items;
+            FollowersCount = relationships.Where(r => r.ToUser == displayedUser.Id).Select(r => r.FromUser).Distinct().Count();
+            FollowingCount = relationships.Where(r => r.FromUser == displayedUser.Id).Select(r => r.ToUser).Distinct().Count();
+            // Revoked reciprocal friendship can also revoke access to private lists and workouts.
+            if (!CanViewConnections) { Connections.Clear(); ConnectionsMessage = "Questo elenco è privato."; }
+            else if (IsConnectionsVisible && ConnectionsTitle == "Seguiti" && IsOwnProfile)
+                foreach (var item in Connections.Where(c => !IsFollowingUser(c.UserId)).ToList()) Connections.Remove(item);
+            await LoadRealWorkouts();
+        }
+        catch (Exception ex) when (ex is HttpRequestException or System.Text.Json.JsonException or TaskCanceledException)
+        { SetError("Impossibile aggiornare il follow."); ConnectionsError = ErrorMessage ?? ""; }
+        finally { IsFollowBusy = false; }
+    }
+    private async Task RefreshFollowStateAsync()
+    {
+        ownRelationships = await pb.GetOwnRelationshipsAsync();
+        ProfileFollowLabel = FollowLabelFor(displayedUser?.Id ?? "");
+        foreach (var item in Connections) { item.IsFollowing = IsFollowingUser(item.UserId); item.FollowLabel = FollowLabelFor(item.UserId); }
+    }
+    [RelayCommand] private async Task OpenConnectionStoryAsync(UserSearchResult user)
+    {
+        if (!user.HasPublicWorkout) { await OpenUserProfileAsync(user); return; }
+        await Shell.Current.GoToAsync($"workoutDetail?workoutId={Uri.EscapeDataString(user.PublicWorkoutId)}&source=pocketbase");
+    }
+    [RelayCommand] private async Task OpenUserProfileAsync(UserSearchResult user)
+    {
+        IsConnectionsVisible = false;
+        await Shell.Current.GoToAsync($"profile?userId={Uri.EscapeDataString(user.UserId)}");
+    }
+    [RelayCommand] private void ToggleBadge(BadgeChoice badge)
+    {
+        if (!badge.IsSelected && BadgeChoices.Count(b => b.IsSelected) >= 3)
+        { ErrorMessage = "Puoi selezionare fino a 3 achievement."; return; }
+        badge.IsSelected = !badge.IsSelected;
+        ErrorMessage = null;
+    }
+}
+
+public partial class BadgeChoice : ObservableObject
+{
+    public string Id { get; set; } = "";
+    public string Name { get; set; } = "";
+    public string Icon { get; set; } = "";
+    [ObservableProperty] private bool isSelected;
 }

@@ -20,13 +20,13 @@
                 <Border.GestureRecognizers>
                     <TapGestureRecognizer Command="{Binding OpenProfileCommand}" />
                 </Border.GestureRecognizers>
-                <Image Source="{Binding UserAvatarSource}" Aspect="AspectFill"
+                <Grid><Image Source="{Binding UserAvatarSource}" Aspect="AspectFill"
                        WidthRequest="40" HeightRequest="40"
                        IsVisible="{Binding HasUserAvatar}" />
-                <Label Text="{Binding UserInitials}" FontFamily="OpenSansSemibold" FontSize="14"
+<Label Text="{Binding UserInitials}" FontFamily="OpenSansSemibold" FontSize="14"
                        TextColor="{DynamicResource Primary}" InputTransparent="True"
                        HorizontalOptions="Center" VerticalOptions="Center"
-                       IsVisible="{Binding HasUserAvatar, Converter={StaticResource InverseBoolConverter}}" />
+                       IsVisible="{Binding HasUserAvatar, Converter={StaticResource InverseBoolConverter}}" /></Grid>
             </Border>
             <Label Grid.Column="1" Text="FORGE"
                    FontFamily="OpenSansSemibold" FontSize="20" FontAttributes="Bold"
@@ -101,7 +101,7 @@
                                             </Grid>
                                         </Border>
                                     <Label Grid.Column="1" Text="{Binding Name}" FontFamily="SpaceGrotesk" FontSize="15"
-                                           TextColor="{DynamicResource OnSurface}" VerticalOptions="Center" />
+                                           TextColor="{DynamicResource OnSurface}" VerticalOptions="Center" ><Label.GestureRecognizers><TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:FeedViewModel}}, Path=OpenUserProfileCommand}" CommandParameter="{Binding .}" /></Label.GestureRecognizers></Label>
                                     <Border Grid.Column="2" BackgroundColor="{DynamicResource Primary}"
                                             StrokeShape="RoundRectangle 8" Padding="12,6" HeightRequest="32"
                                             IsVisible="{Binding IsFollowing, Converter={StaticResource InverseBoolConverter}}">

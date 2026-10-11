@@ -7,6 +7,7 @@ public class CachedExercise
 {
     [PrimaryKey]
     public string Id { get; set; } = string.Empty;
+    public string SourceExerciseId { get; set; } = string.Empty;
     public string Name { get; set; } = string.Empty;
     public string BodyPart { get; set; } = string.Empty;
     public string Equipment { get; set; } = string.Empty;

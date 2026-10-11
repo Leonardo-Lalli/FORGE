@@ -341,3 +341,11 @@ MIT License — see [LICENSE](LICENSE).
 FORGE connects automatically to https://leoforge.duckdns.org when no personal server is configured. Login and registration do not require a packaged .env file. Clear the custom URL in server settings to restore the public instance. The login screen supports the light (blue) and dark (cyan) designs; Google/Apple sign-in is unavailable on the current backend.
 
 See [project structure](docs/project-structure.md) and [login verification](docs/iterations/login-public-server-2026-10-11.md).
+
+## Development priorities
+
+The shared exercise cache stores provider IDs, instructions, filters and GIF URLs in PocketBase, plus fetched catalog pages for reuse. GIF files remain hosted by the provider: URLs display them in the app when reachable, but do not guarantee offline availability. Population starts when the app initializes the exercise catalog; the first load can fetch all 1,500 provider exercises. After completion, other clients read the shared server cache. Self-hosted installations must install the [server migration and hooks](docs/pocketbase-profile-migration.md); database fields alone do not activate caching. Without them the app falls back to the provider and its device cache. See [catalog details and limitations](docs/exercise-catalog.md).
+
+Stability and server-enforced privacy come first, followed by workout flow, social features, analytics and infrastructure. See [ROADMAP.md](ROADMAP.md). The develop branch includes profile badges, mutual-friend visibility, account-owned plans, per-exercise rest and previous-performance suggestions. Profile/privacy options require the [PocketBase migration](docs/pocketbase-profile-migration.md); they are not deployed to the public server automatically.
+
+Follower/following lists have a separate Public, Private or Friends setting enforced by the server. Profiles and connection lists show avatars and follow actions with confirmation before unfollowing; blue avatar rings open the latest public workout. Install the updated server package, including migration `1791677000`, before using connection privacy settings.

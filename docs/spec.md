@@ -304,8 +304,12 @@ Realizzare una applicazione `.NET MAUI` Android-first per:
 
 ## 10. Documentazione collegata
 
+Aggiornamento 11 ottobre 2026: priorità a stabilità e privacy. Gli amici sono follower reciproci con entrambi i follow accettati, spiegato nell’editor account. Visibilità di tutto lo storico pubblico (utenti autenticati), privato o solo amici, applicata sul server. Massimo tre badge già sbloccati in evidenza; achievement retroattivi sullo storico completo. Schede personali senza limite e due esempi iniziali eliminabili senza rigenerazione. Recupero 0–300 secondi e note per esercizio persistono nelle schede; le sessioni generiche non modificano una scheda. Carichi e ripetizioni suggeriti provengono dall’ultima sessione completata. Evidenza e verifiche manuali restanti in `docs/test-matrix.md`; deployment server in `docs/pocketbase-profile-migration.md`.
+
 - `docs/plan.md` — Piano di progetto con stato iterazioni
 - `docs/architecture.md` — Architettura dell'applicazione
 - `docs/test-matrix.md` — Matrice di test
 - `docs/Iterazioni-IA.md` — Audit report e cronologia modifiche
 - `docs/iterations/` — Dettaglio iterazioni completate
+
+Follower e seguiti hanno privacy separata dagli allenamenti (Pubblico, Privato, Solo amici), verificata sul server. Gli elenchi mostrano avatar, follow e cerchio blu per aprire un allenamento pubblico; unfollow richiede conferma coerente con il tema.

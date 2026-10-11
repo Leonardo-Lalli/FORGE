@@ -11,6 +11,9 @@ public class ExerciseDbApiService
     private readonly PocketBaseService? pb;
     private HttpClient? _http;
     private bool warmDone;
+    private int catalogTotal;
+    private bool useServerCatalog;
+    private readonly SemaphoreSlim warmGate = new(1, 1);
 
     private HttpClient GetHttp()
     {
@@ -36,46 +39,30 @@ public class ExerciseDbApiService
     public async Task WarmCacheAsync()
     {
         if (warmDone) return;
-        await db.DeleteExercisesByPrefixAsync("wger-");
-        var count = (await db.GetCachedExercisesAsync()).Count;
-
-        // Force full rebuild if cache is from old code (< 200 exercises = old limit was 100)
-        // A partial cache remains useful offline; never discard it to warm the catalog.
-
-        if (count >= 600) { warmDone = true; return; }
-
+        await warmGate.WaitAsync();
         try
         {
-            // 1. Try pulling from PocketBase first (shared server cache, instant)
-            var fromPb = await PullFromPocketBaseAsync();
-            System.Diagnostics.Debug.WriteLine($"[ExerciseDB WarmCache] pulled {fromPb} from PocketBase");
-
-            count = (await db.GetCachedExercisesAsync()).Count;
-            if (count < 100)
+            if (warmDone) return;
+            var cacheKey = "exercise_catalog_paging_v3:" + Preferences.Get("pb_server_url", ServerAddress.PublicUrl);
+            var statusJson = pb == null ? null : await pb.GetCatalogPageAsync(status: true);
+            useServerCatalog = statusJson != null;
+            var serverComplete = false;
+            if (statusJson != null)
             {
-                // 2. First launch: aggressive fetch from API (happens once, ever)
-                var fromApi = await FetchFullCatalogAsync();
-                System.Diagnostics.Debug.WriteLine($"[ExerciseDB WarmCache] initial fetch: {fromApi} from API");
+                using var status = JsonDocument.Parse(statusJson);
+                serverComplete = status.RootElement.GetProperty("complete").GetBoolean();
+                catalogTotal = status.RootElement.GetProperty("total").GetInt32();
             }
-            else if (count < 600)
-            {
-                // 3. Partial cache: fetch a chunk to fill up
-                var fromApi = await FetchExerciseDbChunkAsync(100);
-                System.Diagnostics.Debug.WriteLine($"[ExerciseDB WarmCache] chunk fetch: {fromApi} from API");
-            }
-
-            count = (await db.GetCachedExercisesAsync()).Count;
-            System.Diagnostics.Debug.WriteLine($"[ExerciseDB WarmCache] total: {count}");
-
-            // 4. Sync to PocketBase so other users on the same server get them
-            // Shared catalog writes belong to the administrator's importer.
-            // Every client re-posting its cache creates duplicate records.
-            warmDone = count >= 600;
+            if (Preferences.Get(cacheKey, "") == "complete" && (!useServerCatalog || serverComplete)) { warmDone = true; return; }
+            var pulled = await PullFromPocketBaseAsync();
+            if (serverComplete && pulled >= catalogTotal)
+            { warmDone = true; Preferences.Set(cacheKey, "complete"); return; }
+            var fetched = await FetchFullCatalogAsync();
+            if (catalogTotal > 0 && fetched >= catalogTotal) { warmDone = true; Preferences.Set(cacheKey, "complete"); }
         }
-        catch (Exception ex)
-        {
-            System.Diagnostics.Debug.WriteLine($"[ExerciseDB WarmCache] ex: {ex.Message}");
-        }
+        catch (Exception ex) when (ex is HttpRequestException or JsonException or TaskCanceledException)
+        { System.Diagnostics.Debug.WriteLine($"[Catalog] {ex.GetType().Name}"); }
+        finally { warmGate.Release(); }
     }
 
     private async Task<int> FetchFullCatalogAsync()
@@ -83,37 +70,41 @@ public class ExerciseDbApiService
         var fetched = 0;
         var cursor = "";
         var consecutiveEmpty = 0;
+        var ids = new HashSet<string>();
+        var cursors = new HashSet<string>();
 
-        while (fetched < 1500 && consecutiveEmpty < 5)
+        while (consecutiveEmpty < 5)
         {
-            var url = $"exercises?limit=25{(string.IsNullOrEmpty(cursor) ? "" : $"&cursor={Uri.EscapeDataString(cursor)}")}";
+            var url = $"exercises?limit=25{(string.IsNullOrEmpty(cursor) ? "" : $"&after={Uri.EscapeDataString(cursor)}")}";
 
-            HttpResponseMessage? response = null;
-            for (var retry = 0; retry < 3; retry++)
+            var json = useServerCatalog && pb != null ? await pb.GetCatalogPageAsync(cursor) : null;
+            if (json == null)
             {
-                try { response = await GetHttp().GetAsync(url); if (response.IsSuccessStatusCode) break; }
-                catch { }
-                await Task.Delay(500 * (retry + 1));
+                HttpResponseMessage? response = null;
+                for (var retry = 0; retry < 3; retry++)
+                {
+                    try { response = await GetHttp().GetAsync(url); if (response.IsSuccessStatusCode) break; }
+                    catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException) { }
+                    await Task.Delay(500 * (retry + 1));
+                }
+                if (response == null || !response.IsSuccessStatusCode)
+                {
+                    response?.Dispose(); consecutiveEmpty++; await Task.Delay(2000); continue;
+                }
+                using (response) { json = await response.Content.ReadAsStringAsync(); }
             }
-
-            if (response == null || !response.IsSuccessStatusCode)
-            {
-                consecutiveEmpty++;
-                await Task.Delay(2000);
-                continue;
-            }
-
-            var json = await response.Content.ReadAsStringAsync();
             var result = JsonSerializer.Deserialize<ExerciseDbV1ListResponse>(json, JsonOptions);
             if (result?.Data == null || result.Data.Count == 0) { consecutiveEmpty++; continue; }
             consecutiveEmpty = 0;
+            catalogTotal = result.Meta?.Total ?? 0;
 
             foreach (var ex in result.Data)
             {
-                if (string.IsNullOrWhiteSpace(ex.GifUrl)) continue;
+                if (string.IsNullOrWhiteSpace(ex.ExerciseId)) continue;
                 await db.SaveCachedExerciseAsync(new CachedExercise
                 {
                     Id = ex.ExerciseId,
+                    SourceExerciseId = ex.ExerciseId,
                     Name = Capitalize(ex.Name),
                     BodyPart = string.Join(", ", ex.GetBodyParts()),
                     Equipment = string.Join(", ", ex.GetEquipments()),
@@ -123,67 +114,18 @@ public class ExerciseDbApiService
                     TargetMuscles = string.Join(", ", ex.GetTargetMuscles()),
                     SecondaryMuscles = string.Join(", ", ex.GetSecondaryMuscles())
                 });
-                fetched++;
-            }
-
-            if (result.Meta?.HasNextPage == true)
-                cursor = result.Meta.NextCursor;
-            else break;
-
-            await Task.Delay(400);
-        }
-        return fetched;
-    }
-
-    private async Task<int> FetchExerciseDbChunkAsync(int targetCount)
-    {
-        var fetched = 0;
-        var cursor = Preferences.Get("exercise_cache_cursor", "");
-
-        while (fetched < targetCount)
-        {
-            var url = $"exercises?limit=25{(string.IsNullOrEmpty(cursor) ? "" : $"&cursor={Uri.EscapeDataString(cursor)}")}";
-
-            HttpResponseMessage? response = null;
-            for (var retry = 0; retry < 3; retry++)
-            {
-                try { response = await GetHttp().GetAsync(url); if (response.IsSuccessStatusCode) break; }
-                catch { }
-                await Task.Delay(500 * (retry + 1));
-            }
-
-            if (response == null || !response.IsSuccessStatusCode) break;
-
-            var json = await response.Content.ReadAsStringAsync();
-            var result = JsonSerializer.Deserialize<ExerciseDbV1ListResponse>(json, JsonOptions);
-            if (result?.Data == null || result.Data.Count == 0) break;
-
-            foreach (var ex in result.Data)
-            {
-                if (string.IsNullOrWhiteSpace(ex.GifUrl)) continue;
-                await db.SaveCachedExerciseAsync(new CachedExercise
-                {
-                    Id = ex.ExerciseId,
-                    Name = Capitalize(ex.Name),
-                    BodyPart = string.Join(", ", ex.GetBodyParts()),
-                    Equipment = string.Join(", ", ex.GetEquipments()),
-                    InstructionsJson = JsonSerializer.Serialize(ex.GetInstructions()),
-                    ImageUrl = ex.GifUrl,
-                    Category = ex.GetBodyParts().FirstOrDefault() ?? "",
-                    TargetMuscles = string.Join(", ", ex.GetTargetMuscles()),
-                    SecondaryMuscles = string.Join(", ", ex.GetSecondaryMuscles())
-                });
-                fetched++;
+                ids.Add(ex.ExerciseId);
+                fetched = ids.Count;
             }
 
             if (result.Meta?.HasNextPage == true)
             {
                 cursor = result.Meta.NextCursor;
-                Preferences.Set("exercise_cache_cursor", cursor);
+                if (string.IsNullOrEmpty(cursor) || !cursors.Add(cursor)) break;
             }
             else break;
 
-            await Task.Delay(400);
+            await Task.Delay(1200);
         }
         return fetched;
     }
@@ -195,19 +137,19 @@ public class ExerciseDbApiService
         try
         {
             var page = 1;
-            while (page <= 10)
+            var seen = new HashSet<string>();
+            while (true)
             {
                 var records = await pb.FetchExcercisePageAsync(page, 100);
                 if (records == null || records.Count == 0) break;
+                if (!records.Any(r => seen.Add(r.Id ?? ""))) break;
 
                 foreach (var r in records)
                 {
-                    var existing = await db.GetCachedExerciseByIdAsync(r.Id ?? "");
-                    if (existing != null) continue;
-
                     var cachedEx = new CachedExercise
                     {
-                        Id = r.Id ?? "",
+                        Id = string.IsNullOrWhiteSpace(r.ExerciseId) ? r.Id ?? "" : r.ExerciseId,
+                        SourceExerciseId = r.ExerciseId ?? "",
                         Name = r.Name ?? "",
                         BodyPart = r.BodyPart ?? "",
                         Equipment = r.Equipment ?? "",
@@ -218,7 +160,7 @@ public class ExerciseDbApiService
                         SecondaryMuscles = r.SecondaryMuscles ?? ""
                     };
                     await db.SaveCachedExerciseAsync(cachedEx);
-                    pulled++;
+                    if (!string.IsNullOrWhiteSpace(r.ExerciseId) && !string.IsNullOrWhiteSpace(r.ImageUrl) && r.Instructions is { Count: > 0 }) pulled++;
                 }
 
                 if (records.Count < 100) break;
@@ -234,58 +176,34 @@ public class ExerciseDbApiService
 
     public async Task<List<ExerciseSearchResultDto>> SearchAsync(string name)
     {
+        await WarmCacheAsync();
         var searchTerm = TranslateSearchTerm(name.ToLowerInvariant());
         var originalTerm = name.ToLowerInvariant();
 
-        var cached = await db.GetCachedExercisesAsync();
+        var cached = await GetCatalogAsync();
         var matches = cached
             .Where(e => e.Name.ToLowerInvariant().Contains(searchTerm)
                      || e.Name.ToLowerInvariant().Contains(originalTerm)
                      || e.BodyPart.ToLowerInvariant().Contains(originalTerm)
-                     || e.Equipment.ToLowerInvariant().Contains(originalTerm))
+                     || e.BodyPart.ToLowerInvariant().Contains(searchTerm)
+                     || e.Equipment.ToLowerInvariant().Contains(originalTerm)
+                     || e.Equipment.ToLowerInvariant().Contains(searchTerm)
+                     || e.TargetMuscles.ToLowerInvariant().Contains(searchTerm)
+                     || e.SecondaryMuscles.ToLowerInvariant().Contains(searchTerm))
             .ToList();
-
-        if (matches.Count >= 5)
-            return matches.Select(ToSearchResult).ToList();
-
-        try
-        {
-            var url = $"exercises?name={Uri.EscapeDataString(searchTerm)}&limit=20";
-            var response = await GetHttp().GetAsync(url);
-            if (!response.IsSuccessStatusCode) return matches.Select(ToSearchResult).ToList();
-
-            var json = await response.Content.ReadAsStringAsync();
-            var result = JsonSerializer.Deserialize<ExerciseDbV1ListResponse>(json, JsonOptions);
-
-            if (result?.Data != null)
-            {
-                foreach (var ex in result.Data)
-                {
-                    var cachedEx = new CachedExercise
-                    {
-                        Id = ex.ExerciseId,
-                        Name = Capitalize(ex.Name),
-                        BodyPart = string.Join(", ", ex.GetBodyParts()),
-                        Equipment = string.Join(", ", ex.GetEquipments()),
-                        InstructionsJson = JsonSerializer.Serialize(ex.GetInstructions()),
-                        ImageUrl = ex.GifUrl,
-                        Category = ex.GetBodyParts().FirstOrDefault() ?? "",
-                        TargetMuscles = string.Join(", ", ex.GetTargetMuscles()),
-                        SecondaryMuscles = string.Join(", ", ex.GetSecondaryMuscles())
-                    };
-                    await db.SaveCachedExerciseAsync(cachedEx);
-                    if (!matches.Any(m => m.Id == ex.ExerciseId))
-                        matches.Add(cachedEx);
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            System.Diagnostics.Debug.WriteLine($"[ExerciseDB Search] ex: {ex.Message}");
-        }
 
         return matches.Select(ToSearchResult).ToList();
     }
+
+    public async Task<List<CachedExercise>> GetCatalogAsync() => (await db.GetCachedExercisesAsync())
+        .GroupBy(e => e.Name.Trim(), StringComparer.OrdinalIgnoreCase)
+        .SelectMany(group => group.Any(e => !string.IsNullOrWhiteSpace(e.SourceExerciseId))
+            ? group.Where(e => !string.IsNullOrWhiteSpace(e.SourceExerciseId))
+            : group.OrderByDescending(e =>
+            (!string.IsNullOrWhiteSpace(e.ImageUrl) ? 4 : 0) +
+            (!string.IsNullOrWhiteSpace(e.InstructionsJson) && e.InstructionsJson != "[]" ? 4 : 0) +
+            (!string.IsNullOrWhiteSpace(e.TargetMuscles) ? 1 : 0)).Take(1))
+        .OrderBy(e => e.Name, StringComparer.OrdinalIgnoreCase).ToList();
 
     public async Task<List<ExerciseSearchResultDto>> GetByBodyPartAsync(string bodyPart)
     {
@@ -327,50 +245,15 @@ public class ExerciseDbApiService
         }
     }
 
-    private async Task SyncToPocketBaseAsync()
-    {
-        if (pb == null || !pb.IsLoggedIn) return;
-        try
-        {
-            var cached = await db.GetCachedExercisesAsync();
-            var synced = 0;
-            foreach (var ex in cached.Take(750))
-            {
-                try
-                {
-                    var instructions = JsonSerializer.Deserialize<List<string>>(ex.InstructionsJson) ?? new();
-                    var payload = new Dictionary<string, object?>
-                    {
-                        ["name"] = ex.Name,
-                        ["bodyPart"] = ex.BodyPart,
-                        ["equipment"] = ex.Equipment,
-                        ["instructions"] = instructions,
-                        ["imageUrl"] = ex.ImageUrl,
-                        ["category"] = ex.Category,
-                        ["targetMuscles"] = ex.TargetMuscles,
-                        ["secondaryMuscles"] = ex.SecondaryMuscles
-                    };
-                    await pb.CreateRecordAsync("excercise", payload);
-                    synced++;
-                }
-                catch (Exception exc) {
-                    System.Diagnostics.Debug.WriteLine($"[ExerciseDB Sync] skip: {exc.Message}");
-                }
-            }
-            System.Diagnostics.Debug.WriteLine($"[ExerciseDB Sync] synced {synced} to PocketBase");
-        }
-        catch (Exception ex)
-        {
-            System.Diagnostics.Debug.WriteLine($"[ExerciseDB Sync] ex: {ex.Message}");
-        }
-    }
-
     private static ExerciseSearchResultDto ToSearchResult(CachedExercise e) => new()
     {
         Id = e.Id,
         Name = e.Name,
         BodyPart = e.BodyPart,
         Equipment = e.Equipment,
+        TargetMuscles = e.TargetMuscles,
+        SecondaryMuscles = e.SecondaryMuscles,
+        Category = e.Category,
         ImageUrl = e.ImageUrl,
         Instructions = JsonSerializer.Deserialize<List<string>>(e.InstructionsJson) ?? new()
     };
@@ -423,6 +306,9 @@ public class ExerciseDbApiService
 
 public class ExerciseSearchResultDto
 {
+    public string TargetMuscles { get; set; } = "";
+    public string SecondaryMuscles { get; set; } = "";
+    public string Category { get; set; } = "";
     public string Id { get; set; } = "";
     public string Name { get; set; } = "";
     public string BodyPart { get; set; } = "";
