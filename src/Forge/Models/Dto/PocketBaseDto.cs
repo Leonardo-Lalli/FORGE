@@ -61,6 +61,7 @@ public class PocketBaseListResponse<T>
 
 public class SocialGraphRecord
 {
+    private string? fromName;
     [JsonPropertyName("id")]
     public string Id { get; set; } = string.Empty;
 
@@ -68,7 +69,10 @@ public class SocialGraphRecord
     public string FromUser { get; set; } = string.Empty;
 
     [JsonPropertyName("from_name")]
-    public string FromName { get; set; } = string.Empty;
+    public string FromName { get => fromName ?? LegacyFromName ?? string.Empty; set => fromName = value; }
+
+    [JsonPropertyName("form_name")]
+    public string? LegacyFromName { get; set; }
 
     [JsonPropertyName("to_user")]
     public string ToUser { get; set; } = string.Empty;

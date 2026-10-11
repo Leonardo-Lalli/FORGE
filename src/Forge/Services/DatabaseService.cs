@@ -5,28 +5,38 @@ namespace Forge.Services;
 
 public class DatabaseService
 {
+    static DatabaseService() => SQLitePCL.Batteries_V2.Init();
     private SQLiteAsyncConnection? db;
     private readonly string dbPath;
+    private readonly SemaphoreSlim initialization = new(1, 1);
 
-    public DatabaseService()
+    public DatabaseService() : this(Path.Combine(FileSystem.AppDataDirectory, "forge.db"))
     {
-        dbPath = Path.Combine(FileSystem.AppDataDirectory, "forge.db");
+    }
+
+    public DatabaseService(string databasePath)
+    {
+        dbPath = databasePath;
     }
 
     private async Task<SQLiteAsyncConnection> GetDbAsync()
     {
         if (db != null) return db;
 
-        db = new SQLiteAsyncConnection(dbPath, SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.Create | SQLiteOpenFlags.SharedCache);
-        await db.CreateTableAsync<LocalWorkout>();
-        await db.CreateTableAsync<CachedExercise>();
-        await db.CreateTableAsync<SavedPlan>();
-        await db.CreateTableAsync<AchievementState>();
-
-        try { await db.ExecuteAsync("ALTER TABLE local_workouts ADD COLUMN IsDraft INTEGER DEFAULT 0"); }
-        catch { /* column already exists */ }
-
-        return db;
+        await initialization.WaitAsync();
+        try
+        {
+            if (db != null) return db;
+            var connection = new SQLiteAsyncConnection(dbPath, SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.Create | SQLiteOpenFlags.SharedCache);
+            // CreateTable migrates added columns; publish only after all tables exist.
+            await connection.CreateTableAsync<LocalWorkout>();
+            await connection.CreateTableAsync<CachedExercise>();
+            await connection.CreateTableAsync<SavedPlan>();
+            await connection.CreateTableAsync<AchievementState>();
+            db = connection;
+            return db;
+        }
+        finally { initialization.Release(); }
     }
 
     public async Task<List<LocalWorkout>> GetWorkoutsAsync(string? userId = null)
@@ -40,7 +50,7 @@ public class DatabaseService
     public async Task<List<LocalWorkout>> GetPendingSyncAsync()
     {
         var d = await GetDbAsync();
-        return await d.Table<LocalWorkout>().Where(w => w.PendingSync).ToListAsync();
+        return await d.Table<LocalWorkout>().Where(w => w.PendingSync && !w.IsDraft).ToListAsync();
     }
 
     public async Task SaveWorkoutAsync(LocalWorkout workout)
@@ -53,7 +63,7 @@ public class DatabaseService
             await d.InsertAsync(workout);
     }
 
-    public async Task MarkSyncedAsync(string workoutId)
+    public async Task MarkSyncedAsync(string workoutId, string? remoteId = null)
     {
         var d = await GetDbAsync();
         var w = await d.FindAsync<LocalWorkout>(workoutId);
@@ -61,7 +71,16 @@ public class DatabaseService
         {
             w.PendingSync = false;
             w.LastSynced = DateTime.UtcNow;
-            await d.UpdateAsync(w);
+            if (remoteId != null && remoteId != workoutId)
+            {
+                w.Id = remoteId;
+                await d.RunInTransactionAsync(connection =>
+                {
+                    connection.InsertOrReplace(w);
+                    connection.Delete<LocalWorkout>(workoutId);
+                });
+            }
+            else await d.UpdateAsync(w);
         }
     }
 

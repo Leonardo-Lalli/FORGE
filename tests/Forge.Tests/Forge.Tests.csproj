@@ -25,8 +25,9 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
-    <PackageReference Include="sqlite-net-pcl" Version="1.9.172" />
-    <PackageReference Include="SQLitePCLRaw.bundle_green" Version="2.1.11" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.9" />
+    <PackageReference Include="sqlite-net-base" Version="1.9.172" />
+    <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="3.0.5" />
   </ItemGroup>
 
   <ItemGroup>
@@ -34,6 +35,16 @@
     <Compile Include="..\..\src\Forge\Models\Dto\*.cs" Link="Shared\Models\Dto\%(Filename)%(Extension)" />
     <Compile Include="..\..\src\Forge\Converters\*.cs" Link="Shared\Converters\%(Filename)%(Extension)" />
     <Compile Include="..\..\src\Forge\Messages\*.cs" Link="Shared\Messages\%(Filename)%(Extension)" />
+    <Compile Include="..\..\src\Forge\Services\AchievementEvaluator.cs" Link="Shared\Services\AchievementEvaluator.cs" />
+    <Compile Include="..\..\src\Forge\Services\DatabaseService.cs" Link="Shared\Services\DatabaseService.cs" />
+    <Compile Include="..\..\src\Forge\Services\CertificatePinningHandler.cs" Link="Shared\Services\CertificatePinningHandler.cs" />
+    <Compile Include="..\..\src\Forge\Services\WorkoutSyncPayload.cs" Link="Shared\Services\WorkoutSyncPayload.cs" />
+    <Compile Include="..\..\src\Forge\Services\PocketBaseService.cs" Link="Shared\Services\PocketBaseService.cs" />
+    <Compile Include="..\..\src\Forge\Services\ServerAddress.cs" Link="Shared\Services\ServerAddress.cs" />
+    <Compile Include="..\..\src\Forge\Services\BuildSecrets.cs" Link="Shared\Services\BuildSecrets.cs" />
+    <Compile Include="..\..\src\Forge\Services\AchievementService.cs" Link="Shared\Services\AchievementService.cs" />
+    <Compile Include="..\..\src\Forge\ViewModels\AchievementsViewModel.cs" Link="Shared\ViewModels\AchievementsViewModel.cs" />
+    <Compile Include="..\..\src\Forge\ViewModels\BaseViewModel.cs" Link="Shared\ViewModels\BaseViewModel.cs" />
   </ItemGroup>
 
 </Project>

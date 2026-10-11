@@ -147,13 +147,17 @@ public partial class SettingsViewModel : BaseViewModel
         {
             Preferences.Remove("pb_server_url");
             pb.InvalidateClient();
-            ServerStatus = "URL rimosso. Usa il valore da .env.";
+            ServerStatus = "Server pubblico FORGE ripristinato.";
             HasServerStatus = true;
             return;
         }
 
-        if (!url.StartsWith("http://") && !url.StartsWith("https://"))
-            url = "http://" + url;
+        if (!ServerAddress.TryNormalize(url, out url))
+        {
+            ServerStatus = "Inserisci un URL HTTP o HTTPS valido.";
+            HasServerStatus = true;
+            return;
+        }
 
         ServerUrl = url;
         Preferences.Set("pb_server_url", url);

@@ -9,50 +9,42 @@ public class SyncService
     private readonly DatabaseService db;
     private readonly PocketBaseService pb;
     private readonly ConnectivityService connectivity;
+    private readonly SemaphoreSlim syncGate = new(1, 1);
 
     public SyncService(DatabaseService db, PocketBaseService pb, ConnectivityService connectivity)
     {
         this.db = db;
         this.pb = pb;
         this.connectivity = connectivity;
+        connectivity.ConnectivityChanged += (_, online) =>
+        {
+            if (online) _ = SyncPendingWorkoutsAsync().ContinueWith(t =>
+                System.Diagnostics.Debug.WriteLine($"[Sync] {t.Exception?.GetType().Name}"),
+                TaskContinuationOptions.OnlyOnFaulted);
+        };
     }
 
     public bool IsOnline => connectivity.IsOnline && pb.IsLoggedIn;
 
     public async Task SyncPendingWorkoutsAsync()
     {
-        if (!IsOnline) return;
-
-        var pending = await db.GetPendingSyncAsync();
-        foreach (var w in pending)
+        if (!IsOnline || !await syncGate.WaitAsync(0)) return;
+        try
         {
-            try
+            var userId = pb.CurrentUser?.Id;
+            var pending = await db.GetPendingSyncAsync();
+            foreach (var w in pending.Where(w => w.UserId == userId && !w.IsDraft))
             {
-                var exercises = JsonSerializer.Deserialize<List<string>>(w.ExercisesJson) ?? new();
-                var exerciseData = w.ExerciseDataJson;
-
-                var payload = new Dictionary<string, object?>
+                if (!IsOnline || pb.CurrentUser?.Id != userId) break;
+                try
                 {
-                    ["user"] = w.UserId,
-                    ["user_name"] = w.UserName,
-                    ["name"] = w.Name,
-                    ["date"] = w.Date,
-                    ["exercises"] = exercises,
-                    ["exercise_data"] = exerciseData,
-                    ["volume"] = w.Volume,
-                    ["duration"] = w.Duration,
-                    ["notes"] = w.Notes
-                };
-
-                var (success, _) = await pb.CreateRecordAsync("logged_workouts", payload);
-                if (success)
-                    await db.MarkSyncedAsync(w.Id);
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"[Sync Pending] ex: {ex.Message}");
+                    if (await pb.UploadWorkoutAsync(w))
+                        await db.MarkSyncedAsync(w.Id, WorkoutSyncPayload.RecordId(w.Id));
+                }
+                catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[Sync Pending] {ex.GetType().Name}"); }
             }
         }
+        finally { syncGate.Release(); }
     }
 
     public async Task SyncWorkoutsFromServerAsync()
@@ -75,6 +67,7 @@ public class SyncService
                     Duration = w.Duration,
                     Notes = w.Notes,
                     ExerciseDataJson = w.ExerciseData,
+                    PhotosJson = JsonSerializer.Serialize(w.Photos),
                     Likes = w.Likes,
                     LikedByJson = JsonSerializer.Serialize(w.LikedBy),
                     UserName = w.UserName,
@@ -98,6 +91,7 @@ public class SyncService
                     Duration = w.Duration,
                     Notes = w.Notes,
                     ExerciseDataJson = w.ExerciseData,
+                    PhotosJson = JsonSerializer.Serialize(w.Photos),
                     Likes = w.Likes,
                     LikedByJson = JsonSerializer.Serialize(w.LikedBy),
                     UserName = w.UserName,

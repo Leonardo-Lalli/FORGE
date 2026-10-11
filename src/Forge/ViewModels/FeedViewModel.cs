@@ -222,23 +222,25 @@ public partial class FeedViewModel : BaseViewModel
         if (!pb.IsLoggedIn) return;
         if (post.IsLiked)
         {
-            var (ok, _) = await pb.UnlikeWorkoutAsync(post.WorkoutId);
+            var (ok, error) = await pb.UnlikeWorkoutAsync(post.WorkoutId);
             if (ok)
             {
                 post.IsLiked = false;
                 post.HeartIcon = "♡";
                 post.Likes = Math.Max(0, post.Likes - 1);
             }
+            else ErrorMessage = error;
         }
         else
         {
-            var (ok, _) = await pb.LikeWorkoutAsync(post.WorkoutId);
+            var (ok, error) = await pb.LikeWorkoutAsync(post.WorkoutId);
             if (ok)
             {
                 post.IsLiked = true;
                 post.HeartIcon = "♥";
                 post.Likes++;
             }
+            else ErrorMessage = error;
         }
     }
 

@@ -28,6 +28,7 @@ public partial class LoginViewModel : BaseViewModel
     private async Task TryAutoLoginAsync()
     {
         await Task.Delay(1000);
+        if (IsBusy || IsRegistering) return;
         var success = await pb.TryAutoLoginAsync();
         if (success)
         {
@@ -39,6 +40,7 @@ public partial class LoginViewModel : BaseViewModel
     [RelayCommand]
     private async Task LoginAsync()
     {
+        if (IsBusy) return;
         if (string.IsNullOrWhiteSpace(Email) || string.IsNullOrWhiteSpace(Password))
         {
             SetError("Inserisci email e password.");
@@ -46,7 +48,7 @@ public partial class LoginViewModel : BaseViewModel
         }
 
         SetLoading();
-        var (success, error) = await pb.LoginAsync(Email, Password);
+        var (success, error) = await pb.LoginAsync(Email.Trim(), Password);
 
         if (success)
         {
@@ -63,11 +65,14 @@ public partial class LoginViewModel : BaseViewModel
     [RelayCommand]
     private async Task RegisterAsync()
     {
+        if (IsBusy) return;
         if (string.IsNullOrWhiteSpace(Email) || string.IsNullOrWhiteSpace(Password))
         {
             SetError("Inserisci email, password e nome.");
             return;
         }
+
+        if (string.IsNullOrWhiteSpace(Name)) { SetError("Inserisci il nome atleta."); return; }
 
         if (Password != PasswordConfirm)
         {
@@ -76,7 +81,7 @@ public partial class LoginViewModel : BaseViewModel
         }
 
         SetLoading();
-        var (success, error) = await pb.RegisterAsync(Email, Password, Name);
+        var (success, error) = await pb.RegisterAsync(Email.Trim(), Password, Name.Trim());
 
         if (success)
         {
@@ -106,7 +111,7 @@ public partial class LoginViewModel : BaseViewModel
 
         var result = await page.DisplayPromptAsync(
             "Server PocketBase",
-            "Inserisci l'URL del tuo server (es. http://192.168.1.50:8090)",
+            "URL del tuo server. Lascia vuoto per usare FORGE pubblico.",
             "Salva",
             "Annulla",
             placeholder: "https://tuo-server.duckdns.org",
@@ -122,11 +127,11 @@ public partial class LoginViewModel : BaseViewModel
             return;
         }
 
-        if (!url.StartsWith("http://") && !url.StartsWith("https://"))
-            url = "https://" + url;
+        if (!ServerAddress.TryNormalize(url, out url))
+        { SetError("Inserisci un URL HTTP o HTTPS valido."); return; }
 
         Preferences.Set("pb_server_url", url);
         pb.InvalidateClient();
-        SetError(null);
+        ErrorMessage = null;
     }
 }

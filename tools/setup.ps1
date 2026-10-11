@@ -13,6 +13,12 @@
 
 $ErrorActionPreference = "Stop"
 
+if ([string]::IsNullOrWhiteSpace($env:PB_ADMIN_EMAIL) -or
+    [string]::IsNullOrWhiteSpace($env:PB_ADMIN_PASSWORD) -or
+    $env:PB_ADMIN_PASSWORD -eq 'forgeadmin123') {
+    throw 'Imposta PB_ADMIN_EMAIL e una PB_ADMIN_PASSWORD unica prima di eseguire il setup.'
+}
+
 $forgeVersion = "v0.8.0-beta"
 
 Write-Host ""
@@ -49,34 +55,35 @@ Write-Host "[ OK ]  Repository pronta" -ForegroundColor Green
 
 # --- Start PocketBase ---
 Write-Host "[INFO]  Avvio PocketBase..." -ForegroundColor Yellow
-docker compose down --remove-orphans 2>$null | Out-Null
 docker compose up -d pocketbase 2>$null | Out-Null
+if ($LASTEXITCODE -ne 0) { throw 'Avvio PocketBase fallito.' }
 
 Write-Host "[INFO]  Attesa PocketBase..." -ForegroundColor Yellow
 $maxWait = 60
+$healthy = $false
 for ($i = 0; $i -lt $maxWait; $i += 2) {
     try {
         $r = Invoke-WebRequest -Uri "http://localhost:8090/api/health" -UseBasicParsing -TimeoutSec 2
-        if ($r.StatusCode -eq 200) { break }
+        if ($r.StatusCode -eq 200) { $healthy = $true; break }
     } catch { }
     Start-Sleep -Seconds 2
 }
+if (-not $healthy) { throw 'PocketBase non raggiungibile entro 60 secondi.' }
 Write-Host "[ OK ]  PocketBase e online" -ForegroundColor Green
 
 # --- Create superuser ---
 Write-Host "[INFO]  Creazione superuser..." -ForegroundColor Yellow
-$result = docker compose exec -T pocketbase pocketbase superuser create admin@forge.local forgeadmin123 2>&1
+$result = docker compose exec -T pocketbase pocketbase superuser create $env:PB_ADMIN_EMAIL $env:PB_ADMIN_PASSWORD 2>&1
 if ($LASTEXITCODE -eq 0) {
     Write-Host "[ OK ]  Superuser creato" -ForegroundColor Green
 } else {
-    Write-Host "[ OK ]  Superuser gia esistente" -ForegroundColor Green
+    Write-Host "Creazione non riuscita; l'initializer verifichera le credenziali dell'account esistente." -ForegroundColor Yellow
 }
 
 # --- Start all services ---
 Write-Host "[INFO]  Creazione collezioni..." -ForegroundColor Yellow
-docker compose up -d 2>$null | Out-Null
-Start-Sleep -Seconds 5
-docker compose logs init 2>$null | Out-String -Stream | ForEach-Object { Write-Host $_ }
+docker compose run --rm init
+if ($LASTEXITCODE -ne 0) { throw 'Inizializzazione fallita. Nessuna conferma di collezioni pronte.' }
 Write-Host "[ OK ]  Collezioni pronte" -ForegroundColor Green
 
 # --- Detect host IP ---
@@ -98,10 +105,11 @@ Write-Host "  FORGE e online!" -ForegroundColor Green
 Write-Host ""
 Write-Host "  Nell'app FORGE, vai su Impostazioni > URL PocketBase" -ForegroundColor White
 Write-Host "  e incolla questo indirizzo:" -ForegroundColor White
-Write-Host "  http://${hostIp}:8090" -ForegroundColor Cyan
+Write-Host "  Usa il dominio HTTPS del reverse proxy configurato." -ForegroundColor Cyan
+Write-Host "  La 8090 e locale per default; per un proxy separato configura PB_BIND_ADDRESS e firewall." -ForegroundColor DarkGray
 Write-Host ""
 Write-Host "  Admin panel: http://localhost:8090/_/" -ForegroundColor DarkGray
-Write-Host "  Login:       admin@forge.local / forgeadmin123" -ForegroundColor DarkGray
+Write-Host "  Admin:       $env:PB_ADMIN_EMAIL (password non mostrata)" -ForegroundColor DarkGray
 Write-Host ""
 Write-Host "  CAMBIA SUBITO LA PASSWORD ADMIN!" -ForegroundColor Red
 Write-Host "========================================" -ForegroundColor Cyan

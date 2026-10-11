@@ -16,7 +16,8 @@ public partial class AchievementDisplay : ObservableObject
     public int Progress { get; set; }
     public int MaxProgress { get; set; } = 1;
     public bool IsUnlocked { get; set; }
-    public double ProgressPercent => MaxProgress > 0 ? (double)Progress / MaxProgress : 0;
+    public double ProgressPercent => MaxProgress > 0 ? Math.Clamp((double)Progress / MaxProgress, 0, 1) : 0;
+    public double CardOpacity => IsUnlocked ? 1 : 0.65;
     public string ProgressText => $"{Progress}/{MaxProgress}";
     public string CategoryIcon => Category switch
     {
@@ -41,6 +42,8 @@ public partial class AchievementsViewModel : BaseViewModel
     [ObservableProperty] private double progressPercent;
     [ObservableProperty] private string selectedCategory = "Tutti";
     [ObservableProperty] private bool hasRecentUnlocks;
+    [ObservableProperty] private string experienceText = "Livello 1 · 0 XP";
+    [ObservableProperty] private double levelProgress;
 
     public AchievementsViewModel(AchievementService achievementService)
     {
@@ -58,6 +61,9 @@ public partial class AchievementsViewModel : BaseViewModel
             TotalCount = AchievementsCatalog.All.Count.ToString();
             UnlockedCount = all.Count(a => a.State.IsUnlocked).ToString();
             ProgressPercent = await achievementService.GetProgressPercentAsync();
+            var training = await achievementService.GetTrainingProgressAsync();
+            ExperienceText = $"Livello {training.Level} · {training.Experience} XP";
+            LevelProgress = training.LevelProgress;
 
             var displayList = all.Select(a => new AchievementDisplay
             {

@@ -9,20 +9,28 @@
 # Installa PocketBase nativamente (no Docker) e pre-configura
 # admin, collezioni e API rules. Pronto all'uso in 30 secondi.
 
-source /dev/stdin <<<"$FUNCTIONS_FILE_PATH"
-color
-verb_ip6
-catch_errors
-setting_up_container
-network_check
-update_os
+set -euo pipefail
+[ "$(id -u)" -eq 0 ] || { echo 'Run inside a Debian/Ubuntu LXC as root.' >&2; exit 1; }
+command -v systemctl >/dev/null || { echo 'A systemd distribution is required.' >&2; exit 1; }
+: "${PB_ADMIN_EMAIL:?Set PB_ADMIN_EMAIL}"
+: "${PB_ADMIN_PASSWORD:?Set a unique PB_ADMIN_PASSWORD}"
+: "${PB_VERSION:?Set a reviewed PocketBase version}"
+[ "$PB_ADMIN_PASSWORD" != 'forgeadmin123' ] || { echo 'Refusing published default password.' >&2; exit 1; }
+FORGE_INIT_SCRIPT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)/init-pocketbase.sh"
+[ -f "$FORGE_INIT_SCRIPT" ] || { echo 'Run from a reviewed local repository checkout.' >&2; exit 1; }
+apt-get update
+apt-get install -y curl jq unzip wget ca-certificates
+msg_info() { printf '%s\n' "$*"; }
+msg_ok() { printf '%s\n' "$*"; }
+msg_error() { printf '%s\n' "$*" >&2; }
+arch_resolve() { case "$(uname -m)" in x86_64) echo amd64;; aarch64) echo arm64;; *) exit 1;; esac; }
 
-PB_VERSION="0.25.9"
+PB_VERSION="${PB_VERSION}"
 PB_ARCH=$(arch_resolve)
 PB_USER="pocketbase"
 PB_DIR="/opt/forge-pocketbase"
-PB_EMAIL="admin@forge.local"
-PB_PASS="forgeadmin123"
+PB_EMAIL="${PB_ADMIN_EMAIL:?Set PB_ADMIN_EMAIL before running the installer}"
+PB_PASS="${PB_ADMIN_PASSWORD:?Set a unique PB_ADMIN_PASSWORD before running the installer}"
 
 msg_info "Installazione PocketBase v${PB_VERSION}"
 
@@ -83,54 +91,7 @@ msg_info "Creazione superuser..."
 
 msg_info "Configurazione collezioni + API rules..."
 
-# Authenticate (try both old and new PocketBase API)
-TOKEN=$(curl -sf -X POST http://localhost:8090/api/collections/_superusers/auth-with-password \
-  -H "Content-Type: application/json" \
-  -d "{\"identity\":\"$PB_EMAIL\",\"password\":\"$PB_PASS\"}" \
-  | grep -o '"token":"[^"]*"' | head -1 | cut -d'"' -f4)
-
-if [ -z "$TOKEN" ]; then
-  TOKEN=$(curl -sf -X POST http://localhost:8090/api/admins/auth-with-password \
-    -H "Content-Type: application/json" \
-    -d "{\"email\":\"$PB_EMAIL\",\"password\":\"$PB_PASS\"}" \
-    | grep -o '"token":"[^"]*"' | head -1 | cut -d'"' -f4)
-fi
-
-if [ -z "$TOKEN" ]; then
-  msg_warn "Auth API fallita. Crea collezioni da Admin Panel:"
-  msg_warn "Login: $PB_EMAIL / $PB_PASS"
-else
-  AUTH="Authorization: Bearer ${TOKEN}"
-  API="http://localhost:8090/api/collections"
-
-  create_collection() {
-    local name="$1" json_file="$2"
-    if curl -sf "$API" -H "$AUTH" | grep -q "\"name\":\"${name}\""; then
-      msg_ok "  $name (esiste)"
-      return
-    fi
-    curl -sf -X POST "$API" -H "$AUTH" -H "Content-Type: application/json" -d "@$json_file" >/dev/null && \
-      msg_ok "  $name" || msg_warn "  $name (fallito)"
-  }
-
-  # Write JSON payloads to temp files (cleaner than inline escaping)
-  cat > /tmp/forge_logged_workouts.json <<'ENDJSON'
-{"name":"logged_workouts","type":"base","schema":[{"name":"user","type":"relation","required":true,"options":{"collectionId":"users","cascadeDelete":false}},{"name":"user_name","type":"text","required":false},{"name":"name","type":"text","required":true},{"name":"date","type":"date","required":true},{"name":"exercises","type":"json","required":false},{"name":"exercise_data","type":"json","required":false},{"name":"volume","type":"number","required":false},{"name":"duration","type":"number","required":false},{"name":"likes","type":"number","required":false},{"name":"liked_by","type":"json","required":false},{"name":"photos","type":"json","required":false}],"listRule":"@request.auth.id != '' && user = @request.auth.id","viewRule":"@request.auth.id != ''","createRule":"@request.auth.id != '' && user = @request.auth.id","updateRule":"@request.auth.id != '' && (user = @request.auth.id || @request.auth.id ?= liked_by)","deleteRule":"@request.auth.id != '' && user = @request.auth.id"}
-ENDJSON
-
-  cat > /tmp/forge_social_graph.json <<'ENDJSON'
-{"name":"social_graph","type":"base","schema":[{"name":"from_user","type":"relation","required":true,"options":{"collectionId":"users","cascadeDelete":false}},{"name":"from_name","type":"text","required":false},{"name":"to_user","type":"relation","required":true,"options":{"collectionId":"users","cascadeDelete":false}},{"name":"status","type":"text","required":true}],"listRule":"@request.auth.id != '' && (from_user = @request.auth.id || to_user = @request.auth.id)","viewRule":"@request.auth.id != '' && (from_user = @request.auth.id || to_user = @request.auth.id)","createRule":"@request.auth.id != '' && from_user = @request.auth.id","updateRule":"@request.auth.id != '' && (from_user = @request.auth.id || to_user = @request.auth.id)","deleteRule":"@request.auth.id != '' && (from_user = @request.auth.id || to_user = @request.auth.id)"}
-ENDJSON
-
-  cat > /tmp/forge_excercise.json <<'ENDJSON'
-{"name":"excercise","type":"base","schema":[{"name":"name","type":"text","required":true},{"name":"bodyPart","type":"text","required":false},{"name":"equipment","type":"text","required":false},{"name":"instructions","type":"json","required":false},{"name":"imageUrl","type":"url","required":false},{"name":"category","type":"text","required":false}],"listRule":"@request.auth.id != ''","viewRule":"@request.auth.id != ''","createRule":"@request.auth.id != ''","updateRule":"@request.auth.id = ''","deleteRule":"@request.auth.id = ''"}
-ENDJSON
-
-  create_collection "logged_workouts" "/tmp/forge_logged_workouts.json"
-  create_collection "social_graph"    "/tmp/forge_social_graph.json"
-  create_collection "excercise"       "/tmp/forge_excercise.json"
-  rm -f /tmp/forge_*.json
-fi
+PB_URL=http://127.0.0.1:8090 PB_ADMIN_EMAIL="$PB_EMAIL" PB_ADMIN_PASSWORD="$PB_PASS" sh "$FORGE_INIT_SCRIPT"
 
 # --- MOTD ---
 IP=$(hostname -I | awk '{print $1}')
@@ -139,7 +100,7 @@ cat <<EOF >> /etc/motd
    FORGE PocketBase
    App:  http://${IP}:8090
    Admin Panel: http://${IP}:8090/_/
-   Login: $PB_EMAIL / $PB_PASS
+   Admin: $PB_EMAIL (password not displayed)
 EOF
 
 msg_ok "Installazione completata!"
@@ -150,12 +111,8 @@ echo "  FORGE PocketBase e online!"
 echo ""
 echo "  App URL:  http://${IP}:8090"
 echo "  Admin:    http://${IP}:8090/_/"
-echo "  Login:    $PB_EMAIL / $PB_PASS"
+echo "  Admin:    $PB_EMAIL (password not displayed)"
 echo ""
 echo "  CAMBIA SUBITO LA PASSWORD ADMIN!"
 echo "============================================"
 echo ""
-
-motd_ssh
-customize
-cleanup_lxc

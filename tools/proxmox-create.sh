@@ -9,16 +9,20 @@
 # Creates a dedicated LXC container and installs PocketBase natively.
 # Runs on the Proxmox hypervisor (not inside the container).
 
-set -uo pipefail
+set -euo pipefail
 
 FORGE_VERSION="v0.8.0-beta"
 CT_ID=""
 CT_HOSTNAME="forge"
 STORAGE="local-lvm"
 BRIDGE="vmbr0"
-PB_EMAIL="admin@forge.local"
-PB_PASS="forgeadmin123"
+PB_EMAIL="${PB_ADMIN_EMAIL:?Set PB_ADMIN_EMAIL before running the installer}"
+PB_PASS="${PB_ADMIN_PASSWORD:?Set a unique PB_ADMIN_PASSWORD before running the installer}"
 PB_PORT="8090"
+: "${PB_VERSION:?Set a reviewed PocketBase version before installation}"
+[ "$PB_PASS" != 'forgeadmin123' ] || { echo 'Refusing published default password.' >&2; exit 1; }
+FORGE_INIT_SCRIPT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)/init-pocketbase.sh"
+[ -f "$FORGE_INIT_SCRIPT" ] || { echo 'Run this script from a reviewed local repository checkout.' >&2; exit 1; }
 
 # ── Colours ────────────────────────────────────
 RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'
@@ -67,19 +71,19 @@ while true; do
   read -r -p "$(echo -e "${BOLD}Enter choice [1-3] (default: 2): ${NC}")" CHOICE
   CHOICE=${CHOICE:-2}
   case "$CHOICE" in
-    1) OS_LABEL="Alpine 3.21"
+    1) msg_error "Alpine is not supported by this systemd installer. Choose Debian or Ubuntu."; OS_LABEL="Alpine 3.21"
        TEMPLATE="alpine-3.21-default_20250210_amd64.tar.xz"
        OS_SETUP="apk add --no-cache curl bash unzip wget"
        PKG_INSTALL="apk add --no-cache"
        break ;;
     2) OS_LABEL="Debian 12"
        TEMPLATE="debian-12-standard_12.7-1_amd64.tar.zst"
-       OS_SETUP="apt-get update -qq && apt-get install -y -qq curl unzip wget"
+       OS_SETUP="apt-get update -qq && apt-get install -y -qq curl unzip wget jq"
        PKG_INSTALL="apt-get install -y -qq"
        break ;;
     3) OS_LABEL="Ubuntu 24.04"
        TEMPLATE="ubuntu-24.04-standard_24.04-2_amd64.tar.zst"
-       OS_SETUP="apt-get update -qq && apt-get install -y -qq curl unzip wget"
+       OS_SETUP="apt-get update -qq && apt-get install -y -qq curl unzip wget jq"
        PKG_INSTALL="apt-get install -y -qq"
        break ;;
     *) echo -e "${RED}Invalid choice. Pick 1, 2, or 3.${NC}" ;;
@@ -147,7 +151,7 @@ pct exec "${CT_ID}" -- bash -c "${OS_SETUP}" &>/dev/null
 msg_ok "Packages installed"
 
 # ── Install PocketBase ─────────────────────────
-PB_VERSION="0.25.9"
+PB_VERSION="${PB_VERSION:?Set a reviewed PocketBase version before installation}"
 PB_ARCH="amd64"
 PB_URL="https://github.com/pocketbase/pocketbase/releases/download/v${PB_VERSION}/pocketbase_${PB_VERSION}_linux_${PB_ARCH}.zip"
 
@@ -209,57 +213,10 @@ pct exec "${CT_ID}" -- /opt/forge-pocketbase/pocketbase superuser create "${PB_E
 # ── Create collections via init script ─────────
 msg_info "Configuring collections..."
 
-# Write init script inside container via heredoc
-pct exec "${CT_ID}" -- bash -c "cat > /tmp/init-forge.sh << 'INITEOF'
-#!/bin/sh
-PB_URL=\"http://localhost:${PB_PORT}\"
-PB_ADMIN_EMAIL=\"${PB_EMAIL}\"
-PB_ADMIN_PASS=\"${PB_PASS}\"
-
-# Authenticate
-TOKEN=\$(curl -sf -X POST \"\${PB_URL}/api/collections/_superusers/auth-with-password\" \
-  -H \"Content-Type: application/json\" \
-  -d \"{\\"identity\\":\\"\${PB_ADMIN_EMAIL}\\",\\"password\\":\\"\${PB_ADMIN_PASS}\\"}\" \
-  | sed 's/.*\"token\":\"\\([^\"]*\\)\".*/\\1/')
-
-if [ -z \"\$TOKEN\" ]; then
-  TOKEN=\$(curl -sf -X POST \"\${PB_URL}/api/admins/auth-with-password\" \
-    -H \"Content-Type: application/json\" \
-    -d \"{\\"email\\":\\"\${PB_ADMIN_EMAIL}\\",\\"password\\":\\"\${PB_ADMIN_PASS}\\"}\" \
-    | sed 's/.*\"token\":\"\\([^\"]*\\)\".*/\\1/')
-fi
-
-if [ -z \"\$TOKEN\" ]; then
-  echo \"AUTH_FAILED\"
-  exit 1
-fi
-
-AUTH=\"Authorization: Bearer \${TOKEN}\"
-API=\"\${PB_URL}/api/collections\"
-
-create_if_missing() {
-  if curl -sf \"\$API\" -H \"\$AUTH\" | grep -q \"\\\\\"name\\\\\":\\\\\"\$1\\\\\"\"; then
-    echo \"  \$1 (exists)\"
-  else
-    curl -sf -X POST \"\$API\" -H \"\$AUTH\" -H \"Content-Type: application/json\" -d \"\$2\" >/dev/null
-    echo \"  \$1 (created)\"
-  fi
-}
-
-create_if_missing 'logged_workouts' '{\"name\":\"logged_workouts\",\"type\":\"base\",\"schema\":[{\"name\":\"user\",\"type\":\"relation\",\"required\":true,\"options\":{\"collectionId\":\"users\",\"cascadeDelete\":false}},{\"name\":\"user_name\",\"type\":\"text\"},{\"name\":\"name\",\"type\":\"text\",\"required\":true},{\"name\":\"date\",\"type\":\"date\",\"required\":true},{\"name\":\"exercises\",\"type\":\"json\"},{\"name\":\"exercise_data\",\"type\":\"json\"},{\"name\":\"volume\",\"type\":\"number\"},{\"name\":\"duration\",\"type\":\"number\"},{\"name\":\"likes\",\"type\":\"number\"},{\"name\":\"liked_by\",\"type\":\"json\"},{\"name\":\"photos\",\"type\":\"json\"}],\"listRule\":\"@request.auth.id != '\\'''\\'' && user = @request.auth.id\",\"viewRule\":\"@request.auth.id != '\\'''\\''\",\"createRule\":\"@request.auth.id != '\\'''\\'' && user = @request.auth.id\",\"updateRule\":\"@request.auth.id != '\\'''\\'' && (user = @request.auth.id || @request.auth.id ?= liked_by)\",\"deleteRule\":\"@request.auth.id != '\\'''\\'' && user = @request.auth.id\"}'
-create_if_missing 'social_graph' '{\"name\":\"social_graph\",\"type\":\"base\",\"schema\":[{\"name\":\"from_user\",\"type\":\"relation\",\"required\":true,\"options\":{\"collectionId\":\"users\",\"cascadeDelete\":false}},{\"name\":\"from_name\",\"type\":\"text\"},{\"name\":\"to_user\",\"type\":\"relation\",\"required\":true,\"options\":{\"collectionId\":\"users\",\"cascadeDelete\":false}},{\"name\":\"status\",\"type\":\"text\",\"required\":true}],\"listRule\":\"@request.auth.id != '\\'''\\'' && (from_user = @request.auth.id || to_user = @request.auth.id)\",\"viewRule\":\"@request.auth.id != '\\'''\\'' && (from_user = @request.auth.id || to_user = @request.auth.id)\",\"createRule\":\"@request.auth.id != '\\'''\\'' && from_user = @request.auth.id\",\"updateRule\":\"@request.auth.id != '\\'''\\'' && (from_user = @request.auth.id || to_user = @request.auth.id)\",\"deleteRule\":\"@request.auth.id != '\\'''\\'' && (from_user = @request.auth.id || to_user = @request.auth.id)\"}'
-create_if_missing 'excercise' '{\"name\":\"excercise\",\"type\":\"base\",\"schema\":[{\"name\":\"name\",\"type\":\"text\",\"required\":true},{\"name\":\"bodyPart\",\"type\":\"text\"},{\"name\":\"equipment\",\"type\":\"text\"},{\"name\":\"instructions\",\"type\":\"json\"},{\"name\":\"imageUrl\",\"type\":\"url\"},{\"name\":\"category\",\"type\":\"text\"}],\"listRule\":\"@request.auth.id != '\\'''\\''\",\"viewRule\":\"@request.auth.id != '\\'''\\''\",\"createRule\":\"@request.auth.id != '\\'''\\''\",\"updateRule\":\"@request.auth.id = '\\'''\\''\",\"deleteRule\":\"@request.auth.id = '\\'''\\''\"}'
-echo 'DONE'
-INITEOF"
-
-INIT_RESULT=$(pct exec "${CT_ID}" -- bash /tmp/init-forge.sh 2>/dev/null)
-if echo "$INIT_RESULT" | grep -q "DONE"; then
-  echo "$INIT_RESULT"
-  msg_ok "Collections configured"
-else
-  msg_warn "Collections may need manual setup"
-  msg_warn "Run inside container: bash /tmp/init-forge.sh"
-fi
+pct push "${CT_ID}" "${FORGE_INIT_SCRIPT}" /tmp/init-forge.sh
+pct exec "${CT_ID}" -- env PB_URL="http://localhost:${PB_PORT}" \
+  PB_ADMIN_EMAIL="${PB_EMAIL}" PB_ADMIN_PASSWORD="${PB_PASS}" sh /tmp/init-forge.sh
+msg_ok "Missing collections initialized; existing live rules were not changed."
 
 # ── Summary ────────────────────────────────────
 echo ""

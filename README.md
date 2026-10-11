@@ -24,7 +24,7 @@ https://github.com/user-attachments/assets/28498cc5-b1e4-4de4-bce0-1627f3fb002d
 [![ExerciseDB](https://img.shields.io/badge/ExerciseDB-750%2B%20exercises-22C55E)](https://oss.exercisedb.dev)
 [![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)](#self-hosting)
 [![MVVM](https://img.shields.io/badge/Architecture-MVVM%20%7C%20CommunityToolkit-7C3AED)](https://learn.microsoft.com/dotnet/communitytoolkit/mvvm/)
-[![Tests](https://img.shields.io/badge/Tests-27%20passed-brightgreen)](tests/)
+[![Tests](https://img.shields.io/badge/Tests-67%20passed-brightgreen)](tests/)
 [![License](https://img.shields.io/badge/License-MIT-blue)](LICENSE)
 
 [![GitHub stars](https://img.shields.io/github/stars/Leonardo-Lalli/FORGE?style=social&label=Star)](https://github.com/Leonardo-Lalli/FORGE/stargazers)
@@ -84,13 +84,13 @@ FORGE is an Android app for tracking gym workouts, with a social twist. Log exer
 | ✅ | Theme | Dual light/dark theme, Inter/Lexend/Space Grotesk fonts |
 | ✅ | Offline | Local SQLite + auto sync when connection returns |
 | ✅ | CSV | Import/export workouts with validation |
-| ✅ | Security | Certificate pinning, HTTPS, SecureStorage, API rules row-level, rate limiting, blocked admin panel |
+| ✅ | Security | System TLS certificate validation, HTTPS, SecureStorage, API rules row-level, rate limiting, blocked admin panel |
 | 🟡 | Photos | Supported (max 3MB, base64 in record). No server-side compression |
 | 🟡 | Connectivity | App requires network for login and new exercise search. Local cache for seen exercises |
 | 🔴 | Push notifications | Not yet implemented (Firebase SDK doesn't support .NET 10) |
 | 🔴 | Body tracking | Weight and measurements not yet implemented |
 | 🔴 | Leaderboard | Ranking among friends not implemented (replaced by feed + likes) |
-| 🚧 | Certificate pinning | Implemented client-side; needs real server testing |
+| ✅ | TLS validation | Removed unsafe custom validator; system TLS validation is used |
 
 ---
 
@@ -171,7 +171,7 @@ The app will use your server instead of the default one. Works on LAN without a 
 
 ### Admin panel
 
-`http://localhost:8090/_/` — login with admin@forge.local / forgeadmin123
+`http://localhost:8090/_/` — use your unique PB_ADMIN_EMAIL and PB_ADMIN_PASSWORD
 
 ---
 
@@ -204,8 +204,8 @@ The app will use your server instead of the default one. Works on LAN without a 
 | Navigation | Shell (3 tabs + 8 routes) |
 | Backend | PocketBase self-hosted (auth, social, storage) |
 | API | ExerciseDB v1 (1,500+ exercises, free) |
-| Persistence | SQLite (sqlite-net-pcl) |
-| Tests | xUnit (27 tests) |
+| Persistence | SQLite (sqlite-net-base + SQLitePCLRaw bundle) |
+| Tests | xUnit (67 tests) |
 | Fonts | Inter, Lexend, Space Grotesk (Google Fonts) |
 
 ---
@@ -228,7 +228,7 @@ dotnet publish src/Forge/Forge.csproj -f net10.0-android -c Release /p:AndroidPa
 ### Prerequisites
 - .NET 10 SDK + MAUI workload
 - Android device or emulator (Android 7+)
-- PocketBase server (configurable via `.env`)
+- Public FORGE server or personal PocketBase URL configured in the app
 
 ### Quick start
 
@@ -236,7 +236,7 @@ dotnet publish src/Forge/Forge.csproj -f net10.0-android -c Release /p:AndroidPa
 git clone https://github.com/Leonardo-Lalli/FORGE.git
 cd FORGE
 cp .env.example .env
-# Edit .env with your PocketBase server URL
+# Backend: set unique PB_ADMIN_EMAIL and PB_ADMIN_PASSWORD
 dotnet build src/Forge/Forge.csproj -f net10.0-android
 dotnet test tests/Forge.Tests/
 dotnet publish src/Forge/Forge.csproj -f net10.0-android -c Release /p:AndroidPackageFormats=apk
@@ -294,7 +294,7 @@ See [`PRIVACY.md`](PRIVACY.md) for full details.
 | Measure | Detail |
 |---------|--------|
 | Password | Encrypted with SecureStorage (Android Keystore) |
-| Connection | HTTPS with Let's Encrypt + certificate pinning |
+| Connection | HTTPS with system certificate validation |
 | Remote DB | Row-level API rules (each user only sees their own data) |
 | Admin panel | Blocked from external access (403) |
 | Rate limiting | 5 login attempts/min, 60 req/min API |
@@ -335,3 +335,9 @@ MIT License — see [LICENSE](LICENSE).
 **FORGE** — Build your physique. Challenge your friends. Forge your legend.
 
 </div>
+
+## Public server and login
+
+FORGE connects automatically to https://leoforge.duckdns.org when no personal server is configured. Login and registration do not require a packaged .env file. Clear the custom URL in server settings to restore the public instance. The login screen supports the light (blue) and dark (cyan) designs; Google/Apple sign-in is unavailable on the current backend.
+
+See [project structure](docs/project-structure.md) and [login verification](docs/iterations/login-public-server-2026-10-11.md).

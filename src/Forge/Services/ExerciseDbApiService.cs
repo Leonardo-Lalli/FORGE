@@ -35,16 +35,12 @@ public class ExerciseDbApiService
 
     public async Task WarmCacheAsync()
     {
+        if (warmDone) return;
         await db.DeleteExercisesByPrefixAsync("wger-");
         var count = (await db.GetCachedExercisesAsync()).Count;
 
         // Force full rebuild if cache is from old code (< 200 exercises = old limit was 100)
-        if (count is > 0 and < 200)
-        {
-            System.Diagnostics.Debug.WriteLine("[ExerciseDB WarmCache] Old cache detected, full rebuild...");
-            await db.DeleteAllExercisesAsync();
-            count = 0;
-        }
+        // A partial cache remains useful offline; never discard it to warm the catalog.
 
         if (count >= 600) { warmDone = true; return; }
 
@@ -72,11 +68,9 @@ public class ExerciseDbApiService
             System.Diagnostics.Debug.WriteLine($"[ExerciseDB WarmCache] total: {count}");
 
             // 4. Sync to PocketBase so other users on the same server get them
-            _ = SyncToPocketBaseAsync().ContinueWith(t =>
-            {
-                if (t.IsFaulted)
-                    System.Diagnostics.Debug.WriteLine($"[ExerciseDB Sync] ex: {t.Exception?.InnerException?.Message}");
-            }, TaskContinuationOptions.OnlyOnFaulted);
+            // Shared catalog writes belong to the administrator's importer.
+            // Every client re-posting its cache creates duplicate records.
+            warmDone = count >= 600;
         }
         catch (Exception ex)
         {

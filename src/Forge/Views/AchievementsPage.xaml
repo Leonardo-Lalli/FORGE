@@ -44,6 +44,12 @@
 
         <!-- Progress bar + Category filters -->
         <VerticalStackLayout Grid.Row="1" Spacing="8" Padding="16,0">
+            <Label Text="{Binding ExperienceText}" FontFamily="SpaceGrotesk" FontSize="16"
+                   TextColor="{DynamicResource Primary}" />
+            <ProgressBar Progress="{Binding LevelProgress}" ProgressColor="{DynamicResource Primary}"
+                         BackgroundColor="{DynamicResource SurfaceContainerHigh}" />
+            <Label Text="100 XP per allenamento completato · 500 XP per livello"
+                   FontSize="11" TextColor="{DynamicResource OnSurfaceVariant}" />
             <ProgressBar Progress="{Binding ProgressPercent}"
                          ProgressColor="{DynamicResource Primary}"
                          BackgroundColor="{DynamicResource SurfaceContainerHigh}" />
@@ -163,7 +169,7 @@
                             <Border StrokeShape="RoundRectangle 14" Padding="14"
                                     BackgroundColor="{DynamicResource SurfaceContainer}"
                                     Stroke="{DynamicResource OutlineVariant}" StrokeThickness="0.5"
-                                    Opacity="{Binding IsUnlocked, Converter={StaticResource InverseBoolConverter}}">
+                                    Opacity="{Binding CardOpacity}">
                                 <Grid ColumnDefinitions="44,*" ColumnSpacing="14">
                                     <!-- Icon -->
                                     <Border Grid.Column="0"

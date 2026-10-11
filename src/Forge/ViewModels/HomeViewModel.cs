@@ -26,6 +26,7 @@ public partial class HomeViewModel : BaseViewModel
     private readonly PlanService planService;
     private readonly AchievementService achievementService;
     private readonly ExerciseDbApiService exerciseDbApi;
+    private readonly SyncService sync;
 
     [ObservableProperty] private string streakCount = "0";
     [ObservableProperty] private string streakLabel = "Week streak";
@@ -39,7 +40,7 @@ public partial class HomeViewModel : BaseViewModel
     [ObservableProperty] private string userAvatarUrl = string.Empty;
     [ObservableProperty] private ImageSource? userAvatarSource;
     [ObservableProperty] private bool hasUserAvatar;
-    [ObservableProperty] private string achievementProgress = "0/48";
+    [ObservableProperty] private string achievementProgress = "0/44";
     [ObservableProperty] private double achievementPercent;
     [ObservableProperty] private string achievementCount = "0";
     [ObservableProperty] private string nextAchievementName = string.Empty;
@@ -49,12 +50,13 @@ public partial class HomeViewModel : BaseViewModel
     [ObservableProperty] private string nextAchievementText = string.Empty;
     [ObservableProperty] private bool hasNextAchievement;
 
-    public HomeViewModel(PocketBaseService pb, PlanService planService, AchievementService achievementService, ExerciseDbApiService exerciseDbApi)
+    public HomeViewModel(PocketBaseService pb, PlanService planService, AchievementService achievementService, ExerciseDbApiService exerciseDbApi, SyncService sync)
     {
         this.pb = pb;
         this.planService = planService;
         this.achievementService = achievementService;
         this.exerciseDbApi = exerciseDbApi;
+        this.sync = sync;
         HasData = true;
 
         _ = exerciseDbApi.WarmCacheAsync().ContinueWith(t =>
@@ -76,7 +78,8 @@ public partial class HomeViewModel : BaseViewModel
         IsBusy = true;
         try
         {
-            LoadUserInfo();
+            await sync.SyncPendingWorkoutsAsync();
+            await LoadUserInfoAsync();
             await CalculateStreakAsync();
             await LoadSquadAsync();
             await LoadRandomPlanAsync();
@@ -86,7 +89,7 @@ public partial class HomeViewModel : BaseViewModel
         finally { IsBusy = false; }
     }
 
-    private async void LoadUserInfo()
+    private async Task LoadUserInfoAsync()
     {
         if (pb.IsLoggedIn && pb.CurrentUser != null)
         {
@@ -112,6 +115,7 @@ public partial class HomeViewModel : BaseViewModel
             AchievementPercent = percent;
 
             var all = await achievementService.GetAllAsync();
+            HasNextAchievement = false;
             var next = all
                 .Where(a => !a.State.IsUnlocked && a.State.Progress > 0)
                 .OrderByDescending(a => (double)a.State.Progress / a.Def.MaxProgress)

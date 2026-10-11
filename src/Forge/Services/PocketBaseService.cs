@@ -2,6 +2,7 @@ using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
 using Forge.Models.Dto;
+using Forge.Models;
 
 namespace Forge.Services;
 
@@ -16,10 +17,9 @@ public class PocketBaseService
     private string GetPbBaseUrl()
     {
         var configured = Preferences.Get("pb_server_url", string.Empty);
-        if (!string.IsNullOrWhiteSpace(configured))
-            return configured.TrimEnd('/');
-
-        return secrets.Get("POCKETBASE_URL")?.TrimEnd('/') ?? "";
+        if (!ServerAddress.TryNormalize(configured, out var url))
+            throw new InvalidOperationException("Indirizzo server non valido. Configura un URL HTTP o HTTPS.");
+        return url;
     }
 
     private HttpClient GetHttp()
@@ -39,8 +39,8 @@ public class PocketBaseService
     {
         _http?.Dispose();
         _http = null;
-        token = null;
-        currentUser = null;
+        // Credentials saved for one server must never be replayed to a new host.
+        Logout();
     }
 
     private static readonly JsonSerializerOptions JsonOptions = new()
@@ -57,10 +57,7 @@ public class PocketBaseService
     {
         var pbUrl = GetPbBaseUrl();
         var coll = string.IsNullOrWhiteSpace(collectionId) ? "users" : collectionId;
-        var url = $"{pbUrl}/api/files/{coll}/{recordId}/{fileName}";
-        if (!string.IsNullOrWhiteSpace(token))
-            url += $"?token={Uri.EscapeDataString(token)}";
-        return url;
+        return $"{pbUrl}/api/files/{Uri.EscapeDataString(coll)}/{Uri.EscapeDataString(recordId)}/{Uri.EscapeDataString(fileName)}";
     }
 
     public async Task<ImageSource?> DownloadAvatarAsync(string collectionId, string recordId, string fileName)
@@ -148,7 +145,12 @@ public class PocketBaseService
         try
         {
             var payload = new { };
-            var response = await GetHttp().PostAsJsonAsync("collections/users/auth-refresh", payload, JsonOptions);
+            using var request = new HttpRequestMessage(HttpMethod.Post, "collections/users/auth-refresh")
+            {
+                Content = JsonContent.Create(payload, options: JsonOptions)
+            };
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            using var response = await GetHttp().SendAsync(request);
             if (!response.IsSuccessStatusCode) return false;
             var auth = await response.Content.ReadFromJsonAsync<PocketBaseAuthResponse>(JsonOptions);
             if (auth == null || string.IsNullOrWhiteSpace(auth.Token)) return false;
@@ -445,6 +447,28 @@ public class PocketBaseService
 #endif
             System.Diagnostics.Debug.WriteLine($"[PB] ex: {ex.Message}"); return (false, "Errore del server.");
         }
+    }
+
+    public async Task<bool> UploadWorkoutAsync(LocalWorkout workout)
+    {
+        if (!IsLoggedIn || currentUser?.Id != workout.UserId || workout.IsDraft) return false;
+        var (ok, _) = await CreateRecordAsync("logged_workouts", WorkoutSyncPayload.Create(workout));
+        if (ok) return true;
+        // A lost response can leave a successful POST on the server. Check its
+        // stable ID before retrying, instead of creating a second workout.
+        try
+        {
+            using var request = new HttpRequestMessage(HttpMethod.Get,
+                $"collections/logged_workouts/records/{WorkoutSyncPayload.RecordId(workout.Id)}?fields=id,user");
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            using var response = await GetHttp().SendAsync(request);
+            if (!response.IsSuccessStatusCode) return false;
+            using var body = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+            return body.RootElement.TryGetProperty("user", out var owner) && owner.GetString() == workout.UserId;
+        }
+        catch (HttpRequestException) { return false; }
+        catch (TaskCanceledException) { return false; }
+        catch (JsonException) { return false; }
     }
 
     public async Task<bool> TryAutoLoginAsync()
@@ -1046,7 +1070,8 @@ public class PocketBaseService
         if (!IsLoggedIn) return null;
         try
         {
-            var filter = $"name=\"{exerciseName.Replace("\"", "\\\"")}\"";
+            var escapedName = exerciseName.Replace("\\", "\\\\").Replace("\"", "\\\"");
+            var filter = $"name=\"{escapedName}\"";
             var url = $"collections/excercise/records?filter={Uri.EscapeDataString(filter)}&perPage=1";
             var request = new HttpRequestMessage(HttpMethod.Get, url);
             request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
@@ -1072,7 +1097,9 @@ public class PocketBaseService
 
     public class CachedExerciseItem
     {
-        public string ImageUrl { get; set; } = "";
+        private string? imageUrl;
+        public string? Image_url { get; set; }
+        public string ImageUrl { get => imageUrl ?? Image_url ?? ""; set => imageUrl = value; }
     }
 
     private static string ParseErrorMessage(string body)
@@ -1109,7 +1136,10 @@ public class PocketBaseService
         if (!IsLoggedIn) return null;
         try
         {
-            var response = await GetHttp().GetAsync($"collections/excercise/records?page={page}&perPage={perPage}&sort=name");
+            using var request = new HttpRequestMessage(HttpMethod.Get,
+                $"collections/excercise/records?page={Math.Max(1, page)}&perPage={Math.Clamp(perPage, 1, 200)}&sort=name");
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            using var response = await GetHttp().SendAsync(request);
             if (!response.IsSuccessStatusCode) return null;
             var json = await response.Content.ReadAsStringAsync();
             var result = JsonSerializer.Deserialize<ExcerciseListResponse>(json, JsonOptions);
@@ -1121,12 +1151,27 @@ public class PocketBaseService
 
 public class ExcerciseRecord
 {
+    private List<string>? instructions;
+    private string? imageUrl;
     public string? Id { get; set; }
     public string? Name { get; set; }
     public string? BodyPart { get; set; }
     public string? Equipment { get; set; }
-    public List<string>? Instructions { get; set; }
-    public string? ImageUrl { get; set; }
+    [System.Text.Json.Serialization.JsonPropertyName("instruction")]
+    public JsonElement LegacyInstructions { get; set; }
+    public List<string>? Instructions
+    {
+        get => instructions ?? (LegacyInstructions.ValueKind switch
+        {
+            JsonValueKind.Array => LegacyInstructions.EnumerateArray().Where(e => e.ValueKind == JsonValueKind.String)
+                .Select(e => e.GetString()!).ToList(),
+            JsonValueKind.String => [LegacyInstructions.GetString()!],
+            _ => []
+        });
+        set => instructions = value;
+    }
+    public string? Image_url { get; set; }
+    public string? ImageUrl { get => imageUrl ?? Image_url; set => imageUrl = value; }
     public string? Category { get; set; }
     public string? TargetMuscles { get; set; }
     public string? SecondaryMuscles { get; set; }

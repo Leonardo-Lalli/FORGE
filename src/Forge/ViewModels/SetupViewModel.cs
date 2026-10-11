@@ -16,7 +16,7 @@ public partial class SetupViewModel : BaseViewModel
     {
         Preferences.Set("setup_completed", true);
         Preferences.Remove("pb_server_url");
-        StatusMessage = "Nessun server configurato. Potrai farlo dalle Impostazioni.";
+        StatusMessage = "Server pubblico FORGE configurato.";
         HasStatus = true;
         GoToLogin();
     }
@@ -28,8 +28,12 @@ public partial class SetupViewModel : BaseViewModel
 
         if (!string.IsNullOrWhiteSpace(url))
         {
-            if (!url.StartsWith("http://") && !url.StartsWith("https://"))
-                url = "http://" + url;
+            if (!ServerAddress.TryNormalize(url, out url))
+            {
+                StatusMessage = "Inserisci un URL HTTP o HTTPS valido.";
+                HasStatus = true;
+                return;
+            }
 
             Preferences.Set("pb_server_url", url);
             StatusMessage = $"Server configurato: {url}";

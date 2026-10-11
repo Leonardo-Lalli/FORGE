@@ -5,13 +5,14 @@
 # License: MIT | https://github.com/Leonardo-Lalli/FORGE/blob/main/LICENSE
 # Source: https://github.com/Leonardo-Lalli/FORGE
 
-set -uo pipefail
+set -euo pipefail
 
 FORGE_VERSION="v0.8.0-beta"
 FORGE_DIR="$HOME/forge-server"
 REPO_URL="https://github.com/Leonardo-Lalli/FORGE.git"
-PB_EMAIL="admin@forge.local"
-PB_PASS="forgeadmin123"
+PB_EMAIL="${PB_ADMIN_EMAIL:?Set PB_ADMIN_EMAIL before running the installer}"
+PB_PASS="${PB_ADMIN_PASSWORD:?Set a unique PB_ADMIN_PASSWORD before running the installer}"
+[ "$PB_PASS" != 'forgeadmin123' ] || { echo 'Refusing the published default password.' >&2; exit 1; }
 
 # ── Colours ────────────────────────────────────
 RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'
@@ -19,7 +20,7 @@ CYAN='\033[0;36m'; BOLD='\033[1m'; NC='\033[0m'
 msg_ok()    { echo -e "${GREEN}[ OK ]${NC}  $*"; }
 msg_info()  { echo -e "${CYAN}[INFO]${NC}  $*"; }
 msg_warn()  { echo -e "${YELLOW}[WARN]${NC}  $*"; }
-msg_error() { echo -e "${RED}[ERR ]${NC}  $*"; }
+msg_error() { echo -e "${RED}[ERR ]${NC}  $*"; exit 1; }
 section()   { echo -e "\n${BOLD}── $* ──${NC}"; }
 
 # ── Header ─────────────────────────────────────
@@ -78,34 +79,32 @@ section "Start PocketBase"
 
 msg_info "Starting Docker containers..."
 cd "$FORGE_DIR"
-docker compose down --remove-orphans 2>&1 | tail -1
 docker compose up -d pocketbase
 msg_ok "PocketBase started"
 
 msg_info "Waiting for PocketBase (max 60s)..."
+healthy=0
 for i in $(seq 1 30); do
   if curl -sf http://localhost:8090/api/health &>/dev/null 2>&1; then
     msg_ok "PocketBase is online"
+    healthy=1
     break
   fi
   sleep 2
 done
+[ "$healthy" -eq 1 ] || msg_error 'PocketBase did not become healthy within 60 seconds.'
 
 # ── Create superuser ───────────────────────────
 msg_info "Creating superuser..."
-docker compose exec -T pocketbase pocketbase superuser create "$PB_EMAIL" "$PB_PASS" 2>&1 | tail -1
-if [ ${PIPESTATUS[0]} -eq 0 ]; then
+if docker compose exec -T pocketbase pocketbase superuser create "$PB_EMAIL" "$PB_PASS" >/dev/null 2>&1; then
   msg_ok "Superuser created ($PB_EMAIL)"
 else
-  msg_ok "Superuser already exists"
+  msg_warn "Creation failed; the initializer will verify the existing credentials."
 fi
 
 # ── Init collections ───────────────────────────
 msg_info "Initializing collections..."
-docker compose up -d init
-sleep 5
-docker compose logs init 2>&1 | tail -12
-docker compose up -d show-ip
+docker compose run --rm init
 msg_ok "Collections ready"
 
 # ── Detect IP ──────────────────────────────────
@@ -127,7 +126,7 @@ detect_ip() {
   return 1
 }
 
-HOST_IP=$(detect_ip)
+HOST_IP=$(detect_ip) || HOST_IP=""
 if [ -z "$HOST_IP" ]; then
   HOST_IP="YOUR-SERVER-IP"
   msg_warn "Could not detect IP. Find it manually: ip addr (Linux) or ipconfig (Windows)"
@@ -147,7 +146,7 @@ echo -e "${BOLD}║${NC}     ${CYAN}http://${HOST_IP}:8090${NC}                 
 echo -e "${BOLD}║${NC}                                                          ${BOLD}║${NC}"
 echo -e "${BOLD}║${NC}     Admin Panel:                                         ${BOLD}║${NC}"
 echo -e "${BOLD}║${NC}     ${CYAN}http://${HOST_IP}:8090/_/${NC}                                     ${BOLD}║${NC}"
-echo -e "${BOLD}║${NC}     Login: ${PB_EMAIL} / ${PB_PASS}        ${BOLD}║${NC}"
+echo -e "${BOLD}║${NC}     Admin: ${PB_EMAIL} (password not displayed)        ${BOLD}║${NC}"
 echo -e "${BOLD}║${NC}                                                          ${BOLD}║${NC}"
 echo -e "${BOLD}║${NC}     ${YELLOW}CHANGE THE ADMIN PASSWORD IMMEDIATELY!${NC}               ${BOLD}║${NC}"
 echo -e "${BOLD}║${NC}                                                          ${BOLD}║${NC}"

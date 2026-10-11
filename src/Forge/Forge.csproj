@@ -64,20 +64,18 @@
 		<MauiFont Include="Resources\Fonts\*" />
 
 		<!-- Raw Assets (also remove the "Resources\Raw" prefix) -->
-		<MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
+		<MauiAsset Include="Resources\Raw\**" Exclude="Resources\Raw\**\*.env" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
 	</ItemGroup>
 
  	<ItemGroup>
  		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.9" />
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
-		<PackageReference Include="sqlite-net-pcl" Version="1.9.172" />
+		<PackageReference Include="sqlite-net-base" Version="1.9.172" />
+		<PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="3.0.5" />
 		<PackageReference Include="Microsoft.Extensions.Http" Version="10.0.9" />
  	</ItemGroup>
 
-	<!-- Build-time secrets injection: copy .env to Resources/Raw/forge.env -->
-	<Target Name="CopyEnvFile" BeforeTargets="BeforeBuild">
-		<Copy SourceFiles="..\..\.env" DestinationFiles="Resources\Raw\forge.env" Condition="Exists('..\..\.env')" SkipUnchangedFiles="true" />
-	</Target>
+	<!-- Configure the server in Setup/Settings; never package backend .env secrets. -->
 
 </Project>

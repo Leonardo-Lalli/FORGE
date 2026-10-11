@@ -1,5 +1,3 @@
-using CommunityToolkit.Mvvm.Messaging;
-using Forge.Messages;
 using Forge.Models;
 
 namespace Forge.Services;
@@ -7,226 +5,87 @@ namespace Forge.Services;
 public class AchievementService
 {
     private readonly DatabaseService db;
-    private List<AchievementState> states = new();
+    private readonly PocketBaseService pb;
+    private readonly SemaphoreSlim gate = new(1, 1);
 
-    public AchievementService(DatabaseService db)
+    public AchievementService(DatabaseService db, PocketBaseService pb)
     {
         this.db = db;
-        WeakReferenceMessenger.Default.Register<WorkoutSavedMessage>(this, (_, _) =>
-        {
-            _ = MainThread.InvokeOnMainThreadAsync(async () => await OnWorkoutSavedAsync());
-        });
+        this.pb = pb;
     }
 
     public async Task<List<(AchievementDefinition Def, AchievementState State)>> GetAllAsync()
     {
-        await LoadStatesAsync();
-        return AchievementsCatalog.All.Select(def =>
+        await gate.WaitAsync();
+        try
         {
-            var state = states.FirstOrDefault(s => s.Id == def.Id)
-                        ?? new AchievementState { Id = def.Id, MaxProgress = def.MaxProgress };
-            return (def, state);
-        }).ToList();
-    }
+            var userId = pb.CurrentUser?.Id;
+            if (string.IsNullOrEmpty(userId))
+                return AchievementsCatalog.All.Select(d => (d, new AchievementState { Id = d.Id, MaxProgress = d.MaxProgress })).ToList();
 
-    public async Task<int> GetUnlockedCountAsync()
-    {
-        await LoadStatesAsync();
-        return states.Count(s => s.IsUnlocked);
-    }
-
-    public async Task<double> GetProgressPercentAsync()
-    {
-        await LoadStatesAsync();
-        var total = AchievementsCatalog.All.Count;
-        if (total == 0) return 0;
-        return (double)states.Count(s => s.IsUnlocked) / total * 100;
-    }
-
-    public async Task<List<(AchievementDefinition Def, AchievementState State)>> GetRecentUnlocksAsync(int count = 3)
-    {
-        await LoadStatesAsync();
-        return AchievementsCatalog.All
-            .Select(def => (Def: def, State: states.FirstOrDefault(s => s.Id == def.Id)
-                ?? new AchievementState { Id = def.Id }))
-            .Where(x => x.State.IsUnlocked && !string.IsNullOrWhiteSpace(x.State.UnlockedAt))
-            .OrderByDescending(x => x.State.UnlockedAt)
-            .Take(count)
-            .ToList();
-    }
-
-    private async Task OnWorkoutSavedAsync()
-    {
-        await LoadStatesAsync();
-
-        var workouts = (await db.GetWorkoutsAsync()).Where(w => !w.IsDraft).ToList();
-        var totalWorkouts = workouts.Count;
-        var now = DateTime.UtcNow;
-
-        // Try to unlock achievements
-        IncrementAchievement("first_workout"); // Completa 1 allenamento
-        SetProgress("member", totalWorkouts); // Completa X allenamenti
-        SetProgress("veteran", totalWorkouts);
-        SetProgress("unstoppable", totalWorkouts); // 30 giorni (approssimato)
-
-        // Check "Comeback" - if last workout before this was >14 days ago
-        var ordered = workouts.OrderByDescending(w => DateTime.TryParse(w.Date, out var d) ? d : DateTime.MinValue).ToList();
-        if (ordered.Count >= 2)
-        {
-            var last = DateTime.TryParse(ordered[0].Date, out var d1) ? d1 : DateTime.MinValue;
-            var prev = DateTime.TryParse(ordered[1].Date, out var d2) ? d2 : DateTime.MinValue;
-            if ((last - prev).TotalDays >= 14)
-                UnlockAchievement("comeback");
-        }
-
-        // Volume achievements
-        var weeklyVolume = workouts
-            .Where(w => DateTime.TryParse(w.Date, out var dd) && dd >= now.AddDays(-7))
-            .Sum(w => w.Volume);
-        SetProgress("iron_marathon", (int)weeklyVolume);
-
-        var monthlyVolume = workouts
-            .Where(w => DateTime.TryParse(w.Date, out var dd) && dd >= now.AddDays(-30))
-            .Sum(w => w.Volume);
-        SetProgress("ton_week", (int)monthlyVolume);
-
-        // Single workout volume
-        var latest = ordered.FirstOrDefault();
-        if (latest != null)
-            SetProgress("max_weight", (int)latest.Volume);
-
-        // Check exercises variety in latest workout
-        if (!string.IsNullOrWhiteSpace(latest?.ExercisesJson))
-        {
-            try
+            var progress = AchievementEvaluator.Evaluate(await db.GetWorkoutsAsync(userId));
+            var saved = (await db.GetAchievementsAsync()).ToDictionary(s => s.Id);
+            var result = new List<(AchievementDefinition Def, AchievementState State)>();
+            foreach (var def in AchievementsCatalog.All)
             {
-                var exList = System.Text.Json.JsonSerializer.Deserialize<List<string>>(latest.ExercisesJson);
-                if (exList != null)
+                // Legacy unscoped states cannot be attributed to an account safely.
+                var key = $"{userId}:{def.Id}";
+                var state = saved.GetValueOrDefault(key) ?? new AchievementState { Id = key };
+                state.MaxProgress = def.MaxProgress;
+                state.Progress = Math.Clamp(Math.Max(state.Progress, progress.GetValueOrDefault(def.Id)), 0, def.MaxProgress);
+                if (state.Progress >= def.MaxProgress && !state.IsUnlocked)
                 {
-                    SetProgress("explorer", exList.Count);
-                    SetProgress("encyclopedia", exList.Distinct().Count());
+                    state.IsUnlocked = true;
+                    state.UnlockedAt = DateTime.UtcNow.ToString("o");
                 }
+                if (def.Id != "legend") await db.SaveAchievementAsync(state);
+                result.Add((def, state));
             }
-            catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[Achievement] Deserialize exList err: {ex.Message}"); }
+            var legend = result.Single(a => a.Def.Id == "legend").State;
+            if (result.Where(a => a.Def.Id != "legend").All(a => a.State.IsUnlocked))
+            {
+                legend.Progress = 1;
+                legend.IsUnlocked = true;
+                if (string.IsNullOrEmpty(legend.UnlockedAt)) legend.UnlockedAt = DateTime.UtcNow.ToString("o");
+                await db.SaveAchievementAsync(legend);
+            }
+            return result;
         }
-
-        // Time-based achievements
-        var localNow = now.ToLocalTime();
-        if (localNow.Hour < 7) UnlockAchievement("early_bird");
-        if (localNow.Hour >= 22) UnlockAchievement("night_owl");
-        if (localNow.Hour >= 12 && localNow.Hour < 14) UnlockAchievement("lunch_break");
-
-        // Weekend warrior
-        if (localNow.DayOfWeek == DayOfWeek.Saturday || localNow.DayOfWeek == DayOfWeek.Sunday)
-        {
-            var weekendWorkouts = workouts
-                .Where(w => DateTime.TryParse(w.Date, out var dd) && dd.ToLocalTime().DayOfWeek is DayOfWeek.Saturday or DayOfWeek.Sunday)
-                .Count();
-            SetProgress("weekend_warrior", weekendWorkouts);
-        }
-
-        // Duration achievements
-        var totalDuration = workouts.Sum(w => w.Duration);
-        SetProgress("milestone", totalDuration); // 100 hours = 6000 min (diviso per 60 dopo)
-
-        // Photo achievements
-        var withPhotos = workouts.Count(w => !string.IsNullOrWhiteSpace(w.PhotosJson) && w.PhotosJson != "[]");
-        SetProgress("narcissus", 1);
-        SetProgress("photographer", withPhotos);
-
-        // Birthday check
-        var registrationDate = workouts.Min(w => DateTime.TryParse(w.Date, out var d) ? d : DateTime.MaxValue);
-        if (registrationDate != DateTime.MaxValue && (now - registrationDate).TotalDays >= 365)
-            UnlockAchievement("anniversary");
-
-        await SaveStatesAsync();
-
-        // Check "Divinità del Fitness" - all others unlocked
-        var allDefs = AchievementsCatalog.All.Where(a => a.Id != "legend").ToList();
-        var allUnlocked = allDefs.All(def => states.Any(s => s.Id == def.Id && s.IsUnlocked));
-        if (allUnlocked)
-            UnlockAchievement("legend");
-
-        await SaveStatesAsync();
+        finally { gate.Release(); }
     }
 
-    public async Task CheckLikeAchievementsAsync()
-    {
-        await LoadStatesAsync();
-        // Like checks would go here when likes are tracked locally
-        await SaveStatesAsync();
-    }
+    public async Task<int> GetUnlockedCountAsync() => (await GetAllAsync()).Count(a => a.State.IsUnlocked);
+
+    // MAUI ProgressBar takes a ratio from zero to one.
+    public async Task<double> GetProgressPercentAsync() =>
+        AchievementsCatalog.All.Count == 0 ? 0 : (double)await GetUnlockedCountAsync() / AchievementsCatalog.All.Count;
+
+    public async Task<List<(AchievementDefinition Def, AchievementState State)>> GetRecentUnlocksAsync(int count = 3) =>
+        (await GetAllAsync()).Where(a => a.State.IsUnlocked).OrderByDescending(a => a.State.UnlockedAt).Take(count).ToList();
+
+    public async Task<TrainingProgress> GetTrainingProgressAsync() =>
+        TrainingProgress.FromWorkouts(string.IsNullOrEmpty(pb.CurrentUser?.Id) ? [] : await db.GetWorkoutsAsync(pb.CurrentUser.Id));
+
+    public Task CheckLikeAchievementsAsync() => Task.CompletedTask;
 
     public async Task CheckFollowAchievementsAsync(int followingCount)
     {
-        await LoadStatesAsync();
-        SetProgress("networker", followingCount);
-        await SaveStatesAsync();
-    }
-
-    private void IncrementAchievement(string id)
-    {
-        var state = states.FirstOrDefault(s => s.Id == id);
-        if (state == null)
-        {
-            state = new AchievementState { Id = id, MaxProgress = AchievementsCatalog.All.FirstOrDefault(a => a.Id == id)?.MaxProgress ?? 1 };
-            states.Add(state);
-        }
-        state.Progress++;
-        if (state.Progress >= state.MaxProgress && !state.IsUnlocked)
-        {
-            state.IsUnlocked = true;
-            state.UnlockedAt = DateTime.UtcNow.ToString("o");
-        }
-    }
-
-    private void SetProgress(string id, int progress)
-    {
-        var state = states.FirstOrDefault(s => s.Id == id);
-        if (state == null)
-        {
-            var def = AchievementsCatalog.All.FirstOrDefault(a => a.Id == id);
-            state = new AchievementState { Id = id, MaxProgress = def?.MaxProgress ?? 1 };
-            states.Add(state);
-        }
-        state.Progress = Math.Max(state.Progress, progress);
-        if (state.Progress >= state.MaxProgress && !state.IsUnlocked)
-        {
-            state.IsUnlocked = true;
-            state.UnlockedAt = DateTime.UtcNow.ToString("o");
-        }
-    }
-
-    private void UnlockAchievement(string id)
-    {
-        var state = states.FirstOrDefault(s => s.Id == id);
-        if (state == null)
-        {
-            var def = AchievementsCatalog.All.FirstOrDefault(a => a.Id == id);
-            state = new AchievementState { Id = id, MaxProgress = def?.MaxProgress ?? 1 };
-            states.Add(state);
-        }
-        if (!state.IsUnlocked)
-        {
-            state.IsUnlocked = true;
-            state.Progress = state.MaxProgress;
-            state.UnlockedAt = DateTime.UtcNow.ToString("o");
-        }
-    }
-
-    private async Task LoadStatesAsync()
-    {
-        if (states.Count > 0) return;
+        var userId = pb.CurrentUser?.Id;
+        if (string.IsNullOrEmpty(userId)) return;
+        await gate.WaitAsync();
         try
         {
-            states = await db.GetAchievementsAsync();
+            var key = $"{userId}:networker";
+            var state = (await db.GetAchievementsAsync()).FirstOrDefault(s => s.Id == key)
+                ?? new AchievementState { Id = key, MaxProgress = 5 };
+            state.Progress = Math.Clamp(Math.Max(state.Progress, followingCount), 0, 5);
+            if (state.Progress == 5 && !state.IsUnlocked)
+            {
+                state.IsUnlocked = true;
+                state.UnlockedAt = DateTime.UtcNow.ToString("o");
+            }
+            await db.SaveAchievementAsync(state);
         }
-        catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[Achievement] LoadStates err: {ex.Message}"); states = new(); }
-    }
-
-    private async Task SaveStatesAsync()
-    {
-        foreach (var s in states)
-            await db.SaveAchievementAsync(s);
+        finally { gate.Release(); }
     }
 }

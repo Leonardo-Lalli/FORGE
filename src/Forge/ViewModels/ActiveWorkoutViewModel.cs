@@ -630,16 +630,19 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
         };
         await planService.SavePlanAsync(plan);
 
-        await SaveToPocketBaseAsync(name);
-
         ShowNotification($"Scheda \"{name}\" salvata!");
         workoutSession.End();
         await Shell.Current.GoToAsync("..");
     }
 
-    private async Task SaveToPocketBaseAsync(string name)
+    private async Task<bool> SaveToPocketBaseAsync(string name)
     {
-        if (!pb.IsLoggedIn) return;
+        var user = pb.CurrentUser;
+        if (user == null)
+        {
+            ShowNotification("Accedi al tuo account prima di completare l'allenamento.");
+            return false;
+        }
 
         try
         {
@@ -659,50 +662,42 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
                 }).ToList()
             }).ToList();
 
-            var volume = Exercises.Sum(e => e.Sets.Sum(s => s.WeightKg * s.Reps));
+            var volume = Exercises.Sum(e => e.Sets.Where(s => s.IsCompleted).Sum(s => s.WeightKg * s.Reps));
             var duration = (int)(DateTime.Now - workoutStartTime).TotalMinutes;
-
-            var payload = new Dictionary<string, object>
-            {
-                ["user"] = pb.CurrentUser!.Id,
-                ["user_name"] = pb.CurrentUser.Name,
-                ["name"] = name,
-                ["date"] = DateTime.UtcNow.ToString("o"),
-                ["notes"] = WorkoutNotes ?? "",
-                ["exercises"] = Exercises.Select(e => e.ExerciseName).ToList(),
-                ["exercise_data"] = System.Text.Json.JsonSerializer.Serialize(exerciseData),
-                ["volume"] = volume,
-                ["duration"] = Math.Max(1, duration),
-                ["photos"] = WorkoutPhotos.ToList()
-            };
-            var (ok, err) = await pb.CreateRecordAsync("logged_workouts", payload);
-            System.Diagnostics.Debug.WriteLine($"[SaveWorkout] PB result: ok={ok} err={err}");
 
             var localWorkout = new Models.LocalWorkout
             {
-                Id = Guid.NewGuid().ToString(),
-                UserId = pb.CurrentUser!.Id,
+                Id = Guid.NewGuid().ToString("N")[..15],
+                UserId = user.Id,
                 Name = name,
-                Date = DateTime.UtcNow.ToString("o"),
+                Date = workoutStartTime.ToUniversalTime().ToString("o"),
                 ExercisesJson = System.Text.Json.JsonSerializer.Serialize(Exercises.Select(e => e.ExerciseName).ToList()),
                 Volume = volume,
                 Duration = Math.Max(1, duration),
                 Notes = WorkoutNotes ?? "",
                 ExerciseDataJson = System.Text.Json.JsonSerializer.Serialize(exerciseData),
-                UserName = pb.CurrentUser.Name,
+                UserName = user.Name,
                 PhotosJson = System.Text.Json.JsonSerializer.Serialize(WorkoutPhotos.ToList()),
-                PendingSync = !ok
+                PendingSync = true
             };
+            // Durable local save is the success boundary, before any network request.
             await db.SaveWorkoutAsync(localWorkout);
 
             WeakReferenceMessenger.Default.Send(new WorkoutSavedMessage());
 
-            if (!ok)
-                ShowNotification($"Errore salvataggio: {err}");
+            try
+            {
+                if (connectivity.IsOnline && await pb.UploadWorkoutAsync(localWorkout))
+                    await db.MarkSyncedAsync(localWorkout.Id);
+            }
+            catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[SaveWorkout Sync] {ex.GetType().Name}"); }
+            return true;
         }
         catch (Exception ex)
         {
             System.Diagnostics.Debug.WriteLine($"[SaveWorkout] PB ex: {ex.Message}");
+            ShowNotification("Salvataggio locale non riuscito. Riprova: l'allenamento è ancora aperto.");
+            return false;
         }
     }
 
@@ -778,7 +773,7 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
 
     private async Task<List<LocalWorkout>> GetDraftsAsync()
     {
-        var all = await db.GetWorkoutsAsync();
+        var all = await db.GetWorkoutsAsync(pb.CurrentUser?.Id ?? "");
         return all.Where(w => w.IsDraft).ToList();
     }
 
@@ -853,13 +848,12 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
         elapsedCts?.Cancel();
         restCts?.Cancel();
 
-        // Delete draft before saving final
-        var drafts = await GetDraftsAsync();
-        foreach (var d in drafts) await db.DeleteWorkoutAsync(d.Id);
-
         if (Exercises.Count > 0 && IsTimerRunning)
         {
-            await SaveToPocketBaseAsync(PlanName);
+            if (!await SaveToPocketBaseAsync(PlanName)) return;
+            // Remove recovery data only after the finished workout is durable.
+            var drafts = await GetDraftsAsync();
+            foreach (var d in drafts) await db.DeleteWorkoutAsync(d.Id);
         }
 
         workoutSession.End();

@@ -39,6 +39,7 @@ public class ThemeService
         if (themeMode < 0 || themeMode > 2) themeMode = 1;
 
         ApplyTheme(IsDarkMode);
+        Application.Current!.UserAppTheme = themeMode == 2 ? AppTheme.Unspecified : IsDarkMode ? AppTheme.Dark : AppTheme.Light;
 
         Application.Current!.RequestedThemeChanged += (_, _) =>
         {
