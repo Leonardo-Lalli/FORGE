@@ -14,7 +14,7 @@ export function B2BPageContent() {
         <div className="grid items-center gap-10 lg:grid-cols-[1.1fr_0.9fr]">
           <div>
             <p className="mb-5 text-xs font-semibold uppercase tracking-widest text-forge-cyan">{b.eyebrow}</p>
-            <h1 className="mb-6 text-balance text-5xl font-extrabold leading-tight tracking-tight sm:text-6xl">{first}<br /><span className="text-forge-cyan">{second}</span></h1>
+            <h1 className="mb-6 text-balance text-4xl font-extrabold leading-tight tracking-tight sm:text-6xl">{first}<br /><span className="text-forge-cyan">{second}</span></h1>
             <p className="mb-6 max-w-[600px] text-lg leading-relaxed text-forge-muted">{b.body}</p>
             <span className="inline-block rounded-full border border-forge-cyan-dim bg-forge-cyan/[0.06] px-3 py-1.5 text-xs font-medium text-forge-cyan">{b.status}</span>
           </div>

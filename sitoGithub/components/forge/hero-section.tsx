@@ -17,7 +17,7 @@ export function HeroSection() {
             <span className="size-1.5 rounded-full bg-forge-cyan" aria-hidden="true" />
             {t.hero.badge}
           </p>
-          <h1 className="mb-6 text-balance text-[clamp(42px,6vw,72px)] font-extrabold leading-[1.06] tracking-[-0.04em]">
+          <h1 className="mb-6 text-balance text-[clamp(34px,6vw,72px)] font-extrabold leading-[1.06] tracking-[-0.04em]">
             {first}<br /><span className="text-forge-cyan">{second}</span>
           </h1>
           <p className="mb-8 max-w-[530px] text-pretty text-lg leading-relaxed text-forge-muted">{t.hero.subtitle}</p>
