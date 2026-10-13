@@ -246,82 +246,74 @@ export const en: Dictionary = {
   "roadmapPage": {
     "eyebrow": "// Roadmap",
     "title": "Where FORGE is heading.",
-    "subtitle": "All project goals, without future dates or versions. Priorities may change with feedback; dates and versions will appear only after release.",
-    "plannedTitle": "Goals to develop and improve",
-    "plannedNote": "Some goals extend existing features. Ideas need evaluation and are not delivery promises.",
-    "groups": [
+    "subtitle": "The next releases, phase by phase. A public timeline of the features we want to build — from usability improvements to the B2B module for gyms.",
+    "legend": {
+      "difficulty": "Difficulty"
+    },
+    "difficulty": {
+      "low": "Low",
+      "med": "Medium",
+      "high": "High",
+      "vhigh": "Very high"
+    },
+    "releases": [
       {
-        "theme": "Stability and privacy",
+        "theme": "Stability & Privacy",
         "features": [
           {
-            "name": "Reliable access and saves",
-            "desc": "Improve login, avatars, drafts, recovery, per-account plans and synchronization when offline."
+            "name": "Reliable access",
+            "desc": "Public and personal servers; verified avatars and session recovery",
+            "diff": "med"
           },
           {
-            "name": "Verified server privacy",
-            "desc": "Verify public, private and mutual-friend workouts and connections, account deletion and data isolation."
+            "name": "Server privacy",
+            "desc": "Public, private or mutual-friend workouts; tested API rules",
+            "diff": "high"
           },
           {
-            "name": "Transparent catalog",
-            "desc": "Check duplicates, written instructions, reachable GIFs and shared caching with real counts."
+            "name": "Account-owned plans",
+            "desc": "Unlimited personal plans; examples once; persistent notes and rest",
+            "diff": "med"
           },
           {
-            "name": "Complete backup and restore",
-            "desc": "Preserve plans, notes, photos, sets and weights: the current CSV is not a complete backup."
+            "name": "Retroactive achievements",
+            "desc": "History recalculation and three selected profile badges",
+            "diff": "med"
           },
           {
-            "name": "Protected origin",
-            "desc": "Consider a proxy or tunnel with a dedicated domain to keep the home IP out of public DNS."
+            "name": "Regression checks",
+            "desc": "Correct volume chart, Android builds and automated tests",
+            "diff": "med"
           }
         ]
       },
       {
-        "theme": "QoL & Usability",
+        "theme": "Verified workout flow",
         "features": [
           {
-            "name": "Quick weight increment (+/-)",
-            "desc": "+2.5kg buttons next to the weight field. Press-and-hold = +5kg"
+            "name": "Per-exercise rest",
+            "desc": "0–5 minute selection stored in plans",
+            "diff": "med"
           },
           {
-            "name": "Copy previous set",
-            "desc": "A \"Duplicate\" button that clones kg×reps into the next set"
+            "name": "Previous performance",
+            "desc": "Editable weight and rep suggestions from history",
+            "diff": "med"
           },
           {
-            "name": "1RM calculator",
-            "desc": "Tap a top lift → shows the estimated max (Epley formula)"
+            "name": "Offline sync",
+            "desc": "Device validation of saves, drafts and account changes",
+            "diff": "high"
           },
           {
-            "name": "Voice timer",
-            "desc": "Android TTS: \"Set complete, 90 seconds rest\""
+            "name": "Exercise catalog",
+            "desc": "Real counts, GIFs, instructions and complete pagination",
+            "diff": "med"
           },
           {
-            "name": "Improved exercise search filter",
-            "desc": "Muscle and equipment filters exist: improve catalog coverage, pagination and result consistency."
-          }
-        ]
-      },
-      {
-        "theme": "Stable Release",
-        "features": [
-          {
-            "name": "FCM push notifications",
-            "desc": "Client and worker exist: verify background delivery for follows, likes and requests."
-          },
-          {
-            "name": "Full localization",
-            "desc": ".resx files for IT/EN/ES/DE/ZH — all strings translated"
-          },
-          {
-            "name": "Body tracking",
-            "desc": "Log body weight, measurements, %BF. Chart over time"
-          },
-          {
-            "name": "Weekly leaderboard",
-            "desc": "Volume ranking among friends, reset every Monday"
-          },
-          {
-            "name": "Auto-build APK in Releases",
-            "desc": "A manual signed workflow exists: validate CI packaging and consider release automation."
+            "name": "Android release",
+            "desc": "Reproducible APK build with release validation",
+            "diff": "med"
           }
         ]
       },
@@ -329,206 +321,206 @@ export const en: Dictionary = {
         "theme": "Social & Community",
         "features": [
           {
-            "name": "Workout comments",
-            "desc": "Friends can comment on your workouts in the feed"
+            "name": "Profiles and follows",
+            "desc": "Searchable profiles and follower lists; friends follow each other",
+            "diff": "med"
           },
           {
-            "name": "1-vs-1 challenges",
-            "desc": "\"Challenge Marco on total volume this week\" → notification + ranking"
+            "name": "Comments and notifications",
+            "desc": "Comments and push after privacy is stable",
+            "diff": "high"
           },
           {
-            "name": "Workout sharing",
-            "desc": "Android share sheet: a summary image of your workout"
+            "name": "Challenges and leaderboards",
+            "desc": "Friend challenges with consent",
+            "diff": "med"
           },
           {
-            "name": "Seasonal badges",
-            "desc": "Time-limited achievements (e.g. \"Train on Christmas\")"
-          },
-          {
-            "name": "Workout stories",
-            "desc": "Extend public workouts and photos into temporary stories while respecting visibility settings."
+            "name": "Sharing",
+            "desc": "Share summaries without exposing private content",
+            "diff": "med"
           }
         ]
       },
       {
-        "theme": "Health & Wear OS",
+        "theme": "Analytics & Localization",
         "features": [
           {
-            "name": "Android widget",
-            "desc": "\"START WORKOUT\" right from your phone home screen"
+            "name": "Advanced analytics",
+            "desc": "1RM, muscle volume, calendar and history",
+            "diff": "med"
           },
           {
-            "name": "Wear OS companion",
-            "desc": "Rest timer + set tracking from your smartwatch"
+            "name": "Body tracking",
+            "desc": "Measurements with privacy controls",
+            "diff": "high"
           },
           {
-            "name": "Health integrations",
-            "desc": "Evaluate supported health APIs for authorized workout and health data synchronization."
+            "name": "Languages and accessibility",
+            "desc": "Full translations and contrast/font size checks",
+            "diff": "high"
           },
           {
-            "name": "Heart rate display",
-            "desc": "Show heart rate during a workout (if supported)"
-          },
-          {
-            "name": "Step counter",
-            "desc": "Daily step widget in the dashboard"
+            "name": "Reports and backup",
+            "desc": "PDF export and tested backup restoration",
+            "diff": "med"
           }
         ]
       },
       {
-        "theme": "Advanced Features",
+        "theme": "Health & Wearables",
         "features": [
           {
-            "name": "PDF report",
-            "desc": "Export a workout report with charts, tables, and photos"
+            "name": "Widgets and Wear OS",
+            "desc": "Quick access and workout companion",
+            "diff": "vhigh"
           },
           {
-            "name": "Preset workouts",
-            "desc": "Expand existing examples with Push/Pull/Legs and Upper/Lower templates; deleted examples must stay deleted."
+            "name": "Health integration",
+            "desc": "Evaluate supported APIs with explicit permission",
+            "diff": "high"
           },
           {
-            "name": "Progressive overload tracker",
-            "desc": "The app suggests how much to increase from the previous session"
-          },
-          {
-            "name": "Advanced charts",
-            "desc": "Volume per muscle over time, PR timeline, weekly frequency"
-          },
-          {
-            "name": "Edit workout after saving",
-            "desc": "Fix a wrong weight after you've saved"
-          },
-          {
-            "name": "Search workouts in history",
-            "desc": "Search by exercise name, date, volume"
+            "name": "Sensors",
+            "desc": "Heart rate and steps on supported devices",
+            "diff": "high"
           }
         ]
       },
       {
-        "theme": "Platform & Infrastructure",
+        "theme": "Infrastructure & B2B",
         "features": [
           {
-            "name": "Google Play Store",
-            "desc": "Store distribution using the existing stable signing key, after the required checks."
+            "name": "Protected origin",
+            "desc": "Dedicated-domain proxy or tunnel; home IP out of public DNS",
+            "diff": "high"
           },
           {
-            "name": "Automatic backup",
-            "desc": "Weekly automatic data export to Google Drive"
+            "name": "Distribution",
+            "desc": "Play Store and production signing keys",
+            "diff": "med"
           },
           {
-            "name": "SQLite encryption",
-            "desc": "Database encrypted with SQLCipher"
+            "name": "Dashboard and API",
+            "desc": "Web dashboard, documented API and server profiles",
+            "diff": "high"
           },
           {
-            "name": "Multi-server switch",
-            "desc": "Multiple profiles: switch between different self-hosted servers"
-          },
-          {
-            "name": "Web dashboard",
-            "desc": "Web interface to view your data from a PC"
-          },
-          {
-            "name": "Public REST API",
-            "desc": "Documented API for third-party integrations"
-          },
-          {
-            "name": "Fully local mode",
-            "desc": "Train without an account or server, with optional cloud connection and synchronization."
-          },
-          {
-            "name": "In-app updates",
-            "desc": "Download and start installing signed updates without finding the APK manually."
-          }
-        ]
-      },
-      {
-        "theme": "Gyms and trainers",
-        "features": [
-          {
-            "name": "Trainer Dashboard",
-            "desc": "A web interface where personal trainers assign plans and protocols to members."
-          },
-          {
-            "name": "Local TV Leaderboard",
-            "desc": "Project the ranking of PRs lifted in real time onto a gym screen."
-          },
-          {
-            "name": "QR Code Onboarding",
-            "desc": "Scan the QR at the gym and the app configures itself with the local server."
-          },
-          {
-            "name": "Multi-tenant",
-            "desc": "Multiple gyms on the same server with full data isolation."
-          }
-        ]
-      },
-      {
-        "theme": "Ideas and experiments",
-        "features": [
-          {
-            "name": "AI form check",
-            "desc": "Posture analysis via camera during an exercise"
-          },
-          {
-            "name": "Voice input",
-            "desc": "\"A hundred kilos, eight reps\" instead of typing"
-          },
-          {
-            "name": "Social login",
-            "desc": "Google/Apple sign-in alongside email/password"
-          },
-          {
-            "name": "Gym maps",
-            "desc": "Map of nearby gyms with community reviews"
-          },
-          {
-            "name": "Plan marketplace",
-            "desc": "Users share and sell workout plans"
-          },
-          {
-            "name": "Nutrition tracker",
-            "desc": "Calories and macros alongside workout tracking"
-          },
-          {
-            "name": "Apple Watch",
-            "desc": "iOS support + watchOS companion"
-          },
-          {
-            "name": "Gamification 2.0",
-            "desc": "Levels and XP exist already: consider competitive seasons and additional rewards."
-          },
-          {
-            "name": "AI coaching",
-            "desc": "Automatic suggestions based on historical data"
-          },
-          {
-            "name": "Exercise videos",
-            "desc": "Embedded YouTube videos alongside the GIFs"
-          },
-          {
-            "name": "Per-set personal record rewards",
-            "desc": "Medals for personal weight, volume or repetition records: a future idea, not implemented."
+            "name": "Gyms",
+            "desc": "Trainer dashboard, QR onboarding and tenant isolation",
+            "diff": "vhigh"
           }
         ]
       }
     ],
-    "completedTitle": "Already released",
-    "completedNote": "Features included in the beta; checks and limitations are documented in the README.",
-    "completed": [
+    "phasesEyebrow": "// Summary",
+    "phasesTitle": "The three pillars ahead",
+    "phases": [
       {
-        "version": "0.8.5 beta",
-        "date": "October 13, 2026",
-        "features": [
-          "Personal plans, one-time examples and automatic notes for exercises already in the plan.",
-          "Per-exercise rest timers, timer notifications and previous-session values.",
-          "Execution tips that automatically cycle through available steps.",
-          "History-based retroactive achievements, XP levels and profile badges.",
-          "Profiles, follows, likes, photos and invitations on the same server.",
-          "Workout and connection visibility and account deletion with an updated backend.",
-          "Calendar, volume and exercise progression; stable APK signing."
-        ]
+        "tag": "Phase 1",
+        "title": "Stability & Privacy",
+        "body": "Public and personal servers; verified avatars and session recovery; Public, private or mutual-friend workouts; tested API rules; Unlimited personal plans; examples once; persistent notes and rest"
+      },
+      {
+        "tag": "Phase 2",
+        "title": "Verified workout flow",
+        "body": "0–5 minute selection stored in plans; Editable weight and rep suggestions from history; Device validation of saves, drafts and account changes"
+      },
+      {
+        "tag": "Phase 3",
+        "title": "Social & Community",
+        "body": "Searchable profiles and follower lists; friends follow each other; Comments and push after privacy is stable; Friend challenges with consent"
       }
-    ]
+    ],
+    "b2b": {
+      "eyebrow": "// FORGE Local Business",
+      "title": "A B2B module for gyms",
+      "body": "The self-hosted architecture lets a gym owner launch the backend on a local mini-PC and create a private management and social system for the whole facility.",
+      "advantages": [
+        {
+          "title": "Zero SaaS costs",
+          "desc": "No subscriptions or per-seat licenses. From 50 to 5,000 members, software cost is €0/month."
+        },
+        {
+          "title": "Local community",
+          "desc": "People training in the same room see each other's PRs in real time, with the gym's internal rankings."
+        },
+        {
+          "title": "Local data control",
+          "desc": "Local hosting helps control data. Privacy and compliance also depend on access, consent, backups and server operations."
+        },
+        {
+          "title": "Offline / LAN First",
+          "desc": "If the internet drops, the app keeps working over local Wi-Fi. Local access depends on the gym network and server."
+        }
+      ],
+      "future": [
+        {
+          "title": "Trainer Dashboard",
+          "desc": "A web interface where personal trainers assign plans and protocols to members."
+        },
+        {
+          "title": "Local TV Leaderboard",
+          "desc": "Project the ranking of PRs lifted in real time onto a gym screen."
+        },
+        {
+          "title": "QR Code Onboarding",
+          "desc": "Scan the QR at the gym and the app configures itself with the local server."
+        },
+        {
+          "title": "Multi-tenant",
+          "desc": "Multiple gyms on the same server with full data isolation."
+        }
+      ],
+      "futureTitle": "Future B2B developments"
+    },
+    "backlog": {
+      "eyebrow": "// Backlog",
+      "title": "Ideas & experiments",
+      "items": [
+        {
+          "name": "AI form check",
+          "desc": "Posture analysis via camera during an exercise"
+        },
+        {
+          "name": "Voice input",
+          "desc": "\"A hundred kilos, eight reps\" instead of typing"
+        },
+        {
+          "name": "Social login",
+          "desc": "Google/Apple sign-in alongside email/password"
+        },
+        {
+          "name": "Gym maps",
+          "desc": "Map of nearby gyms with community reviews"
+        },
+        {
+          "name": "Plan marketplace",
+          "desc": "Users share and sell workout plans"
+        },
+        {
+          "name": "Nutrition tracker",
+          "desc": "Calories and macros alongside workout tracking"
+        },
+        {
+          "name": "Apple Watch",
+          "desc": "iOS support + watchOS companion"
+        },
+        {
+          "name": "Gamification 2.0",
+          "desc": "Levels, XP, competitive seasons"
+        },
+        {
+          "name": "AI coaching",
+          "desc": "Automatic suggestions based on historical data"
+        },
+        {
+          "name": "Exercise videos",
+          "desc": "Embedded YouTube videos alongside the GIFs"
+        }
+      ]
+    },
+    "closing": "Build your body. Challenge your friends. Forge your legend."
   },
   "featureDetails": [
     {
