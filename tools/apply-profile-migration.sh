@@ -30,13 +30,14 @@ for folder in pb_migrations pb_hooks; do
     mkdir -p "$pb_root/$folder"
 done
 cp -- "$script_root"/pocketbase/pb_migrations/*.js "$pb_root/pb_migrations/"
-cp -- "$script_root"/pocketbase/pb_hooks/*.pb.js "$pb_root/pb_hooks/"
+cp -- "$script_root"/pocketbase/pb_hooks/*.js "$pb_root/pb_hooks/"
 "$pb_root/pocketbase" migrate up --dir="$pb_data" --migrationsDir="$pb_root/pb_migrations" --hooksDir="$pb_root/pb_hooks"
 applied=1
 # Preserve the existing service user's ability to read the new files.
-chown --reference="$pb_data" "$pb_root"/pb_migrations/*forge*.js "$pb_root"/pb_hooks/forge*.pb.js
+chown --reference="$pb_data" "$pb_root"/pb_migrations/*forge*.js "$pb_root"/pb_hooks/forge*.js
 echo "Migration applied. Backup: $backup"
 echo 'All accounts without a visibility choice now start PRIVATE. Choose Public or Friends in the app.'
 echo 'Friends means an accepted follow in BOTH directions. Nginx and router settings were not changed.'
 echo 'Shared exercise metadata/URL cache installed. Restart the app to populate it; GIF files remain on the provider.'
 echo 'Follower/following visibility is separate and defaults PRIVATE. Change it in Edit account.'
+echo 'Account deletion, all profile badges and notification queue installed. Remote push stays inactive until Firebase and its worker are configured.'

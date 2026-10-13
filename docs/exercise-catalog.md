@@ -19,3 +19,7 @@ Corretto un problema di paginazione: il provider usa `after`, mentre `cursor` ve
 Il numero dei record effettivi del PocketBase pubblico non è ricavabile dall’elenco anonimo: le regole richiedono autenticazione. Per il conteggio reale nel container usare `python3 tools/audit-pocketbase-exercises.py /opt/pocketbase/pb_data/data.db`. Il controllo è di sola lettura e non stampa dati account o credenziali.
 
 Con 1.500 esercizi il problema prioritario è qualità, ricerca, traduzione e disponibilità offline. [wger](https://github.com/wger-project/wger) offre API REST e contenuti comunitari, con licenze dei dati da rispettare per ciascuna voce: valutabile come integrazione mirata, senza promettere GIF per ogni esercizio. Un’API FORGE propria può aggregare contenuti verificati e gestire cache/versioni, ma non crea automaticamente materiale didattico corretto o diritti di utilizzo. Non è stato sostituito il provider in questa iterazione.
+
+## Conteggio LXC comunicato dal proprietario
+
+Ultimo snapshot dopo import/cache: 2.305 record, 1.500 con URL GIF e istruzioni, 805 senza entrambi, 1.325 nomi distinti, database 3,6 MiB. I nomi distinti non equivalgono al numero di esercizi: varianti possono condividere il nome. Il catalogo canonico del provider contiene 1.500 identificatori; i 805 record precedenti non sono stati cancellati. Il conteggio verifica i campi, non la raggiungibilità di ogni GIF.

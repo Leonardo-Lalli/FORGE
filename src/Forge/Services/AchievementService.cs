@@ -6,12 +6,16 @@ public class AchievementService
 {
     private readonly DatabaseService db;
     private readonly PocketBaseService pb;
+    private readonly NotificationService? notifications;
     private readonly SemaphoreSlim gate = new(1, 1);
+    private string lastImportedUser = "";
+    private DateTime lastImport;
 
-    public AchievementService(DatabaseService db, PocketBaseService pb)
+    public AchievementService(DatabaseService db, PocketBaseService pb, NotificationService? notifications = null)
     {
         this.db = db;
         this.pb = pb;
+        this.notifications = notifications;
     }
 
     public async Task<List<(AchievementDefinition Def, AchievementState State)>> GetAllAsync()
@@ -50,6 +54,22 @@ public class AchievementService
                 if (string.IsNullOrEmpty(legend.UnlockedAt)) legend.UnlockedAt = DateTime.UtcNow.ToString("o");
                 await db.SaveAchievementAsync(legend);
             }
+            var announce = result.Where(a => a.State.IsUnlocked && !a.State.Notified).ToList();
+            if (announce.Count > 0 && Preferences.Get("notifications_enabled", false))
+            {
+                try
+                {
+                    var delivered = false;
+                    if (await pb.HasPushTokenAsync()) delivered = await pb.QueueAchievementNotificationsAsync(announce.Select(a => a.Def.Id));
+                    else if (notifications != null)
+                    {
+                        notifications.Show("Achievement sbloccati", announce.Count == 1 ? announce[0].Def.Name : $"Hai sbloccato {announce.Count} achievement.");
+                        delivered = true;
+                    }
+                    if (delivered) foreach (var item in announce) { item.State.Notified = true; await db.SaveAchievementAsync(item.State); }
+                }
+                catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException) { }
+            }
             return result;
         }
         finally { gate.Release(); }
@@ -65,10 +85,11 @@ public class AchievementService
         (await GetAllAsync()).Where(a => a.State.IsUnlocked).OrderByDescending(a => a.State.UnlockedAt).Take(count).ToList();
 
     public async Task<TrainingProgress> GetTrainingProgressAsync() =>
-        TrainingProgress.FromWorkouts(string.IsNullOrEmpty(pb.CurrentUser?.Id) ? [] : await db.GetWorkoutsAsync(pb.CurrentUser.Id));
+        TrainingProgress.FromAchievements(await GetUnlockedCountAsync());
 
     private async Task ImportOwnHistoryAsync(string userId)
     {
+        if (lastImportedUser == userId && DateTime.UtcNow - lastImport < TimeSpan.FromSeconds(30)) return;
         try
         {
             var local = (await db.GetWorkoutsAsync(userId)).ToDictionary(w => w.Id);
@@ -85,6 +106,8 @@ public class AchievementService
                     UserName = w.UserName, LastSynced = DateTime.UtcNow
                 });
             }
+            lastImportedUser = userId;
+            lastImport = DateTime.UtcNow;
         }
         catch (Exception ex) when (ex is HttpRequestException or System.Text.Json.JsonException or TaskCanceledException)
         { System.Diagnostics.Debug.WriteLine($"[Achievements History] {ex.GetType().Name}"); }

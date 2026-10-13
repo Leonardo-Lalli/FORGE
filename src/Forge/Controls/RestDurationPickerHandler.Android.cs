@@ -5,6 +5,19 @@ using Microsoft.Maui.Platform;
 
 namespace Forge.Controls;
 
+// Use the full available width: NumberPicker's intrinsic width otherwise compresses
+// both weighted wheels to the left while the MAUI headings span the whole panel.
+internal class RestWheelsLayout(global::Android.Content.Context context) : LinearLayout(context)
+{
+    protected override void OnMeasure(int widthMeasureSpec, int heightMeasureSpec)
+    {
+        var width = global::Android.Views.View.MeasureSpec.GetSize(widthMeasureSpec);
+        if (width > 0 && global::Android.Views.View.MeasureSpec.GetMode(widthMeasureSpec) != global::Android.Views.MeasureSpecMode.Unspecified)
+            widthMeasureSpec = global::Android.Views.View.MeasureSpec.MakeMeasureSpec(width, global::Android.Views.MeasureSpecMode.Exactly);
+        base.OnMeasure(widthMeasureSpec, heightMeasureSpec);
+    }
+}
+
 public class RestDurationPickerHandler : ViewHandler<RestDurationPicker, LinearLayout>
 {
     private NumberPicker minutes = null!;
@@ -19,7 +32,7 @@ public class RestDurationPickerHandler : ViewHandler<RestDurationPicker, LinearL
     public RestDurationPickerHandler() : base(RestMapper) { }
     protected override LinearLayout CreatePlatformView()
     {
-        var layout = new LinearLayout(Context) { Orientation = Orientation.Horizontal };
+        var layout = new RestWheelsLayout(Context) { Orientation = Orientation.Horizontal };
         minutes = new NumberPicker(Context) { MinValue = 0, MaxValue = 5, WrapSelectorWheel = false };
         seconds = new NumberPicker(Context) { MinValue = 0, MaxValue = 59, WrapSelectorWheel = false };
         seconds.SetDisplayedValues(Enumerable.Range(0, 60).Select(n => n.ToString("00")).ToArray());

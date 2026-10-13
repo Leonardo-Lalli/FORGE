@@ -4,7 +4,7 @@
   FORGE — Self-hosted Workout Tracker setup (Windows / macOS / Linux)
 .DESCRIPTION
   Clona la repo, avvia PocketBase con Docker, crea superuser e collezioni,
-  e mostra l'IP a cui collegare l'app. Zero configurazione manuale.
+  e mostra l'IP a cui collegare l'app. Credenziali, versione PocketBase e reverse proxy da configurare esplicitamente.
 .EXAMPLE
   Invoke-Expression (Invoke-WebRequest -Uri https://raw.githubusercontent.com/Leonardo-Lalli/FORGE/main/tools/setup.ps1).Content
   # oppure
@@ -19,7 +19,7 @@ if ([string]::IsNullOrWhiteSpace($env:PB_ADMIN_EMAIL) -or
     throw 'Imposta PB_ADMIN_EMAIL e una PB_ADMIN_PASSWORD unica prima di eseguire il setup.'
 }
 
-$forgeVersion = "v0.8.0-beta"
+$forgeVersion = "beta - repository checkout"
 
 Write-Host ""
 Write-Host "   ███████╗ ██████╗ ██████╗  ██████╗ ███████╗" -ForegroundColor Cyan
@@ -32,8 +32,8 @@ Write-Host ""
 Write-Host "           Il diario di allenamento sociale" -ForegroundColor White
 Write-Host "           ${forgeVersion} — Self-Hosted Setup" -ForegroundColor DarkGray
 Write-Host ""
-Write-Host "  PocketBase ~25 MB RAM | ~30 MB disco | Docker"  -ForegroundColor DarkGray
-Write-Host "  1.500+ esercizi | Feed social | Achievement | Offline" -ForegroundColor DarkGray
+Write-Host "  PocketBase | Docker | Risorse dipendenti da utenti e foto"  -ForegroundColor DarkGray
+Write-Host "  Catalogo esercizi | Community su questo server | Achievement" -ForegroundColor DarkGray
 Write-Host ""
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host ""
@@ -45,17 +45,19 @@ $repoUrl = "https://github.com/Leonardo-Lalli/FORGE.git"
 if (Test-Path $repoDir) {
     Write-Host "[INFO]  Directory $repoDir esiste, aggiorno..." -ForegroundColor Yellow
     Set-Location $repoDir
-    git pull --ff-only 2>$null | Out-Null
+    git pull --ff-only
+    if ($LASTEXITCODE -ne 0) { throw 'Aggiornamento repository fallito.' }
 } else {
     Write-Host "[INFO]  Clonando $repoUrl..." -ForegroundColor Yellow
-    git clone $repoUrl $repoDir 2>$null | Out-Null
+    git clone $repoUrl $repoDir
+    if ($LASTEXITCODE -ne 0) { throw 'Clone repository fallito.' }
     Set-Location $repoDir
 }
 Write-Host "[ OK ]  Repository pronta" -ForegroundColor Green
 
 # --- Start PocketBase ---
 Write-Host "[INFO]  Avvio PocketBase..." -ForegroundColor Yellow
-docker compose up -d pocketbase 2>$null | Out-Null
+docker compose up -d --build pocketbase 2>$null | Out-Null
 if ($LASTEXITCODE -ne 0) { throw 'Avvio PocketBase fallito.' }
 
 Write-Host "[INFO]  Attesa PocketBase..." -ForegroundColor Yellow
@@ -73,7 +75,7 @@ Write-Host "[ OK ]  PocketBase e online" -ForegroundColor Green
 
 # --- Create superuser ---
 Write-Host "[INFO]  Creazione superuser..." -ForegroundColor Yellow
-$result = docker compose exec -T pocketbase pocketbase superuser create $env:PB_ADMIN_EMAIL $env:PB_ADMIN_PASSWORD 2>&1
+$result = docker compose exec -T pocketbase pocketbase superuser create $env:PB_ADMIN_EMAIL $env:PB_ADMIN_PASSWORD --dir=/pb_data 2>&1
 if ($LASTEXITCODE -eq 0) {
     Write-Host "[ OK ]  Superuser creato" -ForegroundColor Green
 } else {
@@ -84,7 +86,9 @@ if ($LASTEXITCODE -eq 0) {
 Write-Host "[INFO]  Creazione collezioni..." -ForegroundColor Yellow
 docker compose run --rm init
 if ($LASTEXITCODE -ne 0) { throw 'Inizializzazione fallita. Nessuna conferma di collezioni pronte.' }
-Write-Host "[ OK ]  Collezioni pronte" -ForegroundColor Green
+Write-Host "[ OK ]  Collezioni iniziali pronte" -ForegroundColor Green
+Write-Host "Prima di usare FORGE applica le migrazioni con backup: sudo bash tools/apply-docker-profile-migration.sh (Linux/WSL)." -ForegroundColor Yellow
+Write-Host "L’installazione non è completa senza hook e migrazioni. Vedi docs/self-hosting.md." -ForegroundColor Yellow
 
 # --- Detect host IP ---
 Write-Host "[INFO]  Rilevamento IP..." -ForegroundColor Yellow
@@ -101,7 +105,7 @@ Write-Host "[ OK ]  IP server: $hostIp" -ForegroundColor Green
 # --- Summary ---
 Write-Host ""
 Write-Host "========================================" -ForegroundColor Cyan
-Write-Host "  FORGE e online!" -ForegroundColor Green
+Write-Host "  PocketBase avviato; applica le migrazioni per completare FORGE." -ForegroundColor Green
 Write-Host ""
 Write-Host "  Nell'app FORGE, vai su Impostazioni > URL PocketBase" -ForegroundColor White
 Write-Host "  e incolla questo indirizzo:" -ForegroundColor White
@@ -111,6 +115,6 @@ Write-Host ""
 Write-Host "  Admin panel: http://localhost:8090/_/" -ForegroundColor DarkGray
 Write-Host "  Admin:       $env:PB_ADMIN_EMAIL (password non mostrata)" -ForegroundColor DarkGray
 Write-Host ""
-Write-Host "  CAMBIA SUBITO LA PASSWORD ADMIN!" -ForegroundColor Red
+Write-Host "  Mantieni privato l’accesso amministrativo e conserva i backup." -ForegroundColor Red
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host ""

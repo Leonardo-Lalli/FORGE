@@ -19,16 +19,21 @@ public partial class DetailExercise : ObservableObject
 public partial class DetailSet : ObservableObject
 {
     public int SetNumber { get; set; }
+    public string Kind { get; set; } = "normal";
+    public string DisplayLabel => Kind switch { "warmup" => "W", "drop" => "D", "failure" => "F", _ => SetNumber.ToString() };
     public double WeightKg { get; set; }
     public int Reps { get; set; }
     public bool IsCompleted { get; set; }
     public string CompletedIcon => IsCompleted ? "\u2713" : "";
 }
 
-[QueryProperty(nameof(WorkoutId), "workoutId")]
-[QueryProperty(nameof(Source), "source")]
-public partial class WorkoutDetailViewModel : BaseViewModel
+public partial class WorkoutDetailViewModel : BaseViewModel, IQueryAttributable
 {
+    public void ApplyQueryAttributes(IDictionary<string, object> query)
+    {
+        Source = query.TryGetValue("source", out var source) ? source.ToString() ?? "pocketbase" : "pocketbase";
+        WorkoutId = query.TryGetValue("workoutId", out var id) ? Uri.UnescapeDataString(id.ToString() ?? "") : "";
+    }
     private readonly PocketBaseService pb;
     private readonly DatabaseService db;
 
@@ -162,7 +167,7 @@ public partial class WorkoutDetailViewModel : BaseViewModel
                     int i = 1;
                     foreach (var s in setsArr.EnumerateArray())
                     {
-                        var set = new DetailSet { SetNumber = i++ };
+                        var set = new DetailSet { SetNumber = i++, Kind = s.TryGetProperty("kind", out var kind) ? kind.GetString() ?? "normal" : "normal" };
                         if (s.TryGetProperty("weightKg", out var wk) && wk.TryGetDouble(out var w)) set.WeightKg = w;
                         if (s.TryGetProperty("reps", out var rp) && rp.TryGetInt32(out var r)) set.Reps = r;
                         if (s.TryGetProperty("isCompleted", out var ic) && ic.ValueKind == JsonValueKind.True) set.IsCompleted = true;

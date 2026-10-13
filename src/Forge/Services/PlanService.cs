@@ -9,6 +9,7 @@ public class PlanService
     private readonly PocketBaseService pb;
     private readonly SemaphoreSlim migrationGate = new(1, 1);
     private readonly SemaphoreSlim starterGate = new(1, 1);
+    private readonly SemaphoreSlim planWriteGate = new(1, 1);
 
     public async Task EnsureStarterPlansAsync()
     {
@@ -92,6 +93,29 @@ public class PlanService
 
     public async Task SavePlanAsync(WorkoutPlan plan)
     {
+        await planWriteGate.WaitAsync();
+        try { await SavePlanCoreAsync(plan); }
+        finally { planWriteGate.Release(); }
+    }
+
+    public async Task SaveNotesAsync(string planId, string ownerId, string notes,
+        IReadOnlyList<PlanSessionChanges.ExerciseNote> exerciseNotes)
+    {
+        await planWriteGate.WaitAsync();
+        try
+        {
+            if (string.IsNullOrEmpty(ownerId) || pb.CurrentUser?.Id != ownerId)
+                throw new InvalidOperationException("L’account della sessione è cambiato.");
+            var saved = (await db.GetPlansAsync(ownerId)).FirstOrDefault(p => p.Id == planId)
+                ?? throw new InvalidOperationException("Scheda non disponibile.");
+            var plan = ToWorkoutPlan(saved);
+            if (PlanSessionChanges.ApplyNotes(plan, notes, exerciseNotes)) await SavePlanCoreAsync(plan);
+        }
+        finally { planWriteGate.Release(); }
+    }
+
+    private async Task SavePlanCoreAsync(WorkoutPlan plan)
+    {
         var userId = pb.CurrentUser?.Id ?? throw new InvalidOperationException("Accedi per salvare una scheda.");
         if (!string.IsNullOrEmpty(plan.UserId) && plan.UserId != userId)
             throw new InvalidOperationException("La scheda appartiene a un altro account.");
@@ -116,8 +140,15 @@ public class PlanService
 
     public async Task DeletePlanAsync(string planId)
     {
-        if (!(await LoadPlansAsync()).Any(p => p.Id == planId)) return;
-        await db.DeletePlanAsync(planId);
+        await planWriteGate.WaitAsync();
+        try
+        {
+            var userId = pb.CurrentUser?.Id;
+            if (string.IsNullOrEmpty(userId)) return;
+            if (!(await db.GetPlansAsync(userId)).Any(p => p.Id == planId)) return;
+            await db.DeletePlanAsync(planId);
+        }
+        finally { planWriteGate.Release(); }
     }
 
     private static WorkoutPlan ToWorkoutPlan(SavedPlan sp)

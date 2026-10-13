@@ -1,11 +1,13 @@
 "use client"
 
 import { Download } from "lucide-react"
+import { useReleaseDownload } from "./release-download"
 import { useI18n } from "@/lib/i18n"
 import Link from "next/link"
 
 export function CtaBand() {
   const { t } = useI18n()
+  const downloadUrl = useReleaseDownload()
   return (
     <section className="px-6 py-20">
       <div className="mx-auto w-full max-w-[1120px]">
@@ -18,7 +20,7 @@ export function CtaBand() {
           </p>
           <div className="flex flex-wrap items-center justify-center gap-4">
             <a
-              href="https://github.com/Leonardo-Lalli/FORGE/releases/latest/download/FORGE.apk"
+              href={downloadUrl}
               className="inline-flex items-center gap-2.5 rounded-full bg-forge-cyan px-6 py-3.5 text-[15px] font-semibold text-[#001417] glow-cyan transition-all hover:-translate-y-0.5 hover:glow-cyan-strong"
               aria-label={t.cta.primary}
             >

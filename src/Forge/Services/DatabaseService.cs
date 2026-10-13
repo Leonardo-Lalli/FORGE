@@ -169,4 +169,13 @@ public class DatabaseService
         else
             await d.InsertAsync(state);
     }
+    public async Task DeleteAccountDataAsync(string userId)
+    {
+        var d = await GetDbAsync();
+        await d.RunInTransactionAsync(c => {
+            c.Execute("DELETE FROM local_workouts WHERE UserId = ?", userId);
+            c.Execute("DELETE FROM saved_plans WHERE UserId = ?", userId);
+            c.Execute("DELETE FROM achievements WHERE Id LIKE ?", userId + ":%");
+        });
+    }
 }

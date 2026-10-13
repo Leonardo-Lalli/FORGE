@@ -1,4 +1,7 @@
 import { SiteHeader } from "@/components/forge/site-header"
+import { ComparisonSection } from "@/components/forge/comparison-section"
+import { GamificationSection } from "@/components/forge/gamification-section"
+import { ScreenshotsSection } from "@/components/forge/screenshots-section"
 import { HeroSection } from "@/components/forge/hero-section"
 import { FeaturesSection } from "@/components/forge/features-section"
 import { SelfHostingSection } from "@/components/forge/self-hosting-section"
@@ -17,6 +20,9 @@ export default function Page() {
         <main id="top">
           <HeroSection />
           <FeaturesSection />
+          <GamificationSection />
+          <ScreenshotsSection />
+          <ComparisonSection />
           <SelfHostingSection />
           <DocsSection />
           <CtaBand />

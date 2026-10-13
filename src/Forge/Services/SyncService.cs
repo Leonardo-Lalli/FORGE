@@ -1,4 +1,5 @@
 using System.Text.Json;
+using CommunityToolkit.Mvvm.Messaging;
 using Forge.Models;
 using Forge.Models.Dto;
 
@@ -39,7 +40,10 @@ public class SyncService
                 try
                 {
                     if (await pb.UploadWorkoutAsync(w))
+                    {
                         await db.MarkSyncedAsync(w.Id, WorkoutSyncPayload.RecordId(w.Id));
+                        CommunityToolkit.Mvvm.Messaging.WeakReferenceMessenger.Default.Send(new Forge.Messages.WorkoutSavedMessage());
+                    }
                 }
                 catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[Sync Pending] {ex.GetType().Name}"); }
             }

@@ -59,6 +59,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<CsvImportService>();
         builder.Services.AddSingleton<CsvExportService>();
         builder.Services.AddSingleton<AchievementService>();
+        builder.Services.AddSingleton<NotificationService>();
 
         // ViewModels
         builder.Services.AddTransient<HomeViewModel>();

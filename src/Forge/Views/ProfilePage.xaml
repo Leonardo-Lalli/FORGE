@@ -96,10 +96,21 @@
                             BackgroundColor="{DynamicResource Primary}" TextColor="{DynamicResource OnPrimary}" />
                 </VerticalStackLayout>
 
-                <Grid ColumnDefinitions="*,*" ColumnSpacing="16" IsVisible="{Binding CanViewConnections}">
-                    <Button Text="{Binding FollowersCount, StringFormat='{0} follower'}" Command="{Binding ShowFollowersCommand}" BackgroundColor="{DynamicResource SurfaceContainer}" TextColor="{DynamicResource OnSurface}" />
-                    <Button Grid.Column="1" Text="{Binding FollowingCount, StringFormat='{0} seguiti'}" Command="{Binding ShowFollowingCommand}" BackgroundColor="{DynamicResource SurfaceContainer}" TextColor="{DynamicResource OnSurface}" />
-                </Grid>
+                <Border BackgroundColor="{DynamicResource SurfaceContainer}" Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1" StrokeShape="RoundRectangle 20" Padding="0" IsVisible="{Binding CanViewConnections}">
+                    <Grid ColumnDefinitions="*,1,*" Padding="0,16">
+                        <Grid RowDefinitions="Auto,Auto" RowSpacing="4" Padding="12,0" SemanticProperties.Description="Apri follower">
+                            <Grid.GestureRecognizers><TapGestureRecognizer Command="{Binding ShowFollowersCommand}" /></Grid.GestureRecognizers>
+                            <Label Text="{Binding FollowersCount}" FontFamily="{AppThemeBinding Light=Inter, Dark=SpaceGrotesk}" FontSize="26" FontAttributes="Bold" HorizontalTextAlignment="Center" TextColor="{DynamicResource ElectricBlue}" />
+                            <Label Grid.Row="1" Text="Follower ›" FontFamily="Inter" FontSize="12" HorizontalTextAlignment="Center" TextColor="{DynamicResource TextSecondary}" />
+                        </Grid>
+                        <BoxView Grid.Column="1" Color="{DynamicResource OutlineVariant}" Margin="0,4" />
+                        <Grid Grid.Column="2" RowDefinitions="Auto,Auto" RowSpacing="4" Padding="12,0" SemanticProperties.Description="Apri seguiti">
+                            <Grid.GestureRecognizers><TapGestureRecognizer Command="{Binding ShowFollowingCommand}" /></Grid.GestureRecognizers>
+                            <Label Text="{Binding FollowingCount}" FontFamily="{AppThemeBinding Light=Inter, Dark=SpaceGrotesk}" FontSize="26" FontAttributes="Bold" HorizontalTextAlignment="Center" TextColor="{DynamicResource ElectricBlue}" />
+                            <Label Grid.Row="1" Text="Seguiti ›" FontFamily="Inter" FontSize="12" HorizontalTextAlignment="Center" TextColor="{DynamicResource TextSecondary}" />
+                        </Grid>
+                    </Grid>
+                </Border>
                 <Label Text="Follower e seguiti sono privati." IsVisible="{Binding CanViewConnections, Converter={StaticResource InverseBoolConverter}}"
                        FontFamily="Inter" HorizontalTextAlignment="Center" TextColor="{DynamicResource TextSecondary}" />
                 <Label Text="{Binding ErrorMessage}" IsVisible="{Binding HasError}" TextColor="{DynamicResource Error}" />
@@ -299,7 +310,7 @@
                                                 WidthRequest="60" HeightRequest="60"
                                                 Margin="0,4,0,0"
                                                 BackgroundColor="{DynamicResource SurfaceContainer}">
-                                            <Image Source="{Binding FirstPhoto}" Aspect="AspectFill"
+                                            <Image Source="{Binding FirstPhoto, Converter={StaticResource WorkoutPhotoConverter}}" Aspect="AspectFill"
                                                    WidthRequest="60" HeightRequest="60" />
                                         </Border>
 
@@ -389,8 +400,7 @@
                 <Label Text="Visibilità di follower e seguiti" FontFamily="Lexend" TextColor="{DynamicResource OnSurface}" />
                 <Picker ItemsSource="{Binding VisibilityChoices}" SelectedIndex="{Binding ConnectionsVisibilityIndex}" TextColor="{DynamicResource OnSurface}" BackgroundColor="{DynamicResource SurfaceContainer}" />
                 <Label Text="Gli amici sono le persone con cui vi seguite a vicenda, con entrambe le richieste accettate." FontFamily="Inter" FontSize="12" TextColor="{DynamicResource TextSecondary}" />
-                <Label Text="Gli amici sono gli utenti con cui ti scambi il follow: vi seguite entrambi." FontSize="12" TextColor="{DynamicResource TextSecondary}" />
-                <Label Text="Scegli fino a 3 achievement sbloccati" TextColor="{DynamicResource OnSurface}" />
+                <Label Text="Scegli gli achievement sbloccati da mostrare" TextColor="{DynamicResource OnSurface}" />
                 <CollectionView ItemsSource="{Binding BadgeChoices}" HeightRequest="180" SelectionMode="None">
                     <CollectionView.ItemsLayout><LinearItemsLayout Orientation="Vertical" ItemSpacing="6" /></CollectionView.ItemsLayout>
                     <CollectionView.EmptyView><Label Text="Completa un allenamento per sbloccare i primi achievement." TextColor="{DynamicResource TextSecondary}" /></CollectionView.EmptyView>

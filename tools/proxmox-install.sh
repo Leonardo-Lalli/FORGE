@@ -75,26 +75,28 @@ ExecStart      = $PB_DIR/pocketbase serve --http=0.0.0.0:8090
 WantedBy = multi-user.target
 EOF
 
+systemctl daemon-reload
 systemctl enable -q --now forge-pocketbase
 msg_ok "Servizio avviato su porta 8090"
 
 msg_info "Attesa avvio PocketBase..."
+healthy=0
 for i in $(seq 1 30); do
-  if curl -sf http://localhost:8090/api/health &>/dev/null; then break; fi
+  if curl -sf http://localhost:8090/api/health &>/dev/null; then healthy=1; break; fi
   sleep 2
 done
+[ "$healthy" -eq 1 ] || { msg_error "PocketBase health timeout"; exit 1; }
 msg_ok "PocketBase online"
 
 msg_info "Creazione superuser..."
-"$PB_DIR/pocketbase" superuser create "$PB_EMAIL" "$PB_PASS" 2>/dev/null && \
+"$PB_DIR/pocketbase" superuser create "$PB_EMAIL" "$PB_PASS" --dir="$PB_DIR/pb_data" 2>/dev/null && \
   msg_ok "Superuser creato" || msg_ok "Superuser gia presente"
 
 msg_info "Configurazione collezioni + API rules..."
 
 PB_URL=http://127.0.0.1:8090 PB_ADMIN_EMAIL="$PB_EMAIL" PB_ADMIN_PASSWORD="$PB_PASS" sh "$FORGE_INIT_SCRIPT"
-msg_info 'Profile/privacy and shared exercise cache require the reviewed migration:'
-echo "  sudo bash tools/apply-profile-migration.sh $PB_DIR forge-pocketbase"
-echo 'See docs/pocketbase-profile-migration.md. GIF files remain referenced by URL.'
+msg_info 'Applying FORGE migrations with a backup...'
+bash "$(dirname "$FORGE_INIT_SCRIPT")/apply-profile-migration.sh" "$PB_DIR" forge-pocketbase
 
 # --- MOTD ---
 IP=$(hostname -I | awk '{print $1}')

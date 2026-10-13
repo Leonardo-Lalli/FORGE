@@ -152,10 +152,10 @@ public class ThemeService
         ["OnSurface"] = "#e5e2e1",
         ["OnSurfaceVariant"] = "#bac9cc",
 
-        ["Primary"] = "#c3f5ff",
+        ["Primary"] = "#00daf3",
         ["OnPrimary"] = "#00363d",
-        ["PrimaryContainer"] = "#00e5ff",
-        ["OnPrimaryContainer"] = "#00626e",
+        ["PrimaryContainer"] = "#00daf3",
+        ["OnPrimaryContainer"] = "#00363d",
 
         ["Secondary"] = "#ffffff",
         ["OnSecondary"] = "#283500",

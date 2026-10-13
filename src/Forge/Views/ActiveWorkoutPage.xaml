@@ -5,377 +5,143 @@
     xmlns:vm="clr-namespace:Forge.ViewModels"
     xmlns:controls="clr-namespace:Forge.Controls"
     xmlns:models="clr-namespace:Forge.Models"
+    xmlns:services="clr-namespace:Forge.Services"
     x:Class="Forge.Views.ActiveWorkoutPage"
     x:Name="workoutPage"
     x:DataType="vm:ActiveWorkoutViewModel"
     Title="WORKOUT"
-    Shell.NavBarIsVisible="False">
+    Shell.NavBarIsVisible="False"
+    Shell.TabBarIsVisible="False">
 
-    <Grid RowDefinitions="Auto,Auto,*,Auto" BackgroundColor="{DynamicResource Surface}">
-
-        <!-- Progress bar -->
-        <BoxView Grid.Row="0" HeightRequest="2"
-                 Color="{DynamicResource Primary}"
-                 WidthRequest="{Binding ProgressPercent}"
-                 HorizontalOptions="Start" />
-
-        <!-- Header -->
-        <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto,Auto" Padding="20,10" ColumnSpacing="8">
-            <Border Grid.Column="0" BackgroundColor="{DynamicResource SurfaceContainer}"
-                    StrokeShape="RoundRectangle 10" Padding="8" HeightRequest="36" WidthRequest="36">
-                <Label Text="✕" FontSize="14" TextColor="{DynamicResource OnSurface}"
-                       HorizontalOptions="Center" VerticalOptions="Center">
-                    <Label.GestureRecognizers>
-                        <TapGestureRecognizer Command="{Binding MinimizeWorkoutCommand}" />
-                    </Label.GestureRecognizers>
-                </Label>
-            </Border>
-            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" HorizontalOptions="Center" Spacing="2">
-                <Entry Text="{Binding PlanNameInput}" Placeholder="Workout Name"
-                       FontFamily="SpaceGrotesk" FontSize="16" FontAttributes="Bold"
-                       TextColor="{DynamicResource OnSurface}" PlaceholderColor="{DynamicResource Outline}"
-                       BackgroundColor="Transparent" HorizontalTextAlignment="Center"
-                       IsVisible="{Binding IsTimerRunning, Converter={StaticResource InverseBoolConverter}}" />
-                <Label Text="{Binding PlanName}" FontFamily="SpaceGrotesk" FontSize="16" FontAttributes="Bold"
-                       TextColor="{DynamicResource OnSurface}" HorizontalTextAlignment="Center"
-                       IsVisible="{Binding IsTimerRunning}" />
-                <Label Text="{Binding ElapsedTime, StringFormat='⏱ {0}'}" FontFamily="Lexend" FontSize="11"
-                       TextColor="{DynamicResource LimeGreen}" HorizontalTextAlignment="Center"
-                       IsVisible="{Binding IsTimerRunning}" />
+    <Grid RowDefinitions="Auto,*,Auto" BackgroundColor="{DynamicResource Surface}">
+        <Grid ColumnDefinitions="44,*,Auto" ColumnSpacing="8" Padding="16,12">
+            <Button Text="✕" Command="{Binding MinimizeWorkoutCommand}" BackgroundColor="Transparent" TextColor="{DynamicResource OnSurface}" FontSize="22" Padding="0" HeightRequest="44" />
+            <VerticalStackLayout Grid.Column="1" Spacing="0">
+                <Entry Text="{Binding PlanNameInput}" Placeholder="Workout Name" FontFamily="{AppThemeBinding Light=Inter, Dark=SpaceGrotesk}" FontSize="20" FontAttributes="Bold" TextColor="{DynamicResource OnSurface}" PlaceholderColor="{DynamicResource TextSecondary}" BackgroundColor="Transparent" />
+                <Label Text="{Binding ElapsedTime}" IsVisible="{Binding IsTimerRunning}" FontFamily="Lexend" FontSize="11" TextColor="{DynamicResource TextSecondary}" />
             </VerticalStackLayout>
-            <Border Grid.Column="2" BackgroundColor="{DynamicResource SurfaceContainer}"
-                    StrokeShape="RoundRectangle 10" Padding="8" HeightRequest="36"
-                    IsVisible="{Binding IsTimerRunning}">
-                <Label Text="🔽" FontSize="14" HorizontalOptions="Center" VerticalOptions="Center">
-                    <Label.GestureRecognizers>
-                        <TapGestureRecognizer Command="{Binding CollapseWorkoutCommand}" />
-                    </Label.GestureRecognizers>
-                </Label>
-            </Border>
-            <Border Grid.Column="3" BackgroundColor="{DynamicResource Primary}"
-                    StrokeShape="RoundRectangle 10" Padding="14,8" HeightRequest="36">
-                <Label Text="FINISH" FontFamily="Lexend" FontSize="11" FontAttributes="Bold"
-                       TextColor="{DynamicResource OnPrimary}" CharacterSpacing="1"
-                       HorizontalOptions="Center" VerticalOptions="Center">
-                    <Label.GestureRecognizers>
-                        <TapGestureRecognizer Command="{Binding SaveWorkoutPlanCommand}" />
-                    </Label.GestureRecognizers>
-                </Label>
-            </Border>
+            <Button Grid.Column="2" Text="FINISH" Command="{Binding FinishOrSaveCommand}" BackgroundColor="Transparent" TextColor="{DynamicResource ElectricBlue}" FontFamily="Lexend" FontAttributes="Bold" Padding="8,0">
+                <Button.Triggers><DataTrigger TargetType="Button" Binding="{Binding IsCreating}" Value="True"><Setter Property="Text" Value="SALVA" /></DataTrigger></Button.Triggers>
+            </Button>
         </Grid>
-
-        <!-- Notification -->
-        <Border Grid.Row="1" IsVisible="{Binding IsNotificationVisible}"
-                BackgroundColor="{DynamicResource PrimaryContainer}" Padding="14,10" Margin="16,4"
-                StrokeShape="RoundRectangle 10">
-            <Label Text="{Binding NotificationMessage}" FontFamily="Inter" FontSize="13"
-                   TextColor="{DynamicResource OnPrimaryContainer}" />
-        </Border>
-
-        <!-- Rest Timer -->
-        <Border Grid.Row="1" IsVisible="{Binding IsRestTimerActive}"
-                BackgroundColor="{DynamicResource SurfaceContainerHigh}" Padding="14,10" Margin="16,4"
-                Stroke="{DynamicResource LimeGreen}" StrokeThickness="1.5" StrokeShape="RoundRectangle 12">
-            <Grid ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="10">
-                <Label Grid.Column="0" Text="⏱" FontSize="20" VerticalOptions="Center" />
-                <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
-                    <Label Text="{Binding RestTimerLabel}" FontFamily="Lexend" FontSize="10"
-                           TextColor="{DynamicResource TextSecondary}" CharacterSpacing="0.6" />
-                    <Label Text="{Binding RestTimerText}" FontFamily="SpaceGrotesk" FontSize="24" FontAttributes="Bold"
-                           TextColor="{DynamicResource LimeGreen}" />
+        <CollectionView Grid.Row="1" ItemsSource="{Binding Exercises}" SelectionMode="None">
+            <CollectionView.Header>
+                <VerticalStackLayout Padding="20,0" Spacing="10">
+                    <BoxView HeightRequest="1" Color="{DynamicResource OutlineVariant}" />
+                    <Grid ColumnDefinitions="*,Auto" IsVisible="{Binding IsNotificationVisible}">
+                        <Label Text="{Binding NotificationMessage}" TextColor="{DynamicResource OnSurface}" FontSize="12" VerticalOptions="Center" />
+                        <Button Grid.Column="1" Text="✕" Command="{Binding DismissNotificationCommand}" BackgroundColor="Transparent" TextColor="{DynamicResource OnSurface}" WidthRequest="36" />
+                    </Grid>
+                    <Editor Text="{Binding WorkoutNotes}" Placeholder="Note dell’allenamento" FontFamily="Inter" FontSize="13" HeightRequest="48" TextColor="{DynamicResource OnSurface}" PlaceholderColor="{DynamicResource TextSecondary}" BackgroundColor="Transparent" />
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                        <Button Text="Scatta foto" Command="{Binding TakePhotoCommand}" BackgroundColor="{DynamicResource SurfaceContainer}" TextColor="{DynamicResource OnSurface}" CornerRadius="12" HeightRequest="40" FontSize="12" />
+                        <Button Grid.Column="1" Text="Galleria" Command="{Binding PickPhotoCommand}" BackgroundColor="{DynamicResource SurfaceContainer}" TextColor="{DynamicResource OnSurface}" CornerRadius="12" HeightRequest="40" FontSize="12" />
+                    </Grid>
+                    <ScrollView Orientation="Horizontal" IsVisible="{Binding HasWorkoutPhotos}" HeightRequest="64">
+                        <HorizontalStackLayout Spacing="8" BindableLayout.ItemsSource="{Binding WorkoutPhotos}">
+                            <BindableLayout.ItemTemplate><DataTemplate x:DataType="x:String">
+                                <Border WidthRequest="60" HeightRequest="60" StrokeShape="RoundRectangle 10" Padding="0">
+                                    <Image Source="{Binding ., Converter={StaticResource WorkoutPhotoConverter}}" Aspect="AspectFill" />
+                                    <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding Source={x:Reference workoutPage}, Path=BindingContext.RemovePhotoCommand}" CommandParameter="{Binding .}" /></Border.GestureRecognizers>
+                                </Border>
+                            </DataTemplate></BindableLayout.ItemTemplate>
+                        </HorizontalStackLayout>
+                    </ScrollView>
                 </VerticalStackLayout>
-                <Border Grid.Column="2" BackgroundColor="{DynamicResource SurfaceContainer}"
-                        StrokeShape="RoundRectangle 4" HeightRequest="8" WidthRequest="80" VerticalOptions="Center">
-                    <Border BackgroundColor="{DynamicResource LimeGreen}" StrokeShape="RoundRectangle 4"
-                            WidthRequest="{Binding RestTimerProgress}" HeightRequest="8" HorizontalOptions="Start" />
-                </Border>
-                <Button Grid.Column="3" Text="SKIP" FontFamily="Lexend" FontSize="9" FontAttributes="Bold"
-                        TextColor="White" BackgroundColor="{DynamicResource AlertRed}" CornerRadius="6"
-                        HeightRequest="28" Padding="8,0" Command="{Binding SkipRestTimerCommand}" />
-            </Grid>
-        </Border>
-
-        <HorizontalStackLayout Grid.Row="1" Padding="16,4" Spacing="6" IsVisible="{Binding IsRestTimerActive, Converter={StaticResource InverseBoolConverter}}">
-            <Label Text="Recupero per esercizio · 0–5 min" FontSize="11" TextColor="{DynamicResource TextSecondary}" VerticalOptions="Center" />
-            <Button Text="Salva note / recuperi" Command="{Binding SavePlanPreferencesCommand}" FontSize="11" BackgroundColor="Transparent" TextColor="{DynamicResource Primary}" IsVisible="{Binding IsPlanWorkout}" />
-        </HorizontalStackLayout>
-
-        <!-- Content -->
-        <Grid Grid.Row="2" RowDefinitions="Auto,*">
-
-            <!-- Foto Progresso -->
-            <VerticalStackLayout Spacing="4" Padding="20,6,20,0">
-                <Editor Text="{Binding WorkoutNotes}" Placeholder="Note dell’allenamento" HeightRequest="48"
-                        TextColor="{DynamicResource OnSurface}" PlaceholderColor="{DynamicResource TextSecondary}" />
-                <HorizontalStackLayout Spacing="8" HorizontalOptions="Center">
-                    <Border StrokeShape="RoundRectangle 8" BackgroundColor="{DynamicResource SurfaceContainer}"
-                            Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1"
-                            Padding="8,4" HeightRequest="32">
-                        <Label FontFamily="Lexend" FontSize="10" TextColor="{DynamicResource TextSecondary}"
-                               VerticalOptions="Center">
-                            <Label.FormattedText>
-                                <FormattedString>
-                                    <Span Text="&#x1F4F7; " />
-                                    <Span Text="{Binding WorkoutPhotos.Count, StringFormat='{0}'}" />
-                                </FormattedString>
-                            </Label.FormattedText>
+            </CollectionView.Header>
+            <CollectionView.EmptyView><Label Text="Aggiungi il primo esercizio" FontFamily="Inter" TextColor="{DynamicResource TextSecondary}" HorizontalTextAlignment="Center" Margin="20,36" /></CollectionView.EmptyView>
+            <CollectionView.ItemTemplate><DataTemplate x:DataType="models:WorkoutExercise">
+                <VerticalStackLayout Padding="20,24,20,8" Spacing="14">
+                    <Label Text="{Binding Order, StringFormat='ESERCIZIO {0}'}" FontFamily="Lexend" CharacterSpacing="1" FontSize="10" TextColor="{DynamicResource ElectricBlue}" />
+                    <Grid ColumnDefinitions="*,44,44" ColumnSpacing="4">
+                        <Label Text="{Binding ExerciseName}" FontFamily="{AppThemeBinding Light=Inter, Dark=SpaceGrotesk}" FontSize="25" FontAttributes="Bold" TextColor="{DynamicResource OnSurface}" VerticalOptions="Center" MaxLines="2" LineBreakMode="TailTruncation">
+                            <Label.GestureRecognizers><TapGestureRecognizer Command="{Binding Source={x:Reference workoutPage}, Path=BindingContext.OpenExerciseDetailCommand}" CommandParameter="{Binding .}" /></Label.GestureRecognizers>
                         </Label>
-                    </Border>
-                    <Border StrokeShape="RoundRectangle 8" BackgroundColor="{DynamicResource Primary}"
-                            Padding="8,4" HeightRequest="32">
-                        <Border.GestureRecognizers>
-                            <TapGestureRecognizer Command="{Binding TakePhotoCommand}" />
-                        </Border.GestureRecognizers>
-                        <Label Text="Scatta" FontFamily="Lexend" FontSize="10" FontAttributes="Bold"
-                               TextColor="{DynamicResource OnPrimary}" VerticalOptions="Center" />
-                    </Border>
-                    <Border StrokeShape="RoundRectangle 8" BackgroundColor="{DynamicResource SurfaceContainer}"
-                            Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1"
-                            Padding="8,4" HeightRequest="32">
-                        <Border.GestureRecognizers>
-                            <TapGestureRecognizer Command="{Binding PickPhotoCommand}" />
-                        </Border.GestureRecognizers>
-                        <Label Text="Galleria" FontFamily="Lexend" FontSize="10"
-                               TextColor="{DynamicResource OnSurface}" VerticalOptions="Center" />
-                    </Border>
-                </HorizontalStackLayout>
-                <ScrollView Orientation="Horizontal" HorizontalScrollBarVisibility="Never"
-                            IsVisible="{Binding HasWorkoutPhotos}" HeightRequest="66">
-                    <HorizontalStackLayout Spacing="8" BindableLayout.ItemsSource="{Binding WorkoutPhotos}">
-                        <BindableLayout.ItemTemplate>
-                            <DataTemplate x:DataType="x:String">
-                                <Border StrokeShape="RoundRectangle 8"
-                                        Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1"
-                                        HeightRequest="60" WidthRequest="60">
-                                    <Image Source="{Binding .}" Aspect="AspectFill" />
-                                    <Border.GestureRecognizers>
-                                        <TapGestureRecognizer
-                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ActiveWorkoutViewModel}}, Path=RemovePhotoCommand}"
-                                            CommandParameter="{Binding .}" />
-                                    </Border.GestureRecognizers>
-                                </Border>
-                            </DataTemplate>
-                        </BindableLayout.ItemTemplate>
-                    </HorizontalStackLayout>
-                </ScrollView>
-            </VerticalStackLayout>
-
-            <!-- Creating mode: start button overlay -->
-            <VerticalStackLayout IsVisible="{Binding IsCreating}"
-                                 Grid.Row="1"
-                                 VerticalOptions="End" HorizontalOptions="Center" Spacing="12" Padding="20"
-                                 Margin="0,0,0,20">
-                <Button Text="START WORKOUT" FontFamily="Lexend" FontSize="14" FontAttributes="Bold"
-                        CharacterSpacing="1"
-                        BackgroundColor="{DynamicResource Primary}"
-                        TextColor="{DynamicResource OnPrimary}"
-                        HeightRequest="52" CornerRadius="12"
-                        Command="{Binding StartWorkoutCommand}" />
-            </VerticalStackLayout>
-
-            <!-- Exercise list -->
-            <CollectionView Grid.Row="1" ItemsSource="{Binding Exercises}" Margin="0,4,0,0">
-                <CollectionView.ItemTemplate>
-                    <DataTemplate x:DataType="models:WorkoutExercise">
-                        <Border BackgroundColor="{DynamicResource SurfaceContainerLowest}" Margin="16,4"
-                                StrokeShape="RoundRectangle 16" Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1"
-                                Padding="0">
-                            <Border.GestureRecognizers>
-                                <TapGestureRecognizer Command="{Binding Source={x:Reference workoutPage}, Path=BindingContext.OpenExerciseDetailCommand}" CommandParameter="{Binding .}" />
-                            </Border.GestureRecognizers>
-                            <VerticalStackLayout Spacing="0">
-                                <!-- Exercise Header -->
-                                <Border BackgroundColor="{DynamicResource SurfaceContainer}" Padding="16,12"
-                                        StrokeShape="RoundRectangle 16,16,0,0" StrokeThickness="0">
-                                    <Grid ColumnDefinitions="56,*,Auto,Auto,Auto" ColumnSpacing="10">
-                                        <Border Grid.Column="0" BackgroundColor="{DynamicResource SurfaceContainerHigh}"
-                                                StrokeShape="RoundRectangle 8" WidthRequest="56" HeightRequest="56" Padding="0">
-                                            <Grid>
-                                                <Image Source="{Binding ImageUrl}" Aspect="AspectFill"
-                                                       WidthRequest="56" HeightRequest="56" />
-                                                <Label Text="{Binding Order}" FontFamily="SpaceGrotesk" FontSize="18" FontAttributes="Bold"
-                                                       TextColor="{DynamicResource OnPrimary}"
-                                                       HorizontalOptions="Center" VerticalOptions="Center" />
-                                            </Grid>
-                                        </Border>
-                                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
-                                            <Label Text="{Binding ExerciseName}" FontFamily="SpaceGrotesk" FontSize="16" FontAttributes="Bold"
-                                                   TextColor="{DynamicResource OnSurface}" LineBreakMode="TailTruncation" />
-                                            <Label Text="{Binding BodyPart}" FontFamily="Inter" FontSize="11"
-                                                   TextColor="{DynamicResource TextSecondary}" />
-                                        </VerticalStackLayout>
-                                        <Label Grid.Column="2" Text="▲" FontSize="11" TextColor="{DynamicResource TextSecondary}" VerticalOptions="Center">
-                                            <Label.GestureRecognizers>
-                                                <TapGestureRecognizer Command="{Binding Source={x:Reference workoutPage}, Path=BindingContext.MoveUpCommand}" CommandParameter="{Binding .}" />
-                                            </Label.GestureRecognizers>
-                                        </Label>
-                                        <Label Grid.Column="3" Text="▼" FontSize="11" TextColor="{DynamicResource TextSecondary}" VerticalOptions="Center">
-                                            <Label.GestureRecognizers>
-                                                <TapGestureRecognizer Command="{Binding Source={x:Reference workoutPage}, Path=BindingContext.MoveDownCommand}" CommandParameter="{Binding .}" />
-                                            </Label.GestureRecognizers>
-                                        </Label>
-                                        <Label Grid.Column="4" Text="✕" FontSize="14" TextColor="{DynamicResource AlertRed}" VerticalOptions="Center">
-                                            <Label.GestureRecognizers>
-                                                <TapGestureRecognizer Command="{Binding Source={x:Reference workoutPage}, Path=BindingContext.RemoveExerciseCommand}" CommandParameter="{Binding .}" />
-                                            </Label.GestureRecognizers>
-                                        </Label>
-                                    </Grid>
-                                </Border>
-
-                                <!-- Exercise Notes -->
-                                <Border Padding="14,6" BackgroundColor="{DynamicResource SurfaceContainer}">
-                                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
-                                        <Entry Grid.Column="0" Placeholder="Note su questo esercizio..."
-                                               Text="{Binding Notes}"
-                                               FontFamily="Inter" FontSize="12"
-                                               TextColor="{DynamicResource OnSurface}"
-                                               PlaceholderColor="{DynamicResource TextSecondary}"
-                                               BackgroundColor="Transparent" />
-                                        <VerticalStackLayout Grid.Column="1" Spacing="0">
-                                            <Label Text="RECUPERO · MIN / SEC" FontSize="9" TextColor="{DynamicResource TextSecondary}" HorizontalTextAlignment="Center" />
-                                            <controls:RestDurationPicker Seconds="{Binding RestSeconds}" TextColor="{DynamicResource Primary}" WidthRequest="130" HeightRequest="110" />
-                                        </VerticalStackLayout>
-                                    </Grid>
-                                </Border>
-
-                                <!-- Sets Table Header -->
-                                <Grid ColumnDefinitions="44,*,*,50" Padding="16,8" ColumnSpacing="12"
-                                      BackgroundColor="{DynamicResource SurfaceContainerLow}">
-                                    <Label Grid.Column="0" Text="SET" FontFamily="Lexend" FontSize="10" FontAttributes="Bold"
-                                           TextColor="{DynamicResource TextSecondary}" CharacterSpacing="0.8"
-                                           VerticalOptions="Center" HorizontalTextAlignment="Center" />
-                                    <Label Grid.Column="1" Text="KG" FontFamily="Lexend" FontSize="10" FontAttributes="Bold"
-                                           TextColor="{DynamicResource TextSecondary}" CharacterSpacing="0.8"
-                                           VerticalOptions="Center" HorizontalTextAlignment="Center" />
-                                    <Label Grid.Column="2" Text="REPS" FontFamily="Lexend" FontSize="10" FontAttributes="Bold"
-                                           TextColor="{DynamicResource TextSecondary}" CharacterSpacing="0.8"
-                                           VerticalOptions="Center" HorizontalTextAlignment="Center" />
-                                    <Label Grid.Column="3" Text="✓" FontFamily="Lexend" FontSize="10" FontAttributes="Bold"
-                                           TextColor="{DynamicResource TextSecondary}" CharacterSpacing="0.8"
-                                           VerticalOptions="Center" HorizontalTextAlignment="Center" />
-                                </Grid>
-
-                                <!-- Sets -->
-                                <VerticalStackLayout Spacing="4"
-                                    BindableLayout.ItemsSource="{Binding Sets}">
-                                    <BindableLayout.ItemTemplate>
-                                        <DataTemplate x:DataType="models:ExerciseSet">
-                                            <Grid ColumnDefinitions="44,*,*,50" Padding="14,6" ColumnSpacing="12">
-                                                <!-- Set number -->
-                                                <Border Grid.Column="0" BackgroundColor="{DynamicResource Primary}"
-                                                        StrokeShape="RoundRectangle 4" WidthRequest="24" HeightRequest="24" Padding="0"
-                                                        VerticalOptions="Center" HorizontalOptions="Center">
-                                                    <Label Text="{Binding SetNumber}" FontFamily="Lexend" FontSize="10" FontAttributes="Bold"
-                                                           TextColor="{DynamicResource OnPrimary}"
-                                                           HorizontalOptions="Center" VerticalOptions="Center" />
-                                                </Border>
-
-                                                <!-- Weight Entry -->
-                                                <Border Grid.Column="1" BackgroundColor="{DynamicResource SurfaceContainerHigh}"
-                                                        StrokeShape="RoundRectangle 8" Padding="8,6"
-                                                        VerticalOptions="Center" HorizontalOptions="Fill"
-                                                        Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1">
-                                                    <Entry Text="{Binding WeightKg}"
-                                                           Keyboard="Numeric"
-                                                           FontFamily="SpaceGrotesk" FontSize="15" FontAttributes="Bold"
-                                                           TextColor="{DynamicResource OnSurface}"
-                                                           PlaceholderColor="{DynamicResource Outline}"
-                                                           Placeholder="KG"
-                                                           BackgroundColor="Transparent"
-                                                           HorizontalTextAlignment="Center"><Entry.Triggers><DataTrigger TargetType="Entry" Binding="{Binding IsSuggested}" Value="True"><Setter Property="TextColor" Value="{DynamicResource TextSecondary}" /></DataTrigger></Entry.Triggers></Entry>
-                                                </Border>
-
-                                                <!-- Reps Entry -->
-                                                <Border Grid.Column="2" BackgroundColor="{DynamicResource SurfaceContainerHigh}"
-                                                        StrokeShape="RoundRectangle 8" Padding="8,6"
-                                                        VerticalOptions="Center" HorizontalOptions="Fill"
-                                                        Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1">
-                                                    <Entry Text="{Binding Reps}"
-                                                           Keyboard="Numeric"
-                                                           FontFamily="SpaceGrotesk" FontSize="15" FontAttributes="Bold"
-                                                           TextColor="{DynamicResource LimeGreen}"
-                                                           PlaceholderColor="{DynamicResource Outline}"
-                                                           Placeholder="REPS"
-                                                           BackgroundColor="Transparent"
-                                                           HorizontalTextAlignment="Center"><Entry.Triggers><DataTrigger TargetType="Entry" Binding="{Binding IsSuggested}" Value="True"><Setter Property="TextColor" Value="{DynamicResource TextSecondary}" /></DataTrigger></Entry.Triggers></Entry>
-                                                </Border>
-
-                                                <!-- Checkmark -->
-                                                <Border Grid.Column="3" WidthRequest="30" HeightRequest="30" Padding="0"
-                                                        StrokeShape="RoundRectangle 15"
-                                                        BackgroundColor="Transparent"
-                                                        Stroke="{DynamicResource LimeGreen}"
-                                                        StrokeThickness="2"
-                                                        VerticalOptions="Center" HorizontalOptions="Center">
-                                                    <Border.Triggers>
-                                                        <DataTrigger TargetType="Border" Binding="{Binding IsCompleted}" Value="True">
-                                                            <Setter Property="BackgroundColor" Value="{DynamicResource LimeGreen}" />
-                                                            <Setter Property="StrokeThickness" Value="0" />
-                                                        </DataTrigger>
-                                                    </Border.Triggers>
-                                                    <Label Text="✓" FontSize="16" FontAttributes="Bold"
-                                                           TextColor="{DynamicResource OnPrimary}"
-                                                           HorizontalOptions="Center" VerticalOptions="Center"
-                                                           IsVisible="{Binding IsCompleted}" />
-                                                    <Label.GestureRecognizers>
-                                                        <TapGestureRecognizer Command="{Binding Source={x:Reference workoutPage}, Path=BindingContext.CompleteSetCommand}" CommandParameter="{Binding .}" />
-                                                    </Label.GestureRecognizers>
-                                                </Border>
-                                            </Grid>
-                                        </DataTemplate>
-                                    </BindableLayout.ItemTemplate>
-                                </VerticalStackLayout>
-
-                                <!-- Add Set + Replace -->
-                                <Grid ColumnDefinitions="*,10,*" Padding="16,10" ColumnSpacing="0">
-                                    <Border Grid.Column="0" BackgroundColor="Transparent"
-                                            Padding="14,10" HorizontalOptions="Center"
-                                            StrokeThickness="0">
-                                        <Border.GestureRecognizers>
-                                            <TapGestureRecognizer Command="{Binding Source={x:Reference workoutPage}, Path=BindingContext.AddSetCommand}" CommandParameter="{Binding .}" />
-                                        </Border.GestureRecognizers>
-                                        <Label Text="+ ADD SET" FontFamily="Lexend" FontSize="11"
-                                               TextColor="{DynamicResource OnSurfaceVariant}"
-                                               CharacterSpacing="1"
-                                               HorizontalOptions="Center" />
-                                    </Border>
-                                    <Border Grid.Column="2" BackgroundColor="{DynamicResource SurfaceContainer}"
-                                            StrokeShape="RoundRectangle 8" Padding="14,10"
-                                            HorizontalOptions="Fill">
-                                        <Border.GestureRecognizers>
-                                            <TapGestureRecognizer Command="{Binding Source={x:Reference workoutPage}, Path=BindingContext.ReplaceExerciseCommand}" CommandParameter="{Binding .}" />
-                                        </Border.GestureRecognizers>
-                                        <Label Text="🔄 Replace" FontFamily="Lexend" FontSize="12"
-                                               TextColor="{DynamicResource OnSurfaceVariant}"
-                                               HorizontalOptions="Center" />
-                                    </Border>
-                                </Grid>
-                            </VerticalStackLayout>
+                        <Border Grid.Column="1" BackgroundColor="Transparent" StrokeThickness="0" WidthRequest="44" HeightRequest="44" Padding="10">
+                            <Path Data="M9,1 L15,1 M12,1 L12,5 M18,5 L20,3 M12,5 A8,8 0 1 1 11.99,5 M12,8 L12,13 L15,15" Stroke="{DynamicResource ElectricBlue}" StrokeThickness="2" />
+                            <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding Source={x:Reference workoutPage}, Path=BindingContext.ShowRestPickerCommand}" CommandParameter="{Binding .}" /></Border.GestureRecognizers>
                         </Border>
-                    </DataTemplate>
-                </CollectionView.ItemTemplate>
-            </CollectionView>
-        </Grid>
-
-        <!-- Bottom add exercise -->
-        <Border Grid.Row="3" Margin="16,8,16,100" BackgroundColor="{DynamicResource SurfaceContainerHigh}"
-                Stroke="{DynamicResource Primary}" StrokeThickness="1.5" StrokeShape="RoundRectangle 12"
-                Padding="0" HeightRequest="52">
-            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12" HorizontalOptions="Center" VerticalOptions="Center">
-                <Label Grid.Column="0" Text="+" FontSize="20" TextColor="{DynamicResource Primary}" VerticalOptions="Center" />
-                <Label Grid.Column="1" Text="Aggiungi esercizio" FontFamily="Inter" FontSize="14"
-                       TextColor="{DynamicResource Primary}" VerticalOptions="Center" />
-                <Label Grid.Column="2" Text="{Binding Exercises.Count}" FontFamily="Lexend" FontSize="13"
-                       TextColor="{DynamicResource TextSecondary}" VerticalOptions="Center" />
+                        <Button Grid.Column="2" Text="⋮" FontSize="24" Padding="0" BackgroundColor="Transparent" TextColor="{DynamicResource OnSurface}" Command="{Binding Source={x:Reference workoutPage}, Path=BindingContext.ShowExerciseMenuCommand}" CommandParameter="{Binding .}" />
+                    </Grid>
+                    <Border BackgroundColor="{DynamicResource SurfaceContainer}" StrokeThickness="0" StrokeShape="RoundRectangle 12" Padding="12">
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                            <Label Text="✦" TextColor="{DynamicResource ElectricBlue}" VerticalOptions="Center" />
+                            <Label Grid.Column="1" Text="{Binding ExecutionTip}" FontFamily="Inter" FontSize="13" TextColor="{DynamicResource TextSecondary}" MaxLines="3" LineBreakMode="TailTruncation" />
+                        </Grid>
+                        <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding Source={x:Reference workoutPage}, Path=BindingContext.OpenExerciseDetailCommand}" CommandParameter="{Binding .}" /></Border.GestureRecognizers>
+                    </Border>
+                    <Grid ColumnDefinitions="72,*" ColumnSpacing="12">
+                        <Border WidthRequest="72" HeightRequest="72" Padding="0" StrokeShape="RoundRectangle 12" BackgroundColor="{DynamicResource SurfaceContainer}" StrokeThickness="0">
+                            <Image Source="{Binding ImageUrl}" Aspect="AspectFit" IsAnimationPlaying="True" />
+                            <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding Source={x:Reference workoutPage}, Path=BindingContext.OpenExerciseDetailCommand}" CommandParameter="{Binding .}" /></Border.GestureRecognizers>
+                        </Border>
+                        <VerticalStackLayout Grid.Column="1" Spacing="4" VerticalOptions="Center">
+                            <Label Text="{Binding BodyPart}" FontFamily="Inter" FontSize="12" TextColor="{DynamicResource TextSecondary}" />
+                            <Label Text="{Binding RestLabel}" FontFamily="Lexend" FontSize="13" TextColor="{DynamicResource ElectricBlue}" Padding="0,8">
+                                <Label.GestureRecognizers><TapGestureRecognizer Command="{Binding Source={x:Reference workoutPage}, Path=BindingContext.ShowRestPickerCommand}" CommandParameter="{Binding .}" /></Label.GestureRecognizers>
+                            </Label>
+                        </VerticalStackLayout>
+                    </Grid>
+                    <Grid ColumnDefinitions="26,*,*,*,40" ColumnSpacing="6">
+                        <Label Text="SET" FontSize="9" TextColor="{DynamicResource TextSecondary}" HorizontalTextAlignment="Center" />
+                        <Label Grid.Column="1" Text="PREV" FontSize="9" TextColor="{DynamicResource TextSecondary}" HorizontalTextAlignment="Center" />
+                        <Label Grid.Column="2" Text="KG" FontSize="9" TextColor="{DynamicResource TextSecondary}" HorizontalTextAlignment="Center" />
+                        <Label Grid.Column="3" Text="REPS" FontSize="9" TextColor="{DynamicResource TextSecondary}" HorizontalTextAlignment="Center" />
+                        <Label Grid.Column="4" Text="✓" FontSize="11" TextColor="{DynamicResource TextSecondary}" HorizontalTextAlignment="Center" />
+                    </Grid>
+                    <BoxView HeightRequest="1" Color="{DynamicResource OutlineVariant}" />
+                    <VerticalStackLayout Spacing="6" BindableLayout.ItemsSource="{Binding Sets}">
+                        <BindableLayout.ItemTemplate><DataTemplate x:DataType="models:ExerciseSet">
+                            <Grid ColumnDefinitions="26,*,*,*,40" ColumnSpacing="6" HeightRequest="52">
+                                <Label Text="{Binding DisplayLabel}" FontFamily="Lexend" FontSize="14" FontAttributes="Bold" TextColor="{DynamicResource OnSurface}" VerticalOptions="Center" HorizontalTextAlignment="Center">
+                                    <Label.Triggers>
+                                        <DataTrigger TargetType="Label" Binding="{Binding Kind}" Value="warmup"><Setter Property="TextColor" Value="#F4B942" /></DataTrigger>
+                                        <DataTrigger TargetType="Label" Binding="{Binding Kind}" Value="drop"><Setter Property="TextColor" Value="#AF85FF" /></DataTrigger>
+                                        <DataTrigger TargetType="Label" Binding="{Binding Kind}" Value="failure"><Setter Property="TextColor" Value="#FF6B6B" /></DataTrigger>
+                                    </Label.Triggers>
+                                    <Label.GestureRecognizers><TapGestureRecognizer Command="{Binding Source={x:Reference workoutPage}, Path=BindingContext.ShowSetKindCommand}" CommandParameter="{Binding .}" /></Label.GestureRecognizers>
+                                </Label>
+                                <Label Grid.Column="1" Text="{Binding PreviousText}" FontSize="10" TextColor="{DynamicResource TextSecondary}" HorizontalTextAlignment="Center" VerticalOptions="Center" LineBreakMode="TailTruncation" />
+                                <Border Grid.Column="2" StrokeShape="RoundRectangle 8" BackgroundColor="{DynamicResource SurfaceContainer}" StrokeThickness="0" Padding="4,0">
+                                    <Entry Text="{Binding WeightKg}" Keyboard="Numeric" HorizontalTextAlignment="Center" FontFamily="{AppThemeBinding Light=Inter, Dark=SpaceGrotesk}" FontSize="17" TextColor="{DynamicResource OnSurface}" BackgroundColor="Transparent">
+                                        <Entry.Triggers><DataTrigger TargetType="Entry" Binding="{Binding IsSuggested}" Value="True"><Setter Property="TextColor" Value="{DynamicResource TextSecondary}" /></DataTrigger></Entry.Triggers>
+                                    </Entry>
+                                </Border>
+                                <Border Grid.Column="3" StrokeShape="RoundRectangle 8" BackgroundColor="{DynamicResource SurfaceContainer}" StrokeThickness="0" Padding="4,0">
+                                    <Entry Text="{Binding Reps}" Keyboard="Numeric" HorizontalTextAlignment="Center" FontFamily="{AppThemeBinding Light=Inter, Dark=SpaceGrotesk}" FontSize="17" TextColor="{DynamicResource OnSurface}" BackgroundColor="Transparent">
+                                        <Entry.Triggers><DataTrigger TargetType="Entry" Binding="{Binding IsSuggested}" Value="True"><Setter Property="TextColor" Value="{DynamicResource TextSecondary}" /></DataTrigger></Entry.Triggers>
+                                    </Entry>
+                                </Border>
+                                <Button Grid.Column="4" Text="✓" Command="{Binding Source={x:Reference workoutPage}, Path=BindingContext.CompleteSetCommand}" CommandParameter="{Binding .}" BackgroundColor="Transparent" TextColor="{DynamicResource Outline}" FontSize="20" Padding="0" CornerRadius="20">
+                                    <Button.Triggers><DataTrigger TargetType="Button" Binding="{Binding IsCompleted}" Value="True"><Setter Property="TextColor" Value="{DynamicResource LimeGreen}" /></DataTrigger></Button.Triggers>
+                                </Button>
+                            </Grid>
+                        </DataTemplate></BindableLayout.ItemTemplate>
+                    </VerticalStackLayout>
+                    <Button Text="+ AGGIUNGI SERIE" Command="{Binding Source={x:Reference workoutPage}, Path=BindingContext.AddSetCommand}" CommandParameter="{Binding .}" BackgroundColor="Transparent" TextColor="{DynamicResource OnSurface}" FontFamily="Lexend" FontSize="11" HeightRequest="44" />
+                    <Border StrokeShape="RoundRectangle 10" StrokeThickness="0" BackgroundColor="{DynamicResource SurfaceContainer}" Padding="10,2">
+                        <Entry Text="{Binding Notes}" Placeholder="Note per questo esercizio" FontFamily="Inter" FontSize="12" TextColor="{DynamicResource OnSurface}" PlaceholderColor="{DynamicResource TextSecondary}" BackgroundColor="Transparent" />
+                    </Border>
+                    <BoxView HeightRequest="1" Color="{DynamicResource OutlineVariant}" Margin="0,12,0,0" />
+                </VerticalStackLayout>
+            </DataTemplate></CollectionView.ItemTemplate>
+            <CollectionView.Footer><Button Text="+ AGGIUNGI ESERCIZIO" Command="{Binding AddExerciseCommand}" Margin="20,16,20,24" HeightRequest="52" CornerRadius="14" BackgroundColor="{DynamicResource ElectricBlue}" TextColor="{DynamicResource OnPrimary}" FontFamily="Lexend" /></CollectionView.Footer>
+        </CollectionView>
+        <Border Grid.Row="2" IsVisible="{Binding IsRestTimerActive}" Margin="16,8,16,16" StrokeShape="RoundRectangle 16" Padding="16" StrokeThickness="0"
+                BackgroundColor="{AppThemeBinding Light={DynamicResource ElectricBlue}, Dark={DynamicResource SurfaceContainer}}">
+            <Grid ColumnDefinitions="Auto,*,48,64" ColumnSpacing="10">
+                <Path Data="M9,1 L15,1 M12,1 L12,5 M18,5 L20,3 M12,5 A8,8 0 1 1 11.99,5 M12,8 L12,13 L15,15" WidthRequest="24" HeightRequest="24" VerticalOptions="Center" StrokeThickness="2" Stroke="{AppThemeBinding Light=White, Dark={DynamicResource ElectricBlue}}" />
+                <VerticalStackLayout Grid.Column="1" Spacing="2">
+                    <Label Text="RECUPERO" FontFamily="Lexend" FontSize="9" CharacterSpacing="1" TextColor="{AppThemeBinding Light=White, Dark={DynamicResource TextSecondary}}" />
+                    <Label Text="{Binding RestTimerText}" FontFamily="{AppThemeBinding Light=Inter, Dark=SpaceGrotesk}" FontSize="28" FontAttributes="Bold" TextColor="{AppThemeBinding Light=White, Dark={DynamicResource OnSurface}}" />
+                </VerticalStackLayout>
+                <Button Grid.Column="2" Text="{Binding PauseTimerLabel}" Command="{Binding PauseRestTimerCommand}" BackgroundColor="Transparent" TextColor="{AppThemeBinding Light=White, Dark={DynamicResource OnSurface}}" FontSize="20" Padding="0" />
+                <Button Grid.Column="3" Text="SALTA" Command="{Binding SkipRestTimerCommand}" BackgroundColor="{AppThemeBinding Light=White, Dark={DynamicResource SurfaceContainerHigh}}" TextColor="{DynamicResource ElectricBlue}" FontFamily="Lexend" FontSize="10" Padding="8,0" CornerRadius="20" />
             </Grid>
-            <Border.GestureRecognizers>
-                <TapGestureRecognizer Command="{Binding AddExerciseCommand}" />
-            </Border.GestureRecognizers>
         </Border>
-
         <!-- Search Exercise Overlay -->
-        <Grid Grid.RowSpan="4" IsVisible="{Binding IsSearchVisible}"
-              BackgroundColor="{DynamicResource Surface}" Padding="20"
+        <Grid Grid.RowSpan="3" IsVisible="{Binding IsSearchVisible}"
+              BackgroundColor="{DynamicResource Surface}" Padding="20,16" ZIndex="20"
               RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,*,Auto">
 
             <!-- Search Header -->
@@ -416,13 +182,13 @@
                                     </DataTrigger>
                                 </Border.Triggers>
                                 <Border.GestureRecognizers>
-                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ActiveWorkoutViewModel}}, Path=SelectMuscleFilterCommand}" CommandParameter="{Binding .}" />
+                                    <TapGestureRecognizer Command="{Binding Source={x:Reference workoutPage}, Path=BindingContext.SelectMuscleFilterCommand}" CommandParameter="{Binding .}" />
                                 </Border.GestureRecognizers>
                                 <Label Text="{Binding Label}" FontFamily="Inter" FontSize="12"
                                        TextColor="{DynamicResource OnSurface}" VerticalOptions="Center">
                                     <Label.Triggers>
                                         <DataTrigger TargetType="Label" Binding="{Binding IsSelected}" Value="True">
-                                            <Setter Property="TextColor" Value="White" />
+                                            <Setter Property="TextColor" Value="{DynamicResource OnPrimary}" />
                                         </DataTrigger>
                                     </Label.Triggers>
                                 </Label>
@@ -450,13 +216,13 @@
                                     </DataTrigger>
                                 </Border.Triggers>
                                 <Border.GestureRecognizers>
-                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ActiveWorkoutViewModel}}, Path=SelectEquipmentFilterCommand}" CommandParameter="{Binding .}" />
+                                    <TapGestureRecognizer Command="{Binding Source={x:Reference workoutPage}, Path=BindingContext.SelectEquipmentFilterCommand}" CommandParameter="{Binding .}" />
                                 </Border.GestureRecognizers>
                                 <Label Text="{Binding Label}" FontFamily="Inter" FontSize="12"
                                        TextColor="{DynamicResource OnSurface}" VerticalOptions="Center">
                                     <Label.Triggers>
                                         <DataTrigger TargetType="Label" Binding="{Binding IsSelected}" Value="True">
-                                            <Setter Property="TextColor" Value="White" />
+                                            <Setter Property="TextColor" Value="{DynamicResource OnPrimary}" />
                                         </DataTrigger>
                                     </Label.Triggers>
                                 </Label>
@@ -490,7 +256,7 @@
                                 StrokeShape="RoundRectangle 10" Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1"
                                 Padding="12" Margin="0,4">
                             <Border.GestureRecognizers>
-                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ActiveWorkoutViewModel}}, Path=SelectExerciseCommand}" CommandParameter="{Binding .}" />
+                                <TapGestureRecognizer Command="{Binding Source={x:Reference workoutPage}, Path=BindingContext.SelectExerciseCommand}" CommandParameter="{Binding .}" />
                             </Border.GestureRecognizers>
                             <Grid ColumnDefinitions="80,*" ColumnSpacing="12" RowDefinitions="Auto,Auto">
                                 <Border Grid.Column="0" Grid.RowSpan="2"
@@ -500,7 +266,7 @@
                                            WidthRequest="80" HeightRequest="80" />
                                 </Border>
                                 <Label Grid.Column="1" Grid.Row="0" Text="{Binding Name}"
-                                       FontFamily="SpaceGrotesk" FontSize="16" FontAttributes="Bold"
+                                       FontFamily="{AppThemeBinding Light=Inter, Dark=SpaceGrotesk}" FontSize="16" FontAttributes="Bold"
                                        TextColor="{DynamicResource OnSurface}" LineBreakMode="TailTruncation"
                                        VerticalOptions="End" />
                                 <Label Grid.Column="1" Grid.Row="1" Text="{Binding BodyPart}"
@@ -522,7 +288,7 @@
         </Grid>
 
         <!-- Exercise Detail Overlay -->
-        <Border Grid.RowSpan="4" IsVisible="{Binding IsExerciseDetailVisible}"
+        <Border Grid.RowSpan="3" IsVisible="{Binding IsExerciseDetailVisible}"
                 BackgroundColor="{DynamicResource Surface}" Padding="0">
             <Grid RowDefinitions="Auto,*,Auto">
                 <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" Padding="20,16"
@@ -537,7 +303,7 @@
                         </Label>
                     </Border>
                     <Label Grid.Column="1" Text="{Binding SelectedExercise.ExerciseName}"
-                           FontFamily="SpaceGrotesk" FontSize="18" FontAttributes="Bold"
+                           FontFamily="{AppThemeBinding Light=Inter, Dark=SpaceGrotesk}" FontSize="18" FontAttributes="Bold"
                            TextColor="{DynamicResource OnSurface}"
                            HorizontalOptions="Center" VerticalOptions="Center" LineBreakMode="TailTruncation" />
                     <BoxView Grid.Column="2" WidthRequest="36" Color="Transparent" />
@@ -559,7 +325,7 @@
                                            TextColor="{DynamicResource TextSecondary}" CharacterSpacing="0.6"
                                            HorizontalTextAlignment="Center" />
                                     <Label Text="{Binding SelectedExercise.BodyPart}"
-                                           FontFamily="SpaceGrotesk" FontSize="13" FontAttributes="Bold"
+                                           FontFamily="{AppThemeBinding Light=Inter, Dark=SpaceGrotesk}" FontSize="13" FontAttributes="Bold"
                                            TextColor="{DynamicResource Primary}" HorizontalTextAlignment="Center" />
                                 </VerticalStackLayout>
                             </Border>
@@ -570,7 +336,7 @@
                                            TextColor="{DynamicResource TextSecondary}" CharacterSpacing="0.6"
                                            HorizontalTextAlignment="Center" />
                                     <Label Text="{Binding SelectedExercise.Equipment}"
-                                           FontFamily="SpaceGrotesk" FontSize="13" FontAttributes="Bold"
+                                           FontFamily="{AppThemeBinding Light=Inter, Dark=SpaceGrotesk}" FontSize="13" FontAttributes="Bold"
                                            TextColor="{DynamicResource Primary}" HorizontalTextAlignment="Center" />
                                 </VerticalStackLayout>
                             </Border>
@@ -581,11 +347,26 @@
                                            TextColor="{DynamicResource TextSecondary}" CharacterSpacing="0.6"
                                            HorizontalTextAlignment="Center" />
                                     <Label Text="{Binding SelectedExercise.Sets.Count}"
-                                           FontFamily="SpaceGrotesk" FontSize="13" FontAttributes="Bold"
+                                           FontFamily="{AppThemeBinding Light=Inter, Dark=SpaceGrotesk}" FontSize="13" FontAttributes="Bold"
                                            TextColor="{DynamicResource Primary}" HorizontalTextAlignment="Center" />
                                 </VerticalStackLayout>
                             </Border>
                         </Grid>
+
+                        <Label Text="Progressione" FontFamily="Lexend" FontSize="18" FontAttributes="Bold" TextColor="{DynamicResource OnSurface}" />
+                        <Button Text="{Binding SelectedProgressMetric}" Command="{Binding ShowProgressMetricMenuCommand}" TextColor="{DynamicResource OnSurface}" BackgroundColor="{DynamicResource SurfaceContainer}" CornerRadius="12" />
+                        <Label Text="Completa un allenamento con questo esercizio per vedere la progressione." IsVisible="{Binding HasExerciseProgress, Converter={StaticResource InverseBoolConverter}}" FontFamily="Inter" FontSize="12" TextColor="{DynamicResource TextSecondary}" />
+                        <ScrollView Orientation="Horizontal" IsVisible="{Binding HasExerciseProgress}" HorizontalScrollBarVisibility="Never">
+                            <HorizontalStackLayout Spacing="12" BindableLayout.ItemsSource="{Binding ExerciseProgressPoints}">
+                                <BindableLayout.ItemTemplate><DataTemplate x:DataType="services:ExerciseProgressPoint">
+                                    <Grid WidthRequest="54" HeightRequest="164" RowDefinitions="20,120,24">
+                                        <Label Text="{Binding Value, StringFormat='{0:0.#}'}" FontFamily="Inter" FontSize="10" HorizontalTextAlignment="Center" TextColor="{DynamicResource OnSurface}" />
+                                        <Border Grid.Row="1" WidthRequest="28" HeightRequest="{Binding Height}" VerticalOptions="End" HorizontalOptions="Center" StrokeShape="RoundRectangle 6" StrokeThickness="0" BackgroundColor="{DynamicResource ElectricBlue}" />
+                                        <Label Grid.Row="2" Text="{Binding Date}" FontFamily="Inter" FontSize="10" HorizontalTextAlignment="Center" TextColor="{DynamicResource TextSecondary}" />
+                                    </Grid>
+                                </DataTemplate></BindableLayout.ItemTemplate>
+                            </HorizontalStackLayout>
+                        </ScrollView>
 
                         <Label Text="INSTRUCTIONS" FontFamily="Lexend" FontSize="10" FontAttributes="Bold"
                                TextColor="{DynamicResource TextSecondary}" CharacterSpacing="0.8" />
@@ -603,7 +384,7 @@
                     </VerticalStackLayout>
                 </ScrollView>
 
-                <Border Grid.Row="2" Margin="16,8,16,100" BackgroundColor="{DynamicResource SurfaceContainerHigh}"
+                <Border Grid.Row="2" Margin="16,8,16,16" BackgroundColor="{DynamicResource SurfaceContainerHigh}"
                         Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1" StrokeShape="RoundRectangle 12"
                         Padding="0" HeightRequest="52">
                     <Label Text="✕ CLOSE DETAILS" FontFamily="Lexend" FontSize="13" FontAttributes="Bold"
@@ -617,5 +398,70 @@
             </Grid>
         </Border>
 
+
+        <Grid Grid.RowSpan="3" ZIndex="40" IsVisible="{Binding IsProgressMetricMenuVisible}" BackgroundColor="#99000000" Padding="20">
+            <Border VerticalOptions="End" BackgroundColor="{DynamicResource SurfaceContainer}" StrokeShape="RoundRectangle 24" Padding="20" StrokeThickness="0">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Progressione esercizio" FontSize="20" FontFamily="{AppThemeBinding Light=Inter, Dark=SpaceGrotesk}" TextColor="{DynamicResource OnSurface}" />
+                    <Button Text="Peso massimo (kg)" Command="{Binding SelectProgressMetricCommand}" CommandParameter="0" BackgroundColor="Transparent" TextColor="{DynamicResource OnSurface}" />
+                    <Button Text="Serie completate" Command="{Binding SelectProgressMetricCommand}" CommandParameter="1" BackgroundColor="Transparent" TextColor="{DynamicResource OnSurface}" />
+                    <Button Text="Ripetizioni totali" Command="{Binding SelectProgressMetricCommand}" CommandParameter="2" BackgroundColor="Transparent" TextColor="{DynamicResource OnSurface}" />
+                    <Button Text="Volume totale (kg)" Command="{Binding SelectProgressMetricCommand}" CommandParameter="3" BackgroundColor="Transparent" TextColor="{DynamicResource OnSurface}" />
+                    <Button Text="Chiudi" Command="{Binding CloseProgressMetricMenuCommand}" BackgroundColor="{DynamicResource SurfaceContainerHigh}" TextColor="{DynamicResource OnSurface}" CornerRadius="12" />
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
+        <Grid Grid.RowSpan="3" ZIndex="30" IsVisible="{Binding IsExerciseMenuVisible}" BackgroundColor="#99000000" Padding="20">
+            <Border VerticalOptions="End" StrokeShape="RoundRectangle 24" BackgroundColor="{DynamicResource SurfaceContainer}" Padding="20" StrokeThickness="0">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="{Binding SelectedExercise.ExerciseName}" TextColor="{DynamicResource OnSurface}" FontFamily="{AppThemeBinding Light=Inter, Dark=SpaceGrotesk}" FontSize="20" Margin="0,0,0,8" />
+                    <Button Text="Sposta prima" Command="{Binding MenuMoveUpCommand}" BackgroundColor="Transparent" TextColor="{DynamicResource OnSurface}" />
+                    <Button Text="Sposta dopo" Command="{Binding MenuMoveDownCommand}" BackgroundColor="Transparent" TextColor="{DynamicResource OnSurface}" />
+                    <Button Text="Sostituisci esercizio" Command="{Binding MenuReplaceCommand}" BackgroundColor="Transparent" TextColor="{DynamicResource ElectricBlue}" />
+                    <Button Text="Elimina dall’allenamento" Command="{Binding MenuRemoveCommand}" BackgroundColor="Transparent" TextColor="{DynamicResource Error}" />
+                    <Button Text="Chiudi" Command="{Binding CloseExerciseMenuCommand}" BackgroundColor="{DynamicResource SurfaceContainerHigh}" TextColor="{DynamicResource OnSurface}" CornerRadius="12" />
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
+        <Grid Grid.RowSpan="3" ZIndex="30" IsVisible="{Binding IsRestPickerVisible}" BackgroundColor="#99000000" Padding="20">
+            <Border VerticalOptions="End" MaximumHeightRequest="600" StrokeShape="RoundRectangle 24" BackgroundColor="{DynamicResource SurfaceContainer}" Padding="24" StrokeThickness="0">
+                <ScrollView VerticalScrollBarVisibility="Never">
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="Tempo di recupero" FontFamily="{AppThemeBinding Light=Inter, Dark=SpaceGrotesk}" FontSize="24" FontAttributes="Bold" TextColor="{DynamicResource OnSurface}" />
+                    <Label Text="{Binding SelectedExercise.ExerciseName}" FontFamily="Inter" FontSize="13" TextColor="{DynamicResource TextSecondary}" />
+                    <Grid ColumnDefinitions="*,*"><Label Text="MINUTI" HorizontalTextAlignment="Center" FontSize="10" TextColor="{DynamicResource TextSecondary}" /><Label Grid.Column="1" Text="SECONDI" HorizontalTextAlignment="Center" FontSize="10" TextColor="{DynamicResource TextSecondary}" /></Grid>
+                    <controls:RestDurationPicker Seconds="{Binding RestPickerSeconds}" TextColor="{DynamicResource ElectricBlue}" HeightRequest="140" />
+                    <Button Text="Salva recupero" Command="{Binding SaveRestPickerCommand}" BackgroundColor="{DynamicResource ElectricBlue}" TextColor="{DynamicResource OnPrimary}" CornerRadius="12" />
+                    <Button Text="Avvia timer" Command="{Binding StartPickedRestCommand}" IsVisible="{Binding IsCreating, Converter={StaticResource InverseBoolConverter}}" BackgroundColor="{DynamicResource SurfaceContainerHigh}" TextColor="{DynamicResource OnSurface}" CornerRadius="12" />
+                    <Button Text="Suono e vibrazione del recupero" Command="{Binding RestSoundSettingsCommand}" BackgroundColor="Transparent" TextColor="{DynamicResource ElectricBlue}" FontSize="11" />
+                    <Button Text="Abilita allarmi precisi in background" Command="{Binding EnableExactRestCommand}" BackgroundColor="Transparent" TextColor="{DynamicResource ElectricBlue}" FontSize="11" />
+                    <Button Text="Annulla" Command="{Binding CloseRestPickerCommand}" BackgroundColor="Transparent" TextColor="{DynamicResource OnSurface}" />
+                </VerticalStackLayout>
+                </ScrollView>
+            </Border>
+        </Grid>
+        <Grid Grid.RowSpan="3" ZIndex="50" IsVisible="{Binding IsPlanUpdateVisible}" BackgroundColor="#99000000" Padding="20">
+            <Border VerticalOptions="Center" StrokeShape="RoundRectangle 24" BackgroundColor="{DynamicResource SurfaceContainer}" Padding="24" StrokeThickness="0">
+                <VerticalStackLayout Spacing="14">
+                    <Label Text="Aggiornare la scheda?" FontFamily="{AppThemeBinding Light=Inter, Dark=SpaceGrotesk}" FontSize="23" FontAttributes="Bold" TextColor="{DynamicResource OnSurface}" />
+                    <Label Text="Hai modificato questa sessione. Vuoi salvare nella scheda nome, esercizi, ordine, serie e recuperi, oppure mantenere la versione originale? Le note vengono salvate automaticamente. L’allenamento verrà salvato in entrambi i casi." FontFamily="Inter" FontSize="14" TextColor="{DynamicResource TextSecondary}" />
+                    <Button Text="Aggiorna scheda e termina" Command="{Binding UpdatePlanAndFinishCommand}" BackgroundColor="{DynamicResource ElectricBlue}" TextColor="{DynamicResource OnPrimary}" CornerRadius="12" />
+                    <Button Text="Mantieni originale e termina" Command="{Binding KeepPlanAndFinishCommand}" BackgroundColor="{DynamicResource SurfaceContainerHigh}" TextColor="{DynamicResource OnSurface}" CornerRadius="12" />
+                    <Button Text="Torna all’allenamento" Command="{Binding CancelPlanUpdateCommand}" BackgroundColor="Transparent" TextColor="{DynamicResource TextSecondary}" />
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
+        <Grid Grid.RowSpan="3" ZIndex="50" IsVisible="{Binding IsSetKindVisible}" BackgroundColor="#99000000" Padding="20">
+            <Border VerticalOptions="End" StrokeShape="RoundRectangle 24" BackgroundColor="{DynamicResource SurfaceContainer}" Padding="20" StrokeThickness="0">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Tipo di serie" FontFamily="{AppThemeBinding Light=Inter, Dark=SpaceGrotesk}" FontSize="23" FontAttributes="Bold" TextColor="{DynamicResource OnSurface}" />
+                    <Button Text="Serie normale · numero" Command="{Binding SelectSetKindCommand}" CommandParameter="normal" BackgroundColor="Transparent" TextColor="{DynamicResource OnSurface}" />
+                    <Button Text="W · Warm-up" Command="{Binding SelectSetKindCommand}" CommandParameter="warmup" BackgroundColor="Transparent" TextColor="#F4B942" />
+                    <Button Text="D · Drop set" Command="{Binding SelectSetKindCommand}" CommandParameter="drop" BackgroundColor="Transparent" TextColor="#AF85FF" />
+                    <Button Text="F · Cedimento" Command="{Binding SelectSetKindCommand}" CommandParameter="failure" BackgroundColor="Transparent" TextColor="#FF6B6B" />
+                    <Button Text="Chiudi" Command="{Binding CloseSetKindCommand}" BackgroundColor="{DynamicResource SurfaceContainerHigh}" TextColor="{DynamicResource OnSurface}" CornerRadius="12" />
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
     </Grid>
 </ContentPage>

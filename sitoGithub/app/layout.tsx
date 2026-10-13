@@ -1,4 +1,3 @@
-import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 import { Providers } from '@/components/providers'
@@ -16,11 +15,11 @@ const ogImage = '/apple-icon.png'
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: 'FORGE — Allenati. Traccia. Progredisci.',
+    default: 'FORGE 0.8.5 beta — Allenati. Traccia. Progredisci.',
     template: '%s — FORGE',
   },
   description:
-    "FORGE è l'app di palestra open-source, privacy-first e self-hostable. Traccia i tuoi volumi, gestisci i tempi di recupero e mantieni i tuoi dati al sicuro.",
+    "FORGE è l'app di palestra open-source, privacy-first e self-hostable. Traccia i tuoi volumi, gestisci i tempi di recupero e scegli la community su cui salvare i tuoi dati.",
   keywords: [
     'FORGE', 'app palestra', 'workout tracker', 'gym tracker', 'fitness app',
     'allenamento', 'tracking allenamento', 'self-hosted', 'open source',
@@ -37,19 +36,17 @@ export const metadata: Metadata = {
     languages: {
       'it-IT': '/',
       'en-US': '/',
-      'es-ES': '/',
-      'zh-CN': '/',
     },
   },
   openGraph: {
     type: 'website',
     locale: 'it_IT',
-    alternateLocale: ['en_US', 'es_ES', 'zh_CN'],
+    alternateLocale: ['en_US'],
     url: siteUrl,
     siteName: 'FORGE',
     title: 'FORGE — Il diario di allenamento sociale',
     description:
-      "App Android open-source per tracciare gli allenamenti in palestra. 1.500+ esercizi, feed sociale, achievement, statistiche. Self-hostable e gratis.",
+      "App Android open-source per tracciare gli allenamenti in palestra. Schede personali, feed sulla propria community, achievement e statistiche. Beta 0.8.5, self-hostable.",
     images: [
       {
         url: ogImage,
@@ -63,7 +60,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'FORGE — Il diario di allenamento sociale',
     description:
-      'App Android open-source per tracciare gli allenamenti. 1.500+ esercizi, feed sociale, achievement. Self-hostable e gratis.',
+      'App Android open-source per tracciare gli allenamenti. Schede, feed della community e achievement retroattivi. Beta 0.8.5, self-hostable.',
     images: [ogImage],
   },
   robots: {
@@ -116,7 +113,6 @@ export default function RootLayout({
     >
       <body className="font-sans antialiased bg-forge-bg text-forge-fg">
         <Providers>{children}</Providers>
-        {process.env.NODE_ENV === 'production' && <Analytics />}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{

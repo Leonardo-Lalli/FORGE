@@ -7,7 +7,7 @@
 
 set -euo pipefail
 
-FORGE_VERSION="v0.8.0-beta"
+FORGE_VERSION="beta — repository checkout"
 FORGE_DIR="$HOME/forge-server"
 REPO_URL="https://github.com/Leonardo-Lalli/FORGE.git"
 PB_EMAIL="${PB_ADMIN_EMAIL:?Set PB_ADMIN_EMAIL before running the installer}"
@@ -35,8 +35,8 @@ echo ""
 echo -e "           ${BOLD}The Social Workout Tracker${NC}"
 echo -e "           ${FORGE_VERSION} — Self-Hosted Setup"
 echo ""
-echo -e "  PocketBase ~25 MB RAM | ~30 MB disk | Docker"
-echo -e "  1,500+ exercises | Social feed | Achievements | Offline"
+echo -e "  PocketBase | Docker Compose | Version selected by the administrator"
+echo -e "  Exercise catalogue cache | Community on this server | Achievements"
 echo ""
 
 # ── Pre-checks ─────────────────────────────────
@@ -47,7 +47,7 @@ if ! command -v docker &>/dev/null; then
 fi
 msg_ok "Docker $(docker --version | awk '{print $3}' | tr -d ',')"
 
-if ! docker compose version &>/dev/null 2>&1 && ! docker-compose --version &>/dev/null 2>&1; then
+if ! docker compose version &>/dev/null 2>&1; then
   msg_error "Docker Compose not found."
 fi
 msg_ok "Docker Compose available"
@@ -67,9 +67,9 @@ fi
 msg_ok "Repository ready at $FORGE_DIR"
 
 if [ ! -f "$FORGE_DIR/.env" ]; then
-  msg_info "Creating .env..."
+  msg_info "Creating .env template..."
   cp "$FORGE_DIR/.env.example" "$FORGE_DIR/.env"
-  msg_ok ".env created (using defaults)"
+  msg_error "Fill .env with a reviewed PB_VERSION and unique administrator credentials, then rerun."
 else
   msg_ok ".env already present"
 fi
@@ -79,7 +79,7 @@ section "Start PocketBase"
 
 msg_info "Starting Docker containers..."
 cd "$FORGE_DIR"
-docker compose up -d pocketbase
+docker compose up -d --build pocketbase
 msg_ok "PocketBase started"
 
 msg_info "Waiting for PocketBase (max 60s)..."
@@ -106,9 +106,10 @@ fi
 msg_info "Initializing collections..."
 docker compose run --rm init
 msg_ok "Collections ready"
-msg_info "Profile/privacy and shared exercise cache require the reviewed migration:"
-echo '  sudo bash tools/apply-docker-profile-migration.sh'
-echo 'See docs/pocketbase-profile-migration.md. GIF files are referenced by URL, not stored locally.'
+msg_info "Applying FORGE migrations with a database backup..."
+if [ "$(id -u)" -eq 0 ]; then bash tools/apply-docker-profile-migration.sh;
+else sudo bash tools/apply-docker-profile-migration.sh; fi
+msg_info "GIF files remain on the provider. Remote social push requires separate Firebase setup."
 
 # ── Detect IP ──────────────────────────────────
 msg_info "Detecting server IP..."
@@ -144,14 +145,14 @@ echo -e "${BOLD}║${NC}                                                        
 echo -e "${BOLD}║${NC}     ${GREEN}FORGE is online!${NC}                                        ${BOLD}║${NC}"
 echo -e "${BOLD}║${NC}                                                          ${BOLD}║${NC}"
 echo -e "${BOLD}║${NC}     In the FORGE app, go to Settings >                   ${BOLD}║${NC}"
-echo -e "${BOLD}║${NC}     PocketBase URL and paste:                            ${BOLD}║${NC}"
-echo -e "${BOLD}║${NC}     ${CYAN}http://${HOST_IP}:8090${NC}                                     ${BOLD}║${NC}"
+echo -e "${BOLD}║${NC}     PocketBase URL: your HTTPS proxy; local address:                            ${BOLD}║${NC}"
+echo -e "${BOLD}║${NC}     ${CYAN}http://127.0.0.1:8090${NC}                                     ${BOLD}║${NC}"
 echo -e "${BOLD}║${NC}                                                          ${BOLD}║${NC}"
 echo -e "${BOLD}║${NC}     Admin Panel:                                         ${BOLD}║${NC}"
-echo -e "${BOLD}║${NC}     ${CYAN}http://${HOST_IP}:8090/_/${NC}                                     ${BOLD}║${NC}"
+echo -e "${BOLD}║${NC}     ${CYAN}http://127.0.0.1:8090/_/${NC}                                     ${BOLD}║${NC}"
 echo -e "${BOLD}║${NC}     Admin: ${PB_EMAIL} (password not displayed)        ${BOLD}║${NC}"
 echo -e "${BOLD}║${NC}                                                          ${BOLD}║${NC}"
-echo -e "${BOLD}║${NC}     ${YELLOW}CHANGE THE ADMIN PASSWORD IMMEDIATELY!${NC}               ${BOLD}║${NC}"
+echo -e "${BOLD}║${NC}     ${YELLOW}KEEP ADMIN ACCESS PRIVATE AND BACK UP YOUR DATA${NC}               ${BOLD}║${NC}"
 echo -e "${BOLD}║${NC}                                                          ${BOLD}║${NC}"
 echo -e "${BOLD}╚══════════════════════════════════════════════════════════╝${NC}"
 echo ""
@@ -160,6 +161,6 @@ echo ""
 msg_info "Next steps:"
 echo "  1. Open the FORGE app on your phone"
 echo "  2. Go to Settings > PocketBase URL"
-echo "  3. Enter: http://${HOST_IP}:8090"
+echo "  3. Enter your HTTPS reverse-proxy URL (127.0.0.1 is for this server only)"
 echo "  4. Sign up and start training!"
 echo ""

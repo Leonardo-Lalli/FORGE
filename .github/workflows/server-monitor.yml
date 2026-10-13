@@ -2,71 +2,27 @@ name: Server Monitor
 
 on:
   schedule:
-    - cron: '*/5 * * * *'
+    - cron: '*/30 * * * *'
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   check-server:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-
       - name: Check PocketBase health
-        id: health
+        env:
+          POCKETBASE_URL: ${{ secrets.POCKETBASE_URL }}
         run: |
-          if curl -f -s -o /dev/null -w "%{http_code}" --max-time 10 \
-            "${{ secrets.POCKETBASE_URL }}/api/health" | grep -q "200"; then
-            echo "status=up" >> $GITHUB_OUTPUT
-          else
-            echo "status=down" >> $GITHUB_OUTPUT
+          if [ -z "$POCKETBASE_URL" ]; then
+            echo 'Health check not configured.' >> "$GITHUB_STEP_SUMMARY"
+            exit 0
           fi
-
-      - name: Check if banner already present
-        id: check
-        run: |
-          if grep -q "SERVER OFFLINE" README.md; then
-            echo "has_banner=true" >> $GITHUB_OUTPUT
+          if curl --fail --silent --show-error --retry 2 --retry-delay 5 --max-time 10 "${POCKETBASE_URL%/}/api/health" >/dev/null; then
+            echo 'PocketBase health check passed. This does not verify login or push delivery.' >> "$GITHUB_STEP_SUMMARY"
           else
-            echo "has_banner=false" >> $GITHUB_OUTPUT
+            echo 'PocketBase health endpoint could not be reached after retries.' >> "$GITHUB_STEP_SUMMARY"
+            exit 1
           fi
-
-      - name: Add OFFLINE banner
-        if: steps.health.outputs.status == 'down' && steps.check.outputs.has_banner == 'false'
-        run: |
-          cat > banner.html << 'ENDOFBANNER'
-          <table style="width:100%;border-collapse:collapse;margin-bottom:16px"><tr><td style="background-color:#dc2626;color:white;padding:16px;text-align:center;font-weight:bold;font-size:16px;border-radius:8px">&#x26A0; SERVER OFFLINE &#x26A0; &mdash; Il server FORGE &egrave; temporaneamente irraggiungibile. Torner&agrave; online al pi&ugrave; presto.</td></tr></table>
-          ENDOFBANNER
-          for f in README.md README_en.md README_es.md README_zh.md; do
-            if [ -f "$f" ]; then
-              cat banner.html "$f" > tmp && mv tmp "$f"
-            fi
-          done
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add README.md README_en.md README_es.md README_zh.md 2>/dev/null || true
-          git diff --staged --quiet || git commit -m "server: add OFFLINE banner"
-          git push
-
-      - name: Remove OFFLINE banner
-        if: steps.health.outputs.status == 'up' && steps.check.outputs.has_banner == 'true'
-        run: |
-          cat > remove_banner.py << 'PYEOF'
-          import re, sys
-          for f in sys.argv[1:]:
-              c = open(f).read()
-              c = re.sub(r'<table[^>]*>.*?SERVER OFFLINE.*?</table>\s*', '', c, count=1, flags=re.DOTALL)
-              open(f, 'w').write(c.lstrip('\n'))
-          PYEOF
-          for f in README.md README_en.md README_es.md README_zh.md; do
-            if [ -f "$f" ]; then
-              python3 remove_banner.py "$f"
-            fi
-          done
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add README.md README_en.md README_es.md README_zh.md 2>/dev/null || true
-          git diff --staged --quiet || git commit -m "server: remove OFFLINE banner (back online)"
-          git push

@@ -10,6 +10,7 @@
                 <ResourceDictionary Source="Resources/Styles/Styles.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
+            <converters:WorkoutPhotoConverter x:Key="WorkoutPhotoConverter" />
         </ResourceDictionary>
     </Application.Resources>
 </Application>

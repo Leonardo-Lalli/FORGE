@@ -22,11 +22,15 @@ public partial class WorkoutExercise : ObservableObject
     public string ExerciseName { get; set; } = string.Empty;
     public string BodyPart { get; set; } = string.Empty;
     public string Equipment { get; set; } = string.Empty;
-    public string ImageUrl { get; set; } = string.Empty;
-    public string GifUrl { get; set; } = string.Empty;
+    [ObservableProperty] private string imageUrl = string.Empty;
+    [ObservableProperty] private string gifUrl = string.Empty;
     [ObservableProperty] private string notes = string.Empty;
-    public List<string> Instructions { get; set; } = new();
-    public int Order { get; set; }
+    [ObservableProperty, NotifyPropertyChangedFor(nameof(ExecutionTip))] private List<string> instructions = new();
+    [ObservableProperty, NotifyPropertyChangedFor(nameof(ExecutionTip))] private int executionTipIndex;
+    public string ExecutionTip => Instructions.Count == 0 ? "Istruzioni non disponibili per questo esercizio." : $"STEP {ExecutionTipIndex % Instructions.Count + 1}/{Instructions.Count} · {Instructions[ExecutionTipIndex % Instructions.Count]}";
+    public void AdvanceExecutionTip() { if (Instructions.Count > 1) ExecutionTipIndex = (ExecutionTipIndex + 1) % Instructions.Count; }
+    [ObservableProperty] private int order;
+    public string RestLabel => $"Recupero {RestSeconds / 60:00}:{RestSeconds % 60:00}";
     [ObservableProperty] private int restSeconds = 90;
     [ObservableProperty] private int restMinutes = 1;
     [ObservableProperty] private int restSecondPart = 30;
@@ -39,6 +43,7 @@ public partial class WorkoutExercise : ObservableObject
         RestMinutes = RestSeconds / 60;
         RestSecondPart = RestSeconds % 60;
         updatingRest = false;
+        OnPropertyChanged(nameof(RestLabel));
     }
     partial void OnRestMinutesChanged(int value) => UpdateRestParts();
     partial void OnRestSecondPartChanged(int value) => UpdateRestParts();
@@ -55,12 +60,16 @@ public partial class WorkoutExercise : ObservableObject
 public partial class ExerciseSet : ObservableObject
 {
     public string Id { get; set; } = Guid.NewGuid().ToString();
-    public int SetNumber { get; set; }
+    [ObservableProperty, NotifyPropertyChangedFor(nameof(DisplayLabel))] private int setNumber;
+    [ObservableProperty, NotifyPropertyChangedFor(nameof(DisplayLabel))] private string kind = "normal";
+    public string DisplayLabel => Kind switch { "warmup" => "W", "drop" => "D", "failure" => "F", _ => SetNumber.ToString() };
+
 
     [ObservableProperty] private double weightKg;
     [ObservableProperty] private int reps;
     [ObservableProperty] private bool isCompleted;
     [ObservableProperty] private bool isSuggested;
+    [ObservableProperty] private string previousText = "—";
     partial void OnWeightKgChanged(double value) => IsSuggested = false;
     partial void OnRepsChanged(int value) => IsSuggested = false;
 }

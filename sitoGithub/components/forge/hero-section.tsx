@@ -1,10 +1,12 @@
 "use client"
 
 import { Download } from "lucide-react"
+import { useReleaseDownload } from "./release-download"
 import { useI18n } from "@/lib/i18n"
 
 export function HeroSection() {
   const { t } = useI18n()
+  const downloadUrl = useReleaseDownload()
   return (
     <section className="px-6 pb-[90px] pt-[110px] text-center">
       <div className="mx-auto w-full max-w-[1120px]">
@@ -24,7 +26,7 @@ export function HeroSection() {
 
         <div id="download" className="flex flex-wrap items-center justify-center gap-4">
           <a
-            href="https://github.com/Leonardo-Lalli/FORGE/releases/latest/download/FORGE.apk"
+            href={downloadUrl}
             className="inline-flex items-center gap-2.5 rounded-full bg-forge-cyan px-6 py-3.5 text-[15px] font-semibold text-[#001417] glow-cyan transition-all hover:-translate-y-0.5 hover:glow-cyan-strong"
             aria-label={t.hero.ctaPrimary}
           >
@@ -41,6 +43,7 @@ export function HeroSection() {
           </a>
         </div>
 
+        <div className="mx-auto mt-10 max-w-[680px] rounded-[14px] border border-forge-border bg-forge-elev p-6 text-left"><h2 className="mb-3 text-lg font-bold">{t.story.title}</h2><p className="text-sm leading-relaxed text-forge-muted">{t.story.body}</p></div>
         <p className="mt-[22px] font-mono text-[13px] text-forge-dim">
           {t.hero.note}
         </p>

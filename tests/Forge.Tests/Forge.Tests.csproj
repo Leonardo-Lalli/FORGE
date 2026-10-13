@@ -37,6 +37,10 @@
     <Compile Include="..\..\src\Forge\Messages\*.cs" Link="Shared\Messages\%(Filename)%(Extension)" />
     <Compile Include="..\..\src\Forge\Services\PreviousPerformance.cs" Link="Shared/Services/PreviousPerformance.cs" />
     <Compile Include="..\..\src\Forge\Services\VolumeChart.cs" Link="Shared/Services/VolumeChart.cs" />
+    <Compile Include="../../src/Forge/Services/PlanSessionChanges.cs" Link="Shared/Services/PlanSessionChanges.cs" />
+    <Compile Include="../../src/Forge/Services/ExerciseMuscleFilter.cs" Link="Shared/Services/ExerciseMuscleFilter.cs" />
+    <Compile Include="..\..\src\Forge\Services\StatsPeriod.cs" Link="Shared/Services/StatsPeriod.cs" />
+    <Compile Include="..\..\src\Forge\Services\ExerciseProgress.cs" Link="Shared/Services/ExerciseProgress.cs" />
     <Compile Include="..\..\src\Forge\Services\AchievementEvaluator.cs" Link="Shared\Services\AchievementEvaluator.cs" />
     <Compile Include="..\..\src\Forge\Services\DatabaseService.cs" Link="Shared\Services\DatabaseService.cs" />
     <Compile Include="..\..\src\Forge\Services\CertificatePinningHandler.cs" Link="Shared\Services\CertificatePinningHandler.cs" />
@@ -44,9 +48,11 @@
     <Compile Include="..\..\src\Forge\Services\PocketBaseService.Profiles.cs" Link="Shared/Services/PocketBaseService.Profiles.cs" />
     <Compile Include="..\..\src\Forge\Services\PlanService.cs" Link="Shared/Services/PlanService.cs" />
     <Compile Include="..\..\src\Forge\Services\PocketBaseService.cs" Link="Shared\Services\PocketBaseService.cs" />
+    <Compile Include="../../src/Forge/Services/CommunityInvite.cs" Link="Shared/Services/CommunityInvite.cs" />
     <Compile Include="..\..\src\Forge\Services\ServerAddress.cs" Link="Shared\Services\ServerAddress.cs" />
     <Compile Include="..\..\src\Forge\Services\BuildSecrets.cs" Link="Shared\Services\BuildSecrets.cs" />
     <Compile Include="..\..\src\Forge\Services\AchievementService.cs" Link="Shared\Services\AchievementService.cs" />
+    <Compile Include="..\..\src\Forge\Services\NotificationService.cs" Link="Shared/Services/NotificationService.cs" />
     <Compile Include="..\..\src\Forge\ViewModels\AchievementsViewModel.cs" Link="Shared\ViewModels\AchievementsViewModel.cs" />
     <Compile Include="..\..\src\Forge\ViewModels\BaseViewModel.cs" Link="Shared\ViewModels\BaseViewModel.cs" />
   </ItemGroup>

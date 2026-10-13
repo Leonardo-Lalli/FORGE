@@ -7,8 +7,8 @@ onRecordCreateRequest((e) => {
 onRecordUpdateRequest((e) => {
     const allowed = ["first_workout", "holy_week", "habit", "weekend_warrior", "no_excuses", "unstoppable", "member", "comeback", "metronome", "anniversary", "max_weight", "club_100", "hercules", "iron_marathon", "steel_plank", "marble_legs", "bench_king", "powerlifter", "ton_week", "early_bird", "night_owl", "punctual", "hour_grinder", "explorer", "all_rounder", "specialist", "full_body", "encyclopedia", "narcissus", "photographer", "social_butterfly", "networker", "gym_buddy", "lone_wolf", "mentor", "champion", "serial_winner", "challenger", "underdog", "founder", "beta_tester", "legend", "veteran", "milestone"];
     const badges = JSON.parse(e.record.getString('featured_achievements') || '[]') || [];
-    if (!Array.isArray(badges) || badges.length > 3 || new Set(badges).size !== badges.length || badges.some(id => typeof id !== 'string' || !allowed.includes(id)))
-        throw new BadRequestError('Select at most three distinct achievement IDs.');
+    if (!Array.isArray(badges) || badges.length > allowed.length || new Set(badges).size !== badges.length || badges.some(id => typeof id !== 'string' || !allowed.includes(id)))
+        throw new BadRequestError('Select distinct valid achievement IDs.');
     e.next();
 }, 'users');
 

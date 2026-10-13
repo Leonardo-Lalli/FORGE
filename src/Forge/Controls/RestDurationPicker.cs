@@ -7,7 +7,7 @@ public class RestDurationPicker : ContentView
         nameof(Seconds), typeof(int), typeof(RestDurationPicker), 90, BindingMode.TwoWay,
         coerceValue: (_, value) => Math.Clamp((int)value, 0, 300), propertyChanged: OnSecondsChanged);
     public static readonly BindableProperty TextColorProperty = BindableProperty.Create(
-        nameof(TextColor), typeof(Color), typeof(RestDurationPicker), Colors.Cyan,
+        nameof(TextColor), typeof(Color), typeof(RestDurationPicker), Color.FromArgb("#00daf3"),
         propertyChanged: (view, _, value) => ((RestDurationPicker)view).UpdateColor((Color)value));
     public int Seconds { get => (int)GetValue(SecondsProperty); set => SetValue(SecondsProperty, value); }
     public Color TextColor { get => (Color)GetValue(TextColorProperty); set => SetValue(TextColorProperty, value); }

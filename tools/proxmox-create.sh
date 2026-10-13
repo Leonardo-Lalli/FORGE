@@ -197,17 +197,20 @@ msg_ok "Service started on port ${PB_PORT}"
 
 # ── Wait for PocketBase ────────────────────────
 msg_info "Waiting for PocketBase..."
+healthy=0
 for i in $(seq 1 30); do
   if pct exec "${CT_ID}" -- curl -sf "http://localhost:${PB_PORT}/api/health" &>/dev/null; then
+    healthy=1
     break
   fi
   sleep 2
 done
+[ "$healthy" -eq 1 ] || msg_error "PocketBase did not become healthy within 60 seconds."
 msg_ok "PocketBase online"
 
 # ── Create superuser ───────────────────────────
 msg_info "Creating superuser..."
-pct exec "${CT_ID}" -- /opt/forge-pocketbase/pocketbase superuser create "${PB_EMAIL}" "${PB_PASS}" 2>/dev/null && \
+pct exec "${CT_ID}" -- /opt/forge-pocketbase/pocketbase superuser create "${PB_EMAIL}" "${PB_PASS}" --dir=/opt/forge-pocketbase/pb_data 2>/dev/null && \
   msg_ok "Superuser created" || msg_ok "Superuser already exists"
 
 # ── Create collections via init script ─────────
@@ -217,6 +220,16 @@ pct push "${CT_ID}" "${FORGE_INIT_SCRIPT}" /tmp/init-forge.sh
 pct exec "${CT_ID}" -- env PB_URL="http://localhost:${PB_PORT}" \
   PB_ADMIN_EMAIL="${PB_EMAIL}" PB_ADMIN_PASSWORD="${PB_PASS}" sh /tmp/init-forge.sh
 msg_ok "Missing collections initialized; existing live rules were not changed."
+# Deploy reviewed hooks/migrations into the new CT and use the same backup procedure as existing LXC installs.
+forge_code_stage=$(mktemp -d /tmp/forge-ct-code.XXXXXX)
+cp -a "$(dirname "$FORGE_INIT_SCRIPT")/pocketbase" "$forge_code_stage/pocketbase"
+cp "$(dirname "$FORGE_INIT_SCRIPT")/apply-profile-migration.sh" "$forge_code_stage/apply-profile-migration.sh"
+mkdir -p "$forge_code_stage/tools"
+mv "$forge_code_stage/pocketbase" "$forge_code_stage/apply-profile-migration.sh" "$forge_code_stage/tools/"
+tar -C "$forge_code_stage" -czf "$forge_code_stage/code.tgz" tools
+pct push "${CT_ID}" "$forge_code_stage/code.tgz" /tmp/forge-code.tgz
+pct exec "${CT_ID}" -- bash -c 'mkdir -p /tmp/forge-code; tar -xzf /tmp/forge-code.tgz -C /tmp/forge-code; bash /tmp/forge-code/tools/apply-profile-migration.sh /opt/forge-pocketbase forge-pocketbase'
+
 
 # ── Summary ────────────────────────────────────
 echo ""
@@ -230,7 +243,7 @@ echo -e "${BOLD}║${NC}     RAM:       512 MB | Disk: 4 GB | CPU: 2            
 echo -e "${BOLD}║${NC}                                                          ${BOLD}║${NC}"
 echo -e "${BOLD}║${NC}     App URL:   ${CYAN}http://${CT_IP}:${PB_PORT}${NC}                              ${BOLD}║${NC}"
 echo -e "${BOLD}║${NC}     Admin:     ${CYAN}http://${CT_IP}:${PB_PORT}/_/${NC}                          ${BOLD}║${NC}"
-echo -e "${BOLD}║${NC}     Login:     ${PB_EMAIL} / ${PB_PASS}        ${BOLD}║${NC}"
+echo -e "${BOLD}║${NC}     Login:     ${PB_EMAIL} (password not displayed)        ${BOLD}║${NC}"
 echo -e "${BOLD}║${NC}                                                          ${BOLD}║${NC}"
 echo -e "${BOLD}║${NC}     ${YELLOW}CHANGE THE ADMIN PASSWORD IMMEDIATELY!${NC}               ${BOLD}║${NC}"
 echo -e "${BOLD}║${NC}                                                          ${BOLD}║${NC}"

@@ -39,6 +39,59 @@ public class ProfileWorkoutRegressionTests : IAsyncLifetime
         pb.Logout();
     }
     [Fact]
+    public async Task AutomaticNotesPersistWithoutChangingTheOriginalPlan()
+    {
+        var pb = new PocketBaseService(new Factory(req => Json("{\"token\":\"t\",\"record\":{\"id\":\"" + (req.Content!.ReadAsStringAsync().Result.Contains("bob") ? "bob" : "alice") + "\"}}")), new BuildSecrets());
+        Preferences.Set("pb_server_url", "https://example.invalid");
+        await pb.LoginAsync("alice@test.invalid", "password");
+        try
+        {
+            var service = new PlanService(db, pb);
+            var original = new WorkoutPlan { Name = "Original", Notes = "Old", RestSeconds = 90,
+                Exercises = [new WorkoutExercise { ExerciseId = "squat", ExerciseName = "Squat", Notes = "Old", RestSeconds = 60,
+                    Sets = new([new ExerciseSet { SetNumber = 1, WeightKg = 40, Reps = 10 }]) }] };
+            await service.SavePlanAsync(original);
+            var session = PlanSessionChanges.CopyExercises(original.Exercises);
+            session[0].Notes = "New exercise note"; session[0].RestSeconds = 120; session[0].Sets[0].WeightKg = 80;
+            session.Add(new WorkoutExercise { ExerciseId = "bench", ExerciseName = "Bench", Notes = "New entry" });
+            static List<PlanSessionChanges.ExerciseNote> Notes(IEnumerable<WorkoutExercise> items)
+                => items.Select(e => new PlanSessionChanges.ExerciseNote(e.Id, e.ExerciseId, e.ExerciseName, e.Notes)).ToList();
+            await service.SaveNotesAsync(original.Id, "alice", "New workout note", Notes(session));
+            var restored = (await new PlanService(db, pb).LoadPlansAsync()).Single(p => p.Id == original.Id);
+            Assert.Equal("New workout note", restored.Notes);
+            Assert.Equal("New exercise note", restored.Exercises[0].Notes);
+            Assert.Equal("Original", restored.Name); Assert.Equal(90, restored.RestSeconds);
+            Assert.Single(restored.Exercises); Assert.Equal(60, restored.Exercises[0].RestSeconds);
+            Assert.Equal(40, restored.Exercises[0].Sets[0].WeightKg);
+            // Clearing is persisted, while replacing an exercise must not overwrite the old entry's notes.
+            session[0].ExerciseId = "replacement"; session[0].Notes = "Replacement note";
+            await service.SaveNotesAsync(original.Id, "alice", "", Notes(session));
+            restored = (await service.LoadPlansAsync()).Single(p => p.Id == original.Id);
+            Assert.Equal("", restored.Notes); Assert.Equal("New exercise note", restored.Exercises[0].Notes);
+            session[0].ExerciseId = "squat"; session[0].Notes = "";
+            await service.SaveNotesAsync(original.Id, "alice", "", Notes(session));
+            Assert.Equal("", (await service.LoadPlansAsync()).Single(p => p.Id == original.Id).Exercises[0].Notes);
+            await pb.LoginAsync("bob@test.invalid", "password");
+            await Assert.ThrowsAsync<InvalidOperationException>(() => service.SaveNotesAsync(original.Id, "alice", "Wrong account", Notes(session)));
+        }
+        finally { pb.Logout(); }
+    }
+    [Theory]
+    [InlineData(0, false)]
+    [InlineData(2, true)]
+    [InlineData(-1, null)]
+    public async Task CommunityCountDistinguishesFirstMemberAndUnavailableServer(int count, bool? expected)
+    {
+        var pb = new PocketBaseService(new Factory(req => {
+            if (req.RequestUri!.AbsolutePath.EndsWith("auth-with-password")) return Json("{\"token\":\"t\",\"record\":{\"id\":\"alice\"}}");
+            return count < 0 ? new HttpResponseMessage(HttpStatusCode.ServiceUnavailable) : Json("{\"totalItems\":" + count + ",\"items\":[]}");
+        }), new BuildSecrets());
+        Preferences.Set("pb_server_url", "https://example.invalid");
+        await pb.LoginAsync("alice@test.invalid", "password");
+        try { Assert.Equal(expected, await pb.HasOtherCommunityMembersAsync()); }
+        finally { pb.Logout(); }
+    }
+    [Fact]
     public async Task RetroactiveAwardsImportEveryHistoryPage()
     {
         var pb = new PocketBaseService(new Factory(req => {

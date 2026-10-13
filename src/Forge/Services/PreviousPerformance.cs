@@ -45,6 +45,7 @@ public static class PreviousPerformance
             exercise.Sets[i].WeightKg = previous[i].Weight;
             exercise.Sets[i].Reps = previous[i].Reps;
             exercise.Sets[i].IsSuggested = true;
+            exercise.Sets[i].PreviousText = $"{previous[i].Weight:0.#} × {previous[i].Reps}";
         }
     }
 }

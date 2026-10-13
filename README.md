@@ -1,351 +1,149 @@
-https://github.com/user-attachments/assets/28498cc5-b1e4-4de4-bce0-1627f3fb002d
-
-<div align="center">
-
-> [Visit the official website](https://leonardo-lalli.github.io/FORGE/) — multilingual, full docs, direct download
-
-> **HOBBY PROJECT FOR EDUCATIONAL PURPOSES**
-> This app is developed by a student as a school project.
-> **It is not a commercial product.** The server is self-hosted on home hardware.
-> There may be bugs, limitations, and unplanned downtime.
-> Use for testing and demos, not for critical data.
-
-<img src="assets/screenshots/dashboard.jpeg" width="120" style="border-radius:24px" />
-
-[English](README.md) · [Italiano](README.md?lang=it) · [Español](README_es.md) · [中文](README_zh.md)
-
 # FORGE
 
-### The Social Workout Tracker
+**Diario di allenamento Android con una community sul server che scegli.**
 
-[![.NET MAUI](https://img.shields.io/badge/.NET%20MAUI-Android--first-512BD4?logo=dotnet)](https://learn.microsoft.com/dotnet/maui/)
-[![PocketBase](https://img.shields.io/badge/PocketBase-Backend-000000?logo=pocketbase)](https://pocketbase.io/)
-[![DuckDNS](https://img.shields.io/badge/DuckDNS-DDNS-FF5722?logo=duckdns)](https://duckdns.org)
-[![ExerciseDB](https://img.shields.io/badge/ExerciseDB-750%2B%20exercises-22C55E)](https://oss.exercisedb.dev)
-[![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)](#self-hosting)
-[![MVVM](https://img.shields.io/badge/Architecture-MVVM%20%7C%20CommunityToolkit-7C3AED)](https://learn.microsoft.com/dotnet/communitytoolkit/mvvm/)
-[![Tests](https://img.shields.io/badge/Tests-67%20passed-brightgreen)](tests/)
-[![License](https://img.shields.io/badge/License-MIT-blue)](LICENSE)
+[![.NET MAUI](https://img.shields.io/badge/.NET_10-MAUI-512BD4)](https://learn.microsoft.com/dotnet/maui/)
+[![Stato](https://img.shields.io/badge/versione-0.8.5_beta-blue)](docs/release-readiness.md)
+[![Licenza](https://img.shields.io/badge/codice-MIT-blue)](LICENSE)
 
-[![GitHub stars](https://img.shields.io/github/stars/Leonardo-Lalli/FORGE?style=social&label=Star)](https://github.com/Leonardo-Lalli/FORGE/stargazers)
-[![GitHub downloads](https://img.shields.io/github/downloads/Leonardo-Lalli/FORGE/total?label=Download)](https://github.com/Leonardo-Lalli/FORGE/releases)
-[![Last commit](https://img.shields.io/github/last-commit/Leonardo-Lalli/FORGE?label=Updated)](https://github.com/Leonardo-Lalli/FORGE/commits)
-[![GitHub release](https://img.shields.io/github/v/release/Leonardo-Lalli/FORGE?label=Release)](https://github.com/Leonardo-Lalli/FORGE/releases/latest)
+[Sito e download](https://leonardo-lalli.github.io/FORGE/#download) · [Release pubblicate](https://github.com/Leonardo-Lalli/FORGE/releases) · [Segnala un problema](https://github.com/Leonardo-Lalli/FORGE/issues) · [Roadmap](ROADMAP.md)
 
-**Turn every rep into progress. Challenge your friends. Push your limits.**
+## Il progetto
 
-### Quick Links
-[APK Download](#download-apk) · [Self-Hosting](#self-hosting) · [Screenshots](#screenshots) · [Project Status](#project-status) · [Security](#security)
+FORGE nasce come progetto studentesco di informatica di **Leonardo Lalli**. È cresciuto attraverso prove sul telefono e in palestra, correzioni e feedback, fino alla beta **0.8.5**, aperta a chi vuole provarla e contribuire con feedback.
 
----
+Lo sviluppo impiega estesamente strumenti di **intelligenza artificiale**, incluso Codex, per implementazione, interfacce, revisione, documentazione e verifiche. L’AI è uno strumento di lavoro: non certifica la correttezza o la sicurezza del prodotto. Scelte, revisione e pubblicazione restano responsabilità del proprietario del progetto. Build, verifiche mirate e prove sul dispositivo sono documentate, con i controlli ancora mancanti.
 
-[Watch the demo video](assets/Videos/hailuo-2_3_sculptural_clay_art_Create_a_premium_mobile_app_splash_screen_for_a_fitness_and_-0.mp4)
+L’obiettivo è unire registrazione degli allenamenti e motivazione tra amici. Una possibile evoluzione è l’uso da parte delle palestre per i propri iscritti: **gestione trainer, iscrizioni e più palestre non sono ancora implementate**.
 
-</div>
+## Stato reale
 
----
+**Versione 0.8.5 beta** · codice di riferimento su **main** · Android. La beta è pensata inizialmente per pochi utenti disponibili a segnalare problemi, senza garanzie di disponibilità del server pubblico. Le modifiche successive a un tag non sono automaticamente incluse nel suo APK.
 
-## What is FORGE
+Il proprietario ha confermato sul proprio telefono login, flusso di allenamento, suono del recupero e correttezza apparente dei filtri. Build Android e regressioni mirate passano. Le ultime note automatiche e l’invito community richiedono ancora la prova sul dispositivo aggiornato. Non sono stati provati tutti i telefoni Android né certificata la sicurezza dell’intera infrastruttura.
 
-FORGE is an Android app for tracking gym workouts, with a social twist. Log exercises, sets, and reps. Follow your friends. Unlock achievements. Watch your progress with detailed statistics.
+## Cosa puoi fare
 
-| Problem | FORGE Solution |
-|---------|---------------|
-| You don't remember your weights from last time | Full workout history with set-by-set detail |
-| You don't know which exercises target a muscle | 1,500+ exercise catalog with GIFs, search and filters |
-| You train alone and lose motivation | Friends feed, likes, weekly streaks, achievements |
+- Creare schede personali senza un limite imposto dall’app, oppure iniziare un allenamento libero.
+- Registrare serie, carichi e ripetizioni; segnare serie normali, warm-up, drop set o cedimento.
+- Ritrovare i valori della sessione precedente e salvare automaticamente le note degli esercizi già presenti nella scheda.
+- Scegliere se aggiornare la scheda quando cambi nome, esercizi, ordine, serie o recuperi durante una sessione.
+- Impostare un recupero per esercizio da **0 a 5 minuti**, con notifica Android di avanzamento, pausa e avviso finale.
+- Consultare storico, dettagli, foto degli allenamenti, volume, calendario e progressione per esercizio.
+- Personalizzare avatar e badge sbloccati retroattivamente nel profilo.
+- Cercare utenti, seguire persone, vedere allenamenti condivisi e mettere like **sullo stesso server**.
+- Scegliere visibilità pubblica, privata o per amici reciproci per allenamenti ed elenchi follower. Gli amici sono follow reciproci accettati.
+- Condividere un invito che apre il sito di download e spiega quale server usare.
+- Eliminare il proprio account con conferma della password, se il backend ha le migrazioni aggiornate.
 
-### Why FORGE vs Strong / Hevy / FitNotes?
+Sono disponibili due temi, chiaro e scuro. Le schermate non costituiscono consigli professionali di allenamento.
 
-| Feature | FORGE | Strong | Hevy | FitNotes |
-|---------|:-----:|:------:|:----:|:--------:|
-| Price | **Free** | ~80€/yr | ~40€/yr | Free (no social) |
-| Open source | ✅ | ❌ | ❌ | ❌ |
-| Self-hosting backend | ✅ | ❌ | ❌ | ❌ |
-| 1,500+ exercises with GIFs | ✅ | ~1,000 | ~400 | ~100 |
-| Social feed (like, follow) | ✅ | ❌ | ✅ | ❌ |
-| Achievements / gamification | **48 badges** | ❌ | ❌ | ❌ |
-| Progress photos | ✅ | ❌ | ✅ | ❌ |
-| Offline + sync | ✅ | ❌ | Premium | ✅ (local) |
-| CSV import/export | ✅ | Premium | Premium | ✅ |
-| Privacy-first | ✅ | ❌ | ❌ | ✅ |
+## Gamification: progressi che diventano traguardi
 
----
+Gli achievement rendono visibili la costanza e i progressi senza richiedere di ricominciare da zero: quelli valutabili dallo storico si sbloccano **retroattivamente**, anche per allenamenti completati in precedenza sull’account corrente.
 
-## Project Status
+- **Costanza:** primo allenamento, allenamenti totali e frequenza mensile.
+- **Volume e durata:** traguardi di volume per sessione/settimana/mese e ore di allenamento.
+- **Varietà e foto:** esercizi diversi provati e foto aggiunte agli allenamenti.
+- **Profilo:** scegli quali badge sbloccati mostrare e consulta il tuo livello.
 
-| Status | Category | Detail |
-|:------:|----------|--------|
-| ✅ | Workout | 1,500+ exercise search with GIFs, sets kg×reps, checkmark, rest timer, minimize/draft |
-| ✅ | Statistics | Volume chart, top lifts, calendar, WEEK/MONTH/3M/YEAR/ALL filters |
-| ✅ | Social | Friends feed, like ♥, follow/unfollow, live user search, friend requests |
-| ✅ | Achievements | 48 badges with automatic tracking, profile showcase |
-| ✅ | Profile | Avatar upload, bio, workout history, unlocked badges |
-| ✅ | Theme | Dual light/dark theme, Inter/Lexend/Space Grotesk fonts |
-| ✅ | Offline | Local SQLite + auto sync when connection returns |
-| ✅ | CSV | Import/export workouts with validation |
-| ✅ | Security | System TLS certificate validation, HTTPS, SecureStorage, API rules row-level, rate limiting, blocked admin panel |
-| 🟡 | Photos | Supported (max 3MB, base64 in record). No server-side compression |
-| 🟡 | Connectivity | App requires network for login and new exercise search. Local cache for seen exercises |
-| 🔴 | Push notifications | Not yet implemented (Firebase SDK doesn't support .NET 10) |
-| 🔴 | Body tracking | Weight and measurements not yet implemented |
-| 🔴 | Leaderboard | Ranking among friends not implemented (replaced by feed + likes) |
-| ✅ | TLS validation | Removed unsafe custom validator; system TLS validation is used |
+Il livello usa **100 XP per achievement sbloccato** e aumenta ogni **500 XP**. Riaprire la schermata non assegna XP aggiuntivi. Gli XP rappresentano i badge, non una misura della forma fisica.
 
----
+Alcune voci del catalogo richiedono criteri non ancora implementati, ad esempio classifiche e sfide: non promettiamo che tutti i badge siano già sbloccabili. Medaglie per i record delle singole serie restano un’idea futura, come richiesto durante lo sviluppo. Non ci sono classifiche globali tra server.
 
-## Screenshots
+<p>
+  <img src="src/Forge/Resources/Images/achievements/primopasso.jpg" alt="Achievement Primo Passo" width="110" />
+  <img src="src/Forge/Resources/Images/achievements/habit.jpg" alt="Achievement Abitudinario" width="110" />
+  <img src="src/Forge/Resources/Images/achievements/max_weight.jpg" alt="Achievement Peso Massimo" width="110" />
+</p>
 
-<div align="center">
+## Schermate dell’app
 
-| Dashboard | Feed | Stats |
-|:---:|:---:|:---:|
-| <img src="assets/screenshots/dashboard.jpeg" width="200" /> | <img src="assets/screenshots/feed.jpeg" width="200" /> | <img src="assets/screenshots/stats.jpeg" width="200" /> |
+Schermate reali presenti nell’archivio del progetto, scattate durante lo sviluppo. **Non sono una rappresentazione esatta di tutte le schermate della 0.8.5**: workout, profilo, colori e calendario sono stati aggiornati successivamente. Nuove acquisizioni sul dispositivo sostituiranno queste immagini.
 
-| Active Workout | Profile | Login |
-|:---:|:---:|:---:|
-| <img src="assets/screenshots/active-workout1.jpeg" width="200" /> | <img src="assets/screenshots/profile.jpeg" width="200" /> | <img src="assets/screenshots/login.jpeg" width="200" /> |
+<p>
+  <img src="assets/screenshots/dashboard.jpeg" alt="Dashboard FORGE, schermata di sviluppo" width="200" />
+  <img src="assets/screenshots/allenamento%20attivo%202.jpeg" alt="Allenamento attivo FORGE, schermata di sviluppo" width="200" />
+  <img src="assets/screenshots/stats.jpeg" alt="Statistiche FORGE, schermata di sviluppo" width="200" />
+  <img src="assets/screenshots/profile.jpeg" alt="Profilo FORGE, schermata di sviluppo" width="200" />
+</p>
 
-</div>
+## Download e primo utilizzo
 
----
+1. Apri il [sito ufficiale](https://leonardo-lalli.github.io/FORGE/#download) oppure le [release GitHub](https://github.com/Leonardo-Lalli/FORGE/releases).
+2. Scegli l’APK della versione che vuoi provare e installalo su **Android 6.0 / API 23 o successivo**. Android può richiedere l’autorizzazione a installare dalla fonte scelta.
+3. Registrati o accedi. Se non configuri un server personale, l’app utilizza `https://leoforge.duckdns.org`.
+4. Per un’istanza personale, inserisci il suo URL nelle impostazioni del server e crea un account su quell’istanza.
 
-## Self-Hosting
+**Passaggio dalle vecchie build:** la 0.8.0 pubblicata e gli APK di prova usavano certificati Debug diversi. La 0.8.5 avvia la firma stabile di release; Android può richiedere una reinstallazione. Esporta prima i dati locali dalle impostazioni e conserva le schede: non disinstallare senza backup. Gli allenamenti già sincronizzati restano sul server.
 
-FORGE is privacy-first: run the backend **on your own server**. Your data stays in your home.
+Gli aggiornamenti richiedono attualmente un nuovo APK: **l’aggiornamento direttamente dall’app non è ancora implementato**. Mantieni backup dei dati prima di cambiare installazione; una firma diversa può impedire l’aggiornamento della versione già presente.
 
-### One-liner (pick your OS)
+## Server e community
 
-```bash
-# Linux / macOS / Git Bash (Docker)
-bash <(curl -sSL https://raw.githubusercontent.com/Leonardo-Lalli/FORGE/main/tools/community-install.sh)
-```
+Il server predefinito è self-hosted a casa del proprietario. È una possibilità per provare la beta, non un servizio con disponibilità garantita. Un dominio pubblico non è di per sé una prova di insicurezza, ma un servizio esposto richiede aggiornamenti, regole di accesso e manutenzione.
 
-```powershell
-# Windows PowerShell (Docker)
-Invoke-Expression (Invoke-WebRequest -Uri https://raw.githubusercontent.com/Leonardo-Lalli/FORGE/main/tools/setup.ps1).Content
-```
+Ogni istanza PocketBase ha i propri account e la propria community. **Gli utenti su server diversi non possono seguirsi attraverso FORGE.** L’invito non trasferisce account, non accetta automaticamente follow e non configura il server sul telefono del destinatario: indica i passaggi da seguire. Un indirizzo LAN funziona soltanto dove quella rete è raggiungibile.
 
-```bash
-# Proxmox VE — run INSIDE an existing LXC container (Debian/Alpine)
-# Installs PocketBase natively as a systemd service, no Docker
-bash <(curl -sSL https://raw.githubusercontent.com/Leonardo-Lalli/FORGE/main/tools/proxmox-install.sh)
-```
+Se sei il solo utente del server, il feed offre una schermata di benvenuto e un invito; schede, statistiche e profilo restano utili. Il primo membro è identificato solo quando il server conferma l’assenza di altri utenti visibili: un errore di connessione non equivale a una community vuota.
 
-```bash
-# Proxmox VE — run on the HYPERVISOR (creates a new LXC container from scratch)
-# Container specs: 512 MB RAM | 4 GB disk | 2 CPU cores
-# OS footprint: Alpine ~50 MB | Debian ~100 MB | Ubuntu ~150 MB (+25 MB for PocketBase)
-bash <(curl -sSL https://raw.githubusercontent.com/Leonardo-Lalli/FORGE/main/tools/proxmox-create.sh)
-```
+## Dati, privacy e limiti
 
-> A single command. Downloads, installs, configures admin and collections, shows the IP.
-> Linux/Windows scripts use **Docker**. Proxmox scripts install PocketBase **natively**.
+| Dati / funzione | Comportamento attuale |
+| --- | --- |
+| Schede | SQLite sul telefono, associate all’account; non promettiamo sincronizzazione delle schede tra dispositivi |
+| Allenamenti | Salvataggio locale e sincronizzazione PocketBase; bozze locali |
+| Social e profili | Dati dell’istanza collegata; privacy applicata dal backend aggiornato |
+| Catalogo | ExerciseDB OSS con cache locale/condivisa di metadati, istruzioni e URL dei media |
+| GIF | File ospitati dal provider; conservarne l’URL non garantisce disponibilità offline |
+| Push social | Client Firebase FCM e worker disponibili; richiedono configurazione e prova di consegna |
+| Timer | Notifica locale Android, indipendente dal worker social |
 
-**Resource usage:** PocketBase uses ~25 MB RAM idle and ~30 MB disk.
-With 100 active users it reaches ~80 MB RAM. Runs on Raspberry Pi 4, old PC, 1 GB VPS.
+Lo snapshot del server riportato dal proprietario il 12 ottobre 2026 contiene **2.305 record, 1.325 nomi distinti, 1.500 record con URL GIF e istruzioni e 805 senza**. Sono conteggi del database, non una garanzia di 2.305 esercizi unici o di file GIF tutti raggiungibili. Vedi [catalogo e limiti](docs/exercise-catalog.md).
 
-### Step by step (all OS)
+La modalità completamente locale senza account/server è **solo una proposta**. Non confonderla con la persistenza locale già presente. FCM e i media esterni introducono dipendenze di terze parti; self-hosting non significa automaticamente assenza di connessioni esterne.
 
-```bash
-git clone https://github.com/Leonardo-Lalli/FORGE.git && cd FORGE
-docker compose up -d pocketbase
-docker compose exec -T pocketbase pocketbase superuser create admin@forge.local forgeadmin123
-docker compose up -d
-docker compose logs init
-docker compose logs show-ip
-```
+## Self-hosting
 
-PocketBase comes pre-configured with:
-- **Superuser** pre-created (`admin@forge.local` / `forgeadmin123` — change immediately!)
-- **Collections** `logged_workouts`, `social_graph`, `excercise` with row-level API rules
-
-### Configure the app
-
-1. Install the APK on your phone
-2. Open FORGE → Settings → **PocketBase URL**
-3. Enter `http://<YOUR-PC-IP>:8090` (e.g. `http://192.168.1.50:8090`)
-4. Tap **SAVE**
-
-The app will use your server instead of the default one. Works on LAN without a public domain.
-
-### Admin panel
-
-`http://localhost:8090/_/` — use your unique PB_ADMIN_EMAIL and PB_ADMIN_PASSWORD
-
----
-
-## Architecture
-
-```
-┌──────────────────────────────────────────────────┐
-│                  .NET MAUI App                    │
-│  ┌──────────┐  ┌───────────┐  ┌──────────┐      │
-│  │  Views   │  │ ViewModels│  │ Services │      │
-│  │  XAML    │◄─┤ MVVM      │◄─┤ Business │      │
-│  │  pure    │  │ Toolkit   │  │ Logic    │      │
-│  └──────────┘  └───────────┘  └────┬─────┘      │
-│                                    │             │
-│         ┌──────────────────────────┼──────┐      │
-│    ┌────▼────┐   ┌──────────┐  ┌──▼───┐ │      │
-│    │PocketBase│  │ExerciseDB│  │SQLite│ │      │
-│    │ Auth +   │  │ v1 API   │  │Local │ │      │
-│    │ Social   │  │ 1,500+ex │  │Cache │ │      │
-│    └─────────┘  └──────────┘  └──────┘ │      │
-└─────────────────────────────────────────┘      │
-```
-
-### Stack
-
-| Layer | Technology |
-|-------|-----------|
-| Framework | .NET MAUI 10 (Android-first) |
-| UI Pattern | MVVM with CommunityToolkit.Mvvm 8.4 |
-| Navigation | Shell (3 tabs + 8 routes) |
-| Backend | PocketBase self-hosted (auth, social, storage) |
-| API | ExerciseDB v1 (1,500+ exercises, free) |
-| Persistence | SQLite (sqlite-net-base + SQLitePCLRaw bundle) |
-| Tests | xUnit (67 tests) |
-| Fonts | Inter, Lexend, Space Grotesk (Google Fonts) |
-
----
-
-## Download APK
-
-The Release APK is available on [GitHub Releases](https://github.com/Leonardo-Lalli/FORGE/releases).
-
-To build from source:
-```bash
-dotnet publish src/Forge/Forge.csproj -f net10.0-android -c Release /p:AndroidPackageFormats=apk
-```
-
-> Requires Android 7.0+ and internet connection for APIs.
-
----
-
-## Development
-
-### Prerequisites
-- .NET 10 SDK + MAUI workload
-- Android device or emulator (Android 7+)
-- Public FORGE server or personal PocketBase URL configured in the app
-
-### Quick start
+Serve PocketBase **>= 0.23**, con una versione scelta esplicitamente, collezioni iniziali, **hook e quattro migrazioni FORGE**. Avviare soltanto PocketBase non basta. Il Compose costruisce un’immagine dal binario ufficiale della versione scelta; non usa un tag `latest` di terze parti.
 
 ```bash
 git clone https://github.com/Leonardo-Lalli/FORGE.git
 cd FORGE
 cp .env.example .env
-# Backend: set unique PB_ADMIN_EMAIL and PB_ADMIN_PASSWORD
+# Compila .env: PB_VERSION, PB_ADMIN_EMAIL e PB_ADMIN_PASSWORD.
+# Poi segui la sequenza completa, incluso il backup/migrazione:
+```
+
+Segui [la guida Docker e LXC](docs/self-hosting.md). I percorsi sono diversi per un’installazione FORGE e per il container Proxmox Community Scripts. Le migrazioni creano un backup e mantengono gli account senza una scelta di visibilità privati. Le push richiedono un progetto Firebase compatibile con il client e una chiave amministrativa conservata **solo sul server**: [guida push](docs/push-notifications.md).
+
+La porta Docker 8090 è pubblicata su loopback per default. Configura HTTPS e il reverse proxy per gli accessi esterni, mantieni privata l’amministrazione e non pubblicare password, token, `.env`, `pb_data` o chiavi Firebase. L’installer non configura router o Nginx automaticamente. Prima di aggiornare PocketBase, valida la versione scelta su una copia dei dati e verifica il ripristino del backup.
+
+## Sviluppo
+
+Stack: .NET 10 MAUI, MVVM con CommunityToolkit.Mvvm, PocketBase, SQLite, ExerciseDB OSS, Firebase FCM facoltativo; sito Next.js esportato su GitHub Pages.
+
+```bash
+dotnet workload install maui-android
+dotnet restore src/Forge/Forge.csproj -p:TargetFramework=net10.0-android
 dotnet build src/Forge/Forge.csproj -f net10.0-android
-dotnet test tests/Forge.Tests/
-dotnet publish src/Forge/Forge.csproj -f net10.0-android -c Release /p:AndroidPackageFormats=apk
+dotnet test tests/Forge.Tests/Forge.Tests.csproj
 ```
 
-### Structure
+Usa SDK Android/JDK compatibili con il workload. Per FCM Android configura `google-services.json` per `com.leoforge.forge` seguendo la guida push; non è la chiave Firebase Admin. Per una distribuzione pubblica serve una chiave di firma di produzione stabile. L’APK locale di verifica è distinto dalla release di produzione.
 
-```text
-├── src/Forge/               # MAUI Project
-│   ├── Models/              # Domain entities + DTOs
-│   ├── ViewModels/          # MVVM ViewModels (12)
-│   ├── Views/               # XAML Views (10)
-│   ├── Services/            # Business logic (13)
-│   ├── Converters/          # Value converters
-│   └── Resources/           # Styles, fonts, images
-├── tests/Forge.Tests/       # xUnit Tests (27)
-├── docker-compose.yml       # Self-hosted PocketBase backend
-├── tools/                   # Installation & setup scripts
-└── docs/                    # Documentation
-```
+Struttura: `src/Forge` app, `tests/Forge.Tests` regressioni, `tools` installazione/backend, `sitoGithub` sito, `docs` specifiche e verifiche. Documentazione: [architettura](docs/architecture.md), [matrice verifiche](docs/test-matrix.md), [preparazione beta](docs/release-readiness.md), [roadmap](ROADMAP.md).
 
-### Branches
+## Confronto con altre app
 
-| Branch | Purpose |
-|--------|---------|
-| `main` | Stable, distribution-ready |
-| `develop` | Active development, new features and fixes |
-| `feature/*` | Feature branches (merge into develop) |
+Il vantaggio di FORGE oggi è **scegliere e modificare il proprio backend, creare una community separata e usare schede senza limite applicativo o abbonamento nell’app**. Non affermiamo superiorità generale per affidabilità, integrazioni o facilità d’installazione.
 
----
+Hevy limita la versione gratuita a quattro routine; Strong a tre template. FORGE non impone questi limiti. Hevy offre però un social più articolato e Strong integrazioni e strumenti già consolidati. wger è già open source e self-hosted: non siamo unici in questo e wger copre anche alimentazione e misure. Fonti ufficiali e confronto dettagliato in [app simili](docs/comparison.md), verificato il 13 ottobre 2026.
 
-## Documentation
+## Contribuire e segnalare problemi
 
-| Document | Content |
-|----------|---------|
-| [`docs/spec.md`](docs/spec.md) | Product specification, epics, user stories, acceptance criteria |
-| [`docs/plan.md`](docs/plan.md) | Iteration plan with status |
-| [`docs/architecture.md`](docs/architecture.md) | Technical architecture |
-| [`docs/project-journal.md`](docs/project-journal.md) | Complete development journal |
-| [`docs/test-matrix.md`](docs/test-matrix.md) | 42 manual tests matrix |
-| [`docs/api-notes.md`](docs/api-notes.md) | API technical notes |
+Apri una [issue](https://github.com/Leonardo-Lalli/FORGE/issues) indicando versione APK, modello del telefono, versione Android, passaggi per riprodurre il problema e comportamento atteso. Non includere credenziali, token, dati personali di altri utenti o chiavi server. Contributi piccoli e verificabili sono benvenuti; segnala anche limiti della documentazione.
 
----
+## Licenza e attribuzioni
 
-## Privacy
-
-Data is stored in two places:
-- **On your phone**: local SQLite database (workouts, exercises, achievements, plans)
-- **On the FORGE server**: authentication, completed workouts, likes, followers
-
-See [`PRIVACY.md`](PRIVACY.md) for full details.
-
-## Security
-
-| Measure | Detail |
-|---------|--------|
-| Password | Encrypted with SecureStorage (Android Keystore) |
-| Connection | HTTPS with system certificate validation |
-| Remote DB | Row-level API rules (each user only sees their own data) |
-| Admin panel | Blocked from external access (403) |
-| Rate limiting | 5 login attempts/min, 60 req/min API |
-| Android Backup | Disabled (`allowBackup=false`) |
-
-## Disclaimer
-
-**FORGE is an educational project** developed as part of a computer science study program. It is not a commercial product. The server is self-hosted on home hardware and may not always be available. The ExerciseDB API is a free third-party service with usage limitations.
-
-## Community & Support
-
-<div align="center">
-
-**Like FORGE? Leave a star!**
-
-[![Star FORGE](https://img.shields.io/github/stars/Leonardo-Lalli/FORGE?style=social)](https://github.com/Leonardo-Lalli/FORGE/stargazers)
-
-[Star](https://github.com/Leonardo-Lalli/FORGE/stargazers) · [Bug report](https://github.com/Leonardo-Lalli/FORGE/issues/new?template=bug_report.md) · [Feature request](https://github.com/Leonardo-Lalli/FORGE/issues/new?template=feature_request.md) · [Discussions](https://github.com/Leonardo-Lalli/FORGE/discussions)
-
-</div>
-
-## License
-
-MIT License — see [LICENSE](LICENSE).
-
----
-
-## Attributions
-
-- **ExerciseDB API**: Exercise data and GIFs by [ExerciseDB](https://github.com/yuhonas/free-exercise-db) (free, non-commercial use)
-- **Badge icons**: created with Canva Pro
-- **Fonts**: Inter, Lexend, Space Grotesk by Google Fonts (SIL Open Font License)
-
----
-
-<div align="center">
-
-**FORGE** — Build your physique. Challenge your friends. Forge your legend.
-
-</div>
-
-## Public server and login
-
-FORGE connects automatically to https://leoforge.duckdns.org when no personal server is configured. Login and registration do not require a packaged .env file. Clear the custom URL in server settings to restore the public instance. The login screen supports the light (blue) and dark (cyan) designs; Google/Apple sign-in is unavailable on the current backend.
-
-See [project structure](docs/project-structure.md) and [login verification](docs/iterations/login-public-server-2026-10-11.md).
-
-## Development priorities
-
-The shared exercise cache stores provider IDs, instructions, filters and GIF URLs in PocketBase, plus fetched catalog pages for reuse. GIF files remain hosted by the provider: URLs display them in the app when reachable, but do not guarantee offline availability. Population starts when the app initializes the exercise catalog; the first load can fetch all 1,500 provider exercises. After completion, other clients read the shared server cache. Self-hosted installations must install the [server migration and hooks](docs/pocketbase-profile-migration.md); database fields alone do not activate caching. Without them the app falls back to the provider and its device cache. See [catalog details and limitations](docs/exercise-catalog.md).
-
-Stability and server-enforced privacy come first, followed by workout flow, social features, analytics and infrastructure. See [ROADMAP.md](ROADMAP.md). The develop branch includes profile badges, mutual-friend visibility, account-owned plans, per-exercise rest and previous-performance suggestions. Profile/privacy options require the [PocketBase migration](docs/pocketbase-profile-migration.md); they are not deployed to the public server automatically.
-
-Follower/following lists have a separate Public, Private or Friends setting enforced by the server. Profiles and connection lists show avatars and follow actions with confirmation before unfollowing; blue avatar rings open the latest public workout. Install the updated server package, including migration `1791677000`, before using connection privacy settings.
+Il codice FORGE è distribuito con [licenza MIT](LICENSE). Catalogo, GIF, font e altre risorse di terze parti conservano le proprie licenze: la MIT del repository non concede automaticamente diritti su quei contenuti. Il provider attualmente usato è [ExerciseDB OSS](https://oss.exercisedb.dev/), non wger. Prima di distribuire cataloghi/media o offrire un servizio commerciale, verifica le condizioni dei contenuti scelti.

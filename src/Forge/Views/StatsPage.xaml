@@ -3,6 +3,7 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:vm="clr-namespace:Forge.ViewModels"
+    x:Name="statsPage"
     x:Class="Forge.Views.StatsPage"
     x:DataType="vm:StatsViewModel"
     Title="Stats"
@@ -199,59 +200,44 @@
                     </VerticalStackLayout>
                 </Border>
 
-                <!-- Calendar -->
-                <Border BackgroundColor="{DynamicResource SurfaceContainerLowest}"
-                        StrokeShape="RoundRectangle 12"
-                        Stroke="{DynamicResource OutlineVariant}" StrokeThickness="1" Padding="20">
-                    <VerticalStackLayout Spacing="12">
-                        <Label Text="{Binding CalendarMonth}" FontFamily="SpaceGrotesk" FontSize="18" FontAttributes="Bold"
-                               TextColor="{DynamicResource OnSurface}" />
-                        <Grid ColumnDefinitions="*,*,*,*,*,*,*">
-                            <Label Text="M" FontFamily="Lexend" FontSize="10" FontAttributes="Bold"
-                                   TextColor="{DynamicResource TextSecondary}" HorizontalTextAlignment="Center" />
-                            <Label Grid.Column="1" Text="T" FontFamily="Lexend" FontSize="10" FontAttributes="Bold"
-                                   TextColor="{DynamicResource TextSecondary}" HorizontalTextAlignment="Center" />
-                            <Label Grid.Column="2" Text="W" FontFamily="Lexend" FontSize="10" FontAttributes="Bold"
-                                   TextColor="{DynamicResource TextSecondary}" HorizontalTextAlignment="Center" />
-                            <Label Grid.Column="3" Text="T" FontFamily="Lexend" FontSize="10" FontAttributes="Bold"
-                                   TextColor="{DynamicResource TextSecondary}" HorizontalTextAlignment="Center" />
-                            <Label Grid.Column="4" Text="F" FontFamily="Lexend" FontSize="10" FontAttributes="Bold"
-                                   TextColor="{DynamicResource TextSecondary}" HorizontalTextAlignment="Center" />
-                            <Label Grid.Column="5" Text="S" FontFamily="Lexend" FontSize="10" FontAttributes="Bold"
-                                   TextColor="{DynamicResource TextSecondary}" HorizontalTextAlignment="Center" />
-                            <Label Grid.Column="6" Text="S" FontFamily="Lexend" FontSize="10" FontAttributes="Bold"
-                                   TextColor="{DynamicResource TextSecondary}" HorizontalTextAlignment="Center" />
-                        </Grid>
-                        <CollectionView ItemsSource="{Binding CalendarDays}" ItemsLayout="VerticalGrid, 7">
-                            <CollectionView.ItemTemplate>
-                                <DataTemplate x:DataType="vm:CalendarDay">
-                                    <VerticalStackLayout HeightRequest="42" HorizontalOptions="Center" VerticalOptions="Center" Spacing="2">
-                                        <Label Text="{Binding Day}" FontFamily="Lexend" FontSize="10"
-                                               HorizontalOptions="Center" VerticalOptions="End"
-                                               TextColor="{DynamicResource OnSurfaceVariant}">
-                                            <Label.Triggers>
-                                                <DataTrigger TargetType="Label" Binding="{Binding IsToday}" Value="True">
-                                                    <Setter Property="FontAttributes" Value="Bold" />
-                                                    <Setter Property="TextColor" Value="{DynamicResource LimeGreen}" />
-                                                </DataTrigger>
-                                            </Label.Triggers>
-                                        </Label>
-                                        <Border WidthRequest="6" HeightRequest="6"
-                                                StrokeShape="RoundRectangle 3"
-                                                BackgroundColor="Transparent"
-                                                HorizontalOptions="Center">
-                                            <Border.Triggers>
-                                                <DataTrigger TargetType="Border" Binding="{Binding HasWorkout}" Value="True">
-                                                    <Setter Property="BackgroundColor" Value="{DynamicResource Primary}" />
-                                                </DataTrigger>
-                                            </Border.Triggers>
-                                        </Border>
+                <!-- Calendar follows the same period as the statistics. -->
+                <CollectionView ItemsSource="{Binding CalendarMonths}" HeightRequest="{Binding CalendarHeight}" SelectionMode="None" HorizontalScrollBarVisibility="Never">
+<CollectionView.ItemsLayout><LinearItemsLayout Orientation="Horizontal" ItemSpacing="12" SnapPointsType="MandatorySingle" SnapPointsAlignment="Start" /></CollectionView.ItemsLayout>
+                    <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="vm:CalendarMonthBlock">
+                                <Border WidthRequest="308" Padding="12" VerticalOptions="Start" StrokeShape="RoundRectangle 20" Stroke="{DynamicResource OutlineVariant}" BackgroundColor="{DynamicResource SurfaceContainer}">
+                                    <VerticalStackLayout Spacing="12">
+                                        <Label Text="{Binding Title}" FontFamily="Lexend" FontSize="17" FontAttributes="Bold" TextColor="{DynamicResource OnSurface}" />
+                                        <Grid ColumnDefinitions="*,*,*,*,*,*,*">
+                                            <Label Text="L" HorizontalTextAlignment="Center" TextColor="{DynamicResource TextSecondary}" FontSize="11" />
+                                            <Label Grid.Column="1" Text="M" HorizontalTextAlignment="Center" TextColor="{DynamicResource TextSecondary}" FontSize="11" />
+                                            <Label Grid.Column="2" Text="M" HorizontalTextAlignment="Center" TextColor="{DynamicResource TextSecondary}" FontSize="11" />
+                                            <Label Grid.Column="3" Text="G" HorizontalTextAlignment="Center" TextColor="{DynamicResource TextSecondary}" FontSize="11" />
+                                            <Label Grid.Column="4" Text="V" HorizontalTextAlignment="Center" TextColor="{DynamicResource TextSecondary}" FontSize="11" />
+                                            <Label Grid.Column="5" Text="S" HorizontalTextAlignment="Center" TextColor="{DynamicResource TextSecondary}" FontSize="11" />
+                                            <Label Grid.Column="6" Text="D" HorizontalTextAlignment="Center" TextColor="{DynamicResource TextSecondary}" FontSize="11" />
+                                        </Grid>
+                                        <CollectionView ItemsSource="{Binding Days}" ItemsLayout="VerticalGrid, 7" HeightRequest="{Binding Height}" SelectionMode="None">
+                                            <CollectionView.ItemTemplate>
+                                                <DataTemplate x:DataType="vm:CalendarDay">
+                                                    <VerticalStackLayout HeightRequest="72" WidthRequest="40" Padding="1,3" Spacing="4">
+                                                        <VerticalStackLayout.GestureRecognizers><TapGestureRecognizer Command="{Binding Source={x:Reference statsPage}, Path=BindingContext.OpenCalendarDayCommand}" CommandParameter="{Binding .}" /></VerticalStackLayout.GestureRecognizers>
+                                                        <Border WidthRequest="30" HeightRequest="30" StrokeShape="RoundRectangle 15" StrokeThickness="0" BackgroundColor="Transparent" HorizontalOptions="Center">
+                                                            <Border.Triggers><DataTrigger TargetType="Border" Binding="{Binding HasWorkout}" Value="True"><Setter Property="BackgroundColor" Value="{DynamicResource ElectricBlue}" /></DataTrigger></Border.Triggers>
+                                                            <Label Text="{Binding Day}" FontFamily="Lexend" FontSize="12" HorizontalOptions="Center" VerticalOptions="Center" TextColor="{DynamicResource OnSurface}">
+                                                                <Label.Triggers><DataTrigger TargetType="Label" Binding="{Binding HasWorkout}" Value="True"><Setter Property="TextColor" Value="White" /></DataTrigger></Label.Triggers>
+                                                            </Label>
+                                                        </Border>
+                                                        <Label Text="{Binding WorkoutName}" FontFamily="Inter" FontSize="9" MaxLines="1" LineBreakMode="TailTruncation" HorizontalTextAlignment="Center" TextColor="{DynamicResource TextSecondary}" />
+                                                    </VerticalStackLayout>
+                                                </DataTemplate>
+                                            </CollectionView.ItemTemplate>
+                                        </CollectionView>
                                     </VerticalStackLayout>
-                                </DataTemplate>
-                            </CollectionView.ItemTemplate>
-                        </CollectionView>
-                    </VerticalStackLayout>
-                </Border>
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+</CollectionView>
 
                 <!-- Top Lifts -->
                 <Border BackgroundColor="{DynamicResource SurfaceContainerLowest}"
@@ -292,6 +278,17 @@
             </VerticalStackLayout>
         </ScrollView>
 
+        <Grid Grid.RowSpan="2" IsVisible="{Binding IsDayWorkoutsVisible}" BackgroundColor="#99000000" Padding="24">
+            <Border Padding="24" StrokeShape="RoundRectangle 24" BackgroundColor="{DynamicResource SurfaceContainer}" VerticalOptions="Center">
+                <VerticalStackLayout Spacing="14">
+                    <Label Text="Allenamenti del giorno" FontFamily="Lexend" FontSize="20" TextColor="{DynamicResource OnSurface}" />
+                    <VerticalStackLayout BindableLayout.ItemsSource="{Binding DayWorkouts}"><BindableLayout.ItemTemplate><DataTemplate x:DataType="vm:CalendarWorkout">
+                        <Button Text="{Binding Name}" Command="{Binding Source={x:Reference statsPage}, Path=BindingContext.OpenCalendarWorkoutCommand}" CommandParameter="{Binding .}" BackgroundColor="{DynamicResource Primary}" TextColor="{DynamicResource OnPrimary}" CornerRadius="12" />
+                    </DataTemplate></BindableLayout.ItemTemplate></VerticalStackLayout>
+                    <Button Text="Chiudi" Command="{Binding CloseDayWorkoutsCommand}" BackgroundColor="Transparent" TextColor="{DynamicResource OnSurface}" />
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
     </Grid>
 
 </ContentPage>

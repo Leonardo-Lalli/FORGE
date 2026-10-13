@@ -29,9 +29,13 @@ public class LabelEntry
 public partial class StatsViewModel : BaseViewModel
 {
     private readonly PocketBaseService pb;
+    private readonly DatabaseService db;
     public ObservableCollection<VolumeBar> VolumeBars { get; } = new();
     private List<Models.Dto.LoggedWorkoutRecord> allWorkouts = new();
-    private DateTime lastCalendarDate = DateTime.MinValue;
+    [ObservableProperty] private ObservableCollection<CalendarMonthBlock> calendarMonths = new();
+    [ObservableProperty] private int calendarHeight = 180;
+    [ObservableProperty] private ObservableCollection<CalendarWorkout> dayWorkouts = new();
+    [ObservableProperty] private bool isDayWorkoutsVisible;
 
     [ObservableProperty] private string totalHours = "0";
     [ObservableProperty] private string totalHoursTrend = "";
@@ -54,20 +58,21 @@ public partial class StatsViewModel : BaseViewModel
     [ObservableProperty] private ImageSource? userAvatarSource;
     [ObservableProperty] private bool hasUserAvatar;
 
-    public StatsViewModel(PocketBaseService pb)
+    public StatsViewModel(PocketBaseService pb, DatabaseService db)
     {
         this.pb = pb;
+        this.db = db;
 
         WeakReferenceMessenger.Default.Register<WorkoutSavedMessage>(this, async (_, _) =>
         {
-            await MainThread.InvokeOnMainThreadAsync(async () => await LoadAsync());
+            await MainThread.InvokeOnMainThreadAsync(async () => await LoadStatsAsync(true));
         });
     }
 
     [RelayCommand]
-    private async Task LoadAsync()
+    private Task LoadAsync() => LoadStatsAsync(false);
+    private async Task LoadStatsAsync(bool localOnly)
     {
-        LoadUserInfo();
         if (!pb.IsLoggedIn)
         {
             StatsError = "Effettua il login per vedere le statistiche.";
@@ -83,11 +88,14 @@ public partial class StatsViewModel : BaseViewModel
         try
         {
             System.Diagnostics.Debug.WriteLine("[Stats] LoadAsync fetching workouts...");
-            allWorkouts = await pb.GetMyWorkoutsAsync(0);
+            allWorkouts = await WorkoutHistory.LoadOwnAsync(pb, db, true, allWorkouts);
+            ApplyFilter(SelectedFilter);
+            BuildCalendar();
+            if (!localOnly) { var remote = await WorkoutHistory.LoadOwnAsync(pb, db); allWorkouts = await WorkoutHistory.LoadOwnAsync(pb, db, true, remote); await LoadUserInfoAsync(); }
             System.Diagnostics.Debug.WriteLine($"[Stats] GetMyWorkoutsAsync returned {allWorkouts.Count} items");
             if (allWorkouts.Count == 0)
             {
-                StatsError = "Nessun dato. Verifica su PocketBase:\n1) Collection 'logged_workouts' esiste\n2) API Rule List/Search = @request.auth.id != \"\"";
+                StatsError = "Le statistiche compariranno dopo il tuo primo allenamento.";
                 HasStatsError = true;
                 IsEmptyState = true;
                 HasData = false;
@@ -116,26 +124,20 @@ public partial class StatsViewModel : BaseViewModel
     {
         SelectedFilter = filter;
         ApplyFilter(filter);
+        BuildCalendar();
     }
 
     private void ApplyFilter(string filter)
     {
         if (allWorkouts.Count == 0) { VolumeBars.Clear(); TopLifts.Clear(); TotalHours = "0h"; TotalVolume = "0 kg"; Workouts = "0"; return; }
 
-        var cutoff = filter switch
-        {
-            "week" => DateTime.Now.Date.AddDays(-7),
-            "month" => DateTime.Now.Date.AddMonths(-1),
-            "3months" => DateTime.Now.Date.AddMonths(-3),
-            "year" => DateTime.Now.Date.AddYears(-1),
-            _ => DateTime.MinValue
-        };
+        var cutoff = StatsPeriod.Start(filter, DateTime.Now.Date, allWorkouts.Select(w => AchievementEvaluator.ParseDate(w.Date)).OfType<DateTime>().DefaultIfEmpty(DateTime.Now.Date).Min());
 
         var filtered = allWorkouts
             .Where(w =>
             {
-                DateTime.TryParse(w.Date, out var d);
-                return d >= cutoff || cutoff == DateTime.MinValue;
+                var d = AchievementEvaluator.ParseDate(w.Date);
+                return d.HasValue && d.Value >= cutoff;
             })
             .ToList();
 
@@ -222,7 +224,7 @@ public partial class StatsViewModel : BaseViewModel
     [RelayCommand]
     private async Task OpenProfileAsync() => await Shell.Current.GoToAsync("profile");
 
-    private async void LoadUserInfo()
+    private async Task LoadUserInfoAsync()
     {
         if (pb.IsLoggedIn && pb.CurrentUser != null)
         {
@@ -254,43 +256,40 @@ public partial class StatsViewModel : BaseViewModel
 
     private void BuildCalendar()
     {
-        var today = DateTime.Now;
-        if (lastCalendarDate != DateTime.MinValue && lastCalendarDate.Date != today.Date)
+        var today = DateTime.Now.Date;
+        var dated = allWorkouts.Select(w => (Workout: w, Date: AchievementEvaluator.ParseDate(w.Date)))
+            .Where(w => w.Date.HasValue).GroupBy(w => w.Date!.Value.Date).ToDictionary(g => g.Key, g => g.Select(w => w.Workout).ToList());
+        var start = StatsPeriod.Start(SelectedFilter, today, dated.Keys.DefaultIfEmpty(today).Min());
+        var blocks = new List<CalendarMonthBlock>();
+        var cursor = SelectedFilter == "week" ? start : new DateTime(start.Year, start.Month, 1);
+        do
         {
-            foreach (var day in CalendarDays)
-                day.IsToday = day.Day == today.Day.ToString();
-            lastCalendarDate = today;
-            CalendarMonth = today.ToString("MMMM yyyy");
-            return;
-        }
-        lastCalendarDate = today;
-
-        CalendarDays.Clear();
-        CalendarMonth = today.ToString("MMMM yyyy");
-        var firstOfMonth = new DateTime(today.Year, today.Month, 1);
-        var daysInMonth = DateTime.DaysInMonth(today.Year, today.Month);
-        var startDay = (int)firstOfMonth.DayOfWeek;
-        if (startDay == 0) startDay = 7;
-
-        var workoutDates = allWorkouts
-            .Select(w => { DateTime.TryParse(w.Date, out var d); return d.Date; })
-            .Where(d => d != default)
-            .ToHashSet();
-
-        // Empty cells before first day
-        for (int i = 1; i < startDay; i++)
-            CalendarDays.Add(new CalendarDay { Day = "", HasWorkout = false });
-
-        for (int d = 1; d <= daysInMonth; d++)
-        {
-            var date = new DateTime(today.Year, today.Month, d);
-            CalendarDays.Add(new CalendarDay
+            var end = SelectedFilter == "week" ? cursor.AddDays(6) : cursor.AddMonths(1).AddDays(-1);
+            var days = new List<CalendarDay>();
+            for (var i = 0; i < ((int)cursor.DayOfWeek + 6) % 7; i++) days.Add(new());
+            for (var date = cursor; date <= end; date = date.AddDays(1))
             {
-                Day = d.ToString(),
-                HasWorkout = workoutDates.Contains(date),
-                IsToday = date == today.Date
-            });
-        }
+                var workouts = dated.GetValueOrDefault(date) ?? [];
+                days.Add(new CalendarDay { Day = date.Day.ToString(), IsToday = date == today, HasWorkout = workouts.Count > 0,
+                    WorkoutName = workouts.FirstOrDefault()?.Name ?? "", Workouts = workouts.Select(w => new CalendarWorkout { Id = w.Id, Name = w.Name, Source = w.IsLocal ? "local" : "pocketbase" }).ToList() });
+            }
+            while (days.Count % 7 != 0) days.Add(new());
+            blocks.Add(new CalendarMonthBlock { Title = SelectedFilter == "week" ? $"{cursor:dd MMM} – {end:dd MMM yyyy}" : cursor.ToString("MMMM yyyy"), Days = new(days), Height = days.Count / 7 * 72 });
+            cursor = cursor.AddMonths(1);
+        } while (SelectedFilter != "week" && cursor <= today);
+        CalendarHeight = SelectedFilter == "week" ? 170 : 520;
+        CalendarMonths = new(blocks);
+    }
+    [RelayCommand] private async Task OpenCalendarDayAsync(CalendarDay day)
+    {
+        if (day.Workouts.Count == 1) await OpenCalendarWorkoutAsync(day.Workouts[0]);
+        else if (day.Workouts.Count > 1) { DayWorkouts = new(day.Workouts); IsDayWorkoutsVisible = true; }
+    }
+    [RelayCommand] private void CloseDayWorkouts() => IsDayWorkoutsVisible = false;
+    [RelayCommand] private async Task OpenCalendarWorkoutAsync(CalendarWorkout workout)
+    {
+        IsDayWorkoutsVisible = false;
+        await Shell.Current.GoToAsync($"workoutDetail?workoutId={Uri.EscapeDataString(workout.Id)}&source={workout.Source}");
     }
 }
 
@@ -307,6 +306,10 @@ public partial class CalendarDay : ObservableObject
     public string Day { get; set; } = "";
     [ObservableProperty] private bool hasWorkout;
     [ObservableProperty] private bool isToday;
+    public string WorkoutName { get; set; } = "";
+    public List<CalendarWorkout> Workouts { get; set; } = [];
 }
+public class CalendarMonthBlock { public string Title { get; set; } = ""; public ObservableCollection<CalendarDay> Days { get; set; } = new(); public int Height { get; set; } }
+public class CalendarWorkout { public string Id { get; set; } = ""; public string Name { get; set; } = ""; public string Source { get; set; } = "pocketbase"; }
 
 public class VolumeBar { public double Height { get; set; } public string Label { get; set; } = ""; public string VolumeLabel { get; set; } = ""; }

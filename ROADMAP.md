@@ -1,52 +1,23 @@
 # Roadmap FORGE
 
-Priorità concordate l’11 ottobre 2026: stabilità e privacy prima delle nuove integrazioni. Le versioni indicano obiettivi, senza date promesse. Una funzione implementata su develop non è automaticamente rilasciata o verificata sul server pubblico.
+Aggiornata il 13 ottobre 2026. Priorità scelte dai feedback, senza scadenze promesse. Implementato nel branch non significa pubblicato nella release.
 
-## v0.9.0-beta — Stabilità & Privacy
+## Adesso — 0.8.5 beta: stabilità e feedback
 
-- **Accesso affidabile**: Login pubblico e server personali; avatar e recupero sessione verificati.
-- **Privacy sul server**: Allenamenti pubblici, privati o per amici reciproci; test delle API Rules.
-- **Schede per account**: Schede personali senza limiti; esempi una sola volta; note e recuperi persistenti.
-- **Achievement retroattivi**: Ricalcolo dello storico e tre badge scelti nel profilo.
-- **Regressioni e grafici**: Grafico volume corretto; build Android e test automatici.
+- Rendere affidabili allenamenti, note automatiche, timer e salvataggi.
+- Inviti alla community, README e sito coerenti con il funzionamento reale.
+- Verificare privacy, installazione server e consegna push con un piccolo gruppo di utenti.
 
-## v1.0.0 — Flusso allenamento verificato
+## Poi — migliorare ciò che viene usato
 
-- **Recuperi per esercizio**: Selezione 0–5 minuti, salvata nelle schede.
-- **Sessione precedente**: Pesi e ripetizioni suggeriti dallo storico, modificabili.
-- **Offline e sincronizzazione**: Verifica su dispositivo di salvataggi, bozze e cambio account.
-- **Catalogo esercizi**: Conteggio reale, GIF, istruzioni e paginazione completa.
-- **Release Android**: Build APK riproducibile e validazione prima della release.
+- Correggere i problemi segnalati, chiarire il catalogo e rendere più semplici backup e ripristino.
+- Valutare aggiornamenti dall’app e modalità locale senza account.
+- Provare FORGE con una palestra prima di ampliare la gestione.
 
-## v1.1.0 — Social & Community
+## Idee da valutare
 
-- **Profili e follow**: Profili ricercabili, follower e seguiti; amici = follow reciproco.
-- **Commenti e notifiche**: Commenti e notifiche push dopo il consolidamento della privacy.
-- **Sfide e classifiche**: Sfide tra amici e leaderboard con consenso.
-- **Condivisione**: Riepiloghi condivisibili senza esporre contenuti privati.
+- Ruoli trainer/iscritti, inviti QR e gestione di più palestre.
+- Medaglie o feedback per record personali di peso, volume o ripetizioni nelle serie: **solo idea futura**.
+- Integrazioni salute e social tra server, se emergono esigenze reali.
 
-## v1.2.0 — Analytics & Localizzazione
-
-- **Analytics avanzate**: 1RM, volume per muscolo, calendario e storico.
-- **Body tracking**: Misure e peso con scelte di riservatezza.
-- **Lingue e accessibilità**: Traduzioni complete e test di contrasto e dimensioni testo.
-- **Report e backup**: Export PDF e backup con ripristino verificato.
-
-## v1.3.0 — Health & Wearables
-
-- **Widget e Wear OS**: Accesso rapido e companion per timer e serie.
-- **Integrazioni salute**: Valutazione delle API supportate e autorizzazioni esplicite.
-- **Sensori**: Battito e passi dove supportati dal dispositivo.
-
-## v1.4.0 — Infrastruttura & B2B
-
-- **Origine protetta**: Proxy o tunnel con dominio dedicato; IP domestico fuori dal DNS pubblico.
-- **Distribuzione**: Play Store e gestione chiavi di produzione.
-- **Dashboard e API**: Web dashboard, API documentata e profili server.
-- **Palestre**: Trainer dashboard, QR onboarding e isolamento tra palestre.
-
-## Stato attuale
-
-Login pubblico e nuova schermata confermati sul dispositivo dall’utente. Profilo, schede, recuperi, badge e grafico sono in verifica su develop; privacy live richiede la migrazione PocketBase.
-
-AI coaching, marketplace e nuovi provider esercizi restano esperimenti da valutare dopo affidabilità, dati e licenze.
+Per la beta manteniamo il server predefinito e la possibilità di usare un’istanza personale. Ogni server ospita la propria community; nessuna federazione. Il server domestico non offre disponibilità garantita. La crescita dell’infrastruttura verrà valutata su dati d’uso reali.

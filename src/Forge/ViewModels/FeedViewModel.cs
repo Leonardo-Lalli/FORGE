@@ -129,6 +129,30 @@ public partial class FeedViewModel : BaseViewModel
     [ObservableProperty] private ImageSource? userAvatarSource;
     [ObservableProperty] private bool hasUserAvatar;
 
+    [ObservableProperty, NotifyPropertyChangedFor(nameof(EmptyFeedTitle)), NotifyPropertyChangedFor(nameof(EmptyFeedDescription))]
+    private bool isFirstCommunityMember;
+    public string EmptyFeedTitle => IsFirstCommunityMember ? "Sei il primo nella tua community" : "La tua community inizia qui";
+    public string EmptyFeedDescription => IsFirstCommunityMember
+        ? "Invita un amico e allenatevi insieme. Il feed mostra gli allenamenti condivisi dalle persone che segui su questo server."
+        : "Cerca e segui persone su questo server oppure invita un amico. Gli allenamenti privati restano privati.";
+
+    [RelayCommand]
+    private async Task InviteFriendAsync()
+    {
+        try
+        {
+            await Share.Default.RequestAsync(new ShareTextRequest {
+                Title = "Invita un amico su FORGE", Uri = CommunityInvite.DownloadUrl,
+                Text = CommunityInvite.Message(Preferences.Get("pb_server_url", ""))
+            });
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[CommunityInvite] {ex.GetType().Name}");
+            ErrorMessage = "Impossibile aprire la condivisione. Riprova.";
+        }
+    }
+
     public FeedViewModel(PocketBaseService pb)
     {
         this.pb = pb;
@@ -148,6 +172,9 @@ public partial class FeedViewModel : BaseViewModel
         LoadUserInfo();
         if (!pb.IsLoggedIn) return;
         IsFeedBusy = true;
+        ErrorMessage = null;
+        IsEmptyState = false;
+        IsFirstCommunityMember = false;
         try
         {
             var workouts = await pb.GetFollowedWorkoutsAsync();
@@ -188,7 +215,9 @@ public partial class FeedViewModel : BaseViewModel
                 });
             }
             HasFeed = Posts.Count > 0;
+            if (!HasFeed) IsFirstCommunityMember = await pb.HasOtherCommunityMembersAsync() == false;
             HasData = true;
+            IsEmptyState = !HasFeed;
         }
         catch
         {

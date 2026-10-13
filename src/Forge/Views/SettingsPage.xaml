@@ -126,6 +126,22 @@
                     </VerticalStackLayout>
                 </Border>
 
+                <Label Text="NOTIFICHE" FontFamily="OpenSansSemibold" FontSize="11" TextColor="{DynamicResource TextSecondary}" Margin="0,8,0,0" />
+                <Border BackgroundColor="{DynamicResource SurfaceContainerHigh}" StrokeShape="RoundRectangle 12" Stroke="{DynamicResource OutlineVariant}" Padding="16">
+                    <VerticalStackLayout Spacing="12">
+                        <Label Text="Resta aggiornato" FontFamily="Lexend" FontSize="17" TextColor="{DynamicResource OnSurface}" />
+                        <Label Text="Recuperi, achievement, follow, like e allenamenti condivisi." FontFamily="Inter" FontSize="13" TextColor="{DynamicResource TextSecondary}" />
+                        <Button Text="Attiva notifiche" Command="{Binding EnableNotificationsCommand}" BackgroundColor="{DynamicResource Primary}" TextColor="{DynamicResource OnPrimary}" CornerRadius="12" />
+                        <Grid ColumnDefinitions="*,Auto">
+                            <Label Text="Promemoria allenamento" TextColor="{DynamicResource OnSurface}" VerticalOptions="Center" />
+                            <Switch Grid.Column="1" IsToggled="{Binding IsReminderEnabled}" OnColor="{DynamicResource Primary}" />
+                        </Grid>
+                        <TimePicker Time="{Binding ReminderTime}" Format="HH:mm" TextColor="{DynamicResource OnSurface}" />
+                        <Button Text="Salva promemoria" Command="{Binding SaveReminderCommand}" BackgroundColor="{DynamicResource SurfaceContainer}" TextColor="{DynamicResource OnSurface}" CornerRadius="12" />
+                        <Label Text="{Binding NotificationsStatus}" FontSize="12" TextColor="{DynamicResource TextSecondary}" />
+                    </VerticalStackLayout>
+                </Border>
+
                 <!-- Account Section -->
                 <Label Text="DATI"
                        FontFamily="OpenSansSemibold" FontSize="11" FontAttributes="Bold"
@@ -246,6 +262,7 @@
                         HeightRequest="52" CornerRadius="12"
                         Command="{Binding LogoutCommand}" />
 
+                <Button Text="Elimina account" Command="{Binding ShowDeleteAccountCommand}" FontFamily="Inter" HeightRequest="48" CornerRadius="12" BackgroundColor="Transparent" TextColor="{DynamicResource Error}" />
                 <!-- Attributions -->
                 <Label Text="Exercise data by ExerciseDB (free-exercise-db)"
                        FontFamily="Inter" FontSize="10"
@@ -256,6 +273,19 @@
 
             </VerticalStackLayout>
         </ScrollView>
+        <Grid Grid.RowSpan="2" IsVisible="{Binding IsDeleteAccountVisible}" BackgroundColor="#99000000" Padding="24">
+            <Border StrokeShape="RoundRectangle 24" Padding="24" BackgroundColor="{DynamicResource SurfaceContainer}" VerticalOptions="Center">
+                <VerticalStackLayout Spacing="16">
+                    <Label Text="Eliminare il tuo account?" FontFamily="Lexend" FontSize="22" FontAttributes="Bold" TextColor="{DynamicResource OnSurface}" />
+                    <Label Text="L’account, gli allenamenti e le relazioni social verranno eliminati definitivamente dal server. Le schede salvate su questo dispositivo verranno rimosse. Inserisci la password per confermare." FontFamily="Inter" FontSize="14" TextColor="{DynamicResource TextSecondary}" />
+                    <Entry Text="{Binding DeletePassword}" IsPassword="True" Placeholder="Password account" TextColor="{DynamicResource OnSurface}" PlaceholderColor="{DynamicResource TextSecondary}" />
+                    <Label Text="{Binding DeleteAccountError}" FontFamily="Inter" FontSize="13" TextColor="{DynamicResource Error}" />
+                    <Button Text="Elimina definitivamente" Command="{Binding ConfirmDeleteAccountCommand}" BackgroundColor="{DynamicResource Error}" TextColor="{DynamicResource OnError}" CornerRadius="14" HeightRequest="48" />
+                    <Button Text="Annulla" Command="{Binding CancelDeleteAccountCommand}" BackgroundColor="Transparent" TextColor="{DynamicResource OnSurface}" />
+                    <ActivityIndicator IsVisible="{Binding IsBusy}" IsRunning="{Binding IsBusy}" Color="{DynamicResource Primary}" />
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
     </Grid>
 
 </ContentPage>

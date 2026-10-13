@@ -129,7 +129,7 @@
                                                 Command="{Binding Source={RelativeSource AncestorType={x:Type vm:WorkoutDetailViewModel}}, Path=ExpandPhotoCommand}"
                                                 CommandParameter="{Binding .}" />
                                         </Border.GestureRecognizers>
-                                        <Image Source="{Binding .}" Aspect="AspectFill" />
+                                        <Image Source="{Binding ., Converter={StaticResource WorkoutPhotoConverter}}" Aspect="AspectFill" />
                                     </Border>
                                 </DataTemplate>
                             </BindableLayout.ItemTemplate>
@@ -178,10 +178,16 @@
                                         <BindableLayout.ItemTemplate>
                                             <DataTemplate x:DataType="vm:DetailSet">
                                                 <Grid ColumnDefinitions="40,*,*,40" ColumnSpacing="8">
-                                                    <Label Grid.Column="0" Text="{Binding SetNumber, StringFormat='{0}.'}"
+                                                    <Label Grid.Column="0" Text="{Binding DisplayLabel}"
                                                            FontFamily="Lexend" FontSize="13"
                                                            TextColor="{DynamicResource Primary}"
-                                                           VerticalOptions="Center" />
+                                                           VerticalOptions="Center" >
+                                                        <Label.Triggers>
+                                                            <DataTrigger TargetType="Label" Binding="{Binding Kind}" Value="warmup"><Setter Property="TextColor" Value="#F4B942" /></DataTrigger>
+                                                            <DataTrigger TargetType="Label" Binding="{Binding Kind}" Value="drop"><Setter Property="TextColor" Value="#AF85FF" /></DataTrigger>
+                                                            <DataTrigger TargetType="Label" Binding="{Binding Kind}" Value="failure"><Setter Property="TextColor" Value="#FF6B6B" /></DataTrigger>
+                                                        </Label.Triggers>
+                                                    </Label>
                                                     <Label Grid.Column="1"
                                                            Text="{Binding WeightKg, StringFormat='{0:F1} kg'}"
                                                            FontFamily="Inter" FontSize="13"
@@ -214,7 +220,7 @@
             <Grid.GestureRecognizers>
                 <TapGestureRecognizer Command="{Binding ClosePhotoCommand}" />
             </Grid.GestureRecognizers>
-            <Image Source="{Binding SelectedPhoto}" Aspect="AspectFit"
+            <Image Source="{Binding SelectedPhoto, Converter={StaticResource WorkoutPhotoConverter}}" Aspect="AspectFit"
                    Margin="20" MaximumHeightRequest="500"
                    VerticalOptions="Center" />
             <Border StrokeShape="RoundRectangle 20"

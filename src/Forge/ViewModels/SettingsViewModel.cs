@@ -12,6 +12,14 @@ public partial class SettingsViewModel : BaseViewModel
     private readonly CsvImportService csvImport;
     private readonly CsvExportService csvExport;
     private bool suppressChange;
+    private readonly DatabaseService db;
+    private readonly NotificationService notifications;
+    [ObservableProperty] private string notificationsStatus = "";
+    [ObservableProperty] private bool isReminderEnabled = Preferences.Get("training_reminder", false);
+    [ObservableProperty] private TimeSpan reminderTime = TimeSpan.FromMinutes(Preferences.Get("training_reminder_minutes", 1080));
+    [ObservableProperty] private bool isDeleteAccountVisible;
+    [ObservableProperty] private string deletePassword = "";
+    [ObservableProperty] private string deleteAccountError = "";
 
     public static string LanguageCode => Preferences.Get("exercise_language", "2");
 
@@ -26,12 +34,14 @@ public partial class SettingsViewModel : BaseViewModel
     [ObservableProperty] private bool hasServerStatus;
 
     public SettingsViewModel(ThemeService themeService, PocketBaseService pb,
-        CsvImportService csvImport, CsvExportService csvExport)
+        CsvImportService csvImport, CsvExportService csvExport, DatabaseService db, NotificationService notifications)
     {
         this.themeService = themeService;
         this.pb = pb;
         this.csvImport = csvImport;
         this.csvExport = csvExport;
+        this.db = db;
+        this.notifications = notifications;
         suppressChange = true;
         IsDarkMode = themeService.IsDarkMode;
         ThemeLabel = themeService.ThemeMode switch { 0 => "Chiaro", 1 => "Scuro", _ => "Auto" };
@@ -63,12 +73,64 @@ public partial class SettingsViewModel : BaseViewModel
     }
 
     [RelayCommand]
-    private void Logout()
+    private async Task LogoutAsync()
     {
+        try { await pb.UnregisterPushDeviceAsync(); }
+        catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
+        { SetError("Impossibile disattivare le notifiche di questo account. Controlla la connessione e riprova."); return; }
+        notifications.CancelRest();
+        notifications.SetReminder(false, ReminderTime);
         pb.Logout();
+        ShowLoginPage();
+    }
+    private void ShowLoginPage()
+    {
         var window = App.Current!.Windows[0];
         window.Page = new LoginPage(
             App.Current!.Handler!.MauiContext!.Services.GetService<LoginViewModel>()!);
+    }
+    [RelayCommand] private async Task EnableNotificationsAsync()
+    {
+        try { NotificationsStatus = await notifications.EnableAsync() ? "Notifiche attivate. Le push remote richiedono l’attivazione del servizio." : "Permesso notifiche non concesso."; }
+        catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException) { NotificationsStatus = "Avvisi locali attivi; registrazione push non riuscita."; }
+    }
+    [RelayCommand] private async Task SaveReminderAsync()
+    {
+        try
+        {
+            if (IsReminderEnabled && !await notifications.EnableAsync()) { NotificationsStatus = "Concedi il permesso notifiche per attivare il promemoria."; return; }
+        }
+        catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
+        { /* Local reminders do not depend on push registration. */ }
+        notifications.SetReminder(IsReminderEnabled, ReminderTime);
+        NotificationsStatus = IsReminderEnabled ? "Promemoria salvato." : "Promemoria disattivato.";
+    }
+    [RelayCommand] private void ShowDeleteAccount() { DeletePassword = ""; DeleteAccountError = ""; IsDeleteAccountVisible = true; }
+    [RelayCommand] private void CancelDeleteAccount() { if (IsBusy) return; DeletePassword = ""; IsDeleteAccountVisible = false; }
+    [RelayCommand] private async Task ConfirmDeleteAccountAsync()
+    {
+        if (IsBusy || pb.CurrentUser == null || string.IsNullOrWhiteSpace(DeletePassword)) return;
+        IsBusy = true;
+        DeleteAccountError = "";
+        var id = pb.CurrentUser.Id;
+        try
+        {
+            if (!await pb.DeleteAccountAsync(DeletePassword)) { DeleteAccountError = "Password errata o server non aggiornato. Account non eliminato."; return; }
+            try { await db.DeleteAccountDataAsync(id); }
+            catch (SQLite.SQLiteException) { System.Diagnostics.Debug.WriteLine("[Account deletion] Local cleanup failed; session closed."); }
+            finally
+            {
+                notifications.CancelRest();
+                notifications.SetReminder(false, ReminderTime);
+                pb.Logout();
+                ShowLoginPage();
+            }
+            DeletePassword = "";
+            IsDeleteAccountVisible = false;
+        }
+        catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException or System.Text.Json.JsonException)
+        { DeleteAccountError = "Controlla la connessione e riprova."; }
+        finally { IsBusy = false; }
     }
 
     [RelayCommand]

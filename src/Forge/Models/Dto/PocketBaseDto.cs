@@ -94,6 +94,7 @@ public class SocialGraphRecord
 
 public class LoggedWorkoutRecord
 {
+    [JsonIgnore] public bool IsLocal { get; set; }
     private List<string> exercises = new(), likedBy = new(), photos = new();
     [JsonPropertyName("id")]
     public string Id { get; set; } = string.Empty;

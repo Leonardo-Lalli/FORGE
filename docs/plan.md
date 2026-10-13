@@ -1,5 +1,7 @@
 # Piano di Progetto - FORGE
 
+> Stato corrente al 13 ottobre 2026: beta in preparazione sul branch experiments. Le sezioni iniziali conservano la pianificazione storica; per implementazione e limiti attuali consulta [architettura](architecture.md), [preparazione beta](release-readiness.md) e l’aggiornamento finale di questo documento. Il catalogo corrente usa ExerciseDB OSS, non RapidAPI; SQLite e SecureStorage sostituiscono le precedenti ipotesi di persistenza.
+
 ## 1. Sintesi operativa
 
 ### Obiettivo del progetto
@@ -208,7 +210,7 @@ L'utente può registrare peso e misure corporee e visualizzarne l'andamento nel 
 | Offline SQLite | ✅ | DatabaseService: local_workouts, cached_exercises, saved_plans, achievements |
 | CSV import/export | ✅ | Backup/ripristino dati in Settings |
 | Minimize workout | ✅ | Allenamento non finito salvato come draft, non conta per stats |
-| Push notifications | ⚠️ | PocketBase hook pronto, Firebase SDK non compatibile con .NET 10 |
+| Push notifications | ⚠️ | FCM Android e worker integrati; progetto Firebase e prova reale ancora necessari |
 | Body tracking | ❌ | IT-04 non implementata |
 | Leaderboard | ❌ | Sostituita da feed + like |
 | Confronto diretto | ❌ | Post-MVP |
@@ -222,7 +224,45 @@ Priorità aggiornate al 11 ottobre 2026: migrazione PocketBase per privacy e int
 3. Valutare se implementare IT-04 (body tracking) in una nuova iterazione
 4. Aggiungere leaderboard settimanale tra amici
 5. Implementare confronto diretto statistiche tra amici
-6. Integrare Firebase SDK per push notification quando supporterà .NET 10
+6. Configurare Firebase e verificare le push Android con app chiusa (`docs/push-notifications.md`)
 7. Pubblicazione su Google Play Store
 
 Aggiornamento profili: pagina completa follower/seguiti, foto, allenamenti pubblici e conferma unfollow implementati. Migrazioni 1791676800/1791676900 applicate nel LXC dall’utente; nuova migrazione 1791677000 privacy elenchi pronta e da applicare.
+
+Aggiornamento 12 ottobre: il proprietario ha applicato anche 1791677000. Baseline develop salvata nel commit `305db83`. Implementati calendario per periodo, tutti i badge nel profilo, livello da achievement, eliminazione account, foto ottimizzate e dettagli aggiornati, serie reversibili e progressione esercizi. Nuova migrazione 1791763200 pronta da applicare; Firebase non ancora creato. Cloudflare/domino rimandati su richiesta dell’utente. Verifiche mirate, senza ripetere la suite completa.
+
+## experiments — 12 ottobre 2026
+Interfaccia workout, ricerca e pannelli coerenti con i due temi; timer nativo Android. Implementazione completata; build Android riuscita (0 errori, 3 avvisi preesistenti dei binding Firebase) e APK dedicato artifacts/FORGE-experiments.apk. Verifica visiva e recupero in background sul telefono da eseguire.
+
+### Correzioni experiments del 12 ottobre
+Refresh locale immediato, filtri muscoli, calendario virtualizzato, consigli rotanti e recupero Android riconoscibile implementati. Sei regressioni mirate superate; APK in preparazione. Verifica sul telefono ancora necessaria.
+
+Build finale Android riuscita: 0 errori e 3 avvisi preesistenti Firebase. APK artifacts/FORGE-experiments.apk aggiornato, tono incluso verificato nel pacchetto. Sei regressioni mirate passate; visualizzazione e suono sul telefono restano da confermare.
+
+### Schede e tipi di serie — experiments
+Alla fine di una sessione da scheda, le modifiche a nome, esercizi/ordine, note, recuperi e serie chiedono se aggiornare la scheda o mantenere l’originale. Nessuna modifica automatica durante la sessione; salvare il recupero cambia solo la sessione fino alla scelta finale. La scheda aggiornata mantiene ID e data di creazione e azzera i flag di completamento. Numero SET cliccabile: normale, W warm-up giallo, D drop set viola, F cedimento rosso; tipi persistiti in schede, bozze e storico/dettaglio. Tre test mirati passati (firma, rinomina/esercizi aggiunti, copia senza mutazione e tipi). Prove popup/scelte su telefono ancora da eseguire. Nessun push richiesto.
+
+### Note automatiche — 13 ottobre 2026, experiments
+Le note della scheda e degli esercizi già presenti vengono salvate dopo una breve pausa nella digitazione (400 ms), con salvataggio atteso anche quando si minimizza o termina la sessione. Vengono ricaricate alla successiva apertura della scheda. Le sole modifiche alle note non aprono il popup finale; scegliere di mantenere la scheda originale conserva comunque le note. Il salvataggio delle note aggiorna soltanto quelle, senza introdurre esercizi nuovi o modificare nome, ordine, serie e recuperi. Le note di esercizi aggiunti o sostituiti restano nella sessione e nella scheda se viene approvato l’aggiornamento. Nessuna migrazione server necessaria.
+
+Verifiche: cinque regressioni mirate superate, inclusi round trip SQLite, cancellazione delle note, isolamento dell’account e firma del popup. Da verificare sul dispositivo: modificare soltanto le note e terminare senza popup; riaprire la scheda e ritrovarle; modificare anche il nome e scegliere di mantenere l’originale, poi verificare che il nome resti invariato e le note aggiornate.
+
+## Preparazione beta e community — 13 ottobre 2026, experiments
+
+Server FORGE predefinito mantenuto per la beta; un server personale crea una community distinta. Non sono implementate federazione o migrazione automatica degli account. Nel feed vuoto, il messaggio “Sei il primo nella tua community” appare solo se il server conferma che non ci sono altri utenti visibili; se non è verificabile viene usato un messaggio generico. “Invita un amico” apre la condivisione nativa con link al download sul sito e istruzioni per raggiungere il server corrente, senza token né accesso automatico.
+
+README riscritto con origine scolastica e uso dell’AI, funzioni effettive, dati locali/remoti, limiti, installazione e segnalazioni. Sito nei due temi e italiano/inglese aggiornato mantenendo lo stile; roadmap ridotta a beta/stabilità, feedback, idee future. Confronto con Hevy, Strong e wger basato sulle loro fonti ufficiali, senza affermare superiorità di prestazioni o maturità.
+
+Compose costruisce il binario PocketBase ufficiale della versione scelta; setup esplicito e porta loopback, hook/quattro migrazioni con backup, worker push facoltativo e archivio server completo. Corrette directory dei superuser LXC/Docker, timeout degli installer e messaggi che esponevano la password. Workflow di release prepara una bozza firmata usando secret di produzione, senza pubblicazione automatica.
+
+Verifiche di questa fase: due test invito e tre casi di conteggio community passati; build APK Android riuscita con zero errori e tre avvisi preesistenti Firebase; build statica Next.js e TypeScript riuscita; configurazione Compose, sintassi Bash e PowerShell controllate. Nessuna suite completa ripetuta. Prova di nuovo backend Docker/LXC non eseguita (daemon Docker locale non disponibile); consegna push reale e nuove funzioni sul telefono ancora da verificare. Anteprima browser locale non raggiungibile, quindi nessuna verifica visiva interattiva del sito dichiarata.
+
+Stato: file e APK preparati su experiments, nessun nuovo commit/push, pubblicazione del sito o modifica del server live. Adatta a una piccola beta con feedback dopo i controlli finali in docs/release-readiness.md; non ancora dichiarata pronta per un servizio commerciale per palestre.
+
+## Release 0.8.5 beta — autorizzazione e preparazione, 13 ottobre 2026
+
+Il proprietario ha autorizzato la promozione di experiments a main, il push e la prerelease v0.8.5-beta. Aggiunti README con gamification effettiva (100 XP per badge, un livello ogni 500 XP, criteri non implementati dichiarati), schermate reali dell’archivio identificate come precedenti ad alcune UI, e sezioni equivalenti del sito in entrambi i temi e le lingue. Versione app 0.8.5-beta, versionCode 85. Sito Next.js compilato con TypeScript senza errori.
+
+Generata chiave stabile di firma con backup privato ignorato da Git e accesso Windows limitato all’utente. Dopo un blocco della revisione automatica, il proprietario ha autorizzato esplicitamente payload e destinazione dei cinque secret di firma/Firebase Android su GitHub Actions. Nessuna chiave Firebase Admin del server letta o caricata. Le firme Debug di 0.8.0 e delle prove locali differiscono; avviso di backup/reinstallazione aggiunto a README e release notes.
+
+Il monitor server ora produce solo un riepilogo health e non modifica continuamente README/main. Workflow di release manuale prepara una bozza firmata; pubblicazione attuale autorizzata dal proprietario. Nessuna nuova suite locale completa ripetuta. Conferma pubblicazione, firma dell’APK finale e stato CI da registrare dopo le operazioni.

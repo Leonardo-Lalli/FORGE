@@ -499,3 +499,18 @@ docs/security-hardening.md
 *.aab
 *.apks
 *.tsbuildinfo
+**/google-services.json
+**/*firebase-adminsdk*.json
+**/service-account.json
+**/push.env
+
+# Private server credentials
+secrets/
+**/firebase-admin.json
+
+# Next.js generated files, including temporary root-level builds
+.next/
+
+# Private Android release signing material
+*.keystore
+*.jks

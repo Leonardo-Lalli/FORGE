@@ -11,7 +11,7 @@ public static class VolumeChart
             .Where(w => w.Date.HasValue && double.IsFinite(w.Volume) && w.Volume >= 0)
             .GroupBy(w => w.Date!.Value.Date).ToDictionary(g => g.Key, g => g.Sum(w => w.Volume));
         if (days.Count == 0) return [];
-        var start = filter switch { "week" => today.AddDays(-7), "month" => today.AddMonths(-1), "3months" => today.AddMonths(-3), "year" => today.AddYears(-1), _ => days.Keys.Min() };
+        var start = StatsPeriod.Start(filter, today, days.Keys.Min());
         var step = filter is "week" or "month" ? 1 : 7;
         var buckets = new List<(string Label, double Volume)>();
         for (var cursor = start; cursor <= today; cursor = cursor.AddDays(step))

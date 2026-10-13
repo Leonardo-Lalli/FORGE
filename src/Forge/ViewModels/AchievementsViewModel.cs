@@ -60,8 +60,9 @@ public partial class AchievementsViewModel : BaseViewModel
             var all = await achievementService.GetAllAsync();
             TotalCount = AchievementsCatalog.All.Count.ToString();
             UnlockedCount = all.Count(a => a.State.IsUnlocked).ToString();
-            ProgressPercent = await achievementService.GetProgressPercentAsync();
-            var training = await achievementService.GetTrainingProgressAsync();
+            var unlocked = all.Count(a => a.State.IsUnlocked);
+            ProgressPercent = (double)unlocked / AchievementsCatalog.All.Count;
+            var training = TrainingProgress.FromAchievements(unlocked);
             ExperienceText = $"Livello {training.Level} · {training.Experience} XP";
             LevelProgress = training.LevelProgress;
 
@@ -82,7 +83,7 @@ public partial class AchievementsViewModel : BaseViewModel
 
             Achievements = new ObservableCollection<AchievementDisplay>(displayList);
 
-            var recent = await achievementService.GetRecentUnlocksAsync(5);
+            var recent = all.Where(a => a.State.IsUnlocked).OrderByDescending(a => a.State.UnlockedAt).Take(5).ToList();
             RecentUnlocks = new ObservableCollection<AchievementDisplay>(
                 recent.Select(a => new AchievementDisplay
                 {

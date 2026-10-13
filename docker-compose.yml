@@ -1,6 +1,11 @@
 services:
   pocketbase:
-    image: ghcr.io/muchobien/pocketbase:latest
+    image: forge-pocketbase:${PB_VERSION:?Set a reviewed PB_VERSION in .env}
+    build:
+      context: ./tools/docker
+      dockerfile: Dockerfile.pocketbase
+      args:
+        PB_VERSION: ${PB_VERSION:?Set a reviewed PB_VERSION in .env}
     container_name: forge-pocketbase
     restart: unless-stopped
     ports:
@@ -13,6 +18,7 @@ services:
       - ./tools/pocketbase/pb_migrations:/forge_migrations:ro
     environment:
       - PB_ENCRYPTION_KEY=${PB_ENCRYPTION_KEY:-}
+      - FORGE_PUSH_WORKER_TOKEN=${FORGE_PUSH_WORKER_TOKEN:-}
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8090/api/health"]
       interval: 30s
@@ -20,7 +26,8 @@ services:
       retries: 3
 
   init:
-    image: alpine:latest
+    profiles: ["setup"]
+    image: alpine:3.22
     container_name: forge-init
     depends_on:
       pocketbase:
@@ -34,7 +41,8 @@ services:
     command: sh -c "apk add --no-cache curl jq && sh /init.sh"
 
   show-ip:
-    image: alpine:latest
+    profiles: ["setup"]
+    image: alpine:3.22
     container_name: forge-show-ip
     depends_on:
       init:
@@ -45,3 +53,28 @@ services:
       - ./tools/show-ip.sh:/show-ip.sh:ro
     command: sh /show-ip.sh
     network_mode: host
+
+  push:
+    profiles: ["push"]
+    build:
+      context: ./tools
+      dockerfile: docker/Dockerfile.push
+    restart: unless-stopped
+    depends_on:
+      pocketbase:
+        condition: service_healthy
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    tmpfs: [/tmp]
+    environment:
+      GOOGLE_APPLICATION_CREDENTIALS: /run/forge/service-account.json
+      FORGE_INTERNAL_API: http://pocketbase:8090/api
+      FORGE_PUSH_WORKER_TOKEN: ${FORGE_PUSH_WORKER_TOKEN:-}
+    volumes:
+      - type: bind
+        source: ${FORGE_FIREBASE_KEY_FILE:-./secrets/firebase-admin.json}
+        target: /run/forge/service-account.json
+        read_only: true
+        bind:
+          create_host_path: false

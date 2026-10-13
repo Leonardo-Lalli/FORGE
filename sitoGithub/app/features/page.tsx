@@ -12,19 +12,7 @@ function Eyebrow({ children }: { children: React.ReactNode }) {
 export default function FeaturesPage() {
   const { t } = useI18n()
 
-  const features = [
-    { icon: Dumbbell, title: "1.500+ Esercizi con GIF", desc: "Catalogo completo da ExerciseDB. Cerca per nome, gruppo muscolare o attrezzatura. Filtri combinabili: muscolo AND attrezzatura. Ogni esercizio ha una GIF animata e istruzioni passo-passo. Cache locale su SQLite per accesso istantaneo anche offline.", status: "✅" },
-    { icon: Timer, title: "Allenamento Completo", desc: "Registra serie, ripetizioni e peso per ogni esercizio. Rest timer configurabile (5-600s) con vibrazione a fine recupero. Ghost inputs: i pesi dell'ultima sessione vengono pre-compilati. Modalità Quick Start, Create Plan o avvia da piano salvato.", status: "✅" },
-    { icon: Camera, title: "Foto Progresso", desc: "Scatta foto durante l'allenamento (fotocamera o galleria). Max 5 foto per workout. Visualizza il tuo progresso fisico nel tempo. Le foto sono salvate nel record allenamento e visibili nel dettaglio.", status: "✅" },
-    { icon: BarChart3, title: "Statistiche Avanzate", desc: "Grafico volume a barre settimanali. Top lifts con pesi massimi per esercizio. Calendario mensile con giorni di allenamento. Filtri temporali: WEEK, MONTH, 3M, YEAR, ALL. Volume totale, ore di allenamento, streak settimanale.", status: "✅" },
-    { icon: Users, title: "Feed Sociale", desc: "Cerca e segui altri utenti. Feed con gli allenamenti dei tuoi amici: nome, esercizi, volume, durata, foto. Metti like (♥) ai workout. Ricevi notifiche di like e richieste di follow. Avatar personalizzato con upload.", status: "✅" },
-    { icon: Trophy, title: "48 Achievement", desc: "6 categorie: Costanza 📅, Forza 💪, Orari ⏰, Varietà 🧬, Social 🦋, Elite 👑. Tracking automatico a ogni workout salvato. Notifiche di sblocco. Vetrina badge nel profilo. Achievement nascosti da scoprire.", status: "✅" },
-    { icon: Shield, title: "Sicurezza Completa", desc: "Password in SecureStorage (Android Keystore). HTTPS con certificate pinning Let's Encrypt. API rules row-level ownership. Rate limiting (5 login/min, 60 req/min). Admin panel bloccato da esterno. Backup Android disabilitato.", status: "✅" },
-    { icon: Palette, title: "Doppio Tema", desc: "Tema scuro \"Cyber-Athletic Elite\" (ciano #00E5FF su nero). Tema chiaro \"Fitness Core\" (blu #0052CC su bianco). Modalità Auto: segue il tema di sistema Android. Font Inter, Lexend, Space Grotesk da Google Fonts.", status: "✅" },
-    { icon: Database, title: "Offline SQLite + Sync", desc: "4 tabelle SQLite: workout, esercizi, piani, achievement. Sync automatico quando la connessione torna. I workout non salvati restano in coda (PendingSync). Draft: chiudi l'allenamento senza finire e riprendi dopo.", status: "✅" },
-    { icon: FileSpreadsheet, title: "Import/Export CSV", desc: "Esporta tutti i tuoi allenamenti in formato CSV. Importa dati da altre app (colonne: Date, WorkoutName, ExerciseName, Sets, Reps, WeightKg, Notes). Validazione automatica: max 2MB e 1000 righe.", status: "✅" },
-    { icon: Search, title: "Self-Hosting Docker", desc: "Avvia il backend con docker compose up -d. Funziona su LAN (Wi-Fi di casa/palestra). URL server configurabile da Impostazioni. Primo avvio: SetupPage per inserire IP del server o usare il server predefinito.", status: "✅" },
-  ]
+  const features = t.featureDetails.map((f, i) => ({ ...f, icon: [Dumbbell, Timer, Camera, BarChart3, Users, Search, Shield, Trophy, Database][i], status: "BETA" }))
 
   return (
     <div className="relative min-h-screen overflow-x-hidden bg-forge-bg text-forge-fg">
@@ -37,12 +25,11 @@ export default function FeaturesPage() {
             <div className="mx-auto w-full max-w-[1120px]">
               <p className="mb-4 font-mono text-[13px] uppercase tracking-[0.18em] text-forge-cyan">// Funzionalità</p>
               <h1 className="mb-6 max-w-[700px] text-balance text-[clamp(32px,6vw,52px)] font-extrabold leading-[1.08] tracking-[-0.02em]">
-                Tutto quello che serve{" "}
-                <span className="text-forge-cyan text-glow-cyan">per allenarti meglio.</span>
+                {t.features.title}{" "}
+                <span className="text-forge-cyan text-glow-cyan"></span>
               </h1>
               <p className="max-w-[600px] text-[18px] leading-relaxed text-forge-muted">
-                Niente fronzoli, niente paywall, niente pubblicità. Solo gli strumenti essenziali per registrare,
-                analizzare e condividere i tuoi allenamenti — open source e per sempre gratuito.
+                {t.features.subtitle}
               </p>
             </div>
           </section>
@@ -70,26 +57,6 @@ export default function FeaturesPage() {
             </div>
           </section>
 
-          <section className="px-6 py-16">
-            <div className="mx-auto w-full max-w-[1120px]">
-              <div className="rounded-[20px] border border-forge-cyan-dim bg-gradient-to-b from-forge-cyan/[0.06] to-forge-cyan/[0.01] px-6 py-12 text-center glow-cyan-soft">
-                <Eyebrow>// In numeri</Eyebrow>
-                <div className="grid grid-cols-2 gap-8 sm:grid-cols-4 mt-6">
-                  {[
-                    { value: "1.500+", label: "Esercizi" },
-                    { value: "48", label: "Achievement" },
-                    { value: "10", label: "Pagine XAML" },
-                    { value: "27", label: "Test xUnit" },
-                  ].map((s, i) => (
-                    <div key={i}>
-                      <p className="text-3xl font-extrabold text-forge-cyan">{s.value}</p>
-                      <p className="text-sm text-forge-muted mt-1">{s.label}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </section>
         </main>
         <SiteFooter />
       </div>

@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import Link from "next/link"
+import { currentTag, currentReleaseUrl, isCurrentOrNewer } from "@/lib/release"
 
 interface Release {
   tag_name: string
@@ -10,16 +10,17 @@ interface Release {
 }
 
 export function VersionBadge() {
-  const [version, setVersion] = useState<string>("")
+  const [version, setVersion] = useState<string>(currentTag)
   const [isNew, setIsNew] = useState(false)
-  const [url, setUrl] = useState("")
+  const [url, setUrl] = useState(currentReleaseUrl)
 
   useEffect(() => {
     const cached = localStorage.getItem("forge_last_version")
-    fetch("https://api.github.com/repos/Leonardo-Lalli/FORGE/releases/latest")
+    fetch("https://api.github.com/repos/Leonardo-Lalli/FORGE/releases?per_page=10")
       .then(r => r.json())
-      .then((data: Release) => {
-        if (data?.tag_name) {
+      .then((releases: Release[]) => {
+        const data = Array.isArray(releases) ? releases[0] : null
+        if (data?.tag_name && isCurrentOrNewer(data.tag_name)) {
           setVersion(data.tag_name)
           setUrl(data.html_url)
           if (cached && cached !== data.tag_name) {

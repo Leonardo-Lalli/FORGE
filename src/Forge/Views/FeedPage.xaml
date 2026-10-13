@@ -189,7 +189,7 @@
                                             StrokeShape="RoundRectangle 10"
                                             WidthRequest="80" HeightRequest="80"
                                             BackgroundColor="{DynamicResource SurfaceContainer}">
-                                        <Image Source="{Binding FirstPhoto}" Aspect="AspectFill"
+                                        <Image Source="{Binding FirstPhoto, Converter={StaticResource WorkoutPhotoConverter}}" Aspect="AspectFill"
                                                WidthRequest="80" HeightRequest="80" />
                                     </Border>
 
@@ -241,10 +241,20 @@
                 </VerticalStackLayout>
 
                 <!-- Empty State -->
-                <Label Text="Follow athletes to see their workouts here"
-                       FontFamily="Inter" FontSize="14" TextColor="{DynamicResource TextSecondary}"
-                       HorizontalOptions="Center" Margin="0,40"
-                       IsVisible="{Binding HasFeed, Converter={StaticResource InverseBoolConverter}}" />
+                <Border IsVisible="{Binding IsEmptyState}" Margin="0,24" Padding="24"
+                        StrokeShape="RoundRectangle 20" Stroke="{DynamicResource OutlineVariant}"
+                        BackgroundColor="{DynamicResource SurfaceContainer}">
+                    <VerticalStackLayout Spacing="14">
+                        <Label Text="COMMUNITY" FontFamily="Lexend" FontSize="11" CharacterSpacing="2"
+                               TextColor="{DynamicResource ElectricBlue}" />
+                        <Label Text="{Binding EmptyFeedTitle}" FontFamily="SpaceGrotesk" FontSize="24"
+                               FontAttributes="Bold" TextColor="{DynamicResource OnSurface}" />
+                        <Label Text="{Binding EmptyFeedDescription}" FontFamily="Inter" FontSize="14"
+                               TextColor="{DynamicResource TextSecondary}" />
+                        <Button Text="Invita un amico" Command="{Binding InviteFriendCommand}" CornerRadius="14"
+                                FontFamily="Lexend" BackgroundColor="{DynamicResource ElectricBlue}" TextColor="White" />
+                    </VerticalStackLayout>
+                </Border>
 
             </VerticalStackLayout>
         </ScrollView>

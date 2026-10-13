@@ -85,6 +85,7 @@ public partial class HomeViewModel : BaseViewModel
             await LoadRandomPlanAsync();
             await LoadAchievementProgressAsync();
             SetSuccess(true);
+            await NotificationNavigation.OpenPendingAsync();
         }
         finally { IsBusy = false; }
     }
@@ -108,13 +109,13 @@ public partial class HomeViewModel : BaseViewModel
     {
         try
         {
-            var unlocked = await achievementService.GetUnlockedCountAsync();
-            var percent = await achievementService.GetProgressPercentAsync();
+            var all = await achievementService.GetAllAsync();
+            var unlocked = all.Count(a => a.State.IsUnlocked);
+            var percent = (double)unlocked / AchievementsCatalog.All.Count;
             AchievementCount = unlocked.ToString();
             AchievementProgress = $"{unlocked}/{AchievementsCatalog.All.Count}";
             AchievementPercent = percent;
 
-            var all = await achievementService.GetAllAsync();
             HasNextAchievement = false;
             var next = all
                 .Where(a => !a.State.IsUnlocked && a.State.Progress > 0)

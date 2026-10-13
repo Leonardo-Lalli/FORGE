@@ -11,6 +11,7 @@ namespace Forge.ViewModels;
 public partial class ProfileWorkout : ObservableObject
 {
     public string WorkoutId { get; set; } = string.Empty;
+    public string Source { get; set; } = "pocketbase";
     public string Title { get; set; } = string.Empty;
     public string Date { get; set; } = string.Empty;
     public string Exercises { get; set; } = string.Empty;
@@ -52,6 +53,8 @@ public partial class ProfileViewModel : BaseViewModel
     private List<Models.Dto.SocialGraphRecord> relationships = [];
     private readonly PocketBaseService pb;
     private readonly AchievementService achievementService;
+    private readonly DatabaseService db;
+    private List<Models.Dto.LoggedWorkoutRecord> loadedWorkouts = [];
 
     [ObservableProperty] private string username = string.Empty;
     [ObservableProperty] private string tier = string.Empty;
@@ -76,15 +79,16 @@ public partial class ProfileViewModel : BaseViewModel
     [ObservableProperty] private bool hasUnlockedBadges;
     [ObservableProperty] private string achievementSummary = string.Empty;
 
-    public ProfileViewModel(PocketBaseService pb, AchievementService achievementService)
+    public ProfileViewModel(PocketBaseService pb, AchievementService achievementService, DatabaseService db)
     {
         this.pb = pb;
         this.achievementService = achievementService;
+        this.db = db;
         HasData = true;
 
         WeakReferenceMessenger.Default.Register<WorkoutSavedMessage>(this, async (_, _) =>
         {
-            await MainThread.InvokeOnMainThreadAsync(async () => await LoadAsync());
+            await MainThread.InvokeOnMainThreadAsync(async () => { if (string.IsNullOrEmpty(ViewedUserId) || ViewedUserId == pb.CurrentUser?.Id) await LoadRealWorkouts(true); });
         });
     }
 
@@ -98,7 +102,7 @@ public partial class ProfileViewModel : BaseViewModel
             try
             {
             IsOwnProfile = string.IsNullOrEmpty(ViewedUserId) || ViewedUserId == pb.CurrentUser.Id;
-            if (IsOwnProfile) await pb.RefreshUserAsync();
+            if (IsOwnProfile) { await LoadRealWorkouts(true); await pb.RefreshUserAsync(); }
             var user = IsOwnProfile ? pb.CurrentUser : await pb.GetUserByIdAsync(ViewedUserId);
             if (user == null) { SetError("Profilo non disponibile."); return; }
             displayedUser = user;
@@ -149,14 +153,16 @@ public partial class ProfileViewModel : BaseViewModel
         }
     }
 
-    private async Task LoadRealWorkouts()
+    private async Task LoadRealWorkouts(bool localOnly = false)
     {
         WorkoutLoadError = string.Empty;
         HasWorkoutError = false;
         try
         {
             System.Diagnostics.Debug.WriteLine("[Profile] LoadRealWorkouts starting...");
-            var workouts = await pb.GetUserWorkoutsAsync(displayedUser?.Id ?? pb.CurrentUser?.Id ?? "");
+            var workouts = IsOwnProfile ? await WorkoutHistory.LoadOwnAsync(pb, db, localOnly, loadedWorkouts) : await pb.GetUserWorkoutsAsync(displayedUser?.Id ?? "");
+            if (IsOwnProfile && !localOnly) workouts = await WorkoutHistory.LoadOwnAsync(pb, db, true, workouts);
+            loadedWorkouts = workouts;
             System.Diagnostics.Debug.WriteLine($"[Profile] GetMyWorkoutsAsync returned {workouts.Count} items");
             TotalWorkouts = workouts.Count.ToString();
 
@@ -179,6 +185,7 @@ public partial class ProfileViewModel : BaseViewModel
                 RecentWorkouts.Add(new ProfileWorkout
                 {
                     WorkoutId = w.Id,
+                    Source = w.IsLocal ? "local" : "pocketbase",
                     Title = w.Name,
                     Date = dateStr,
                     Exercises = string.Join(", ", w.Exercises ?? new()),
@@ -219,7 +226,7 @@ public partial class ProfileViewModel : BaseViewModel
     {
         try
         {
-            var workouts = await pb.GetUserWorkoutsAsync(displayedUser?.Id ?? "");
+            var workouts = loadedWorkouts;
             if (workouts.Count == 0) { StreakDays = "0"; StreakLabel = "Week Streak"; return; }
 
             var dates = workouts
@@ -274,7 +281,7 @@ public partial class ProfileViewModel : BaseViewModel
     private async Task OpenWorkoutDetailAsync(ProfileWorkout workout)
     {
         if (string.IsNullOrWhiteSpace(workout?.WorkoutId)) return;
-        await Shell.Current.GoToAsync($"workoutDetail?workoutId={Uri.EscapeDataString(workout.WorkoutId)}&source=pocketbase");
+        await Shell.Current.GoToAsync($"workoutDetail?workoutId={Uri.EscapeDataString(workout.WorkoutId)}&source={workout.Source}");
     }
 
     [RelayCommand]
@@ -295,7 +302,7 @@ public partial class ProfileViewModel : BaseViewModel
 
         SetLoading();
         var selected = BadgeChoices.Where(b => b.IsSelected).Select(b => b.Id).ToList();
-        if (selected.Count > 3) { SetError("Puoi mostrare al massimo 3 achievement."); return; }
+
         try
         {
         var (success, error) = await pb.UpdateProfileOptionsAsync(EditName.Trim(), EditBio, VisibilityIndex switch { 1 => "private", 2 => "friends", _ => "public" }, selected, ConnectionsVisibilityIndex switch { 1 => "private", 2 => "friends", _ => "public" });
@@ -371,7 +378,7 @@ public partial class ProfileViewModel : BaseViewModel
         {
             if (!IsOwnProfile)
             {
-                UnlockedBadges = new(displayedUser?.FeaturedAchievements.Take(3).Select(id => AchievementsCatalog.All.FirstOrDefault(a => a.Id == id)?.Icon).OfType<string>() ?? []);
+                UnlockedBadges = new(displayedUser?.FeaturedAchievements.Select(id => AchievementsCatalog.All.FirstOrDefault(a => a.Id == id)?.Icon).OfType<string>() ?? []);
                 HasUnlockedBadges = UnlockedBadges.Count > 0;
                 AchievementSummary = "In evidenza";
                 BadgeChoices.Clear();
@@ -379,9 +386,11 @@ public partial class ProfileViewModel : BaseViewModel
             }
             var all = await achievementService.GetAllAsync();
             var unlocked = all.Where(a => a.State.IsUnlocked).ToList();
+            var xp = unlocked.Count * 100;
+            Tier = $"Livello {xp / 500 + 1} · {xp} XP da achievement";
             BadgeChoices.Clear();
             foreach (var a in unlocked) BadgeChoices.Add(new BadgeChoice { Id = a.Def.Id, Name = a.Def.Name, Icon = a.Def.Icon, IsSelected = displayedUser?.FeaturedAchievements.Contains(a.Def.Id) == true });
-            UnlockedBadges = new ObservableCollection<string>(unlocked.Where(a => displayedUser?.FeaturedAchievements.Contains(a.Def.Id) == true).Take(3).Select(a => a.Def.Icon));
+            UnlockedBadges = new ObservableCollection<string>(unlocked.Where(a => displayedUser?.FeaturedAchievements.Contains(a.Def.Id) == true).Select(a => a.Def.Icon));
             HasUnlockedBadges = UnlockedBadges.Count > 0;
             AchievementSummary = $"{unlocked.Count}/{AchievementsCatalog.All.Count} sbloccati";
         }
@@ -490,8 +499,6 @@ public partial class ProfileViewModel : BaseViewModel
     }
     [RelayCommand] private void ToggleBadge(BadgeChoice badge)
     {
-        if (!badge.IsSelected && BadgeChoices.Count(b => b.IsSelected) >= 3)
-        { ErrorMessage = "Puoi selezionare fino a 3 achievement."; return; }
         badge.IsSelected = !badge.IsSelected;
         ErrorMessage = null;
     }

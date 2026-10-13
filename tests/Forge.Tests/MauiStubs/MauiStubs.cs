@@ -12,7 +12,11 @@ internal static class Preferences
 {
     private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, string> values = new();
     public static string Get(string key, string fallback) => values.GetValueOrDefault(key, fallback);
+    public static bool Get(string key, bool fallback) => bool.TryParse(Get(key, ""), out var value) ? value : fallback;
+    public static int Get(string key, int fallback) => int.TryParse(Get(key, ""), out var value) ? value : fallback;
     public static void Set(string key, string value) => values[key] = value;
+    public static void Set(string key, bool value) => Set(key, value.ToString());
+    public static void Set(string key, int value) => Set(key, value.ToString());
     public static void Remove(string key) => values.TryRemove(key, out _);
 }
 
@@ -36,6 +40,7 @@ namespace Microsoft.Maui.Controls
     {
         public static ImageSource FromFile(string path) => new();
         public static ImageSource FromUri(Uri uri) => new();
+        public static ImageSource FromStream(Func<Stream> stream) => new();
     }
     public interface IValueConverter
     {

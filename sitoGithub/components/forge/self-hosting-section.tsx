@@ -33,7 +33,7 @@ export function SelfHostingSection() {
               <span className="text-forge-cyan">cd</span> FORGE
             </p>
             <p className="mt-2">
-              <span className="text-forge-cyan">docker compose</span> up -d
+              <span className="text-forge-cyan">cp</span> .env.example .env<br /># PB_VERSION + credentials: see /self-hosting
             </p>
           </div>
         </div>

@@ -202,6 +202,7 @@ public partial class PocketBaseService
             System.Diagnostics.Debug.WriteLine($"[PB Login] userId={currentUser.Id}");
 #endif
             await SaveCredentialsAsync(email, password);
+            _ = RegisterPushDeviceAsync().ContinueWith(t => System.Diagnostics.Debug.WriteLine("[Push] Registrazione da riprovare."), TaskContinuationOptions.OnlyOnFaulted);
 
             return (true, string.Empty);
         }
@@ -459,8 +460,11 @@ public partial class PocketBaseService
     public async Task<bool> UploadWorkoutAsync(LocalWorkout workout)
     {
         if (!IsLoggedIn || currentUser?.Id != workout.UserId || workout.IsDraft) return false;
-        var (ok, _) = await CreateRecordAsync("logged_workouts", WorkoutSyncPayload.Create(workout));
-        if (ok) return true;
+        var payload = WorkoutSyncPayload.Create(workout);
+        var photos = System.Text.Json.JsonSerializer.Deserialize<List<string>>(workout.PhotosJson) ?? [];
+        if (photos.Count > 0) payload.Remove("photos");
+        var (ok, _) = await CreateRecordAsync("logged_workouts", payload);
+        if (ok) return photos.Count == 0 || await UploadWorkoutPhotosAsync(workout.Id, photos);
         // A lost response can leave a successful POST on the server. Check its
         // stable ID before retrying, instead of creating a second workout.
         try
@@ -471,7 +475,7 @@ public partial class PocketBaseService
             using var response = await GetHttp().SendAsync(request);
             if (!response.IsSuccessStatusCode) return false;
             using var body = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
-            return body.RootElement.TryGetProperty("user", out var owner) && owner.GetString() == workout.UserId;
+            return body.RootElement.TryGetProperty("user", out var owner) && owner.GetString() == workout.UserId && (photos.Count == 0 || await UploadWorkoutPhotosAsync(workout.Id, photos));
         }
         catch (HttpRequestException) { return false; }
         catch (TaskCanceledException) { return false; }
@@ -528,6 +532,28 @@ public partial class PocketBaseService
         {
             System.Diagnostics.Debug.WriteLine($"[PB] SecureStorage unavailable: {ex.Message}. Auto-login disabled.");
         }
+    }
+
+    // null means the server could not confirm the count; never label a failed query "first member".
+    public async Task<bool?> HasOtherCommunityMembersAsync()
+    {
+        await EnsureAuthAsync();
+        if (!IsLoggedIn || currentUser == null) return null;
+        try
+        {
+            var filter = Uri.EscapeDataString("id != " + FilterValue(currentUser.Id));
+            using var request = new HttpRequestMessage(HttpMethod.Get,
+                $"collections/users/records?perPage=1&fields=totalItems,items.id&filter={filter}");
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            using var response = await GetHttp().SendAsync(request);
+            response.EnsureSuccessStatusCode();
+            using var result = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+            return result.RootElement.TryGetProperty("totalItems", out var total) && total.TryGetInt32(out var count)
+                ? count > 0 : null;
+        }
+        catch (HttpRequestException) { return null; }
+        catch (TaskCanceledException) { return null; }
+        catch (JsonException) { return null; }
     }
 
     public async Task<List<PocketBaseUserRecord>> SearchUsersAsync(string query)

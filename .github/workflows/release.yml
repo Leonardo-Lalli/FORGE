@@ -1,70 +1,76 @@
-name: Publish Release
-
+name: Prepare beta release
 on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Versione (es. v0.8.0-beta)'
+        description: 'Tag/version (for example v0.8.5-beta)'
         required: true
         type: string
-      name:
-        description: 'Nome release (es. FORGE v0.8.0-beta)'
+      version_code:
+        description: 'Android versionCode, greater than every previously distributed APK'
         required: true
         type: string
-
 permissions:
   contents: write
-
 jobs:
   release:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+      - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.0.x'
-
-      - name: Install MAUI workload
+      - name: Install Android workload
         run: dotnet workload install maui-android
-
-      - name: Create .env
-        run: echo "POCKETBASE_URL=${{ secrets.POCKETBASE_URL }}" > .env
-
-      - name: Publish APK
-        run: dotnet publish src/Forge/Forge.csproj -f net10.0-android -c Release /p:AndroidPackageFormats=apk
-
-      - name: Copy APK for release
+      - name: Validate version and configure signing/Firebase
         shell: pwsh
+        env:
+          RELEASE_VERSION: ${{ inputs.version }}
+          RELEASE_CODE: ${{ inputs.version_code }}
+          FORGE_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          FORGE_GOOGLE_BASE64: ${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}
+          FORGE_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          FORGE_KEY_PASS: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          FORGE_STORE_PASS: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
         run: |
-          $apk = Get-ChildItem -Path "src/Forge/bin/Release/net10.0-android/publish/" -Filter "*-Signed.apk" | Select-Object -First 1
-          Copy-Item $apk.FullName -Destination "FORGE.apk"
-
-      - name: Create Release
-        uses: softprops/action-gh-release@v2
+          if ($env:RELEASE_VERSION -notmatch '^v[0-9]+\.[0-9]+\.[0-9]+(-[A-Za-z0-9.-]+)?$' -or $env:RELEASE_CODE -notmatch '^[1-9][0-9]*$') { throw 'Invalid version or versionCode.' }
+          foreach ($name in 'FORGE_KEYSTORE_BASE64','FORGE_GOOGLE_BASE64','FORGE_KEY_ALIAS','FORGE_KEY_PASS','FORGE_STORE_PASS') {
+            if ([string]::IsNullOrWhiteSpace([Environment]::GetEnvironmentVariable($name))) { throw "Missing release configuration: $name" }
+          }
+          [IO.File]::WriteAllBytes("$env:RUNNER_TEMP/forge-release.keystore", [Convert]::FromBase64String($env:FORGE_KEYSTORE_BASE64))
+          [IO.File]::WriteAllBytes('src/Forge/Platforms/Android/google-services.json', [Convert]::FromBase64String($env:FORGE_GOOGLE_BASE64))
+          $google = Get-Content 'src/Forge/Platforms/Android/google-services.json' -Raw | ConvertFrom-Json
+          if ('com.leoforge.forge' -notin $google.client.client_info.android_client_info.package_name) { throw 'Firebase package does not match FORGE.' }
+      - name: Publish signed APK
+        shell: pwsh
+        env:
+          RELEASE_VERSION: ${{ inputs.version }}
+          RELEASE_CODE: ${{ inputs.version_code }}
+          FORGE_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          FORGE_KEY_PASS: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          FORGE_STORE_PASS: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+        run: |
+          dotnet publish src/Forge/Forge.csproj -f net10.0-android -c Release -p:AndroidPackageFormats=apk -p:PublishTrimmed=false -p:RunAOTCompilation=false -p:EmbedAssembliesIntoApk=true -p:AndroidKeyStore=true "-p:AndroidSigningKeyStore=$env:RUNNER_TEMP/forge-release.keystore" "-p:AndroidSigningKeyAlias=$env:FORGE_KEY_ALIAS" -p:AndroidSigningKeyPass=env:FORGE_KEY_PASS -p:AndroidSigningStorePass=env:FORGE_STORE_PASS "-p:ApplicationDisplayVersion=$($env:RELEASE_VERSION.TrimStart('v'))" "-p:ApplicationVersion=$env:RELEASE_CODE"
+          if ($LASTEXITCODE -ne 0) { throw 'APK publish failed.' }
+          $apk = Get-ChildItem 'src/Forge/bin/Release/net10.0-android/publish/' -Filter '*-Signed.apk' | Select-Object -First 1
+          if (-not $apk) { throw 'Signed APK missing.' }
+          Copy-Item $apk.FullName 'FORGE.apk'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Package reviewed server sources
+        run: python tools/build-server-package.py
+      - uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ inputs.version }}
-          name: ${{ inputs.name }}
+          name: FORGE ${{ inputs.version }}
+          target_commitish: ${{ github.sha }}
+          draft: true
+          prerelease: true
           files: |
             FORGE.apk
-            docker-compose.yml
-          draft: false
-          prerelease: true
+            artifacts/forge-server-tools.zip
           body: |
-            ## 📦 Download
-            **FORGE.apk** — installa su Android 7.0+
-
-            ## 🐳 Self-Hosting
-            ```bash
-            wget https://github.com/Leonardo-Lalli/FORGE/releases/download/${{ inputs.version }}/docker-compose.yml
-            docker compose up -d
-            ```
-            Oppure clona la repo e fai checkout del tag:
-            ```bash
-            git clone https://github.com/Leonardo-Lalli/FORGE.git
-            cd FORGE && git checkout ${{ inputs.version }}
-            docker compose up -d
-            ```
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            Android beta (API 23+). See README for current functionality and limitations.
+            The server archive contains Compose, Dockerfiles, scripts, hooks and migrations; follow docs/self-hosting.md.
+            This is a draft: complete docs/release-readiness.md before publication.

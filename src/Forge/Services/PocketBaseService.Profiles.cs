@@ -5,6 +5,72 @@ using Forge.Models.Dto;
 namespace Forge.Services;
 public partial class PocketBaseService
 {
+    public async Task<bool> QueueAchievementNotificationAsync(string id)
+        => await QueueAchievementNotificationsAsync([id]);
+    public async Task<bool> HasPushTokenAsync() => !string.IsNullOrEmpty(await SecureStorage.GetAsync("forge_push_token"));
+    public async Task<bool> QueueAchievementNotificationsAsync(IEnumerable<string> ids)
+    {
+        if (!IsLoggedIn) return false;
+        using var request = new HttpRequestMessage(HttpMethod.Post, "forge/notifications/achievement") { Content = JsonContent.Create(new { ids = ids.ToArray() }) };
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        using var response = await GetHttp().SendAsync(request);
+        return response.IsSuccessStatusCode;
+    }
+    public async Task RegisterPushDeviceAsync()
+    {
+        if (!IsLoggedIn || !Preferences.Get("notifications_enabled", false)) return;
+        var pushToken = await SecureStorage.GetAsync("forge_push_token");
+        if (string.IsNullOrEmpty(pushToken)) return;
+        using var request = new HttpRequestMessage(HttpMethod.Post, "forge/push/device") { Content = JsonContent.Create(new { token = pushToken }) };
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        using var response = await GetHttp().SendAsync(request);
+        response.EnsureSuccessStatusCode();
+    }
+    public async Task UnregisterPushDeviceAsync()
+    {
+        if (!IsLoggedIn) return;
+        var pushToken = await SecureStorage.GetAsync("forge_push_token");
+        if (string.IsNullOrEmpty(pushToken)) return;
+        using var request = new HttpRequestMessage(HttpMethod.Delete, "forge/push/device") { Content = JsonContent.Create(new { token = pushToken }) };
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        using var response = await GetHttp().SendAsync(request);
+        response.EnsureSuccessStatusCode();
+    }
+    private async Task<bool> UploadWorkoutPhotosAsync(string workoutId, List<string> photos)
+    {
+        var path = "collections/logged_workouts/records/" + WorkoutSyncPayload.RecordId(workoutId);
+        using var jsonRequest = new HttpRequestMessage(HttpMethod.Patch, path) { Content = JsonContent.Create(new { photos }) };
+        jsonRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        using var jsonResponse = await GetHttp().SendAsync(jsonRequest);
+        if (jsonResponse.IsSuccessStatusCode)
+        {
+            var record = await jsonResponse.Content.ReadFromJsonAsync<LoggedWorkoutRecord>(JsonOptions);
+            if (record?.Photos.Count == photos.Count) return true;
+        }
+        // Existing installations may use a protected PocketBase FileField instead of JSON.
+        using var form = new MultipartFormDataContent();
+        for (var i = 0; i < photos.Count; i++)
+        {
+            if (!photos[i].StartsWith("data:image/", StringComparison.OrdinalIgnoreCase)) return false;
+            var bytes = Convert.FromBase64String(photos[i][(photos[i].IndexOf(',') + 1)..]);
+            var file = new ByteArrayContent(bytes);
+            file.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("image/jpeg");
+            form.Add(file, "photos", $"workout-{i}.jpg");
+        }
+        using var request = new HttpRequestMessage(HttpMethod.Patch, path) { Content = form };
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        using var response = await GetHttp().SendAsync(request);
+        return response.IsSuccessStatusCode;
+    }
+    public async Task<bool> DeleteAccountAsync(string password)
+    {
+        await EnsureAuthAsync();
+        if (!IsLoggedIn) return false;
+        using var request = new HttpRequestMessage(HttpMethod.Post, "forge/account/delete") { Content = JsonContent.Create(new { password }) };
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        using var response = await GetHttp().SendAsync(request);
+        return response.IsSuccessStatusCode;
+    }
     public async Task<string?> GetCatalogPageAsync(string cursor = "", bool status = false)
     {
         await EnsureAuthAsync();
@@ -120,7 +186,7 @@ public partial class PocketBaseService
     public async Task<(bool Success, string Error)> UpdateProfileOptionsAsync(string name, string bio, string visibility, List<string> badges, string? connectionsVisibility = null)
     {
         if (currentUser == null) return (false, "Non autenticato.");
-        if (!new[] { "public", "private", "friends" }.Contains(visibility) || badges.Count > 3 || badges.Distinct().Count() != badges.Count)
+        if (!new[] { "public", "private", "friends" }.Contains(visibility) || badges.Count > Forge.Models.AchievementsCatalog.All.Count || badges.Distinct().Count() != badges.Count)
             return (false, "Opzioni profilo non valide.");
         if (connectionsVisibility != null && !new[] { "public", "private", "friends" }.Contains(connectionsVisibility))
             return (false, "Privacy follower non valida.");
