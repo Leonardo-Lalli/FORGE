@@ -6,12 +6,14 @@ Log workouts, create personal plans without an app-imposed limit, use per-exerci
 
 [Download and website](https://leonardo-lalli.github.io/FORGE/#download) · [Canonical README and current setup instructions](README.md) · [Roadmap](ROADMAP.md) · [License](LICENSE)
 
+During workouts, available exercise instructions rotate automatically as a carousel of execution steps.
+
 The app has no subscription, but hosting has costs. Code is MIT; exercise/media and other third-party assets retain their own licenses. AI assistance does not certify correctness or security.
 
 ## Gamification and screenshots
 
 Achievements supported by workout history unlock retroactively. Each unlocked badge contributes 100 XP; every 500 XP adds a level. Unlocked badges can be displayed on the profile. Some catalog criteria, including leaderboards and challenges, are not implemented; per-set record medals remain future ideas.
 
-[Real development screenshots and detailed limitations](README.md#schermate-dellapp) are available in the canonical README. Archived screenshots predate parts of the current UI. Earlier Debug APKs use different certificates; back up local data before reinstalling the release build.
+[Real development screenshots and detailed limitations](README.md#schermate-dellapp) are available in the canonical README. The workout image is a recent owner-supplied capture; the other screenshots predate parts of the current UI. Earlier Debug APKs use different certificates; back up local data before reinstalling the release build.
 
 The current CSV export is a summary, not a full backup of plans, photos, sets or weights. Before reinstalling, verify workout synchronization and save plans/notes/photos separately.

@@ -19,12 +19,17 @@ public partial class ProtocolCard : ObservableObject
 public partial class StartSessionViewModel : BaseViewModel
 {
     private readonly PlanService planService;
+    private readonly DatabaseService db;
+    private readonly PocketBaseService pb;
 
     [ObservableProperty] private ObservableCollection<ProtocolCard> protocols = new();
+    [ObservableProperty] private bool hasDraft;
 
-    public StartSessionViewModel(PlanService planService)
+    public StartSessionViewModel(PlanService planService, DatabaseService db, PocketBaseService pb)
     {
         this.planService = planService;
+        this.db = db;
+        this.pb = pb;
         HasData = true;
         _ = InitializeAsync().ContinueWith(t =>
         {
@@ -42,6 +47,7 @@ public partial class StartSessionViewModel : BaseViewModel
     public async Task LoadProtocolsAsync()
     {
         var plans = await planService.LoadPlansAsync();
+        HasDraft = (await db.GetWorkoutsAsync(pb.CurrentUser?.Id ?? "")).Any(w => w.IsDraft);
         Protocols.Clear();
         foreach (var plan in plans)
         {
@@ -73,6 +79,15 @@ public partial class StartSessionViewModel : BaseViewModel
         await Shell.Current.GoToAsync("activeWorkout", new Dictionary<string, object>
         {
             ["mode"] = "free"
+        });
+    }
+
+    [RelayCommand]
+    private async Task ResumeWorkoutAsync()
+    {
+        await Shell.Current.GoToAsync("activeWorkout", new Dictionary<string, object>
+        {
+            ["mode"] = "resume"
         });
     }
 

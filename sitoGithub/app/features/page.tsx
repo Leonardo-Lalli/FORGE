@@ -3,7 +3,7 @@
 import { SiteHeader } from "@/components/forge/site-header"
 import { SiteFooter } from "@/components/forge/cta-footer"
 import { useI18n } from "@/lib/i18n"
-import { CheckCircle2, Dumbbell, BarChart3, Users, Trophy, Shield, Palette, Database, FileSpreadsheet, Timer, Camera, Search } from "lucide-react"
+import { Dumbbell, BarChart3, Users, Trophy, Shield, Database, FileSpreadsheet, Timer, Search, Sparkles } from "lucide-react"
 
 function Eyebrow({ children }: { children: React.ReactNode }) {
   return <p className="mb-3 font-mono text-xs uppercase tracking-[0.16em] text-forge-cyan">{children}</p>
@@ -12,7 +12,8 @@ function Eyebrow({ children }: { children: React.ReactNode }) {
 export default function FeaturesPage() {
   const { t } = useI18n()
 
-  const features = t.featureDetails.map((f, i) => ({ ...f, icon: [Dumbbell, Timer, Camera, BarChart3, Users, Search, Shield, Trophy, Database][i], status: "BETA" }))
+  const icons = [Dumbbell, FileSpreadsheet, Sparkles, Timer, BarChart3, Users, Search, Shield, Trophy, Database]
+  const features = t.featureDetails.map((f, i) => ({ ...f, icon: icons[i] ?? Dumbbell, status: "BETA" }))
 
   return (
     <div className="relative min-h-screen overflow-x-hidden bg-forge-bg text-forge-fg">

@@ -2,7 +2,7 @@
 
 import { useI18n } from "@/lib/i18n"
 
-const screenshots = ["dashboard.jpeg", "workout.jpeg", "stats.jpeg", "profile.jpeg"]
+const screenshots = ["dashboard.jpeg", "workout-current.jpg", "stats.jpeg", "profile.jpeg"]
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH || ""
 
 export function ScreenshotsSection() {

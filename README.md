@@ -28,6 +28,7 @@ Il proprietario ha confermato sul proprio telefono login, flusso di allenamento,
 - Registrare serie, carichi e ripetizioni; segnare serie normali, warm-up, drop set o cedimento.
 - Ritrovare i valori della sessione precedente e salvare automaticamente le note degli esercizi già presenti nella scheda.
 - Scegliere se aggiornare la scheda quando cambi nome, esercizi, ordine, serie o recuperi durante una sessione.
+- Leggere i consigli di esecuzione disponibili sopra l’esercizio: gli step cambiano automaticamente a carosello durante l’allenamento.
 - Impostare un recupero per esercizio da **0 a 5 minuti**, con notifica Android di avanzamento, pausa e avviso finale.
 - Consultare storico, dettagli, foto degli allenamenti, volume, calendario e progressione per esercizio.
 - Personalizzare avatar e badge sbloccati retroattivamente nel profilo.
@@ -59,11 +60,11 @@ Alcune voci del catalogo richiedono criteri non ancora implementati, ad esempio 
 
 ## Schermate dell’app
 
-Schermate reali presenti nell’archivio del progetto, scattate durante lo sviluppo. **Non sono una rappresentazione esatta di tutte le schermate della 0.8.5**: workout, profilo, colori e calendario sono stati aggiornati successivamente. Nuove acquisizioni sul dispositivo sostituiranno queste immagini.
+L’allenamento è una **acquisizione recente fornita dal proprietario**, con consigli a carosello, tipo di serie e note. Dashboard, statistiche e profilo provengono dall’archivio di sviluppo e possono differire dall’interfaccia attuale.
 
 <p>
   <img src="assets/screenshots/dashboard.jpeg" alt="Dashboard FORGE, schermata di sviluppo" width="200" />
-  <img src="assets/screenshots/allenamento%20attivo%202.jpeg" alt="Allenamento attivo FORGE, schermata di sviluppo" width="200" />
+  <img src="assets/screenshots/workout-current.jpg" alt="Allenamento attivo FORGE con consigli a carosello, serie e note" width="200" />
   <img src="assets/screenshots/stats.jpeg" alt="Statistiche FORGE, schermata di sviluppo" width="200" />
   <img src="assets/screenshots/profile.jpeg" alt="Profilo FORGE, schermata di sviluppo" width="200" />
 </p>

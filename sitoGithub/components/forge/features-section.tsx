@@ -12,7 +12,7 @@ export function FeaturesSection() {
           <h2 className="mb-4 text-balance text-[clamp(28px,5vw,40px)] font-extrabold leading-[1.1] tracking-[-0.02em]">{t.features.title}</h2>
           <p className="text-pretty text-[17px] text-forge-muted">{t.features.subtitle}</p>
         </div>
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {t.features.items.map((item, i) => (
             <div key={i} className="rounded-[14px] border border-forge-border bg-forge-elev p-6 transition-all hover:-translate-y-0.5 hover:border-forge-cyan-dim">
               <h3 className="mb-2 text-lg font-bold">{item.title}</h3>

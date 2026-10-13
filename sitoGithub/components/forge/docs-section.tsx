@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import Link from "next/link"
 import { BookText, Boxes, GitBranch, ScrollText, CheckCircle2, CircleDashed, XCircle, AlertTriangle } from "lucide-react"
 import type { LucideIcon } from "lucide-react"
 import { useI18n } from "@/lib/i18n"
@@ -165,6 +166,9 @@ function ArchPanel({ t }: { t: any }) {
 function RoadmapPanel({ t, lang }: { t: any; lang: string }) {
   return (
     <div className="flex flex-col gap-3">
+      <Link href="/roadmap" className="mb-2 text-sm text-forge-cyan underline underline-offset-4">
+        {lang === "en" ? "All goals and released milestones →" : "Tutti gli obiettivi e i traguardi rilasciati →"}
+      </Link>
       {t.iterations.map((it: any) => {
         const meta = statusMeta[it.status as Status]
         const Icon = meta.icon

@@ -71,3 +71,11 @@ Generata chiave stabile di firma con backup privato ignorato da Git e accesso Wi
 Il monitor server ora produce solo un riepilogo health e non modifica continuamente README/main. Workflow di release manuale prepara una bozza firmata; pubblicazione attuale autorizzata dal proprietario. Nessuna nuova suite locale completa ripetuta. Conferma pubblicazione, firma dell’APK finale e stato CI da registrare dopo le operazioni.
 
 Verifica confezionamento: APK Release 0.8.5-beta, versionCode 85, firma CN=Leonardo Lalli verificata da apksigner; 94.789.711 byte. Build locale completata con tre avvisi Firebase già noti. CI Build & Test del commit dbd2c6d passata (run 38455094135), senza ulteriore suite locale. Corretto avviso aggiornamento: l’export CSV attuale è solo riepilogo, non backup completo di schede, foto o serie.
+
+## Allenamento libero e roadmap completa — 13 ottobre 2026
+
+Quick Start avvia sempre una nuova sessione senza esercizi, PlanId, note o foto ereditati. Il recupero della bozza è esplicito tramite «Riprendi allenamento»; completare una sessione libera salva l’allenamento e non crea/aggiorna schede né elimina bozze estranee. I parametri Shell sono applicati insieme nel ViewModel. Il popup di aggiornamento rimane solo per sessioni avviate da una scheda esistente.
+
+Roadmap completa ripristinata dal precedente sito: 54 obiettivi in 9 gruppi, senza date/versioni future; data e versione solo nei traguardi già rilasciati. Stile FORGE conservato, obiettivi incompleti e idee distinti dalle funzioni della beta. Foto workout sostituita con l’allegato recente del proprietario su README e sito, senza modificarne i pixel. I consigli di esecuzione a carosello sono descritti tra le funzionalità.
+
+Verifica richiesta sul telefono aggiornato: lasciare una bozza da scheda, avviare Quick Start e trovare zero esercizi; aggiungere esercizi e terminare senza popup di aggiornamento né nuova scheda; usare Riprendi e recuperare la bozza precedente; avviare una scheda, cambiare esercizi e verificare che il popup resti. Il tag v0.8.5-beta e il suo APK non includono automaticamente questa correzione.

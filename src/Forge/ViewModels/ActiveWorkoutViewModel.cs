@@ -8,9 +8,7 @@ using Forge.Services;
 
 namespace Forge.ViewModels;
 
-[QueryProperty(nameof(Mode), "mode")]
-[QueryProperty(nameof(PlanId), "planId")]
-public partial class ActiveWorkoutViewModel : BaseViewModel
+public partial class ActiveWorkoutViewModel : BaseViewModel, IQueryAttributable
 {
     private readonly WorkoutSession workoutSession;
     private readonly ExerciseDbApiService exerciseDbApi;
@@ -24,6 +22,7 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
     private int restSecondsRemaining;
     private DateTime workoutStartTime;
     private bool restoringDraft;
+    private string? sessionDraftId;
     private bool planNotesReady;
     private string planNotesOwner = "";
     private CancellationTokenSource? notesSaveCts;
@@ -79,8 +78,8 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
     public IReadOnlyList<int> RestSecondOptions { get; } = Enumerable.Range(0, 60).ToList();
 
     [ObservableProperty, NotifyPropertyChangedFor(nameof(IsPlanWorkout))] private string mode = "";
-    public bool IsPlanWorkout => Mode == "plan";
-    [ObservableProperty] private string planId = string.Empty;
+    public bool IsPlanWorkout => Mode == "plan" && !string.IsNullOrWhiteSpace(PlanId);
+    [ObservableProperty, NotifyPropertyChangedFor(nameof(IsPlanWorkout))] private string planId = string.Empty;
     [ObservableProperty] private string planName = "Nuovo Allenamento";
     [ObservableProperty] private ObservableCollection<WorkoutExercise> exercises = new();
     [ObservableProperty] private bool hasExercises;
@@ -312,34 +311,64 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
         };
     }
 
-    partial void OnModeChanged(string value)
+    public void ApplyQueryAttributes(IDictionary<string, object> query)
     {
-        if (restoringDraft) return;
-        PlanName = value switch { "free" => "Allenamento Libero", "create" => "Nuova Scheda", _ => "Scheda Salvata" };
-        IsCreating = (value == "create");
-
-        HasData = true;
-        workoutStartTime = DateTime.Now;
-
-        if (!string.IsNullOrWhiteSpace(PlanId))
-            _ = LoadPlanAsync().ContinueWith(t => { if (t.IsFaulted) System.Diagnostics.Debug.WriteLine($"[ActiveWk LoadPlan] ex: {t.Exception?.InnerException?.Message}"); }, TaskContinuationOptions.OnlyOnFaulted);
-        else if (value == "free")
-            _ = LoadDraftAsync().ContinueWith(t => { if (t.IsFaulted) System.Diagnostics.Debug.WriteLine($"[ActiveWk LoadDraft] ex: {t.Exception?.InnerException?.Message}"); }, TaskContinuationOptions.OnlyOnFaulted);
-
-        if (!IsCreating)
-        {
-            IsTimerRunning = true;
-            workoutSession.Start(PlanName);
-            _ = RunElapsedTimerAsync().ContinueWith(t => { if (t.IsFaulted) System.Diagnostics.Debug.WriteLine($"[ActiveWk Elapsed] ex: {t.Exception?.InnerException?.Message}"); }, TaskContinuationOptions.OnlyOnFaulted);
-            if (notifications.RestRemaining > 0) { IsRestTimerActive = true; activeRestDuration = notifications.RestRemaining; restCts = new(); RunTimerAsync(restCts.Token); }
-        }
+        if (!query.TryGetValue("mode", out var modeValue)) return;
+        var requestedMode = modeValue?.ToString() ?? "free";
+        var requestedPlanId = query.TryGetValue("planId", out var id) ? id?.ToString() ?? "" : "";
+        _ = InitializeSessionAsync(requestedMode, requestedPlanId);
     }
 
-    partial void OnPlanIdChanged(string value)
+    private async Task InitializeSessionAsync(string requestedMode, string requestedPlanId)
     {
-        if (restoringDraft) return;
-        if (!string.IsNullOrWhiteSpace(value) && Mode == "plan")
-            _ = LoadPlanAsync().ContinueWith(t => { if (t.IsFaulted) System.Diagnostics.Debug.WriteLine($"[ActiveWk LoadPlan2] ex: {t.Exception?.InnerException?.Message}"); }, TaskContinuationOptions.OnlyOnFaulted);
+        if (IsBusy || IsTimerRunning || IsCreating) return;
+        IsBusy = true;
+        ErrorMessage = null;
+        HasData = false;
+        IsEmptyState = false;
+        planNotesReady = false;
+        notesSaveCts?.Cancel();
+        try
+        {
+            // Apply navigation parameters together. Quick Start never adopts a saved plan or draft.
+            Mode = requestedMode is "plan" or "create" or "resume" ? requestedMode : "free";
+            PlanId = Mode == "plan" ? requestedPlanId : "";
+            if (Mode == "plan" && string.IsNullOrWhiteSpace(PlanId)) Mode = "free";
+            IsCreating = Mode == "create";
+            Exercises.Clear();
+            WorkoutPhotos.Clear();
+            HasWorkoutPhotos = false;
+            WorkoutNotes = "";
+            PlanNameInput = "";
+            PlanName = IsCreating ? "Nuova Scheda" : "Allenamento Libero";
+            originalPlanSignature = null;
+            sessionDraftId = null;
+            planChoiceResolved = false;
+            updatePlanOnFinish = false;
+            IsPlanUpdateVisible = false;
+            workoutStartTime = DateTime.Now;
+
+            if (Mode != "resume") notifications.CancelRest();
+            if (Mode == "plan") await LoadPlanAsync();
+            else if (Mode == "resume") await LoadDraftAsync();
+
+            HasData = true;
+            if (!IsCreating)
+            {
+                IsTimerRunning = true;
+                workoutSession.Start(PlanName);
+                _ = RunElapsedTimerAsync();
+                if (notifications.RestRemaining > 0) { IsRestTimerActive = true; activeRestDuration = notifications.RestRemaining; restCts = new(); RunTimerAsync(restCts.Token); }
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[ActiveWk Initialize] {ex.GetType().Name}");
+            HasData = false;
+            ErrorMessage = "Impossibile aprire la sessione. Torna indietro e riprova.";
+            ShowNotification("Impossibile aprire la sessione. Torna indietro e riprova.");
+        }
+        finally { IsBusy = false; }
     }
 
     private string? originalPlanSignature;
@@ -363,7 +392,7 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
         notesSaveCts?.Cancel();
         var plans = await planService.LoadPlansAsync();
         var plan = plans.FirstOrDefault(p => p.Id == PlanId);
-        if (plan == null) return;
+        if (plan == null) throw new InvalidOperationException("Scheda non disponibile.");
 
         PlanName = plan.Name;
         PlanNameInput = plan.Name;
@@ -876,6 +905,7 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
     [RelayCommand]
     private async Task MinimizeWorkoutAsync()
     {
+        if (IsBusy) return;
         if (!await PersistPlanNotesAsync()) return;
         if (Exercises.Count > 0)
         {
@@ -895,8 +925,8 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
     {
         try
         {
-            // Keep the previous draft until the replacement has been saved.
-            var oldDrafts = await GetDraftsAsync();
+            // Replace only this session's draft; an unrelated interrupted workout stays available.
+            var oldDraftId = sessionDraftId;
 
 
             var exerciseData = Exercises.Select(e => new
@@ -938,7 +968,8 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
                 IsDraft = true
             };
             await db.SaveWorkoutAsync(draft);
-            foreach (var old in oldDrafts) await db.DeleteWorkoutAsync(old.Id);
+            sessionDraftId = draft.Id;
+            if (oldDraftId != null) await db.DeleteWorkoutAsync(oldDraftId);
             System.Diagnostics.Debug.WriteLine($"[Draft] saved id={draft.Id}");
             return true;
         }
@@ -964,13 +995,13 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
         {
             var drafts = await GetDraftsAsync();
             var draft = drafts.FirstOrDefault();
-            if (draft == null) return;
+            if (draft == null) { Mode = "free"; return; }
 
             Exercises.Clear();
             var exerciseData = System.Text.Json.JsonSerializer.Deserialize<List<System.Text.Json.JsonElement>>(draft.ExerciseDataJson);
-            var exerciseNames = System.Text.Json.JsonSerializer.Deserialize<List<string>>(draft.ExercisesJson);
 
-            if (exerciseData == null) return;
+            if (exerciseData == null) throw new InvalidOperationException("Bozza non valida.");
+            sessionDraftId = draft.Id;
 
             int order = 1;
             for (int i = 0; i < exerciseData.Count; i++)
@@ -1014,6 +1045,7 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
             PlanName = draft.Name;
             PlanNameInput = draft.Name;
             WorkoutNotes = draft.Notes;
+            workoutStartTime = DateTime.Now.AddMinutes(-draft.Duration);
             if (!string.IsNullOrEmpty(PlanId))
             {
                 var original = (await planService.LoadPlansAsync()).FirstOrDefault(p => p.Id == PlanId);
@@ -1041,6 +1073,7 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
         catch (Exception ex)
         {
             System.Diagnostics.Debug.WriteLine($"[Draft] Load ex: {ex.Message}");
+            throw;
         }
     }
 
@@ -1055,9 +1088,9 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
     private async Task FinishWorkoutCoreAsync()
     {
         if (!await PersistPlanNotesAsync()) return;
-        if (Mode == "plan" && originalPlanSignature != null && CurrentPlanSignature() != originalPlanSignature && !planChoiceResolved)
+        if (IsPlanWorkout && originalPlanSignature != null && CurrentPlanSignature() != originalPlanSignature && !planChoiceResolved)
         { IsPlanUpdateVisible = true; return; }
-        if (updatePlanOnFinish)
+        if (IsPlanWorkout && updatePlanOnFinish)
         {
             try { await ApplySessionToPlanAsync(); updatePlanOnFinish = false; }
             catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[UpdatePlan] {ex.GetType().Name}"); planChoiceResolved = false; ShowNotification("Impossibile aggiornare la scheda. La sessione resta aperta: riprova."); return; }
@@ -1066,8 +1099,7 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
         {
             if (!await SaveToPocketBaseAsync(string.IsNullOrWhiteSpace(PlanNameInput) ? PlanName : PlanNameInput.Trim())) { planChoiceResolved = false; return; }
             // Remove recovery data only after the finished workout is durable.
-            var drafts = await GetDraftsAsync();
-            foreach (var d in drafts) await db.DeleteWorkoutAsync(d.Id);
+            if (sessionDraftId != null) await db.DeleteWorkoutAsync(sessionDraftId);
         }
 
         elapsedCts?.Cancel();
@@ -1097,6 +1129,7 @@ public partial class ActiveWorkoutViewModel : BaseViewModel
     [RelayCommand] private void DismissNotification() => NotificationMessage = "";
     [RelayCommand] private async Task FinishOrSaveAsync()
     {
+        if (IsBusy) return;
         if (IsCreating) await SaveWorkoutPlanAsync();
         else if (IsTimerRunning) await FinishWorkoutAsync();
         else ShowNotification("Avvia l’allenamento prima di terminarlo.");
