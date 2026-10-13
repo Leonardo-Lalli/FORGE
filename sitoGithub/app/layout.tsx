@@ -10,7 +10,7 @@ const geistMono = Geist_Mono({
 })
 
 const siteUrl = 'https://leonardo-lalli.github.io/FORGE'
-const ogImage = '/apple-icon.png'
+const ogImage = `${siteUrl}/forge-logo.png`
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -32,7 +32,7 @@ export const metadata: Metadata = {
   category: 'Health & Fitness',
   formatDetection: { telephone: false },
   alternates: {
-    canonical: '/',
+    canonical: `${siteUrl}/`,
     languages: {
       'it-IT': '/',
       'en-US': '/',
@@ -76,19 +76,19 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       {
-        url: '/icon-light-32x32.png',
+        url: `${siteUrl}/icon-light-32x32.png`,
         media: '(prefers-color-scheme: light)',
       },
       {
-        url: '/icon-dark-32x32.png',
+        url: `${siteUrl}/icon-dark-32x32.png`,
         media: '(prefers-color-scheme: dark)',
       },
       {
-        url: '/icon.svg',
+        url: `${siteUrl}/icon.svg`,
         type: 'image/svg+xml',
       },
     ],
-    apple: '/apple-icon.png',
+    apple: `${siteUrl}/apple-icon.png`,
   },
 }
 
@@ -126,11 +126,6 @@ export default function RootLayout({
                 'App Android open-source per tracciare gli allenamenti in palestra con funzionalità social.',
               author: { '@type': 'Person', name: 'Leonardo Lalli' },
               offers: { '@type': 'Offer', price: '0', priceCurrency: 'EUR' },
-              aggregateRating: {
-                '@type': 'AggregateRating',
-                ratingValue: '5',
-                ratingCount: '1',
-              },
             }),
           }}
         />

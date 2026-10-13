@@ -1,5 +1,6 @@
 "use client"
 
+import { ComparisonSection } from "@/components/forge/comparison-section"
 import { SiteHeader } from "@/components/forge/site-header"
 import { SiteFooter } from "@/components/forge/cta-footer"
 import { useI18n } from "@/lib/i18n"
@@ -24,7 +25,7 @@ export default function FeaturesPage() {
         <main>
           <section className="px-6 pb-16 pt-20">
             <div className="mx-auto w-full max-w-[1120px]">
-              <p className="mb-4 font-mono text-[13px] uppercase tracking-[0.18em] text-forge-cyan">// Funzionalità</p>
+              <p className="mb-4 font-mono text-[13px] uppercase tracking-[0.18em] text-forge-cyan">{t.features.eyebrow}</p>
               <h1 className="mb-6 max-w-[700px] text-balance text-[clamp(32px,6vw,52px)] font-extrabold leading-[1.08] tracking-[-0.02em]">
                 {t.features.title}{" "}
                 <span className="text-forge-cyan text-glow-cyan"></span>
@@ -58,6 +59,7 @@ export default function FeaturesPage() {
             </div>
           </section>
 
+          <ComparisonSection />
         </main>
         <SiteFooter />
       </div>

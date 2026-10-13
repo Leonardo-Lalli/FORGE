@@ -1,12 +1,12 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { currentReleaseUrl, isCurrentOrNewer } from "@/lib/release"
+import { currentApkUrl, isCurrentOrNewer } from "@/lib/release"
 
 const fallback = "https://github.com/Leonardo-Lalli/FORGE/releases"
 
 export function useReleaseDownload() {
-  const [url, setUrl] = useState(currentReleaseUrl)
+  const [url, setUrl] = useState(currentApkUrl)
 
   useEffect(() => {
     const abort = new AbortController()
@@ -33,7 +33,7 @@ export function useReleaseDownload() {
           }
         }
       })
-      .catch(() => {}) // Keep the release-list link when GitHub is unavailable.
+      .catch(() => {}) // Keep the current APK link when GitHub API is unavailable.
       .finally(() => clearTimeout(timeout))
 
     return () => {

@@ -1,22 +1,17 @@
-import type { Metadata } from 'next'
+import type { Metadata } from "next"
 
 export const metadata: Metadata = {
-  title: 'Roadmap',
-  description:
-    'Roadmap FORGE: stabilità e privacy prima, poi flusso allenamento, social, analytics, wearable e infrastruttura.',
-  alternates: { canonical: '/roadmap' },
+  title: "Roadmap",
+  description: "Gli obiettivi di FORGE e le idee da esplorare, senza date di rilascio promesse.",
+  alternates: { canonical: "https://leonardo-lalli.github.io/FORGE/roadmap" },
   openGraph: {
-    title: 'FORGE — Roadmap',
-    description:
-      'Il percorso di sviluppo di FORGE dalle feature QoL al Play Store, modulo B2B per palestre e integrazioni Wear OS.',
-    url: '/roadmap',
+    title: "FORGE — Roadmap",
+    description: "Gli obiettivi di FORGE e le idee da esplorare, senza date di rilascio promesse.",
+    url: "https://leonardo-lalli.github.io/FORGE/roadmap",
+    images: ["https://leonardo-lalli.github.io/FORGE/forge-logo.png"],
   },
 }
 
-export default function RoadmapLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function PageLayout({ children }: { children: React.ReactNode }) {
   return children
 }

@@ -1,22 +1,17 @@
-import type { Metadata } from 'next'
+import type { Metadata } from "next"
 
 export const metadata: Metadata = {
-  title: 'Funzionalità',
-  description:
-    '1.500+ esercizi con GIF, registrazione allenamenti con serie e rest timer, statistiche avanzate, feed sociale, 48 achievement, offline SQLite, CSV import/export, self-hosting Docker.',
-  alternates: { canonical: '/features' },
+  title: "Funzionalità",
+  description: "Schede personali, serie, recuperi per esercizio, consigli a carosello, statistiche e community sullo stesso server. Funzioni e limiti della beta FORGE.",
+  alternates: { canonical: "https://leonardo-lalli.github.io/FORGE/features" },
   openGraph: {
-    title: 'FORGE — Funzionalità',
-    description:
-      'Tutto quello che serve per allenarti meglio: catalogo esercizi, tracking serie, statistiche, social, achievement, offline sync.',
-    url: '/features',
+    title: "FORGE — Funzionalità",
+    description: "Schede personali, serie, recuperi per esercizio, consigli a carosello, statistiche e community sullo stesso server. Funzioni e limiti della beta FORGE.",
+    url: "https://leonardo-lalli.github.io/FORGE/features",
+    images: ["https://leonardo-lalli.github.io/FORGE/forge-logo.png"],
   },
 }
 
-export default function FeaturesLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function PageLayout({ children }: { children: React.ReactNode }) {
   return children
 }

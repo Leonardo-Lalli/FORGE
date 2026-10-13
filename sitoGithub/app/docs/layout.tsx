@@ -1,22 +1,17 @@
-import type { Metadata } from 'next'
+import type { Metadata } from "next"
 
 export const metadata: Metadata = {
-  title: 'Documentazione',
-  description:
-    'Documentazione completa di FORGE: specifica prodotto, piano iterazioni, architettura tecnica MVVM, diario di sviluppo, matrice di test, note API PocketBase e ExerciseDB.',
-  alternates: { canonical: '/docs' },
+  title: "Documentazione",
+  description: "Origine del progetto, specifiche, architettura, diario di sviluppo e verifiche di FORGE. Documentazione e limiti dichiarati della beta.",
+  alternates: { canonical: "https://leonardo-lalli.github.io/FORGE/docs" },
   openGraph: {
-    title: 'FORGE — Documentazione',
-    description:
-      'Spec, architettura, diario di sviluppo, test matrix e note tecniche API.',
-    url: '/docs',
+    title: "FORGE — Documentazione",
+    description: "Origine del progetto, specifiche, architettura, diario di sviluppo e verifiche di FORGE. Documentazione e limiti dichiarati della beta.",
+    url: "https://leonardo-lalli.github.io/FORGE/docs",
+    images: ["https://leonardo-lalli.github.io/FORGE/forge-logo.png"],
   },
 }
 
-export default function DocsLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function PageLayout({ children }: { children: React.ReactNode }) {
   return children
 }

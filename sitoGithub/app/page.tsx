@@ -1,34 +1,25 @@
 import { SiteHeader } from "@/components/forge/site-header"
-import { ComparisonSection } from "@/components/forge/comparison-section"
-import { GamificationSection } from "@/components/forge/gamification-section"
-import { ScreenshotsSection } from "@/components/forge/screenshots-section"
+import { SiteFooter } from "@/components/forge/cta-footer"
 import { HeroSection } from "@/components/forge/hero-section"
 import { FeaturesSection } from "@/components/forge/features-section"
-import { SelfHostingSection } from "@/components/forge/self-hosting-section"
-import { DocsSection } from "@/components/forge/docs-section"
-import { CtaBand, SiteFooter } from "@/components/forge/cta-footer"
+import { ScreenshotsSection } from "@/components/forge/screenshots-section"
+import { GamificationSection } from "@/components/forge/gamification-section"
+import { CommunitySection, DownloadSection, ProjectSection } from "@/components/forge/landing-sections"
 
 export default function Page() {
   return (
-    <div className="relative min-h-screen overflow-x-hidden bg-forge-bg text-forge-fg">
-      {/* Bagliore ambientale e griglia di sfondo */}
-      <div className="pointer-events-none fixed inset-0 z-0 forge-ambient" aria-hidden="true" />
-      <div className="pointer-events-none fixed inset-0 z-0 forge-grid" aria-hidden="true" />
-
-      <div className="relative z-10">
-        <SiteHeader />
-        <main id="top">
-          <HeroSection />
-          <FeaturesSection />
-          <GamificationSection />
-          <ScreenshotsSection />
-          <ComparisonSection />
-          <SelfHostingSection />
-          <DocsSection />
-          <CtaBand />
-        </main>
-        <SiteFooter />
-      </div>
+    <div className="min-h-screen bg-forge-bg text-forge-fg">
+      <SiteHeader />
+      <main id="top">
+        <HeroSection />
+        <FeaturesSection />
+        <ScreenshotsSection />
+        <GamificationSection />
+        <CommunitySection />
+        <DownloadSection />
+        <ProjectSection />
+      </main>
+      <SiteFooter />
     </div>
   )
 }

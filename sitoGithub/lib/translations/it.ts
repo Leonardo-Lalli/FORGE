@@ -6,7 +6,7 @@ export const it = {
     "roadmap": "Roadmap",
     "download": "Download",
     "backHome": "Torna alla home",
-    "b2b": "B2B"
+    "b2b": "Palestre · B2B"
   },
   "controls": {
     "toggleThemeToLight": "Passa al tema chiaro",
@@ -17,33 +17,42 @@ export const it = {
   },
   "hero": {
     "badge": "0.8.5 beta · Android · Open source",
-    "title": "Forgia il tuo fisico.\nTraccia ogni progresso.",
-    "subtitle": "Registra allenamenti, ritrova i tuoi carichi e condividi i progressi con la tua community. Usa il server FORGE predefinito oppure una tua istanza PocketBase.",
-    "ctaPrimary": "Scarica FORGE 0.8.5 beta",
-    "ctaSecondary": "Vedi su GitHub",
-    "note": "0.8.5 beta · Account sul server scelto · Nessun abbonamento nell’app",
-    "updateNote": "Vecchie installazioni: la firma è cambiata e potrebbe servire una reinstallazione. Il CSV non è un backup completo: conserva le schede e le foto separatamente e verifica la sincronizzazione prima di rimuovere l’app."
+    "title": "Ogni allenamento,\nun passo avanti.",
+    "subtitle": "Schede, carichi, recuperi e progressi in un’unica app. Allenati con il tuo ritmo e condividi ciò che vuoi con la tua community.",
+    "ctaPrimary": "Prova FORGE su Android",
+    "ctaSecondary": "Guarda l’app",
+    "note": "Open source · Nessun abbonamento nell’app · Due temi",
+    "updateNote": "Vecchie installazioni: la firma è cambiata e potrebbe servire una reinstallazione. Il CSV non è un backup completo: conserva le schede e le foto separatamente e verifica la sincronizzazione prima di rimuovere l’app.",
+    "imageLabel": "Allenamento FORGE · acquisizione recente"
   },
   "features": {
     "eyebrow": "// Funzionalità",
-    "title": "Tutto quello che serve per allenarti meglio.",
-    "subtitle": "Strumenti di allenamento già implementati, con limiti e verifiche della beta dichiarati nella documentazione.",
+    "title": "Tutto il tuo allenamento, al suo posto.",
+    "subtitle": "Dal primo esercizio all’ultima serie: strumenti semplici per seguire la sessione e ritrovare i tuoi progressi.",
     "items": [
       {
-        "title": "Tracciamento volumi",
-        "desc": "Registra serie, ripetizioni e carichi. FORGE calcola automaticamente il volume totale e i tuoi top lift per ogni esercizio."
+        "title": "Schede senza limiti",
+        "desc": "Crea le tue schede o parti con una sessione libera. Ritrova le note e personalizza le serie."
       },
       {
-        "title": "Privacy configurabile",
-        "desc": "Allenamenti ed elenchi follower pubblici, privati o per amici reciproci. Le regole sono applicate dal backend FORGE aggiornato."
+        "title": "Carichi e progressi",
+        "desc": "Registra peso e ripetizioni, ritrova i valori precedenti e consulta volume e storico."
       },
       {
-        "title": "Timer di recupero",
-        "desc": "Timer di recupero configurabile tra le serie, con notifica al termine, così mantieni il ritmo giusto senza distrazioni."
+        "title": "Recupero per esercizio",
+        "desc": "Scegli da 0 a 5 minuti di recupero, segui il timer e ricevi un avviso al termine."
       },
       {
         "title": "Consigli a carosello",
-        "desc": "Sopra ogni esercizio, gli step di esecuzione disponibili cambiano automaticamente durante l’allenamento. Istruzioni e immagini dipendono dal catalogo."
+        "desc": "Gli step disponibili cambiano automaticamente sopra l’esercizio, insieme a immagini e istruzioni del catalogo."
+      },
+      {
+        "title": "Una community vicina",
+        "desc": "Segui chi si allena sul tuo stesso server e condividi allenamenti e foto con chi vuoi."
+      },
+      {
+        "title": "Scegli cosa condividere",
+        "desc": "Allenamenti ed elenchi follower possono essere pubblici, privati o visibili agli amici reciproci."
       }
     ]
   },
@@ -245,7 +254,7 @@ export const it = {
   "roadmapPage": {
     "eyebrow": "// Roadmap",
     "title": "Dove sta andando FORGE.",
-    "subtitle": "Le prossime release, fase per fase. Una timeline pubblica delle funzionalità che vogliamo costruire — dai miglioramenti di usabilità al modulo B2B per le palestre.",
+    "subtitle": "Gli obiettivi del progetto, passo dopo passo. Nessuna data o versione futura: le priorità si costruiscono con i feedback.",
     "legend": {
       "difficulty": "Difficoltà"
     },
@@ -466,50 +475,6 @@ export const it = {
         "body": "Profili ricercabili, follower e seguiti; amici = follow reciproco; Commenti e notifiche push dopo il consolidamento della privacy; Sfide tra amici e leaderboard con consenso"
       }
     ],
-    "b2b": {
-      "eyebrow": "// FORGE Local Business",
-      "title": "Un modulo B2B per le palestre",
-      "body": "L'architettura self-hosted permette a un proprietario di palestra di lanciare il backend su un mini-PC locale e creare un sistema gestionale e social privato per tutta la struttura.",
-      "advantages": [
-        {
-          "title": "Software open source",
-          "desc": "Codice MIT, senza abbonamento nell’app. Server, manutenzione e gestione hanno comunque dei costi."
-        },
-        {
-          "title": "Community locale",
-          "desc": "Gli iscritti sullo stesso server possono condividere gli allenamenti. Le classifiche interne della palestra sono un obiettivo futuro."
-        },
-        {
-          "title": "Controllo locale dei dati",
-          "desc": "La configurazione locale aiuta a controllare i dati. Privacy e conformità dipendono da accessi, consensi, backup e gestione del server."
-        },
-        {
-          "title": "Offline / LAN First",
-          "desc": "Se internet si interrompe, l'app continua a funzionare via Wi-Fi locale. Il funzionamento locale dipende dalla rete e dal server della palestra."
-        }
-      ],
-      "future": [
-        {
-          "title": "Trainer Dashboard",
-          "desc": "Interfaccia web dove i personal trainer assegnano schede e protocolli agli iscritti."
-        },
-        {
-          "title": "Local TV Leaderboard",
-          "desc": "Proietta su uno schermo della palestra la classifica dei PR sollevati in tempo reale."
-        },
-        {
-          "title": "QR Code Onboarding",
-          "desc": "Scansiona il QR in palestra e l'app si configura da sola con il server locale."
-        },
-        {
-          "title": "Multi-tenant",
-          "desc": "Più palestre sullo stesso server con isolamento completo dei dati."
-        }
-      ],
-      "futureTitle": "Sviluppi futuri B2B",
-      "status": "Gestione palestra · Obiettivo futuro",
-      "note": "La community sul proprio server è già disponibile. Dashboard trainer, onboarding QR e gestione di più palestre sono sviluppi pianificati."
-    },
     "backlog": {
       "eyebrow": "// Backlog",
       "title": "Idee & esperimenti",
@@ -633,5 +598,104 @@ export const it = {
       "Statistiche",
       "Profilo"
     ]
+  },
+  "b2b": {
+    "eyebrow": "// FORGE Local Business",
+    "title": "La tua palestra.\nLa tua community.",
+    "body": "FORGE può ospitare una community sul server della palestra. Il progetto B2B vuole affiancarla a strumenti per trainer e iscritti, costruiti a partire dalle esigenze reali delle strutture.",
+    "advantages": [
+      {
+        "title": "Software open source",
+        "desc": "Codice MIT, senza abbonamento nell’app. Server, manutenzione e gestione hanno comunque dei costi."
+      },
+      {
+        "title": "Community locale",
+        "desc": "Gli iscritti sullo stesso server possono condividere gli allenamenti. Le classifiche interne della palestra sono un obiettivo futuro."
+      },
+      {
+        "title": "Controllo locale dei dati",
+        "desc": "La configurazione locale aiuta a controllare i dati. Privacy e conformità dipendono da accessi, consensi, backup e gestione del server."
+      },
+      {
+        "title": "Offline / LAN First",
+        "desc": "Se internet si interrompe, l'app continua a funzionare via Wi-Fi locale. Il funzionamento locale dipende dalla rete e dal server della palestra."
+      }
+    ],
+    "future": [
+      {
+        "title": "Trainer Dashboard",
+        "desc": "Interfaccia web dove i personal trainer assegnano schede e protocolli agli iscritti."
+      },
+      {
+        "title": "Local TV Leaderboard",
+        "desc": "Proietta su uno schermo della palestra la classifica dei PR sollevati in tempo reale."
+      },
+      {
+        "title": "QR Code Onboarding",
+        "desc": "Scansiona il QR in palestra e l'app si configura da sola con il server locale."
+      },
+      {
+        "title": "Multi-tenant",
+        "desc": "Più palestre sullo stesso server con isolamento completo dei dati."
+      }
+    ],
+    "futureTitle": "Sviluppi futuri B2B",
+    "status": "Gestione palestra · Obiettivo futuro",
+    "note": "La community sul proprio server è già disponibile. Dashboard trainer, onboarding QR e gestione di più palestre sono sviluppi pianificati.",
+    "currentTitle": "Da dove possiamo partire",
+    "currentBody": "La beta offre già schede personali, storico, profili e condivisione tra utenti dello stesso server. La gestione trainer/iscritti e l’isolamento tra più palestre non sono ancora implementati.",
+    "cta": "Condividi le esigenze della tua palestra",
+    "ctaBody": "Stiamo definendo il progetto: raccontaci su GitHub quali strumenti sarebbero utili. Le funzionalità gestionali sono obiettivi futuri, senza date di rilascio promesse.",
+    "hostingLink": "Come funziona il self-hosting",
+    "appLink": "Prova prima l’app"
+  },
+  "landing": {
+    "communityTitle": "Allenarsi è personale. La motivazione si condivide.",
+    "communityBody": "Segui gli amici, condividi una sessione e scegli la tua visibilità. La community è quella del server a cui ti colleghi: gli utenti di server diversi non si vedono.",
+    "communityNote": "Amici significa due persone che si ricambiano il follow.",
+    "downloadTitle": "Il prossimo allenamento inizia qui.",
+    "downloadBody": "FORGE è una beta Android: puoi già provarla e aiutare il progetto con il tuo feedback.",
+    "downloadRequirements": "Android 6.0 o successivo · APK firmato · Beta 0.8.5",
+    "downloadButton": "Scarica l’APK Android",
+    "releaseLink": "Note della release",
+    "steps": [
+      {
+        "title": "Scarica e installa",
+        "body": "Apri l’APK sul telefono. Android potrebbe chiederti di consentire l’installazione dalla fonte scelta."
+      },
+      {
+        "title": "Crea il tuo account",
+        "body": "Il server FORGE è già selezionato. Non serve installarne uno per provare l’app."
+      },
+      {
+        "title": "Inizia ad allenarti",
+        "body": "Personalizza una scheda oppure avvia un allenamento libero e aggiungi i tuoi esercizi."
+      }
+    ],
+    "faqTitle": "Prima di iniziare",
+    "faq": [
+      {
+        "question": "Devo avere un server mio?",
+        "answer": "No. Puoi usare il server FORGE predefinito; un’istanza personale è facoltativa. Il server pubblico è gestito dal proprietario e non offre disponibilità garantita."
+      },
+      {
+        "question": "Cosa significa che è una beta?",
+        "answer": "L’app è aperta alle prove e può avere problemi. Allenamenti, schede e timer sono disponibili; le push social con app chiusa restano da verificare. Segnala i problemi su GitHub."
+      },
+      {
+        "question": "Dove vengono salvati i dati?",
+        "answer": "Schede, note e bozze sono sul telefono; gli allenamenti si sincronizzano con il server scelto. La modalità completamente senza account non è ancora disponibile. Conserva un backup prima di disinstallare."
+      }
+    ],
+    "existingInstall": "Hai già una vecchia build di FORGE?",
+    "feedback": "Hai trovato un problema? Segnalalo su GitHub →",
+    "projectTitle": "Un progetto aperto, che cresce con chi lo usa.",
+    "projectLink": "Origini e documentazione",
+    "b2bTitle": "Gestisci una palestra?",
+    "b2bBody": "Scopri la visione di FORGE per una community della palestra e gli strumenti per trainer che vogliamo costruire.",
+    "b2bLink": "Scopri FORGE per le palestre",
+    "hostingTitle": "Preferisci un server tuo?",
+    "hostingBody": "Una tua istanza ospita account e community separati. La guida spiega installazione, backup e manutenzione.",
+    "hostingLink": "Guida al self-hosting"
   }
 } as const

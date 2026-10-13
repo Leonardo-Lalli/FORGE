@@ -8,7 +8,7 @@ export const en: Dictionary = {
     "roadmap": "Roadmap",
     "download": "Download",
     "backHome": "Back to home",
-    "b2b": "B2B"
+    "b2b": "Gyms · B2B"
   },
   "controls": {
     "toggleThemeToLight": "Switch to light theme",
@@ -19,33 +19,42 @@ export const en: Dictionary = {
   },
   "hero": {
     "badge": "0.8.5 beta · Android · Open source",
-    "title": "Forge your body.\nTrack every gain.",
-    "subtitle": "Log workouts, recover your previous loads and share progress with your community. Use the default FORGE server or your own PocketBase instance.",
-    "ctaPrimary": "Download FORGE 0.8.5 beta",
-    "ctaSecondary": "View on GitHub",
-    "note": "0.8.5 beta · Account on your chosen server · No in-app subscription",
-    "updateNote": "Older installations: the signing key changed, so reinstallation may be required. CSV is not a full backup: save plans and photos separately and verify synchronization before removing the app."
+    "title": "Every workout,\na step forward.",
+    "subtitle": "Plans, weights, rest and progress in one app. Train at your own pace and share what you choose with your community.",
+    "ctaPrimary": "Try FORGE on Android",
+    "ctaSecondary": "See the app",
+    "note": "Open source · No in-app subscription · Two themes",
+    "updateNote": "Older installations: the signing key changed, so reinstallation may be required. CSV is not a full backup: save plans and photos separately and verify synchronization before removing the app.",
+    "imageLabel": "FORGE workout · recent capture"
   },
   "features": {
     "eyebrow": "// Features",
-    "title": "Everything you need to train better.",
-    "subtitle": "Implemented workout tools, with beta limitations and remaining checks documented openly.",
+    "title": "Your whole workout, in one place.",
+    "subtitle": "From the first exercise to the last set: simple tools to follow your session and revisit your progress.",
     "items": [
       {
-        "title": "Volume tracking",
-        "desc": "Log sets, reps, and loads. FORGE automatically computes your total volume and top lifts for every exercise."
+        "title": "Plans without limits",
+        "desc": "Create your plans or start a free session. Keep your notes and customize sets."
       },
       {
-        "title": "Configurable privacy",
-        "desc": "Public, private or mutual-friend workouts and connection lists. Rules are enforced by an updated FORGE backend."
+        "title": "Weights and progress",
+        "desc": "Log weights and reps, find previous values and explore volume and history."
       },
       {
-        "title": "Rest timer",
-        "desc": "Configurable rest timer between sets, with a notification when it ends, so you keep the right pace without distractions."
+        "title": "Rest for each exercise",
+        "desc": "Choose 0 to 5 minutes of rest, follow the timer and get an alert when it ends."
       },
       {
-        "title": "Rotating exercise tips",
-        "desc": "Above each exercise, available execution steps change automatically during the workout. Instructions and images depend on the catalog."
+        "title": "Rotating execution tips",
+        "desc": "Available steps rotate automatically above the exercise, alongside catalog images and instructions."
+      },
+      {
+        "title": "A community around you",
+        "desc": "Follow people on your server and share workouts and photos with whoever you choose."
+      },
+      {
+        "title": "Choose what to share",
+        "desc": "Workouts and follower lists can be public, private or visible to mutual friends."
       }
     ]
   },
@@ -247,7 +256,7 @@ export const en: Dictionary = {
   "roadmapPage": {
     "eyebrow": "// Roadmap",
     "title": "Where FORGE is heading.",
-    "subtitle": "The next releases, phase by phase. A public timeline of the features we want to build — from usability improvements to the B2B module for gyms.",
+    "subtitle": "Project goals, step by step. No future dates or versions: priorities are shaped by feedback.",
     "legend": {
       "difficulty": "Difficulty"
     },
@@ -468,50 +477,6 @@ export const en: Dictionary = {
         "body": "Searchable profiles and follower lists; friends follow each other; Comments and push after privacy is stable; Friend challenges with consent"
       }
     ],
-    "b2b": {
-      "eyebrow": "// FORGE Local Business",
-      "title": "A B2B module for gyms",
-      "body": "The self-hosted architecture lets a gym owner launch the backend on a local mini-PC and create a private management and social system for the whole facility.",
-      "advantages": [
-        {
-          "title": "Open-source software",
-          "desc": "MIT code without an in-app subscription. Servers, maintenance and operations still have costs."
-        },
-        {
-          "title": "Local community",
-          "desc": "Members on the same server can share workouts. Internal gym leaderboards are a future goal."
-        },
-        {
-          "title": "Local data control",
-          "desc": "Local hosting helps control data. Privacy and compliance also depend on access, consent, backups and server operations."
-        },
-        {
-          "title": "Offline / LAN First",
-          "desc": "If the internet drops, the app keeps working over local Wi-Fi. Local access depends on the gym network and server."
-        }
-      ],
-      "future": [
-        {
-          "title": "Trainer Dashboard",
-          "desc": "A web interface where personal trainers assign plans and protocols to members."
-        },
-        {
-          "title": "Local TV Leaderboard",
-          "desc": "Project the ranking of PRs lifted in real time onto a gym screen."
-        },
-        {
-          "title": "QR Code Onboarding",
-          "desc": "Scan the QR at the gym and the app configures itself with the local server."
-        },
-        {
-          "title": "Multi-tenant",
-          "desc": "Multiple gyms on the same server with full data isolation."
-        }
-      ],
-      "futureTitle": "Future B2B developments",
-      "status": "Gym management · Future goal",
-      "note": "A community on your own server is already available. Trainer dashboards, QR onboarding and multi-gym management are planned developments."
-    },
     "backlog": {
       "eyebrow": "// Backlog",
       "title": "Ideas & experiments",
@@ -635,5 +600,104 @@ export const en: Dictionary = {
       "Statistics",
       "Profile"
     ]
+  },
+  "b2b": {
+    "eyebrow": "// FORGE Local Business",
+    "title": "Your gym.\nYour community.",
+    "body": "FORGE can host a community on the gym’s server. The B2B project aims to add tools for trainers and members, built around real gym needs.",
+    "advantages": [
+      {
+        "title": "Open-source software",
+        "desc": "MIT code without an in-app subscription. Servers, maintenance and operations still have costs."
+      },
+      {
+        "title": "Local community",
+        "desc": "Members on the same server can share workouts. Internal gym leaderboards are a future goal."
+      },
+      {
+        "title": "Local data control",
+        "desc": "Local hosting helps control data. Privacy and compliance also depend on access, consent, backups and server operations."
+      },
+      {
+        "title": "Offline / LAN First",
+        "desc": "If the internet drops, the app keeps working over local Wi-Fi. Local access depends on the gym network and server."
+      }
+    ],
+    "future": [
+      {
+        "title": "Trainer Dashboard",
+        "desc": "A web interface where personal trainers assign plans and protocols to members."
+      },
+      {
+        "title": "Local TV Leaderboard",
+        "desc": "Project the ranking of PRs lifted in real time onto a gym screen."
+      },
+      {
+        "title": "QR Code Onboarding",
+        "desc": "Scan the QR at the gym and the app configures itself with the local server."
+      },
+      {
+        "title": "Multi-tenant",
+        "desc": "Multiple gyms on the same server with full data isolation."
+      }
+    ],
+    "futureTitle": "Future B2B developments",
+    "status": "Gym management · Future goal",
+    "note": "A community on your own server is already available. Trainer dashboards, QR onboarding and multi-gym management are planned developments.",
+    "currentTitle": "Where we can start",
+    "currentBody": "The beta already offers personal plans, history, profiles and sharing between users on the same server. Trainer/member management and multi-gym isolation are not implemented yet.",
+    "cta": "Share your gym’s needs",
+    "ctaBody": "We are shaping the project: tell us on GitHub which tools would help. Management features are future goals, without promised release dates.",
+    "hostingLink": "How self-hosting works",
+    "appLink": "Try the app first"
+  },
+  "landing": {
+    "communityTitle": "Training is personal. Motivation can be shared.",
+    "communityBody": "Follow friends, share a session and choose your visibility. Your community belongs to the server you connect to: users on different servers do not see each other.",
+    "communityNote": "Friends are two people who follow each other.",
+    "downloadTitle": "Your next workout starts here.",
+    "downloadBody": "FORGE is an Android beta: you can try it now and help the project with your feedback.",
+    "downloadRequirements": "Android 6.0 or later · Signed APK · Beta 0.8.5",
+    "downloadButton": "Download Android APK",
+    "releaseLink": "Release notes",
+    "steps": [
+      {
+        "title": "Download and install",
+        "body": "Open the APK on your phone. Android may ask you to allow installation from your chosen source."
+      },
+      {
+        "title": "Create your account",
+        "body": "The FORGE server is already selected. You do not need to install a server to try the app."
+      },
+      {
+        "title": "Start training",
+        "body": "Customize a plan or start a free workout and add your exercises."
+      }
+    ],
+    "faqTitle": "Before you start",
+    "faq": [
+      {
+        "question": "Do I need my own server?",
+        "answer": "No. You can use the default FORGE server; a personal instance is optional. The public server is operated by the owner and has no availability guarantee."
+      },
+      {
+        "question": "What does beta mean?",
+        "answer": "The app is open for testing and may have issues. Workouts, plans and timers are available; social push delivery with the app closed still needs verification. Report issues on GitHub."
+      },
+      {
+        "question": "Where is my data saved?",
+        "answer": "Plans, notes and drafts stay on your phone; workouts synchronize with your chosen server. Fully account-free mode is not available yet. Keep a backup before uninstalling."
+      }
+    ],
+    "existingInstall": "Already using an older FORGE build?",
+    "feedback": "Found an issue? Report it on GitHub →",
+    "projectTitle": "An open project, growing with its users.",
+    "projectLink": "Origins and documentation",
+    "b2bTitle": "Run a gym?",
+    "b2bBody": "Explore FORGE’s vision for a gym community and the trainer tools we want to build.",
+    "b2bLink": "Explore FORGE for gyms",
+    "hostingTitle": "Prefer your own server?",
+    "hostingBody": "Your instance hosts separate accounts and a separate community. The guide covers setup, backups and maintenance.",
+    "hostingLink": "Self-hosting guide"
   }
 }

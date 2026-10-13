@@ -8,6 +8,7 @@
   --font-heading: var(--font-sans);
   --font-sans: var(--font-geist-sans), 'Geist Fallback';
   --font-mono: var(--font-geist-mono), 'Geist Mono Fallback';
+  --color-forge-on-accent: #001417;
   --color-forge-bg: var(--forge-bg);
   --color-forge-elev: var(--forge-elev);
   --color-forge-code: var(--forge-code);
@@ -246,4 +247,13 @@
         transparent 70%
       );
   }
+}
+
+/* Shared focus and motion behavior for the product site. */
+a:focus-visible, button:focus-visible, summary:focus-visible {
+  outline: 2px solid var(--forge-cyan);
+  outline-offset: 4px;
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
 }

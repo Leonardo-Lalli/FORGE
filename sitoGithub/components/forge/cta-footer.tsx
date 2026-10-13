@@ -1,61 +1,37 @@
 "use client"
 
-import { Download } from "lucide-react"
-import { useReleaseDownload } from "./release-download"
-import { useI18n } from "@/lib/i18n"
 import Link from "next/link"
+import { useI18n } from "@/lib/i18n"
 
-export function CtaBand() {
-  const { t } = useI18n()
-  const downloadUrl = useReleaseDownload()
-  return (
-    <section className="px-6 py-20">
-      <div className="mx-auto w-full max-w-[1120px]">
-        <div className="rounded-[20px] border border-forge-cyan-dim bg-gradient-to-b from-forge-cyan/[0.06] to-forge-cyan/[0.01] px-6 py-16 text-center glow-cyan-soft">
-          <h2 className="mb-3.5 text-balance text-[clamp(28px,5vw,40px)] font-extrabold tracking-[-0.02em]">
-            {t.cta.title}
-          </h2>
-          <p className="mx-auto mb-8 max-w-[460px] text-forge-muted">
-            {t.cta.subtitle}
-          </p>
-          <div className="flex flex-wrap items-center justify-center gap-4">
-            <a
-              href={downloadUrl}
-              className="inline-flex items-center gap-2.5 rounded-full bg-forge-cyan px-6 py-3.5 text-[15px] font-semibold text-[#001417] glow-cyan transition-all hover:-translate-y-0.5 hover:glow-cyan-strong"
-              aria-label={t.cta.primary}
-            >
-              <Download className="size-5" aria-hidden="true" />
-              {t.cta.primary}
-            </a>
-            <Link
-              href="/docs"
-              className="inline-flex items-center gap-2.5 rounded-full border border-forge-border px-6 py-3.5 text-[15px] font-semibold text-forge-fg transition-colors hover:border-forge-cyan hover:text-forge-cyan"
-            >
-              {t.cta.secondary}
-            </Link>
-          </div>
-        </div>
-      </div>
-    </section>
-  )
-}
+const basePath = process.env.NEXT_PUBLIC_BASE_PATH || ""
 
 export function SiteFooter() {
   const { t } = useI18n()
+  const groups = [
+    { label: t.footer.product, links: [
+      { href: "/features", label: t.nav.features },
+      { href: "/#download", label: t.nav.download },
+      { href: "/b2b", label: t.nav.b2b },
+      { href: "/roadmap", label: t.nav.roadmap },
+    ] },
+    { label: t.footer.resources, links: [
+      { href: "/docs", label: t.nav.docs },
+      { href: "/self-hosting", label: t.nav.selfHosting },
+      { href: "https://github.com/Leonardo-Lalli/FORGE", label: "GitHub" },
+      { href: "https://github.com/Leonardo-Lalli/FORGE/issues", label: t.landing.feedback.replace(" →", "") },
+    ] },
+  ]
   return (
-    <footer className="mt-10 border-t border-forge-border px-6 py-10">
-      <div className="mx-auto flex w-full max-w-[1120px] flex-wrap items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <span className="grid size-9 flex-shrink-0 place-items-center rounded-[9px] border border-forge-cyan text-lg font-extrabold text-forge-cyan glow-cyan" aria-hidden="true">F</span>
-          <span className="text-base font-extrabold tracking-[0.22em]">FORGE</span>
+    <footer className="border-t border-forge-border px-6 py-12">
+      <div className="mx-auto max-w-[1120px]">
+        <div className="grid gap-10 md:grid-cols-[1.4fr_1fr_1fr]">
+          <div>
+            <Link href="/" className="inline-flex items-center gap-3"><img src={`${basePath}/forge-logo.png`} alt="" width={36} height={36} className="size-9 rounded-xl" /><span className="text-lg font-extrabold tracking-[0.15em]">FORGE</span></Link>
+            <p className="mt-4 max-w-[340px] text-sm leading-relaxed text-forge-muted">{t.footer.tagline}</p>
+          </div>
+          {groups.map(group => <nav key={group.label} aria-label={group.label}><p className="mb-4 text-sm font-semibold">{group.label}</p><ul className="space-y-3">{group.links.map(link => <li key={link.href}><Link href={link.href} className="text-sm text-forge-muted transition-colors hover:text-forge-cyan">{link.label}</Link></li>)}</ul></nav>)}
         </div>
-        <p className="text-[13px] text-forge-dim">{t.footer.tagline}</p>
-        <nav className="flex gap-6" aria-label="Link footer">
-          <a href="https://github.com/Leonardo-Lalli/FORGE" target="_blank" rel="noopener" className="text-[13px] text-forge-muted transition-colors hover:text-forge-cyan">{t.footer.links.github}</a>
-          <Link href="/#funzionalita" className="text-[13px] text-forge-muted transition-colors hover:text-forge-cyan">{t.footer.links.features}</Link>
-          <Link href="/docs" className="text-[13px] text-forge-muted transition-colors hover:text-forge-cyan">{t.footer.links.docs}</Link>
-          <Link href="/roadmap" className="text-[13px] text-forge-muted transition-colors hover:text-forge-cyan">{t.footer.links.roadmap}</Link>
-        </nav>
+        <p className="mt-10 border-t border-forge-border pt-6 text-xs text-forge-muted">{t.footer.rights}</p>
       </div>
     </footer>
   )

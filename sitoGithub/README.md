@@ -1,33 +1,28 @@
-# forge-landing-page
+# Sito FORGE
 
-This is a [Next.js](https://nextjs.org) project bootstrapped with [v0](https://v0.app).
+Sito ufficiale Next.js con esportazione statica su GitHub Pages, due temi e testi in italiano/inglese.
 
-## Built with v0
+## Percorsi
 
-This repository is linked to a [v0](https://v0.app) project. You can continue developing by visiting the link below -- start new chats to make changes, and v0 will push commits directly to this repo. Every merge to `main` will automatically deploy.
+- `/`: presentazione dell’app, schermate reali, achievement, community, download guidato e FAQ.
+- `/features`: funzioni della beta, limiti e confronto con app simili.
+- `/b2b`: visione per le palestre, funzioni attuali e strumenti gestionali pianificati.
+- `/roadmap`: timeline degli obiettivi e AI form check negli esperimenti, senza date/versioni future.
+- `/docs`: origine, specifiche, architettura e diario.
+- `/self-hosting`: installazione e manutenzione del proprio backend.
 
-[Continue working on v0 →](https://v0.app/chat/projects/prj_hOIJRccgXCQ8XzfrSFOAKjHBZbCa)
+B2B e roadmap sono pagine distinte. Nessuna sezione presenta le funzioni future come già disponibili.
 
-## Getting Started
+## Sviluppo
 
-First, run the development server:
+Da questa cartella: `npm ci`, poi `npm run dev`. Per l’esportazione destinata a GitHub Pages impostare `NEXT_PUBLIC_BASE_PATH=/FORGE` e usare `npm run build`; i file sono in `out/`.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-```
+Testi: `lib/translations/it.ts` e `en.ts`. Layout e componenti: `app/` e `components/forge/`. Immagini: `public/`; la foto workout è un’acquisizione recente del proprietario, le altre immagini sono archiviate e dichiarate come tali.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Il download usa l’APK della release corrente come fallback e controlla le release GitHub per trovare versioni successive, incluse le beta. Non caricare chiavi di firma o configurazioni Firebase nel sito.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Pubblicazione
 
-## Learn More
+Il workflow `.github/workflows/deploy-pages.yml` compila ed esporta il sito su `gh-pages`. Si avvia manualmente o quando viene pubblicata una release; un push su main da solo non avvia il deploy.
 
-To learn more, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-- [v0 Documentation](https://v0.app/docs) - learn about v0 and how to use it.
+Prima di pubblicare: verificare la build, la distinzione tra funzioni disponibili e pianificate, i link con prefisso `/FORGE`, navigazione mobile, temi e lingue. Le modifiche al sito non sostituiscono gli APK delle release.

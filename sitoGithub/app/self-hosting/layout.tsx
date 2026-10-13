@@ -1,22 +1,17 @@
-import type { Metadata } from 'next'
+import type { Metadata } from "next"
 
 export const metadata: Metadata = {
-  title: 'Self-Hosting',
-  description:
-    'Self-hosta FORGE con Docker e PocketBase sul tuo server: Raspberry Pi, mini-PC o VPS. Privacy by design, LAN-first, zero costi cloud. Avvia il backend in 30 secondi con docker compose up.',
-  alternates: { canonical: '/self-hosting' },
+  title: "Self-Hosting",
+  description: "Installa il backend FORGE con PocketBase sul tuo server. Guida a configurazione, migrazioni, HTTPS, backup e manutenzione.",
+  alternates: { canonical: "https://leonardo-lalli.github.io/FORGE/self-hosting" },
   openGraph: {
-    title: 'FORGE — Self-Hosting con Docker',
-    description:
-      'Il tuo server, le tue regole. Avvia il backend FORGE con PocketBase su Raspberry Pi, mini-PC o VPS. Zero costi cloud, privacy totale.',
-    url: '/self-hosting',
+    title: "FORGE — Self-Hosting",
+    description: "Installa il backend FORGE con PocketBase sul tuo server. Guida a configurazione, migrazioni, HTTPS, backup e manutenzione.",
+    url: "https://leonardo-lalli.github.io/FORGE/self-hosting",
+    images: ["https://leonardo-lalli.github.io/FORGE/forge-logo.png"],
   },
 }
 
-export default function SelfHostingLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function PageLayout({ children }: { children: React.ReactNode }) {
   return children
 }

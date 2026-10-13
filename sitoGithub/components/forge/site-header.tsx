@@ -1,80 +1,49 @@
 "use client"
 
 import { useState } from "react"
-import { Star, Menu, X } from "lucide-react"
+import { Menu, X, Download } from "lucide-react"
 import Link from "next/link"
+import { usePathname } from "next/navigation"
 import { ThemeToggle } from "@/components/forge/theme-toggle"
 import { LanguageToggle } from "@/components/forge/language-toggle"
-import { VersionBadge } from "@/components/forge/version-badge"
 import { useI18n } from "@/lib/i18n"
 
-export function SiteHeader() {
-  const { t } = useI18n()
-  const [open, setOpen] = useState(false)
+const basePath = process.env.NEXT_PUBLIC_BASE_PATH || ""
 
+export function SiteHeader() {
+  const { t, lang } = useI18n()
+  const pathname = usePathname()
+  const [open, setOpen] = useState(false)
   const links = [
     { href: "/features", label: t.nav.features },
-    { href: "/roadmap#b2b", label: t.nav.b2b },
-    { href: "/self-hosting", label: t.nav.selfHosting },
-    { href: "/docs", label: t.nav.docs },
+    { href: "/b2b", label: t.nav.b2b },
     { href: "/roadmap", label: t.nav.roadmap },
-    { href: "/#download", label: t.nav.download },
+    { href: "/docs", label: t.nav.docs },
+    { href: "/self-hosting", label: t.nav.selfHosting },
   ]
-
+  const active = (href: string) => pathname === href || pathname === `${basePath}${href}`
   return (
-    <header className="sticky top-0 z-50 border-b border-forge-border bg-forge-bg/70 backdrop-blur-md">
-      <div className="mx-auto flex h-[68px] w-full max-w-[1120px] items-center justify-between px-6">
-        <Link href="/" className="flex items-center gap-3 flex-shrink-0" aria-label="FORGE — home">
-          <span className="grid size-9 flex-shrink-0 place-items-center rounded-[9px] border border-forge-cyan text-lg font-extrabold text-forge-cyan glow-cyan" aria-hidden="true">F</span>
-          <span className="text-xl font-extrabold tracking-[0.22em]">FORGE</span>
-          <VersionBadge />
+    <header className="sticky top-0 z-50 border-b border-forge-border bg-forge-bg/95 backdrop-blur-md">
+      <div className="mx-auto flex h-[72px] max-w-[1120px] items-center justify-between gap-4 px-6">
+        <Link href="/" className="flex shrink-0 items-center gap-2.5" aria-label="FORGE — home">
+          <img src={`${basePath}/forge-logo.png`} alt="" width={36} height={36} className="size-9 rounded-xl" />
+          <span className="text-lg font-extrabold tracking-[0.15em]">FORGE</span>
         </Link>
-
-        <nav className="hidden items-center gap-5 lg:flex">
-          {links.map((l) => (
-            <Link key={l.href} href={l.href} className={l.href === "/roadmap#b2b" ? "rounded-full border border-forge-cyan-dim bg-forge-cyan/[0.06] px-3 py-1.5 text-sm font-semibold text-forge-cyan transition-colors hover:border-forge-cyan" : "text-sm text-forge-muted transition-colors hover:text-forge-fg"}>{l.label}</Link>
-          ))}
+        <nav className="hidden items-center gap-5 lg:flex" aria-label={lang === "it" ? "Navigazione principale" : "Main navigation"}>
+          {links.map(link => <Link key={link.href} href={link.href} aria-current={active(link.href) ? "page" : undefined} className={`text-sm transition-colors hover:text-forge-cyan ${active(link.href) ? "font-semibold text-forge-cyan" : "text-forge-muted"}`}>{link.label}</Link>)}
         </nav>
-
-        <div className="flex items-center gap-2">
-          <LanguageToggle />
-          <ThemeToggle />
-          <a href="https://github.com/Leonardo-Lalli/FORGE" target="_blank" rel="noopener"
-            className="hidden lg:inline-flex items-center gap-2 rounded-full border border-forge-border px-4 py-2 text-sm text-forge-fg transition-all hover:border-forge-cyan hover:text-forge-cyan">
-            GitHub
-            <Star className="size-3.5" aria-hidden="true" />
-          </a>
-          <button
-            onClick={() => setOpen(!open)}
-            className="lg:hidden grid size-9 place-items-center rounded-lg border border-forge-border text-forge-muted hover:text-forge-fg hover:border-forge-cyan"
-            aria-label={open ? "Chiudi menu" : "Apri menu"}
-            aria-expanded={open}
-            aria-controls="mobile-navigation"
-          >
+        <div className="flex shrink-0 items-center gap-2">
+          <LanguageToggle /><ThemeToggle />
+          <Link href="/#download" className="hidden items-center gap-2 rounded-full bg-forge-cyan px-4 py-2.5 text-xs font-semibold text-forge-on-accent lg:inline-flex"><Download className="size-3.5" aria-hidden="true" />{t.nav.download}</Link>
+          <button type="button" onClick={() => setOpen(!open)} className="grid size-9 place-items-center rounded-lg border border-forge-border bg-forge-elev text-forge-muted lg:hidden" aria-label={lang === "it" ? (open ? "Chiudi menu" : "Apri menu") : (open ? "Close menu" : "Open menu")} aria-expanded={open} aria-controls="mobile-navigation">
             {open ? <X className="size-5" /> : <Menu className="size-5" />}
           </button>
         </div>
       </div>
-
-      {open && (
-        <nav id="mobile-navigation" className="lg:hidden border-t border-forge-border bg-forge-bg/95 backdrop-blur-md px-6 pb-4 pt-2">
-          {links.map((l) => (
-            <Link
-              key={l.href}
-              href={l.href}
-              onClick={() => setOpen(false)}
-              className={`block py-3 text-sm border-b border-forge-border/60 last:border-0 transition-colors hover:text-forge-cyan ${l.href === "/roadmap#b2b" ? "font-semibold text-forge-cyan" : "text-forge-muted"}`}
-            >
-              {l.label}
-            </Link>
-          ))}
-          <a href="https://github.com/Leonardo-Lalli/FORGE" target="_blank" rel="noopener"
-            onClick={() => setOpen(false)}
-            className="flex items-center gap-2 py-3 text-sm text-forge-muted transition-colors hover:text-forge-cyan">
-            <Star className="size-3.5" aria-hidden="true" /> GitHub
-          </a>
-        </nav>
-      )}
+      <nav id="mobile-navigation" hidden={!open} className="border-t border-forge-border bg-forge-bg px-6 pb-4 lg:hidden" aria-label={lang === "it" ? "Navigazione mobile" : "Mobile navigation"}>
+        {links.map(link => <Link key={link.href} href={link.href} onClick={() => setOpen(false)} aria-current={active(link.href) ? "page" : undefined} className={`block border-b border-forge-border py-3 text-sm ${active(link.href) ? "font-semibold text-forge-cyan" : "text-forge-muted"}`}>{link.label}</Link>)}
+        <Link href="/#download" onClick={() => setOpen(false)} className="mt-4 inline-flex items-center gap-2 rounded-full bg-forge-cyan px-5 py-3 text-sm font-semibold text-forge-on-accent"><Download className="size-4" aria-hidden="true" />{t.nav.download}</Link>
+      </nav>
     </header>
   )
 }

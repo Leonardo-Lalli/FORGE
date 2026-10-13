@@ -10,7 +10,7 @@ export function ScreenshotsSection() {
   const content = t.screenshots
 
   return (
-    <section className="px-6 py-20">
+    <section id="schermate" className="scroll-mt-24 px-6 py-16">
       <div className="mx-auto max-w-[1120px]">
         <p className="mb-3 font-mono text-xs text-forge-cyan">{content.eyebrow}</p>
         <h2 className="mb-5 text-3xl font-extrabold">{content.title}</h2>
