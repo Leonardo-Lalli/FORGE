@@ -5,7 +5,8 @@ export const it = {
     "docs": "Documentazione",
     "roadmap": "Roadmap",
     "download": "Download",
-    "backHome": "Torna alla home"
+    "backHome": "Torna alla home",
+    "b2b": "B2B"
   },
   "controls": {
     "toggleThemeToLight": "Passa al tema chiaro",
@@ -282,6 +283,11 @@ export const it = {
             "name": "Regressioni e grafici",
             "desc": "Grafico volume corretto; build Android e test automatici",
             "diff": "med"
+          },
+          {
+            "name": "Social login",
+            "desc": "Google/Apple sign-in oltre a email/password",
+            "diff": "high"
           }
         ]
       },
@@ -312,6 +318,16 @@ export const it = {
             "name": "Release Android",
             "desc": "Build APK riproducibile e validazione prima della release",
             "diff": "med"
+          },
+          {
+            "name": "Voice input",
+            "desc": "\"Cento chili, otto rep\" invece di digitare",
+            "diff": "med"
+          },
+          {
+            "name": "Video esercizi",
+            "desc": "Video YouTube integrati oltre alle GIF",
+            "diff": "med"
           }
         ]
       },
@@ -337,6 +353,16 @@ export const it = {
             "name": "Condivisione",
             "desc": "Riepiloghi condivisibili senza esporre contenuti privati",
             "diff": "med"
+          },
+          {
+            "name": "Mappe palestre",
+            "desc": "Mappa delle palestre vicine con recensioni community",
+            "diff": "high"
+          },
+          {
+            "name": "Gamification 2.0",
+            "desc": "Estendere livelli e XP già presenti con stagioni competitive e nuove ricompense.",
+            "diff": "high"
           }
         ]
       },
@@ -362,6 +388,11 @@ export const it = {
             "name": "Report e backup",
             "desc": "Export PDF e backup con ripristino verificato",
             "diff": "med"
+          },
+          {
+            "name": "Nutrizione tracker",
+            "desc": "Calorie e macro insieme al tracking degli allenamenti",
+            "diff": "high"
           }
         ]
       },
@@ -382,6 +413,11 @@ export const it = {
             "name": "Sensori",
             "desc": "Battito e passi dove supportati dal dispositivo",
             "diff": "high"
+          },
+          {
+            "name": "Apple Watch",
+            "desc": "Supporto iOS + companion watchOS",
+            "diff": "vhigh"
           }
         ]
       },
@@ -436,12 +472,12 @@ export const it = {
       "body": "L'architettura self-hosted permette a un proprietario di palestra di lanciare il backend su un mini-PC locale e creare un sistema gestionale e social privato per tutta la struttura.",
       "advantages": [
         {
-          "title": "Zero costi SaaS",
-          "desc": "Niente abbonamenti o licenze per postazione. Da 50 a 5.000 iscritti, il costo software è 0€/mese."
+          "title": "Software open source",
+          "desc": "Codice MIT, senza abbonamento nell’app. Server, manutenzione e gestione hanno comunque dei costi."
         },
         {
           "title": "Community locale",
-          "desc": "Chi si allena nella stessa sala vede i PR degli altri in tempo reale, con classifiche interne della palestra."
+          "desc": "Gli iscritti sullo stesso server possono condividere gli allenamenti. Le classifiche interne della palestra sono un obiettivo futuro."
         },
         {
           "title": "Controllo locale dei dati",
@@ -470,7 +506,9 @@ export const it = {
           "desc": "Più palestre sullo stesso server con isolamento completo dei dati."
         }
       ],
-      "futureTitle": "Sviluppi futuri B2B"
+      "futureTitle": "Sviluppi futuri B2B",
+      "status": "Gestione palestra · Obiettivo futuro",
+      "note": "La community sul proprio server è già disponibile. Dashboard trainer, onboarding QR e gestione di più palestre sono sviluppi pianificati."
     },
     "backlog": {
       "eyebrow": "// Backlog",
@@ -478,43 +516,7 @@ export const it = {
       "items": [
         {
           "name": "AI form check",
-          "desc": "Analisi posturale via fotocamera durante l'esercizio"
-        },
-        {
-          "name": "Voice input",
-          "desc": "\"Cento chili, otto rep\" invece di digitare"
-        },
-        {
-          "name": "Social login",
-          "desc": "Google/Apple sign-in oltre a email/password"
-        },
-        {
-          "name": "Mappe palestre",
-          "desc": "Mappa delle palestre vicine con recensioni community"
-        },
-        {
-          "name": "Marketplace piani",
-          "desc": "Utenti condividono e vendono piani di allenamento"
-        },
-        {
-          "name": "Nutrizione tracker",
-          "desc": "Calorie e macro insieme al tracking degli allenamenti"
-        },
-        {
-          "name": "Apple Watch",
-          "desc": "Supporto iOS + companion watchOS"
-        },
-        {
-          "name": "Gamification 2.0",
-          "desc": "Livelli, XP, stagioni competitive"
-        },
-        {
-          "name": "Coaching AI",
-          "desc": "Suggerimenti automatici basati sui dati storici"
-        },
-        {
-          "name": "Video esercizi",
-          "desc": "Video YouTube integrati oltre alle GIF"
+          "desc": "Un esperimento per analizzare un breve video dell’esercizio e segnalare possibili errori di postura o movimento. Fattibilità e accuratezza sono ancora da valutare; la funzione non è disponibile nell’app."
         }
       ]
     },

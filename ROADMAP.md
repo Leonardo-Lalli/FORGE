@@ -11,6 +11,7 @@ Alcuni obiettivi estendono funzioni già presenti. Le idee sono da valutare, non
 - **Catalogo trasparente**: Controllare duplicati, istruzioni, GIF raggiungibili e cache condivisa, con conteggi reali.
 - **Backup completo e ripristino**: Conservare e ripristinare schede, note, foto, serie e carichi: il CSV attuale non è un backup completo.
 - **Origine protetta**: Valutare proxy o tunnel con dominio dedicato per non esporre l’IP domestico nel DNS pubblico.
+- **Social login**: Google/Apple sign-in oltre a email/password
 
 ## QoL & Usabilità
 
@@ -19,6 +20,8 @@ Alcuni obiettivi estendono funzioni già presenti. Le idee sono da valutare, non
 - **Calcolatore 1RM**: Tap su un top lift → mostra massimale stimato (formula Epley)
 - **Timer a voce**: TTS Android: "Serie completata, 90 secondi di pausa"
 - **Filtro ricerca esercizi migliorato**: Filtri muscolo e attrezzatura già presenti: consolidare copertura del catalogo, paginazione e risultati.
+- **Voice input**: "Cento chili, otto rep" invece di digitare
+- **Video esercizi**: Video YouTube integrati oltre alle GIF
 
 ## Release Stabile
 
@@ -35,6 +38,9 @@ Alcuni obiettivi estendono funzioni già presenti. Le idee sono da valutare, non
 - **Condivisione workout**: Share sheet Android: immagine riassuntiva dell'allenamento
 - **Badge stagionali**: Achievement limitati nel tempo (es. "Allenati a Natale")
 - **Storie workout**: Evolvere gli allenamenti pubblici e le foto in storie temporanee, rispettando la visibilità scelta.
+- **Mappe palestre**: Mappa delle palestre vicine con recensioni community
+- **Gamification 2.0**: Livelli e XP esistono già: valutare stagioni competitive e ricompense aggiuntive.
+- **Ricompense per record delle serie**: Medagliette per record personali di peso, volume o ripetizioni: solo idea futura, ancora da implementare.
 
 ## Health & Wear OS
 
@@ -43,6 +49,7 @@ Alcuni obiettivi estendono funzioni già presenti. Le idee sono da valutare, non
 - **Integrazioni salute**: Valutare API salute supportate per sincronizzare allenamenti e dati autorizzati.
 - **Heart rate display**: Mostra battito cardiaco durante l'allenamento (se supportato)
 - **Contatore passi**: Widget passi giornalieri nella dashboard
+- **Apple Watch**: Supporto iOS + companion watchOS
 
 ## Advanced Features
 
@@ -52,6 +59,7 @@ Alcuni obiettivi estendono funzioni già presenti. Le idee sono da valutare, non
 - **Grafici avanzati**: Volume per muscolo nel tempo, PR timeline, frequenza settimanale
 - **Modifica workout post-salvataggio**: Correggi un peso sbagliato dopo aver salvato
 - **Ricerca workout nello storico**: Cerca per nome esercizio, data, volume
+- **Nutrizione tracker**: Calorie e macro insieme al tracking degli allenamenti
 
 ## Platform & Infrastruttura
 
@@ -73,17 +81,7 @@ Alcuni obiettivi estendono funzioni già presenti. Le idee sono da valutare, non
 
 ## Idee ed esperimenti
 
-- **AI form check**: Analisi posturale via fotocamera durante l'esercizio
-- **Voice input**: "Cento chili, otto rep" invece di digitare
-- **Social login**: Google/Apple sign-in oltre a email/password
-- **Mappe palestre**: Mappa delle palestre vicine con recensioni community
-- **Marketplace piani**: Utenti condividono e vendono piani di allenamento
-- **Nutrizione tracker**: Calorie e macro insieme al tracking degli allenamenti
-- **Apple Watch**: Supporto iOS + companion watchOS
-- **Gamification 2.0**: Livelli e XP esistono già: valutare stagioni competitive e ricompense aggiuntive.
-- **Coaching AI**: Suggerimenti automatici basati sui dati storici
-- **Video esercizi**: Video YouTube integrati oltre alle GIF
-- **Ricompense per record delle serie**: Medagliette per record personali di peso, volume o ripetizioni: solo idea futura, ancora da implementare.
+- **AI form check**: Analizzare un breve video dell’esercizio per segnalare possibili errori di postura o movimento. Esperimento da valutare per fattibilità e accuratezza; non disponibile nell’app.
 
 ## Già rilasciato
 

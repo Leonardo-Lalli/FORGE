@@ -7,7 +7,8 @@ export const en: Dictionary = {
     "docs": "Docs",
     "roadmap": "Roadmap",
     "download": "Download",
-    "backHome": "Back to home"
+    "backHome": "Back to home",
+    "b2b": "B2B"
   },
   "controls": {
     "toggleThemeToLight": "Switch to light theme",
@@ -284,6 +285,11 @@ export const en: Dictionary = {
             "name": "Regression checks",
             "desc": "Correct volume chart, Android builds and automated tests",
             "diff": "med"
+          },
+          {
+            "name": "Social login",
+            "desc": "Google/Apple sign-in alongside email/password",
+            "diff": "high"
           }
         ]
       },
@@ -314,6 +320,16 @@ export const en: Dictionary = {
             "name": "Android release",
             "desc": "Reproducible APK build with release validation",
             "diff": "med"
+          },
+          {
+            "name": "Voice input",
+            "desc": "\"A hundred kilos, eight reps\" instead of typing",
+            "diff": "med"
+          },
+          {
+            "name": "Exercise videos",
+            "desc": "Embedded YouTube videos alongside the GIFs",
+            "diff": "med"
           }
         ]
       },
@@ -339,6 +355,16 @@ export const en: Dictionary = {
             "name": "Sharing",
             "desc": "Share summaries without exposing private content",
             "diff": "med"
+          },
+          {
+            "name": "Gym maps",
+            "desc": "Map of nearby gyms with community reviews",
+            "diff": "high"
+          },
+          {
+            "name": "Gamification 2.0",
+            "desc": "Extend existing levels and XP with competitive seasons and new rewards.",
+            "diff": "high"
           }
         ]
       },
@@ -364,6 +390,11 @@ export const en: Dictionary = {
             "name": "Reports and backup",
             "desc": "PDF export and tested backup restoration",
             "diff": "med"
+          },
+          {
+            "name": "Nutrition tracker",
+            "desc": "Calories and macros alongside workout tracking",
+            "diff": "high"
           }
         ]
       },
@@ -384,6 +415,11 @@ export const en: Dictionary = {
             "name": "Sensors",
             "desc": "Heart rate and steps on supported devices",
             "diff": "high"
+          },
+          {
+            "name": "Apple Watch",
+            "desc": "iOS support + watchOS companion",
+            "diff": "vhigh"
           }
         ]
       },
@@ -438,12 +474,12 @@ export const en: Dictionary = {
       "body": "The self-hosted architecture lets a gym owner launch the backend on a local mini-PC and create a private management and social system for the whole facility.",
       "advantages": [
         {
-          "title": "Zero SaaS costs",
-          "desc": "No subscriptions or per-seat licenses. From 50 to 5,000 members, software cost is €0/month."
+          "title": "Open-source software",
+          "desc": "MIT code without an in-app subscription. Servers, maintenance and operations still have costs."
         },
         {
           "title": "Local community",
-          "desc": "People training in the same room see each other's PRs in real time, with the gym's internal rankings."
+          "desc": "Members on the same server can share workouts. Internal gym leaderboards are a future goal."
         },
         {
           "title": "Local data control",
@@ -472,7 +508,9 @@ export const en: Dictionary = {
           "desc": "Multiple gyms on the same server with full data isolation."
         }
       ],
-      "futureTitle": "Future B2B developments"
+      "futureTitle": "Future B2B developments",
+      "status": "Gym management · Future goal",
+      "note": "A community on your own server is already available. Trainer dashboards, QR onboarding and multi-gym management are planned developments."
     },
     "backlog": {
       "eyebrow": "// Backlog",
@@ -480,43 +518,7 @@ export const en: Dictionary = {
       "items": [
         {
           "name": "AI form check",
-          "desc": "Posture analysis via camera during an exercise"
-        },
-        {
-          "name": "Voice input",
-          "desc": "\"A hundred kilos, eight reps\" instead of typing"
-        },
-        {
-          "name": "Social login",
-          "desc": "Google/Apple sign-in alongside email/password"
-        },
-        {
-          "name": "Gym maps",
-          "desc": "Map of nearby gyms with community reviews"
-        },
-        {
-          "name": "Plan marketplace",
-          "desc": "Users share and sell workout plans"
-        },
-        {
-          "name": "Nutrition tracker",
-          "desc": "Calories and macros alongside workout tracking"
-        },
-        {
-          "name": "Apple Watch",
-          "desc": "iOS support + watchOS companion"
-        },
-        {
-          "name": "Gamification 2.0",
-          "desc": "Levels, XP, competitive seasons"
-        },
-        {
-          "name": "AI coaching",
-          "desc": "Automatic suggestions based on historical data"
-        },
-        {
-          "name": "Exercise videos",
-          "desc": "Embedded YouTube videos alongside the GIFs"
+          "desc": "An experiment to analyze a short exercise video and flag possible posture or movement errors. Feasibility and accuracy still need evaluation; this feature is not available in the app."
         }
       ]
     },

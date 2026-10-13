@@ -14,6 +14,7 @@ export function SiteHeader() {
 
   const links = [
     { href: "/features", label: t.nav.features },
+    { href: "/roadmap#b2b", label: t.nav.b2b },
     { href: "/self-hosting", label: t.nav.selfHosting },
     { href: "/docs", label: t.nav.docs },
     { href: "/roadmap", label: t.nav.roadmap },
@@ -29,9 +30,9 @@ export function SiteHeader() {
           <VersionBadge />
         </Link>
 
-        <nav className="hidden items-center gap-8 sm:flex">
+        <nav className="hidden items-center gap-5 lg:flex">
           {links.map((l) => (
-            <Link key={l.href} href={l.href} className="text-sm text-forge-muted transition-colors hover:text-forge-fg">{l.label}</Link>
+            <Link key={l.href} href={l.href} className={l.href === "/roadmap#b2b" ? "rounded-full border border-forge-cyan-dim bg-forge-cyan/[0.06] px-3 py-1.5 text-sm font-semibold text-forge-cyan transition-colors hover:border-forge-cyan" : "text-sm text-forge-muted transition-colors hover:text-forge-fg"}>{l.label}</Link>
           ))}
         </nav>
 
@@ -39,14 +40,16 @@ export function SiteHeader() {
           <LanguageToggle />
           <ThemeToggle />
           <a href="https://github.com/Leonardo-Lalli/FORGE" target="_blank" rel="noopener"
-            className="hidden sm:inline-flex items-center gap-2 rounded-full border border-forge-border px-4 py-2 text-sm text-forge-fg transition-all hover:border-forge-cyan hover:text-forge-cyan">
+            className="hidden lg:inline-flex items-center gap-2 rounded-full border border-forge-border px-4 py-2 text-sm text-forge-fg transition-all hover:border-forge-cyan hover:text-forge-cyan">
             GitHub
             <Star className="size-3.5" aria-hidden="true" />
           </a>
           <button
             onClick={() => setOpen(!open)}
-            className="sm:hidden grid size-9 place-items-center rounded-lg border border-forge-border text-forge-muted hover:text-forge-fg hover:border-forge-cyan"
+            className="lg:hidden grid size-9 place-items-center rounded-lg border border-forge-border text-forge-muted hover:text-forge-fg hover:border-forge-cyan"
             aria-label={open ? "Chiudi menu" : "Apri menu"}
+            aria-expanded={open}
+            aria-controls="mobile-navigation"
           >
             {open ? <X className="size-5" /> : <Menu className="size-5" />}
           </button>
@@ -54,13 +57,13 @@ export function SiteHeader() {
       </div>
 
       {open && (
-        <nav className="sm:hidden border-t border-forge-border bg-forge-bg/95 backdrop-blur-md px-6 pb-4 pt-2">
+        <nav id="mobile-navigation" className="lg:hidden border-t border-forge-border bg-forge-bg/95 backdrop-blur-md px-6 pb-4 pt-2">
           {links.map((l) => (
             <Link
               key={l.href}
               href={l.href}
               onClick={() => setOpen(false)}
-              className="block py-3 text-sm text-forge-muted border-b border-forge-border/60 last:border-0 transition-colors hover:text-forge-cyan"
+              className={`block py-3 text-sm border-b border-forge-border/60 last:border-0 transition-colors hover:text-forge-cyan ${l.href === "/roadmap#b2b" ? "font-semibold text-forge-cyan" : "text-forge-muted"}`}
             >
               {l.label}
             </Link>

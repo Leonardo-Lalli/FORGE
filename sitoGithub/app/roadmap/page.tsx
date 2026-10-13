@@ -3,8 +3,7 @@
 import { SiteHeader } from "@/components/forge/site-header"
 import { SiteFooter } from "@/components/forge/cta-footer"
 import { useI18n } from "@/lib/i18n"
-import { CheckCircle2, CircleDashed, XCircle, AlertTriangle, GitBranch, Sparkles } from "lucide-react"
-import type { LucideIcon } from "lucide-react"
+import { CheckCircle2, GitBranch, Sparkles } from "lucide-react"
 
 function Eyebrow({ children }: { children: React.ReactNode }) {
   return <p className="mb-3 font-mono text-xs uppercase tracking-[0.16em] text-forge-cyan">{children}</p>
@@ -41,6 +40,38 @@ export default function RoadmapPage() {
                 <h1 className="mb-4 text-balance text-[clamp(30px,5vw,44px)] font-extrabold leading-[1.1] tracking-[-0.02em]">{r.title}</h1>
                 <p className="text-pretty text-[17px] text-forge-muted">{r.subtitle}</p>
               </div>
+
+              {/* B2B section */}
+              <section id="b2b" className="mb-16 scroll-mt-24 rounded-[14px] border border-forge-cyan-dim bg-forge-cyan/[0.03] p-5 sm:p-8" aria-labelledby="b2b-heading">
+                <span className="mb-5 inline-block rounded-full border border-forge-cyan-dim bg-forge-cyan/[0.06] px-3 py-1 font-mono text-xs text-forge-cyan">{r.b2b.status}</span>
+                <p className="mb-4 font-mono text-[13px] uppercase tracking-[0.18em] text-forge-cyan">{r.b2b.eyebrow}</p>
+                <h2 id="b2b-heading" className="mb-3 text-[clamp(26px,4vw,36px)] font-extrabold">{r.b2b.title}</h2>
+                <p className="mb-4 max-w-[640px] text-[17px] text-forge-muted">{r.b2b.body}</p>
+                <p className="mb-10 max-w-[760px] text-sm leading-relaxed text-forge-muted">{r.b2b.note}</p>
+                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                  {r.b2b.advantages.map((a, i) => (
+                    <Card key={i}>
+                      <CheckCircle2 className="mb-3 size-5 text-forge-cyan" aria-hidden="true" />
+                      <h3 className="mb-1.5 text-base font-bold">{a.title}</h3>
+                      <p className="text-[14px] text-forge-muted">{a.desc}</p>
+                    </Card>
+                  ))}
+                </div>
+                <div className="mt-12">
+                  <h3 className="mb-5 text-xl font-bold">{r.b2b.futureTitle}</h3>
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    {r.b2b.future.map((f, i) => (
+                      <Card key={i} className="flex items-start gap-4">
+                        <GitBranch className="mt-0.5 size-5 flex-shrink-0 text-forge-cyan" aria-hidden="true" />
+                        <div>
+                          <p className="text-[15px] font-semibold">{f.title}</p>
+                          <p className="text-[13px] text-forge-muted mt-0.5">{f.desc}</p>
+                        </div>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+              </section>
 
               {/* Release timeline */}
               <div className="relative pl-6 sm:pl-8">
@@ -88,36 +119,6 @@ export default function RoadmapPage() {
                       <p className="text-[14px] leading-relaxed text-forge-muted">{p.body}</p>
                     </Card>
                   ))}
-                </div>
-              </div>
-
-              {/* B2B section */}
-              <div className="mt-20">
-                <p className="mb-4 font-mono text-[13px] uppercase tracking-[0.18em] text-forge-cyan">{r.b2b.eyebrow}</p>
-                <h2 className="mb-3 text-[clamp(26px,4vw,36px)] font-extrabold">{r.b2b.title}</h2>
-                <p className="mb-10 max-w-[640px] text-[17px] text-forge-muted">{r.b2b.body}</p>
-                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-                  {r.b2b.advantages.map((a, i) => (
-                    <Card key={i}>
-                      <CheckCircle2 className="mb-3 size-5 text-forge-cyan" aria-hidden="true" />
-                      <h3 className="mb-1.5 text-base font-bold">{a.title}</h3>
-                      <p className="text-[14px] text-forge-muted">{a.desc}</p>
-                    </Card>
-                  ))}
-                </div>
-                <div className="mt-12">
-                  <h3 className="mb-5 text-xl font-bold">{r.b2b.futureTitle}</h3>
-                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    {r.b2b.future.map((f, i) => (
-                      <Card key={i} className="flex items-start gap-4">
-                        <GitBranch className="mt-0.5 size-5 flex-shrink-0 text-forge-cyan" aria-hidden="true" />
-                        <div>
-                          <p className="text-[15px] font-semibold">{f.title}</p>
-                          <p className="text-[13px] text-forge-muted mt-0.5">{f.desc}</p>
-                        </div>
-                      </Card>
-                    ))}
-                  </div>
                 </div>
               </div>
 
