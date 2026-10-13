@@ -43,6 +43,8 @@ export function HeroSection() {
           </a>
         </div>
 
+        <p className="mx-auto mt-6 max-w-[680px] rounded-xl border border-forge-border bg-forge-elev p-4 text-left text-xs leading-relaxed text-forge-muted">{t.hero.updateNote}</p>
+
         <div className="mx-auto mt-10 max-w-[680px] rounded-[14px] border border-forge-border bg-forge-elev p-6 text-left"><h2 className="mb-3 text-lg font-bold">{t.story.title}</h2><p className="text-sm leading-relaxed text-forge-muted">{t.story.body}</p></div>
         <p className="mt-[22px] font-mono text-[13px] text-forge-dim">
           {t.hero.note}

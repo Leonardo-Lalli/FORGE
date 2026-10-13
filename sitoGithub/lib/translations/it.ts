@@ -20,7 +20,8 @@ export const it = {
     "subtitle": "Registra allenamenti, ritrova i tuoi carichi e condividi i progressi con la tua community. Usa il server FORGE predefinito oppure una tua istanza PocketBase.",
     "ctaPrimary": "Scarica FORGE 0.8.5 beta",
     "ctaSecondary": "Vedi su GitHub",
-    "note": "0.8.5 beta · Account sul server scelto · Nessun abbonamento nell’app"
+    "note": "0.8.5 beta · Account sul server scelto · Nessun abbonamento nell’app",
+    "updateNote": "Vecchie installazioni: la firma è cambiata e potrebbe servire una reinstallazione. Il CSV non è un backup completo: conserva le schede e le foto separatamente e verifica la sincronizzazione prima di rimuovere l’app."
   },
   "features": {
     "eyebrow": "// Funzionalità",

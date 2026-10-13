@@ -75,7 +75,7 @@ Schermate reali presenti nell’archivio del progetto, scattate durante lo svilu
 3. Registrati o accedi. Se non configuri un server personale, l’app utilizza `https://leoforge.duckdns.org`.
 4. Per un’istanza personale, inserisci il suo URL nelle impostazioni del server e crea un account su quell’istanza.
 
-**Passaggio dalle vecchie build:** la 0.8.0 pubblicata e gli APK di prova usavano certificati Debug diversi. La 0.8.5 avvia la firma stabile di release; Android può richiedere una reinstallazione. Esporta prima i dati locali dalle impostazioni e conserva le schede: non disinstallare senza backup. Gli allenamenti già sincronizzati restano sul server.
+**Passaggio dalle vecchie build:** la 0.8.0 pubblicata e gli APK di prova usavano certificati Debug diversi. La 0.8.5 avvia la firma stabile di release; Android può richiedere una reinstallazione. **Il CSV è un riepilogo, non un backup completo:** non conserva schede, foto né i dettagli reali delle serie e dei carichi. Prima di disinstallare verifica la sincronizzazione degli allenamenti e conserva separatamente schede, note e foto (ad esempio trascrivendole o acquisendo schermate). Gli allenamenti già sincronizzati restano sul server.
 
 Gli aggiornamenti richiedono attualmente un nuovo APK: **l’aggiornamento direttamente dall’app non è ancora implementato**. Mantieni backup dei dati prima di cambiare installazione; una firma diversa può impedire l’aggiornamento della versione già presente.
 

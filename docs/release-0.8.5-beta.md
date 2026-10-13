@@ -19,7 +19,7 @@ Beta Android per provare FORGE e segnalare problemi. Codice, README e sito sono 
 
 Scarica FORGE.apk e installa su Android 6.0/API 23 o successivo. Usa il server predefinito o imposta la tua istanza.
 
-**Firma nuova:** la 0.8.0 pubblicata e gli APK di prova avevano certificati Debug diversi. La 0.8.5 usa una chiave di release stabile e versionCode 85. Android potrebbe richiedere una reinstallazione: esporta prima i dati locali dalle impostazioni e conserva le schede. Disinstallare senza backup elimina i dati locali; gli allenamenti già sincronizzati restano sul server.
+**Firma nuova:** la 0.8.0 pubblicata e gli APK di prova avevano certificati Debug diversi. La 0.8.5 usa una chiave di release stabile e versionCode 85. Android potrebbe richiedere una reinstallazione: **il CSV è un riepilogo, non un backup completo di schede, foto, serie e carichi.** Verifica la sincronizzazione e conserva separatamente le schede e le foto prima di rimuovere l’app. Disinstallare senza conservare i dati li elimina dal telefono; gli allenamenti già sincronizzati restano sul server.
 
 Per il backend leggi docs/self-hosting.md: non basta avviare PocketBase o scaricare soltanto Compose. Le push social richiedono Firebase compatibile, chiave Admin solo server e worker. Il timer locale non richiede Firebase.
 

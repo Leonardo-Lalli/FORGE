@@ -22,7 +22,8 @@ export const en: Dictionary = {
     "subtitle": "Log workouts, recover your previous loads and share progress with your community. Use the default FORGE server or your own PocketBase instance.",
     "ctaPrimary": "Download FORGE 0.8.5 beta",
     "ctaSecondary": "View on GitHub",
-    "note": "0.8.5 beta · Account on your chosen server · No in-app subscription"
+    "note": "0.8.5 beta · Account on your chosen server · No in-app subscription",
+    "updateNote": "Older installations: the signing key changed, so reinstallation may be required. CSV is not a full backup: save plans and photos separately and verify synchronization before removing the app."
   },
   "features": {
     "eyebrow": "// Features",
