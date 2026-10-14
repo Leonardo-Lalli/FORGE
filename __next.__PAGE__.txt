@@ -1,0 +1,14 @@
+1:"$Sreact.fragment"
+2:I[27655,["/FORGE/_next/static/chunks/01q7j2r.61tjn.js","/FORGE/_next/static/chunks/0d3shmwh5_nmn.js","/FORGE/_next/static/chunks/0-7cza5uwfp0m.js","/FORGE/_next/static/chunks/0iirqd19xhewn.js"],"SiteHeader"]
+3:I[38359,["/FORGE/_next/static/chunks/01q7j2r.61tjn.js","/FORGE/_next/static/chunks/0d3shmwh5_nmn.js","/FORGE/_next/static/chunks/0-7cza5uwfp0m.js","/FORGE/_next/static/chunks/0iirqd19xhewn.js"],"HeroSection"]
+4:I[83274,["/FORGE/_next/static/chunks/01q7j2r.61tjn.js","/FORGE/_next/static/chunks/0d3shmwh5_nmn.js","/FORGE/_next/static/chunks/0-7cza5uwfp0m.js","/FORGE/_next/static/chunks/0iirqd19xhewn.js"],"FeaturesSection"]
+5:I[3814,["/FORGE/_next/static/chunks/01q7j2r.61tjn.js","/FORGE/_next/static/chunks/0d3shmwh5_nmn.js","/FORGE/_next/static/chunks/0-7cza5uwfp0m.js","/FORGE/_next/static/chunks/0iirqd19xhewn.js"],"ScreenshotsSection"]
+6:I[67287,["/FORGE/_next/static/chunks/01q7j2r.61tjn.js","/FORGE/_next/static/chunks/0d3shmwh5_nmn.js","/FORGE/_next/static/chunks/0-7cza5uwfp0m.js","/FORGE/_next/static/chunks/0iirqd19xhewn.js"],"GamificationSection"]
+7:I[78395,["/FORGE/_next/static/chunks/01q7j2r.61tjn.js","/FORGE/_next/static/chunks/0d3shmwh5_nmn.js","/FORGE/_next/static/chunks/0-7cza5uwfp0m.js","/FORGE/_next/static/chunks/0iirqd19xhewn.js"],"CommunitySection"]
+8:I[78395,["/FORGE/_next/static/chunks/01q7j2r.61tjn.js","/FORGE/_next/static/chunks/0d3shmwh5_nmn.js","/FORGE/_next/static/chunks/0-7cza5uwfp0m.js","/FORGE/_next/static/chunks/0iirqd19xhewn.js"],"DownloadSection"]
+9:I[78395,["/FORGE/_next/static/chunks/01q7j2r.61tjn.js","/FORGE/_next/static/chunks/0d3shmwh5_nmn.js","/FORGE/_next/static/chunks/0-7cza5uwfp0m.js","/FORGE/_next/static/chunks/0iirqd19xhewn.js"],"ProjectSection"]
+a:I[13813,["/FORGE/_next/static/chunks/01q7j2r.61tjn.js","/FORGE/_next/static/chunks/0d3shmwh5_nmn.js","/FORGE/_next/static/chunks/0-7cza5uwfp0m.js","/FORGE/_next/static/chunks/0iirqd19xhewn.js"],"SiteFooter"]
+b:I[97367,["/FORGE/_next/static/chunks/01q7j2r.61tjn.js","/FORGE/_next/static/chunks/0d3shmwh5_nmn.js","/FORGE/_next/static/chunks/0-7cza5uwfp0m.js"],"OutletBoundary"]
+c:"$Sreact.suspense"
+0:{"rsc":["$","$1","c",{"children":[["$","div",null,{"className":"min-h-screen bg-forge-bg text-forge-fg","children":[["$","$L2",null,{}],["$","main",null,{"id":"top","children":[["$","$L3",null,{}],["$","$L4",null,{}],["$","$L5",null,{}],["$","$L6",null,{}],["$","$L7",null,{}],["$","$L8",null,{}],["$","$L9",null,{}]]}],["$","$La",null,{}]]}],[["$","script","script-0",{"src":"/FORGE/_next/static/chunks/0iirqd19xhewn.js","async":true}]],["$","$Lb",null,{"children":["$","$c",null,{"name":"Next.MetadataOutlet","children":"$@d"}]}]]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"Q02GeZj2vtndoXGUpy5mX"}
+d:null

@@ -1,0 +1,8 @@
+1:"$Sreact.fragment"
+2:I[27655,["/FORGE/_next/static/chunks/01q7j2r.61tjn.js","/FORGE/_next/static/chunks/0d3shmwh5_nmn.js","/FORGE/_next/static/chunks/0-7cza5uwfp0m.js","/FORGE/_next/static/chunks/140~1cd-4vv1b.js"],"SiteHeader"]
+3:I[72384,["/FORGE/_next/static/chunks/01q7j2r.61tjn.js","/FORGE/_next/static/chunks/0d3shmwh5_nmn.js","/FORGE/_next/static/chunks/0-7cza5uwfp0m.js","/FORGE/_next/static/chunks/140~1cd-4vv1b.js"],"B2BPageContent"]
+4:I[13813,["/FORGE/_next/static/chunks/01q7j2r.61tjn.js","/FORGE/_next/static/chunks/0d3shmwh5_nmn.js","/FORGE/_next/static/chunks/0-7cza5uwfp0m.js","/FORGE/_next/static/chunks/140~1cd-4vv1b.js"],"SiteFooter"]
+5:I[97367,["/FORGE/_next/static/chunks/01q7j2r.61tjn.js","/FORGE/_next/static/chunks/0d3shmwh5_nmn.js","/FORGE/_next/static/chunks/0-7cza5uwfp0m.js"],"OutletBoundary"]
+6:"$Sreact.suspense"
+0:{"rsc":["$","$1","c",{"children":[["$","div",null,{"className":"min-h-screen bg-forge-bg text-forge-fg","children":[["$","$L2",null,{}],["$","$L3",null,{}],["$","$L4",null,{}]]}],[["$","script","script-0",{"src":"/FORGE/_next/static/chunks/140~1cd-4vv1b.js","async":true}]],["$","$L5",null,{"children":["$","$6",null,{"name":"Next.MetadataOutlet","children":"$@7"}]}]]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"Q02GeZj2vtndoXGUpy5mX"}
+7:null
