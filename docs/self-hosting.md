@@ -2,6 +2,23 @@
 
 13 ottobre 2026. Server e community distinti per istanza; nessuna federazione. Non eseguire gli installer Docker su un LXC Community Scripts già configurato.
 
+## Avvio guidato per nuove installazioni
+
+Gli installer sono mantenuti da FORGE; non sono ancora integrati ufficialmente in Proxmox Community Scripts.
+
+```bash
+# Linux/WSL con Docker e Compose già installati:
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/Leonardo-Lalli/FORGE/main/tools/install.sh)" -- docker
+# Dentro un nuovo LXC Debian/Ubuntu, come root:
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/Leonardo-Lalli/FORGE/main/tools/install.sh)" -- lxc
+# Sul nodo Proxmox, come root, per creare un nuovo CT:
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/Leonardo-Lalli/FORGE/main/tools/install.sh)" -- proxmox
+```
+
+Il bootstrap raccoglie PB_VERSION, PB_ADMIN_EMAIL e PB_ADMIN_PASSWORD, oppure usa quelli già esportati. Una password lasciata vuota viene generata casualmente e salvata senza mostrarla. Il checkout e il file privato `.env` sono in `~/forge-server` (modificabile con FORGE_INSTALL_DIR). La password di setup non accetta apostrofi, backslash o ritorni a capo; ciò evita interpretazioni ambigue del file. Per parametri personalizzati del nuovo CT usa FORGE_CT_STORAGE, FORGE_CT_BRIDGE, FORGE_CT_HOSTNAME e FORGE_CT_OS (1 Debian, 2 Ubuntu).
+
+È un percorso per nuove installazioni: non sovrascrive destinazioni esistenti e non aggiorna il server Community Scripts del proprietario. Versione PocketBase, HTTPS, proxy e push vanno scelti/configurati; le nuove combinazioni guidate richiedono ancora una prova completa su Docker/LXC. Per aggiornare un server esistente segui i paragrafi sotto.
+
 ## Docker su Linux
 
 Clona il repository della versione che vuoi installare. Copia `.env.example` in `.env`, scegli una versione numerica PocketBase >= 0.23.0 e credenziali amministrative uniche. Il file `.env` deve rimanere privato. Se usi le istruzioni shell seguenti, usa valori quotati secondo la sintassi shell; è un tuo file di configurazione locale.

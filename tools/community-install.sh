@@ -8,7 +8,7 @@
 set -euo pipefail
 
 FORGE_VERSION="beta — repository checkout"
-FORGE_DIR="$HOME/forge-server"
+FORGE_DIR="${FORGE_INSTALL_DIR:-$HOME/forge-server}"
 REPO_URL="https://github.com/Leonardo-Lalli/FORGE.git"
 PB_EMAIL="${PB_ADMIN_EMAIL:?Set PB_ADMIN_EMAIL before running the installer}"
 PB_PASS="${PB_ADMIN_PASSWORD:?Set a unique PB_ADMIN_PASSWORD before running the installer}"

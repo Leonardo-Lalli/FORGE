@@ -7,7 +7,7 @@
 #
 # FORGE — Self-hosted Workout Tracker per Proxmox LXC
 # Installa PocketBase nativamente (no Docker) e pre-configura
-# admin, collezioni e API rules. Pronto all'uso in 30 secondi.
+# admin, collezioni, hook e migrazioni FORGE.
 
 set -euo pipefail
 [ "$(id -u)" -eq 0 ] || { echo 'Run inside a Debian/Ubuntu LXC as root.' >&2; exit 1; }
@@ -89,8 +89,8 @@ done
 msg_ok "PocketBase online"
 
 msg_info "Creazione superuser..."
-"$PB_DIR/pocketbase" superuser create "$PB_EMAIL" "$PB_PASS" --dir="$PB_DIR/pb_data" 2>/dev/null && \
-  msg_ok "Superuser creato" || msg_ok "Superuser gia presente"
+"$PB_DIR/pocketbase" superuser create "$PB_EMAIL" "$PB_PASS" --dir="$PB_DIR/pb_data" >/dev/null 2>&1 && \
+  msg_ok "Superuser creato" || msg_info "Creazione superuser non riuscita; l’inizializzatore verificherà le credenziali esistenti."
 
 msg_info "Configurazione collezioni + API rules..."
 
@@ -118,6 +118,6 @@ echo "  App URL:  http://${IP}:8090"
 echo "  Admin:    http://${IP}:8090/_/"
 echo "  Admin:    $PB_EMAIL (password not displayed)"
 echo ""
-echo "  CAMBIA SUBITO LA PASSWORD ADMIN!"
+echo "  Mantieni privata l’amministrazione e conserva i backup."
 echo "============================================"
 echo ""

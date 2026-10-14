@@ -1,45 +1,60 @@
+<p align="center"><img src="src/Forge/Resources/AppIcon/appicon.png" alt="FORGE" width="100" /></p>
+
 # FORGE
 
-**Diario di allenamento Android con una community sul server che scegli.**
+**Allenati, traccia i progressi e condividili nella tua community.**
 
-[![.NET MAUI](https://img.shields.io/badge/.NET_10-MAUI-512BD4)](https://learn.microsoft.com/dotnet/maui/)
-[![Stato](https://img.shields.io/badge/versione-0.8.5_beta-blue)](docs/release-readiness.md)
-[![Licenza](https://img.shields.io/badge/codice-MIT-blue)](LICENSE)
+Diario di allenamento Android open source: schede personali, timer, statistiche e achievement, con un backend che puoi usare sul server FORGE oppure ospitare tu.
 
-[Sito e download](https://leonardo-lalli.github.io/FORGE/#download) · [Release pubblicate](https://github.com/Leonardo-Lalli/FORGE/releases) · [Segnala un problema](https://github.com/Leonardo-Lalli/FORGE/issues) · [Roadmap](ROADMAP.md)
+[![Android](https://img.shields.io/badge/Android-6.0%2B-3DDC84)](https://leonardo-lalli.github.io/FORGE/#download)
+[![Beta](https://img.shields.io/badge/release-0.8.5_beta-blue)](https://github.com/Leonardo-Lalli/FORGE/releases/tag/v0.8.5-beta)
+[![MIT](https://img.shields.io/badge/codice-MIT-blue)](LICENSE)
 
-## Il progetto
+[Scarica l’app](https://leonardo-lalli.github.io/FORGE/#download) · [Sito](https://leonardo-lalli.github.io/FORGE/) · [Self-hosting](#installa-il-tuo-server) · [Roadmap](ROADMAP.md) · [Segnala un problema](https://github.com/Leonardo-Lalli/FORGE/issues)
 
-FORGE nasce come progetto studentesco di informatica di **Leonardo Lalli**. È cresciuto attraverso prove sul telefono e in palestra, correzioni e feedback, fino alla beta **0.8.5**, aperta a chi vuole provarla e contribuire con feedback.
+## Per il tuo allenamento
 
-Lo sviluppo impiega estesamente strumenti di **intelligenza artificiale**, incluso Codex, per implementazione, interfacce, revisione, documentazione e verifiche. L’AI è uno strumento di lavoro: non certifica la correttezza o la sicurezza del prodotto. Scelte, revisione e pubblicazione restano responsabilità del proprietario del progetto. Build, verifiche mirate e prove sul dispositivo sono documentate, con i controlli ancora mancanti.
+- **Le tue schede:** senza un limite imposto dall’app, oppure una sessione libera; serie normali, warm-up, drop set e cedimento.
+- **Ritrova il punto di partenza:** carichi e ripetizioni precedenti, note automatiche degli esercizi già presenti nella scheda.
+- **Segui la sessione:** recupero per esercizio da 0 a 5 minuti, notifica del timer e consigli di esecuzione che cambiano a carosello.
+- **Guarda i progressi:** storico, foto, volume, calendario e progressione per esercizio.
+- **Condividi con chi vuoi:** profili, follow e like tra utenti dello stesso server, con visibilità pubblica, privata o per amici reciproci.
+- **Rendi visibili i traguardi:** achievement retroattivi supportati dallo storico, livello e badge nel profilo.
 
-L’obiettivo è unire registrazione degli allenamenti e motivazione tra amici. Una possibile evoluzione è l’uso da parte delle palestre per i propri iscritti: **gestione trainer, iscrizioni e più palestre non sono ancora implementate**.
+Due temi, chiaro e scuro. Il catalogo offre istruzioni e URL GIF dove disponibili; completezza e disponibilità dei media dipendono dai dati e dal provider.
 
-## Stato reale
+## Dentro l’app
 
-**Versione 0.8.5 beta** · codice di riferimento su **main** · Android. La beta è pensata inizialmente per pochi utenti disponibili a segnalare problemi, senza garanzie di disponibilità del server pubblico. Le modifiche successive a un tag non sono automaticamente incluse nel suo APK.
+L’allenamento è una foto recente fornita dal proprietario. Le altre schermate provengono dall’archivio di sviluppo e possono differire dall’interfaccia attuale. Sul sito le icone delle notifiche sono coperte nella visualizzazione; il file originale resta invariato.
 
-Il proprietario ha confermato sul proprio telefono login, flusso di allenamento, suono del recupero e correttezza apparente dei filtri. Build Android e regressioni mirate passano. Le ultime note automatiche e l’invito community richiedono ancora la prova sul dispositivo aggiornato. Non sono stati provati tutti i telefoni Android né certificata la sicurezza dell’intera infrastruttura.
+<p>
+  <img src="assets/screenshots/dashboard.jpeg" alt="Dashboard FORGE, archivio di sviluppo" width="200" />
+  <img src="assets/screenshots/workout-current.jpg" alt="Allenamento FORGE con consigli, serie e note" width="200" />
+  <img src="assets/screenshots/stats.jpeg" alt="Statistiche FORGE, archivio di sviluppo" width="200" />
+  <img src="assets/screenshots/profile.jpeg" alt="Profilo FORGE, archivio di sviluppo" width="200" />
+</p>
 
-## Cosa puoi fare
+## Inizia a usare FORGE
 
-- Creare schede personali senza un limite imposto dall’app, oppure iniziare un allenamento libero.
-- Registrare serie, carichi e ripetizioni; segnare serie normali, warm-up, drop set o cedimento.
-- Ritrovare i valori della sessione precedente e salvare automaticamente le note degli esercizi già presenti nella scheda.
-- Scegliere se aggiornare la scheda quando cambi nome, esercizi, ordine, serie o recuperi durante una sessione.
-- Leggere i consigli di esecuzione disponibili sopra l’esercizio: gli step cambiano automaticamente a carosello durante l’allenamento.
-- Impostare un recupero per esercizio da **0 a 5 minuti**, con notifica Android di avanzamento, pausa e avviso finale.
-- Consultare storico, dettagli, foto degli allenamenti, volume, calendario e progressione per esercizio.
-- Personalizzare avatar e badge sbloccati retroattivamente nel profilo.
-- Cercare utenti, seguire persone, vedere allenamenti condivisi e mettere like **sullo stesso server**.
-- Scegliere visibilità pubblica, privata o per amici reciproci per allenamenti ed elenchi follower. Gli amici sono follow reciproci accettati.
-- Condividere un invito che apre il sito di download e spiega quale server usare.
-- Eliminare il proprio account con conferma della password, se il backend ha le migrazioni aggiornate.
+1. Scarica l’APK dalle [release](https://github.com/Leonardo-Lalli/FORGE/releases) o dal [sito](https://leonardo-lalli.github.io/FORGE/#download), e installalo su Android 6.0 o successivo.
+2. Crea un account: il server FORGE predefinito è già selezionato. Non devi installare un server per provare l’app.
+3. Personalizza una scheda oppure inizia un allenamento libero.
 
-Sono disponibili due temi, chiaro e scuro. Le schermate non costituiscono consigli professionali di allenamento.
+Se hai un backend tuo, inserisci il suo URL nelle impostazioni e crea un account su quella istanza. Ogni server ha la propria community: **gli utenti di istanze diverse non si vedono**. Amici significa due persone che si ricambiano il follow.
 
-## Gamification: progressi che diventano traguardi
+**Beta 0.8.5:** disponibile per le prove, con limiti dichiarati e feedback benvenuti. Il codice su `main` può includere correzioni successive: un push non aggiorna automaticamente l’APK del tag. Il server pubblico è gestito a casa del proprietario e non ha disponibilità garantita.
+
+<details>
+<summary>Hai una vecchia build? Leggi prima di reinstallare</summary>
+
+**Passaggio dalle vecchie build:** la 0.8.0 pubblicata e gli APK di prova usavano certificati Debug diversi. La 0.8.5 avvia la firma stabile di release; Android può richiedere una reinstallazione. **Il CSV è un riepilogo, non un backup completo:** non conserva schede, foto né i dettagli reali delle serie e dei carichi. Prima di disinstallare verifica la sincronizzazione degli allenamenti e conserva separatamente schede, note e foto (ad esempio trascrivendole o acquisendo schermate). Gli allenamenti già sincronizzati restano sul server.
+
+
+Gli aggiornamenti direttamente dall’app non sono ancora implementati.
+
+</details>
+
+## Achievement e gamification
 
 Gli achievement rendono visibili la costanza e i progressi senza richiedere di ricominciare da zero: quelli valutabili dallo storico si sbloccano **retroattivamente**, anche per allenamenti completati in precedenza sull’account corrente.
 
@@ -58,35 +73,47 @@ Alcune voci del catalogo richiedono criteri non ancora implementati, ad esempio 
   <img src="src/Forge/Resources/Images/achievements/max_weight.jpg" alt="Achievement Peso Massimo" width="110" />
 </p>
 
-## Schermate dell’app
+## Installa il tuo server
 
-L’allenamento è una **acquisizione recente fornita dal proprietario**, con consigli a carosello, tipo di serie e note. Dashboard, statistiche e profilo provengono dall’archivio di sviluppo e possono differire dall’interfaccia attuale.
+**Docker, LXC e Proxmox hanno percorsi distinti.** Docker avvia i servizi in container; LXC installa il backend dentro un container esistente; il percorso Proxmox crea un nuovo LXC dal nodo. Gli installer sono di FORGE, non ancora del catalogo ufficiale Community Scripts.
 
-<p>
-  <img src="assets/screenshots/dashboard.jpeg" alt="Dashboard FORGE, schermata di sviluppo" width="200" />
-  <img src="assets/screenshots/workout-current.jpg" alt="Allenamento attivo FORGE con consigli a carosello, serie e note" width="200" />
-  <img src="assets/screenshots/stats.jpeg" alt="Statistiche FORGE, schermata di sviluppo" width="200" />
-  <img src="assets/screenshots/profile.jpeg" alt="Profilo FORGE, schermata di sviluppo" width="200" />
-</p>
+L’avvio guidato chiede una versione numerica di PocketBase >= 0.23.0, l’email amministrativa e una password unica. Può generare una password casuale e conserva la configurazione nel file privato `.env`. Clona il progetto e richiama l’installer che configura PocketBase, collezioni, hook e quattro migrazioni, con backup.
 
-## Download e primo utilizzo
+### Docker — Linux o WSL
 
-1. Apri il [sito ufficiale](https://leonardo-lalli.github.io/FORGE/#download) oppure le [release GitHub](https://github.com/Leonardo-Lalli/FORGE/releases).
-2. Scegli l’APK della versione che vuoi provare e installalo su **Android 6.0 / API 23 o successivo**. Android può richiedere l’autorizzazione a installare dalla fonte scelta.
-3. Registrati o accedi. Se non configuri un server personale, l’app utilizza `https://leoforge.duckdns.org`.
-4. Per un’istanza personale, inserisci il suo URL nelle impostazioni del server e crea un account su quell’istanza.
+Richiede Docker Engine e Docker Compose già installati, con accesso root/sudo per backup e migrazioni. Esegui sul server Docker:
 
-**Passaggio dalle vecchie build:** la 0.8.0 pubblicata e gli APK di prova usavano certificati Debug diversi. La 0.8.5 avvia la firma stabile di release; Android può richiedere una reinstallazione. **Il CSV è un riepilogo, non un backup completo:** non conserva schede, foto né i dettagli reali delle serie e dei carichi. Prima di disinstallare verifica la sincronizzazione degli allenamenti e conserva separatamente schede, note e foto (ad esempio trascrivendole o acquisendo schermate). Gli allenamenti già sincronizzati restano sul server.
+```bash
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/Leonardo-Lalli/FORGE/main/tools/install.sh)" -- docker
+```
 
-Gli aggiornamenti richiedono attualmente un nuovo APK: **l’aggiornamento direttamente dall’app non è ancora implementato**. Mantieni backup dei dati prima di cambiare installazione; una firma diversa può impedire l’aggiornamento della versione già presente.
+### LXC — dentro il container
 
-## Server e community
+Per un nuovo container Debian/Ubuntu con systemd. Esegui **come root dentro il CT**, non sul nodo Proxmox:
 
-Il server predefinito è self-hosted a casa del proprietario. È una possibilità per provare la beta, non un servizio con disponibilità garantita. Un dominio pubblico non è di per sé una prova di insicurezza, ma un servizio esposto richiede aggiornamenti, regole di accesso e manutenzione.
+```bash
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/Leonardo-Lalli/FORGE/main/tools/install.sh)" -- lxc
+```
 
-Ogni istanza PocketBase ha i propri account e la propria community. **Gli utenti su server diversi non possono seguirsi attraverso FORGE.** L’invito non trasferisce account, non accetta automaticamente follow e non configura il server sul telefono del destinatario: indica i passaggi da seguire. Un indirizzo LAN funziona soltanto dove quella rete è raggiungibile.
+### Proxmox VE — dal nodo
 
-Se sei il solo utente del server, il feed offre una schermata di benvenuto e un invito; schede, statistiche e profilo restano utili. Il primo membro è identificato solo quando il server conferma l’assenza di altri utenti visibili: un errore di connessione non equivale a una community vuota.
+Esegui **come root nella shell del nodo Proxmox**. Crea un nuovo LXC, seleziona Debian/Ubuntu e installa FORGE. Storage e bridge sono `local-lvm` e `vmbr0` per default, personalizzabili con `FORGE_CT_STORAGE` e `FORGE_CT_BRIDGE`. Per scegliere il sistema senza il menu usa `FORGE_CT_OS=1` (Debian) o `FORGE_CT_OS=2` (Ubuntu):
+
+```bash
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/Leonardo-Lalli/FORGE/main/tools/install.sh)" -- proxmox
+```
+
+Questi comandi scaricano ed eseguono [lo script guidato](tools/install.sh) da `main`; puoi anche leggere il sorgente e avviarlo da un checkout. Sono per **nuove installazioni**: il bootstrap non sovrascrive una directory esistente e non aggiorna un CT PocketBase già configurato. La configurazione rimane privata in `~/forge-server/.env` salvo percorso personalizzato; conserva un backup protetto.
+
+Docker pubblica la 8090 su loopback per default. Il dominio HTTPS/reverse proxy e le push Firebase richiedono configurazione separata: il setup non apre porte del router né modifica Nginx. I percorsi guidati sono verificati staticamente; **la prova completa Docker/LXC è ancora necessaria**, senza promettere installazione universale o tempi fissi.
+
+[Guida completa, aggiornamenti e backup](docs/self-hosting.md) · [Push facoltative](docs/push-notifications.md) · [Installer Docker](tools/community-install.sh) · [Installer LXC](tools/proxmox-install.sh) · [Creazione CT](tools/proxmox-create.sh)
+
+### Obiettivo: Proxmox Community Scripts
+
+Vogliamo rendere FORGE semplice da installare anche per la community Proxmox. Gli script nel repository sono la base: il prossimo passo è adattarli alla struttura `ct/forge.sh` e `install/forge-install.sh`, verificarli su un’istanza Proxmox reale e proporli nel repository DevScripts per revisione. **FORGE non è ancora integrato ufficialmente.**
+
+Le [linee guida del progetto](https://github.com/community-scripts/ProxmoxVE/blob/main/CONTRIBUTING.md) prevedono per nuovi script il passaggio dal repository di sviluppo e dalla revisione dei maintainer. Non confondere l’installer FORGE con l’attuale script Community Scripts che installa soltanto PocketBase.
 
 ## Dati, privacy e limiti
 
@@ -104,21 +131,15 @@ Lo snapshot del server riportato dal proprietario il 12 ottobre 2026 contiene **
 
 La modalità completamente locale senza account/server è **solo una proposta**. Non confonderla con la persistenza locale già presente. FCM e i media esterni introducono dipendenze di terze parti; self-hosting non significa automaticamente assenza di connessioni esterne.
 
-## Self-hosting
+Le regole di privacy e la cancellazione account dipendono da un backend FORGE con le migrazioni aggiornate. Il timer locale è distinto dalle push social: client FCM e worker sono disponibili, ma la consegna con app chiusa resta da verificare. [Stato e verifiche della beta](docs/release-readiness.md).
 
-Serve PocketBase **>= 0.23**, con una versione scelta esplicitamente, collezioni iniziali, **hook e quattro migrazioni FORGE**. Avviare soltanto PocketBase non basta. Il Compose costruisce un’immagine dal binario ufficiale della versione scelta; non usa un tag `latest` di terze parti.
+## FORGE per le palestre
 
-```bash
-git clone https://github.com/Leonardo-Lalli/FORGE.git
-cd FORGE
-cp .env.example .env
-# Compila .env: PB_VERSION, PB_ADMIN_EMAIL e PB_ADMIN_PASSWORD.
-# Poi segui la sequenza completa, incluso il backup/migrazione:
-```
+Una community per chi si allena nella stessa struttura è la direzione del progetto. La beta offre già schede personali e social sullo stesso server; dashboard trainer, assegnazione schede e gestione di più palestre sono ancora obiettivi futuri. [Visione B2B](https://leonardo-lalli.github.io/FORGE/b2b).
 
-Segui [la guida Docker e LXC](docs/self-hosting.md). I percorsi sono diversi per un’installazione FORGE e per il container Proxmox Community Scripts. Le migrazioni creano un backup e mantengono gli account senza una scelta di visibilità privati. Le push richiedono un progetto Firebase compatibile con il client e una chiave amministrativa conservata **solo sul server**: [guida push](docs/push-notifications.md).
+## Origine del progetto
 
-La porta Docker 8090 è pubblicata su loopback per default. Configura HTTPS e il reverse proxy per gli accessi esterni, mantieni privata l’amministrazione e non pubblicare password, token, `.env`, `pb_data` o chiavi Firebase. L’installer non configura router o Nginx automaticamente. Prima di aggiornare PocketBase, valida la versione scelta su una copia dei dati e verifica il ripristino del backup.
+FORGE è nato come progetto studentesco di informatica di **Leonardo Lalli**, ed è cresciuto con prove sul telefono e in palestra e feedback degli utenti. Lo sviluppo usa estesamente l’AI, incluso Codex, per codice, interfacce, revisione e documentazione. L’AI è uno strumento: la responsabilità delle scelte e delle release resta del proprietario; prove e limiti sono documentati.
 
 ## Sviluppo
 

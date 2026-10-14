@@ -256,7 +256,7 @@ export const en: Dictionary = {
   "roadmapPage": {
     "eyebrow": "// Roadmap",
     "title": "Where FORGE is heading.",
-    "subtitle": "Project goals, step by step. No future dates or versions: priorities are shaped by feedback.",
+    "subtitle": "Only features we still need to add. Available features are described on the Features page; no future dates or versions are promised here.",
     "legend": {
       "difficulty": "Difficulty"
     },
@@ -268,67 +268,27 @@ export const en: Dictionary = {
     },
     "releases": [
       {
-        "theme": "Stability & Privacy",
+        "theme": "Accounts and data",
         "features": [
-          {
-            "name": "Reliable access",
-            "desc": "Public and personal servers; verified avatars and session recovery",
-            "diff": "med"
-          },
-          {
-            "name": "Server privacy",
-            "desc": "Public, private or mutual-friend workouts; tested API rules",
-            "diff": "high"
-          },
-          {
-            "name": "Account-owned plans",
-            "desc": "Unlimited personal plans; examples once; persistent notes and rest",
-            "diff": "med"
-          },
-          {
-            "name": "Retroactive achievements",
-            "desc": "History recalculation and three selected profile badges",
-            "diff": "med"
-          },
-          {
-            "name": "Regression checks",
-            "desc": "Correct volume chart, Android builds and automated tests",
-            "diff": "med"
-          },
           {
             "name": "Social login",
             "desc": "Google/Apple sign-in alongside email/password",
+            "diff": "high"
+          },
+          {
+            "name": "Plan synchronization",
+            "desc": "Find plans and notes across devices connected to the same account.",
             "diff": "high"
           }
         ]
       },
       {
-        "theme": "Verified workout flow",
+        "theme": "Workout improvements",
         "features": [
           {
-            "name": "Per-exercise rest",
-            "desc": "0–5 minute selection stored in plans",
-            "diff": "med"
-          },
-          {
-            "name": "Previous performance",
-            "desc": "Editable weight and rep suggestions from history",
-            "diff": "med"
-          },
-          {
-            "name": "Offline sync",
-            "desc": "Device validation of saves, drafts and account changes",
+            "name": "Fully local mode",
+            "desc": "Train without an account or server, with optional cloud connection.",
             "diff": "high"
-          },
-          {
-            "name": "Exercise catalog",
-            "desc": "Real counts, GIFs, instructions and complete pagination",
-            "diff": "med"
-          },
-          {
-            "name": "Android release",
-            "desc": "Reproducible APK build with release validation",
-            "diff": "med"
           },
           {
             "name": "Voice input",
@@ -346,13 +306,8 @@ export const en: Dictionary = {
         "theme": "Social & Community",
         "features": [
           {
-            "name": "Profiles and follows",
-            "desc": "Searchable profiles and follower lists; friends follow each other",
-            "diff": "med"
-          },
-          {
-            "name": "Comments and notifications",
-            "desc": "Comments and push after privacy is stable",
+            "name": "Workout comments",
+            "desc": "Conversations below shared workouts, respecting their chosen visibility.",
             "diff": "high"
           },
           {
@@ -361,8 +316,8 @@ export const en: Dictionary = {
             "diff": "med"
           },
           {
-            "name": "Sharing",
-            "desc": "Share summaries without exposing private content",
+            "name": "Shareable summaries",
+            "desc": "Generate a workout summary image to share outside the app.",
             "diff": "med"
           },
           {
@@ -374,6 +329,11 @@ export const en: Dictionary = {
             "name": "Gamification 2.0",
             "desc": "Extend existing levels and XP with competitive seasons and new rewards.",
             "diff": "high"
+          },
+          {
+            "name": "Per-set record rewards",
+            "desc": "Medals for personal weight, volume or repetition records; not implemented yet.",
+            "diff": "med"
           }
         ]
       },
@@ -382,7 +342,7 @@ export const en: Dictionary = {
         "features": [
           {
             "name": "Advanced analytics",
-            "desc": "1RM, muscle volume, calendar and history",
+            "desc": "Estimated 1RM, volume per muscle and additional progress reports.",
             "diff": "med"
           },
           {
@@ -441,8 +401,8 @@ export const en: Dictionary = {
             "diff": "high"
           },
           {
-            "name": "Distribution",
-            "desc": "Play Store and production signing keys",
+            "name": "Play Store distribution",
+            "desc": "Bring the beta to the store after the required checks, using the existing stable signing key.",
             "diff": "med"
           },
           {
@@ -454,6 +414,16 @@ export const en: Dictionary = {
             "name": "Gyms",
             "desc": "Trainer dashboard, QR onboarding and tenant isolation",
             "diff": "vhigh"
+          },
+          {
+            "name": "In-app updates",
+            "desc": "Download and start installing signed APK updates without finding them manually on GitHub.",
+            "diff": "high"
+          },
+          {
+            "name": "Proxmox Community Scripts",
+            "desc": "Adapt the installer to project standards, test it on Proxmox and submit it for review. Not officially integrated yet.",
+            "diff": "high"
           }
         ]
       }
@@ -462,19 +432,19 @@ export const en: Dictionary = {
     "phasesTitle": "The three pillars ahead",
     "phases": [
       {
-        "tag": "Phase 1",
-        "title": "Stability & Privacy",
-        "body": "Public and personal servers; verified avatars and session recovery; Public, private or mutual-friend workouts; tested API rules; Unlimited personal plans; examples once; persistent notes and rest"
+        "tag": "Goal 1",
+        "title": "Plans and data",
+        "body": "Plan synchronization, complete backups and account-free mode."
       },
       {
-        "tag": "Phase 2",
-        "title": "Verified workout flow",
-        "body": "0–5 minute selection stored in plans; Editable weight and rep suggestions from history; Device validation of saves, drafts and account changes"
+        "tag": "Goal 2",
+        "title": "Community and progress",
+        "body": "Comments, challenges, leaderboards and personal-record rewards."
       },
       {
-        "tag": "Phase 3",
-        "title": "Social & Community",
-        "body": "Searchable profiles and follower lists; friends follow each other; Comments and push after privacy is stable; Friend challenges with consent"
+        "tag": "Goal 3",
+        "title": "Gyms and distribution",
+        "body": "Trainer tools, Community Scripts integration and in-app updates."
       }
     ],
     "backlog": {
@@ -699,5 +669,34 @@ export const en: Dictionary = {
     "hostingTitle": "Prefer your own server?",
     "hostingBody": "Your instance hosts separate accounts and a separate community. The guide covers setup, backups and maintenance.",
     "hostingLink": "Self-hosting guide"
+  },
+  "selfHostingInstall": {
+    "title": "One command, three installation modes.",
+    "body": "The guided setup asks for a PocketBase version and administrator email/password. It can generate a random password and saves configuration in a private .env file. Installers configure the backend, collections, hooks and migrations.",
+    "copy": "Copy command",
+    "copied": "Copied",
+    "modes": [
+      {
+        "name": "Docker",
+        "where": "On Linux/WSL, with Docker/Compose installed and root/sudo access.",
+        "mode": "docker"
+      },
+      {
+        "name": "LXC",
+        "where": "Inside a new Debian/Ubuntu systemd container, as root.",
+        "mode": "lxc"
+      },
+      {
+        "name": "Proxmox VE",
+        "where": "On the Proxmox node, as root: creates a new LXC and installs FORGE.",
+        "mode": "proxmox"
+      }
+    ],
+    "note": "For new installations. Do not use it to update an existing PocketBase CT. HTTPS domain, reverse proxy and Firebase push need separate configuration. Guided paths are checked statically; full Docker/LXC testing is still required.",
+    "source": "Read the script",
+    "communityTitle": "Towards Proxmox Community Scripts",
+    "communityBody": "Scripts are currently maintained by FORGE. The goal is to prepare them for Community Scripts review; FORGE is not in the official catalog yet.",
+    "copyFallback": "Copy the command by selecting the text below.",
+    "manualTitle": "Prefer a manual installation?"
   }
 }

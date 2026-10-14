@@ -33,8 +33,9 @@ export function HeroSection() {
         </div>
         <figure className="relative mx-auto w-full max-w-[310px] lg:max-w-[290px]">
           <div className="absolute inset-8 -z-10 rounded-full bg-forge-cyan/15 blur-3xl" aria-hidden="true" />
-          <div className="overflow-hidden rounded-[36px] border-[7px] border-[#24282c] bg-[#121212] shadow-2xl">
+          <div className="relative overflow-hidden rounded-[36px] border-[7px] border-[#24282c] bg-[#121212] shadow-2xl">
             <img src={`${basePath}/screenshots/workout-current.jpg`} alt={t.hero.imageLabel} width={945} height={2048} fetchPriority="high" className="h-auto w-full" />
+            <span aria-hidden="true" className="pointer-events-none absolute left-[17%] top-0 z-10 h-[4%] w-[20%] bg-[#121212]" />
           </div>
           <figcaption className="mt-4 text-center text-xs text-forge-muted">{t.hero.imageLabel}</figcaption>
         </figure>

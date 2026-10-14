@@ -14,6 +14,12 @@ The app has no subscription, but hosting has costs. Code is MIT; exercise/media 
 
 Achievements supported by workout history unlock retroactively. Each unlocked badge contributes 100 XP; every 500 XP adds a level. Unlocked badges can be displayed on the profile. Some catalog criteria, including leaderboards and challenges, are not implemented; per-set record medals remain future ideas.
 
-[Real development screenshots and detailed limitations](README.md#schermate-dellapp) are available in the canonical README. The workout image is a recent owner-supplied capture; the other screenshots predate parts of the current UI. Earlier Debug APKs use different certificates; back up local data before reinstalling the release build.
+[Real development screenshots and detailed limitations](README.md#dentro-lapp) are available in the canonical README. The workout image is a recent owner-supplied capture; the other screenshots predate parts of the current UI. Earlier Debug APKs use different certificates; back up local data before reinstalling the release build.
 
 The current CSV export is a summary, not a full backup of plans, photos, sets or weights. Before reinstalling, verify workout synchronization and save plans/notes/photos separately.
+
+## Guided self-hosting
+
+FORGE provides a guided bootstrap for new Linux/WSL Docker installations, native installs inside a new Debian/Ubuntu LXC, and LXC creation on a Proxmox VE node. These are FORGE-maintained scripts; Community Scripts inclusion is a future goal, not an existing endorsement. Setup asks for a selected PocketBase version and unique credentials; Docker Engine/Compose must already be installed. HTTPS/proxy and Firebase push are separate configuration steps. The new guided paths still need full Docker/LXC verification.
+
+See [the three installation commands](README.md#installa-il-tuo-server) and [the full setup/update guide](docs/self-hosting.md).

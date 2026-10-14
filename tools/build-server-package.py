@@ -17,7 +17,7 @@ block += ['bash "$forge_stage/tools/apply-profile-migration.sh" /opt/pocketbase 
 with zipfile.ZipFile(output / 'forge-profile-server-tools.zip', 'w', zipfile.ZIP_DEFLATED) as archive:
     extra = ['docs/pocketbase-profile-migration.md', 'docs/push-notifications.md', 'docs/self-hosting.md',
         'tools/forge-push-worker.py', 'tools/install-push-worker.sh', 'tools/apply-docker-profile-migration.sh',
-        'tools/community-install.sh', 'tools/proxmox-install.sh', 'tools/proxmox-create.sh', 'tools/setup.ps1',
+        'tools/install.sh', 'tools/community-install.sh', 'tools/proxmox-install.sh', 'tools/proxmox-create.sh', 'tools/setup.ps1',
         'tools/init-pocketbase.sh', 'tools/show-ip.sh', 'tools/nginx-pocketbase-hardening.conf',
         'tools/docker/Dockerfile.pocketbase', 'tools/docker/Dockerfile.push', 'tools/docker/entrypoint.sh',
         'docker-compose.yml', '.env.example']

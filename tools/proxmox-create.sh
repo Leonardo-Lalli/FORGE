@@ -11,11 +11,11 @@
 
 set -euo pipefail
 
-FORGE_VERSION="v0.8.0-beta"
+FORGE_VERSION="beta — repository checkout"
 CT_ID=""
-CT_HOSTNAME="forge"
-STORAGE="local-lvm"
-BRIDGE="vmbr0"
+CT_HOSTNAME="${FORGE_CT_HOSTNAME:-forge}"
+STORAGE="${FORGE_CT_STORAGE:-local-lvm}"
+BRIDGE="${FORGE_CT_BRIDGE:-vmbr0}"
 PB_EMAIL="${PB_ADMIN_EMAIL:?Set PB_ADMIN_EMAIL before running the installer}"
 PB_PASS="${PB_ADMIN_PASSWORD:?Set a unique PB_ADMIN_PASSWORD before running the installer}"
 PB_PORT="8090"
@@ -33,7 +33,7 @@ msg_warn()  { echo -e "${YELLOW}[WARN]${NC}  $*"; }
 msg_error() { echo -e "${RED}[ERR ]${NC}  $*"; exit 1; }
 
 # ── Header ─────────────────────────────────────
-clear
+if [[ -t 1 ]]; then clear; fi
 echo ""
 echo -e "${CYAN}   ███████╗ ██████╗ ██████╗  ██████╗ ███████╗${NC}"
 echo -e "${CYAN}   ██╔════╝██╔═══██╗██╔══██╗██╔════╝ ██╔════╝${NC}"
@@ -45,64 +45,36 @@ echo ""
 echo -e "           ${BOLD}The Social Workout Tracker${NC}"
 echo -e "           ${FORGE_VERSION} — Proxmox VE Installer"
 echo ""
-echo -e "  PocketBase ~25 MB RAM | ~30 MB disk | Native (no Docker)"
-echo -e "  1,500+ exercises | Social feed | Achievements | Offline"
+echo -e "  PocketBase nativo (senza Docker); risorse dipendenti da utenti e foto"
+echo -e "  Community sul server | Catalogo condiviso | Achievement"
 echo ""
 
 # ── OS Selection Menu ──────────────────────────
 echo -e "${BOLD}Choose the base OS for your FORGE container:${NC}"
 echo ""
-echo -e "  ${CYAN}1)${NC} Alpine Linux 3.21"
-echo -e "     ${YELLOW}OS: ~50 MB RAM | ~200 MB disk | 1 CPU${NC}"
-echo -e "     Lightest. Fastest boot. Minimal attack surface."
-echo ""
-echo -e "  ${CYAN}2)${NC} Debian 12 (Bookworm) ${GREEN}[recommended]${NC}"
-echo -e "     ${YELLOW}OS: ~100 MB RAM | ~500 MB disk | 1 CPU${NC}"
-echo -e "     Best compatibility. LTS until 2028. Large package ecosystem."
-echo ""
-echo -e "  ${CYAN}3)${NC} Ubuntu 24.04 (Noble)"
-echo -e "     ${YELLOW}OS: ~150 MB RAM | ~800 MB disk | 1 CPU${NC}"
-echo -e "     Latest packages. 10 years of security updates."
-echo ""
-echo -e "  ${YELLOW}+ PocketBase adds ~25 MB RAM and ~30 MB disk to any choice${NC}"
-echo ""
-
-while true; do
-  read -r -p "$(echo -e "${BOLD}Enter choice [1-3] (default: 2): ${NC}")" CHOICE
-  CHOICE=${CHOICE:-2}
-  case "$CHOICE" in
-    1) msg_error "Alpine is not supported by this systemd installer. Choose Debian or Ubuntu."; OS_LABEL="Alpine 3.21"
-       TEMPLATE="alpine-3.21-default_20250210_amd64.tar.xz"
-       OS_SETUP="apk add --no-cache curl bash unzip wget"
-       PKG_INSTALL="apk add --no-cache"
-       break ;;
-    2) OS_LABEL="Debian 12"
-       TEMPLATE="debian-12-standard_12.7-1_amd64.tar.zst"
-       OS_SETUP="apt-get update -qq && apt-get install -y -qq curl unzip wget jq"
-       PKG_INSTALL="apt-get install -y -qq"
-       break ;;
-    3) OS_LABEL="Ubuntu 24.04"
-       TEMPLATE="ubuntu-24.04-standard_24.04-2_amd64.tar.zst"
-       OS_SETUP="apt-get update -qq && apt-get install -y -qq curl unzip wget jq"
-       PKG_INSTALL="apt-get install -y -qq"
-       break ;;
-    *) echo -e "${RED}Invalid choice. Pick 1, 2, or 3.${NC}" ;;
-  esac
-done
+echo -e "  1) Debian 12 (default)"
+echo -e "  2) Ubuntu 24.04"
+CHOICE=${FORGE_CT_OS:-}
+if [[ -z "$CHOICE" ]]; then
+  [[ -r /dev/tty ]] || msg_error 'Set FORGE_CT_OS=1 (Debian) or 2 (Ubuntu) for unattended installation.'
+  read -r -p "Choose [1-2] (default: 1): " CHOICE </dev/tty
+fi
+case "${CHOICE:-1}" in
+  1) OS_LABEL="Debian 12"; TEMPLATE_PATTERN='^debian-12-standard_.*amd64.tar.zst$';;
+  2) OS_LABEL="Ubuntu 24.04"; TEMPLATE_PATTERN='^ubuntu-24.04-standard_.*amd64.tar.zst$';;
+  *) msg_error "Choose Debian or Ubuntu.";;
+esac
+OS_SETUP="apt-get update -qq && apt-get install -y -qq curl unzip wget jq ca-certificates"
+pveam update
+TEMPLATE=$(pveam available --section system | awk -v pattern="$TEMPLATE_PATTERN" '$2 ~ pattern { print $2 }' | sort -V | tail -n1)
+[ -n "$TEMPLATE" ] || msg_error "No matching template is available; check pveam available."
 
 echo ""
 msg_info "Selected: ${OS_LABEL}"
 
-# ── Find next available CT ID ──────────────────
-for i in $(seq 100 999); do
-  if ! pct status "$i" &>/dev/null; then
-    CT_ID=$i
-    break
-  fi
-done
-if [ -z "$CT_ID" ]; then
-  msg_error "No free container ID found (100-999)."
-fi
+# Select a cluster-wide free ID, including IDs used by QEMU VMs.
+CT_ID=$(pvesh get /cluster/nextid)
+[[ "$CT_ID" =~ ^[0-9]+$ ]] || msg_error "Proxmox did not return a valid free container ID."
 msg_info "Container ID: ${CT_ID}"
 
 # ── Download template if missing ───────────────
@@ -140,9 +112,10 @@ sleep 5
 
 # Wait for boot
 for i in $(seq 1 20); do
-  if pct exec "${CT_ID}" -- echo "ready" &>/dev/null 2>&1; then break; fi
+  if pct exec "${CT_ID}" -- echo "ready" &>/dev/null 2>&1; then ready=1; break; fi
   sleep 2
 done
+[[ ${ready:-0} == 1 ]] || msg_error 'Container boot timeout. The created CT was retained for diagnosis.'
 msg_ok "Container is running"
 
 # ── Install dependencies ───────────────────────
@@ -157,6 +130,7 @@ PB_URL="https://github.com/pocketbase/pocketbase/releases/download/v${PB_VERSION
 
 msg_info "Downloading PocketBase v${PB_VERSION}..."
 pct exec "${CT_ID}" -- bash -c "
+  set -euo pipefail
   mkdir -p /opt/forge-pocketbase/{pb_data,pb_public,pb_migrations,pb_hooks}
   cd /opt/forge-pocketbase
   wget -q '${PB_URL}' -O pocketbase.zip
@@ -171,6 +145,7 @@ msg_ok "PocketBase installed"
 # ── Create systemd service ─────────────────────
 msg_info "Creating systemd service..."
 pct exec "${CT_ID}" -- bash -c "
+set -euo pipefail
 cat <<'UNIT' > /etc/systemd/system/forge-pocketbase.service
 [Unit]
 Description = FORGE PocketBase Backend
@@ -210,8 +185,8 @@ msg_ok "PocketBase online"
 
 # ── Create superuser ───────────────────────────
 msg_info "Creating superuser..."
-pct exec "${CT_ID}" -- /opt/forge-pocketbase/pocketbase superuser create "${PB_EMAIL}" "${PB_PASS}" --dir=/opt/forge-pocketbase/pb_data 2>/dev/null && \
-  msg_ok "Superuser created" || msg_ok "Superuser already exists"
+pct exec "${CT_ID}" -- /opt/forge-pocketbase/pocketbase superuser create "${PB_EMAIL}" "${PB_PASS}" --dir=/opt/forge-pocketbase/pb_data >/dev/null 2>&1 && \
+  msg_ok "Superuser created" || msg_warn "Superuser creation failed; initialization will verify existing credentials."
 
 # ── Create collections via init script ─────────
 msg_info "Configuring collections..."
@@ -232,6 +207,11 @@ pct exec "${CT_ID}" -- bash -c 'mkdir -p /tmp/forge-code; tar -xzf /tmp/forge-co
 
 
 # ── Summary ────────────────────────────────────
+CT_IP=$(pct exec "${CT_ID}" -- hostname -I | awk '{print $1}')
+if [[ -z "$CT_IP" ]]; then
+  CT_IP=YOUR-CONTAINER-IP
+  msg_warn 'No container address detected; inspect its network settings before connecting the app.'
+fi
 echo ""
 echo -e "${BOLD}╔══════════════════════════════════════════════════════════╗${NC}"
 echo -e "${BOLD}║${NC}                                                          ${BOLD}║${NC}"
@@ -245,7 +225,7 @@ echo -e "${BOLD}║${NC}     App URL:   ${CYAN}http://${CT_IP}:${PB_PORT}${NC}  
 echo -e "${BOLD}║${NC}     Admin:     ${CYAN}http://${CT_IP}:${PB_PORT}/_/${NC}                          ${BOLD}║${NC}"
 echo -e "${BOLD}║${NC}     Login:     ${PB_EMAIL} (password not displayed)        ${BOLD}║${NC}"
 echo -e "${BOLD}║${NC}                                                          ${BOLD}║${NC}"
-echo -e "${BOLD}║${NC}     ${YELLOW}CHANGE THE ADMIN PASSWORD IMMEDIATELY!${NC}               ${BOLD}║${NC}"
+echo -e "${BOLD}║${NC}     ${YELLOW}KEEP ADMIN ACCESS PRIVATE AND BACK UP YOUR DATA${NC}               ${BOLD}║${NC}"
 echo -e "${BOLD}║${NC}                                                          ${BOLD}║${NC}"
 echo -e "${BOLD}╚══════════════════════════════════════════════════════════╝${NC}"
 echo ""

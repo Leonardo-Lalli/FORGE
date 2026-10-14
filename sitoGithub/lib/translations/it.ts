@@ -254,7 +254,7 @@ export const it = {
   "roadmapPage": {
     "eyebrow": "// Roadmap",
     "title": "Dove sta andando FORGE.",
-    "subtitle": "Gli obiettivi del progetto, passo dopo passo. Nessuna data o versione futura: le priorità si costruiscono con i feedback.",
+    "subtitle": "Solo le funzioni che dobbiamo ancora aggiungere. Ciò che è già disponibile è descritto nella pagina Funzionalità; qui non fissiamo date o versioni future.",
     "legend": {
       "difficulty": "Difficoltà"
     },
@@ -266,67 +266,27 @@ export const it = {
     },
     "releases": [
       {
-        "theme": "Stabilità & Privacy",
+        "theme": "Account e dati",
         "features": [
-          {
-            "name": "Accesso affidabile",
-            "desc": "Login pubblico e server personali; avatar e recupero sessione verificati",
-            "diff": "med"
-          },
-          {
-            "name": "Privacy sul server",
-            "desc": "Allenamenti pubblici, privati o per amici reciproci; test delle API Rules",
-            "diff": "high"
-          },
-          {
-            "name": "Schede per account",
-            "desc": "Schede personali senza limiti; esempi una sola volta; note e recuperi persistenti",
-            "diff": "med"
-          },
-          {
-            "name": "Achievement retroattivi",
-            "desc": "Ricalcolo dello storico e tre badge scelti nel profilo",
-            "diff": "med"
-          },
-          {
-            "name": "Regressioni e grafici",
-            "desc": "Grafico volume corretto; build Android e test automatici",
-            "diff": "med"
-          },
           {
             "name": "Social login",
             "desc": "Google/Apple sign-in oltre a email/password",
+            "diff": "high"
+          },
+          {
+            "name": "Sincronizzazione delle schede",
+            "desc": "Ritrovare schede e note su più dispositivi collegati allo stesso account.",
             "diff": "high"
           }
         ]
       },
       {
-        "theme": "Flusso allenamento verificato",
+        "theme": "Evoluzione dell’allenamento",
         "features": [
           {
-            "name": "Recuperi per esercizio",
-            "desc": "Selezione 0–5 minuti, salvata nelle schede",
-            "diff": "med"
-          },
-          {
-            "name": "Sessione precedente",
-            "desc": "Pesi e ripetizioni suggeriti dallo storico, modificabili",
-            "diff": "med"
-          },
-          {
-            "name": "Offline e sincronizzazione",
-            "desc": "Verifica su dispositivo di salvataggi, bozze e cambio account",
+            "name": "Modalità completamente locale",
+            "desc": "Allenarsi senza account o server, con collegamento cloud facoltativo.",
             "diff": "high"
-          },
-          {
-            "name": "Catalogo esercizi",
-            "desc": "Conteggio reale, GIF, istruzioni e paginazione completa",
-            "diff": "med"
-          },
-          {
-            "name": "Release Android",
-            "desc": "Build APK riproducibile e validazione prima della release",
-            "diff": "med"
           },
           {
             "name": "Voice input",
@@ -344,13 +304,8 @@ export const it = {
         "theme": "Social & Community",
         "features": [
           {
-            "name": "Profili e follow",
-            "desc": "Profili ricercabili, follower e seguiti; amici = follow reciproco",
-            "diff": "med"
-          },
-          {
-            "name": "Commenti e notifiche",
-            "desc": "Commenti e notifiche push dopo il consolidamento della privacy",
+            "name": "Commenti agli allenamenti",
+            "desc": "Conversazioni sotto gli allenamenti condivisi, nel rispetto della visibilità scelta.",
             "diff": "high"
           },
           {
@@ -359,8 +314,8 @@ export const it = {
             "diff": "med"
           },
           {
-            "name": "Condivisione",
-            "desc": "Riepiloghi condivisibili senza esporre contenuti privati",
+            "name": "Riepiloghi condivisibili",
+            "desc": "Generare un’immagine riepilogativa dell’allenamento da condividere fuori dall’app.",
             "diff": "med"
           },
           {
@@ -372,6 +327,11 @@ export const it = {
             "name": "Gamification 2.0",
             "desc": "Estendere livelli e XP già presenti con stagioni competitive e nuove ricompense.",
             "diff": "high"
+          },
+          {
+            "name": "Ricompense per record delle serie",
+            "desc": "Medagliette per record personali di peso, volume o ripetizioni; idea ancora da implementare.",
+            "diff": "med"
           }
         ]
       },
@@ -380,7 +340,7 @@ export const it = {
         "features": [
           {
             "name": "Analytics avanzate",
-            "desc": "1RM, volume per muscolo, calendario e storico",
+            "desc": "Massimale stimato 1RM, volume per muscolo e nuovi report di progressione.",
             "diff": "med"
           },
           {
@@ -439,8 +399,8 @@ export const it = {
             "diff": "high"
           },
           {
-            "name": "Distribuzione",
-            "desc": "Play Store e gestione chiavi di produzione",
+            "name": "Pubblicazione sul Play Store",
+            "desc": "Portare la beta sullo store dopo i controlli richiesti, usando la firma stabile già presente.",
             "diff": "med"
           },
           {
@@ -452,6 +412,16 @@ export const it = {
             "name": "Palestre",
             "desc": "Trainer dashboard, QR onboarding e isolamento tra palestre",
             "diff": "vhigh"
+          },
+          {
+            "name": "Aggiornamenti dall’app",
+            "desc": "Scaricare e avviare l’installazione di APK firmati senza cercarli manualmente su GitHub.",
+            "diff": "high"
+          },
+          {
+            "name": "Proxmox Community Scripts",
+            "desc": "Adattare l’installer agli standard del progetto, provarlo su Proxmox e proporlo per revisione. Non ancora integrato ufficialmente.",
+            "diff": "high"
           }
         ]
       }
@@ -460,19 +430,19 @@ export const it = {
     "phasesTitle": "I tre pilastri in arrivo",
     "phases": [
       {
-        "tag": "Fase 1",
-        "title": "Stabilità & Privacy",
-        "body": "Login pubblico e server personali; avatar e recupero sessione verificati; Allenamenti pubblici, privati o per amici reciproci; test delle API Rules; Schede personali senza limiti; esempi una sola volta; note e recuperi persistenti"
+        "tag": "Obiettivo 1",
+        "title": "Schede e dati",
+        "body": "Sincronizzazione delle schede, backup completo e modalità senza account."
       },
       {
-        "tag": "Fase 2",
-        "title": "Flusso allenamento verificato",
-        "body": "Selezione 0–5 minuti, salvata nelle schede; Pesi e ripetizioni suggeriti dallo storico, modificabili; Verifica su dispositivo di salvataggi, bozze e cambio account"
+        "tag": "Obiettivo 2",
+        "title": "Community e progressi",
+        "body": "Commenti, sfide, classifiche e ricompense per i record personali."
       },
       {
-        "tag": "Fase 3",
-        "title": "Social & Community",
-        "body": "Profili ricercabili, follower e seguiti; amici = follow reciproco; Commenti e notifiche push dopo il consolidamento della privacy; Sfide tra amici e leaderboard con consenso"
+        "tag": "Obiettivo 3",
+        "title": "Palestre e distribuzione",
+        "body": "Strumenti trainer, integrazione Community Scripts e aggiornamenti dall’app."
       }
     ],
     "backlog": {
@@ -697,5 +667,34 @@ export const it = {
     "hostingTitle": "Preferisci un server tuo?",
     "hostingBody": "Una tua istanza ospita account e community separati. La guida spiega installazione, backup e manutenzione.",
     "hostingLink": "Guida al self-hosting"
+  },
+  "selfHostingInstall": {
+    "title": "Un comando, tre modalità di installazione.",
+    "body": "L’avvio guidato chiede versione PocketBase, email e password amministrativa. Può generare una password casuale e salva la configurazione in un file .env privato. Gli installer configurano backend, collezioni, hook e migrazioni.",
+    "copy": "Copia comando",
+    "copied": "Copiato",
+    "modes": [
+      {
+        "name": "Docker",
+        "where": "Su Linux/WSL, con Docker e Compose installati e accesso root/sudo.",
+        "mode": "docker"
+      },
+      {
+        "name": "LXC",
+        "where": "Dentro un nuovo container Debian/Ubuntu con systemd, come root.",
+        "mode": "lxc"
+      },
+      {
+        "name": "Proxmox VE",
+        "where": "Sul nodo Proxmox, come root: crea un nuovo LXC e installa FORGE.",
+        "mode": "proxmox"
+      }
+    ],
+    "note": "Per nuove installazioni. Non usarlo per aggiornare il CT PocketBase già esistente. Dominio HTTPS, reverse proxy e push Firebase richiedono configurazione separata. I nuovi percorsi guidati sono verificati staticamente: la prova completa su Docker/LXC resta necessaria.",
+    "source": "Leggi lo script",
+    "communityTitle": "Verso Proxmox Community Scripts",
+    "communityBody": "Gli script sono oggi mantenuti da FORGE. L’obiettivo è prepararli per la revisione del progetto Community Scripts; non siamo ancora nel catalogo ufficiale.",
+    "copyFallback": "Copia il comando selezionando il testo qui sotto.",
+    "manualTitle": "Preferisci installare manualmente?"
   }
 } as const
