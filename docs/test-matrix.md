@@ -79,3 +79,33 @@ Quick Start avvia sempre una nuova sessione senza esercizi, PlanId, note o foto 
 Roadmap completa ripristinata dal precedente sito: 54 obiettivi in 9 gruppi, senza date/versioni future; data e versione solo nei traguardi già rilasciati. Stile FORGE conservato, obiettivi incompleti e idee distinti dalle funzioni della beta. Foto workout sostituita con l’allegato recente del proprietario su README e sito, senza modificarne i pixel. I consigli di esecuzione a carosello sono descritti tra le funzionalità.
 
 Verifica richiesta sul telefono aggiornato: lasciare una bozza da scheda, avviare Quick Start e trovare zero esercizi; aggiungere esercizi e terminare senza popup di aggiornamento né nuova scheda; usare Riprendi e recuperare la bozza precedente; avviare una scheda, cambiare esercizi e verificare che il popup resti. Il tag v0.8.5-beta e il suo APK non includono automaticamente questa correzione.
+
+
+## Sessione recuperabile — 16 ottobre 2026
+
+- Suite `dotnet test tests/Forge.Tests/Forge.Tests.csproj --no-restore`: 107/107 passati, inclusi nuovi casi di serie vuote/suggerite/corpo libero, durata precisa zero e legacy, recupero dopo nuova connessione SQLite, note con newline e foto, mini barra e isolamento account.
+- Test transazione: completamento elimina solo la bozza della sessione e mantiene quella di un altro account; storico pronto per la sincronizzazione.
+- Build Android Debug: completata; tre avvisi Firebase preesistenti. XAML compilato e icona generata dall’allegato ispezionata. Il primo tentativo nel sandbox non accedeva alla cache; riuscito con accesso SDK. Il test runner nel sandbox non collegava testhost; suite riuscita con permessi per la comunicazione locale. Corretto un errore di cleanup SQLite nel nuovo test prima della riesecuzione completa.
+- Nessun dispositivo/emulatore collegato (`adb devices` vuoto). Da eseguire sul telefono: X/back con annullamento e scarto, note lunghe, minimizza e cambia tab, pausa/riapertura, chiusura forzata, selezione foto, completamento e riavvio senza bozza fantasma, temi e accessibilità, calendario tra mesi/febbraio e filtro settimana a cavallo del mese. Nessuna prova UI/device dichiarata eseguita.
+
+## Schede account e feedback telefono — 26 ottobre 2026
+
+- .NET: 111/111 test passati. Nuovi test per ripristino da database/client vuoto con serie e note, isolamento utenti, scritture/cancellazioni offline, mancata rigenerazione esempi quando il server non risponde e migrazione del vecchio schema SQLite senza perdita di schede. Test barra aggiornati per assenza della durata e presenza del recupero.
+- PocketBase reale locale, database temporaneo: nuova migrazione/hook, upload e recupero, isolamento, autenticazione, CRUD collezione bloccato, input/timestamp/batch duplicati invalidi, ordinamento sotto il millisecondo e prevenzione della ricomparsa di schede cancellate. Suite privacy/account/push precedente passata. Ultima esecuzione: artifacts/pb-profile-test-199e003a/result.json. Una prova intermedia aveva avuto ConnectionResetError; riesecuzione completa riuscita.
+- Release Android 0.8.7-beta (versionCode 87): pubblicazione locale riuscita, 94.001.713 byte. Firma verificata e certificato SHA-256 identico alla 0.8.6-beta: 87098c4bf774e2e2512d0635ef6f192de0939de844bc5953f4e6f142a04ebe87. Avvisi Firebase già presenti; nessun nuovo errore di build. NuGet segnala indisponibilità del feed per l’audit vulnerabilità durante i test.
+- Da verificare sul telefono: Aggiorna senza disinstallare, tema chiaro/scuro del popup, recupero live/minimizzato, primo upload e ripristino su un secondo client dopo l’aggiornamento del server. Nessun server reale o dispositivo modificato/testato in questa fase.
+
+## Kg/libbre e roadmap candidata 0.8.5-beta — 26 ottobre 2026
+
+- Suite .NET: 119/119 passati. Otto test unità/CSV su conversione esatta, preferenza persistita e messaggi, 100 cambi ripetuti senza alterare peso e suggerimenti, serializzazione solo kg, soglie achievement e rapporti invariati, intestazioni WeightKg/WeightLb, note multilinea/virgolette e riepiloghi legacy senza bozze. Dopo l’ultima correzione del parser CSV rieseguiti gli 8 test mirati: passati.
+- Build Android Debug riuscita con tre avvisi Firebase preesistenti; Release firmata candidata 0.8.5-beta/versionCode 88 preparata per test umano. Nessun nuovo pacchetto.
+- Build statica Next.js/TypeScript e validatore roadmap passati. Difficoltà rimosse da UI e dati; metadati coerenti anche nel backlog. Controllata la codifica e confermato che le altre traduzioni del sito sono identiche a HEAD. Nessuna pubblicazione del sito e nessuna verifica visiva sul telefono dichiarata eseguita.
+- Manuale da fare: scegliere lb nelle impostazioni, controllare 100 kg come 220,46 lb in serie/PREV e storico; inserire 100 lb e tornare a kg (45,36 in lettura); ripetere con workout minimizzato, riaprire app, verificare scheda salvata e dettagli. Controllare grafici/statistiche/feed/profilo, obiettivi achievement, tema chiaro/scuro e CSV importato con unità opposta a quella corrente. Roadmap IT/EN: date/riferimenti visibili, difficoltà assenti, sync account ancora indicata da attivare sul server.
+
+## Avvio Android 0.8.5-beta build 89 — 4 novembre 2026
+
+- Build Release firmata pulita: riuscita; tre avvisi Firebase preesistenti. Callback JNI di avvio presenti nell’APK per ARM64/x64. Il controllo di regressione rifiuta il precedente build 88 prima dell’avvio. Firma stabile, ApplicationId com.leoforge.forge, versione 0.8.5-beta, versionCode 89 verificati. Hash/evidenze: artifacts/forge-0.8.5-beta-startup-validation.json.
+- Test ripetibile: `tools/test-android-startup.ps1 -Serial emulator-5554 -Apk artifacts/FORGE-0.8.5-beta-startup-fix.apk`. Per un’installazione già configurata aggiungere `-ExpectedText 'System Access'`. Lo script non installa o cancella dati; verifica il pacchetto e poi due aperture, log crash e UI. Attende anche la creazione del processo, che può essere ritardata dal sistema.
+- Runtime: **inconclusivo**, non passato. Il precedente errore JNI manca nei log del nuovo APK e l’activity viene creata, ma i test UI terminano su dialoghi ANR; anche System UI/Bluetooth/servizi Google dell’emulatore vanno in timeout. Cartella principale: artifacts/android-startup-smoke-fixed-native. Non confondere il pass dei callback confezionati con il pass delle due aperture.
+- Non testato sul Samsung A15: il proprietario deve aggiornare senza disinstallare e verificare apertura, login/account, schede esistenti, chiusura/riapertura. Nessuna perdita dati provocata sul telefono; ADB limitato all’emulatore dedicato.
+- Roadmap: validatore IT/EN passato; Next.js e TypeScript compilati. Nessuna nuova suite unità della logica di dominio, invariata in questa correzione.

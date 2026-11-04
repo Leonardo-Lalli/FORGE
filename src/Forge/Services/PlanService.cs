@@ -1,15 +1,56 @@
 using System.Text.Json;
 using Forge.Models;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 
 namespace Forge.Services;
 
-public class PlanService
+public partial class PlanService : ObservableObject
 {
     private readonly DatabaseService db;
     private readonly PocketBaseService pb;
     private readonly SemaphoreSlim migrationGate = new(1, 1);
     private readonly SemaphoreSlim starterGate = new(1, 1);
     private readonly SemaphoreSlim planWriteGate = new(1, 1);
+    [ObservableProperty, NotifyPropertyChangedFor(nameof(HasSyncError))] private string syncError = "";
+    public bool HasSyncError => !string.IsNullOrWhiteSpace(SyncError);
+
+    [RelayCommand]
+    public async Task<bool> SyncPlansAsync()
+    {
+        var ownerId = pb.CurrentUser?.Id;
+        if (string.IsNullOrEmpty(ownerId)) return false;
+        await planWriteGate.WaitAsync();
+        try
+        {
+            var local = await db.GetPlansAsync(ownerId);
+            var migrationKey = $"plan_cloud_v1:{ownerId}";
+            if (!Preferences.Get(migrationKey, false))
+                foreach (var plan in local) { plan.PendingSync = true; await db.SavePlanAsync(plan); }
+            var remote = await pb.SyncPlansAsync(ownerId, local.Where(p => p.PendingSync).ToList());
+            if (pb.CurrentUser?.Id != ownerId) return false;
+            foreach (var plan in remote)
+            {
+                var existing = local.FirstOrDefault(p => p.Id == plan.Id);
+                if (existing != null && existing.PendingSync && existing.UpdatedAt.ToUniversalTime() > plan.UpdatedAt.ToUniversalTime()) continue;
+                // Global SQLite IDs must never replace a different account's plan.
+                if ((await db.GetPlansAsync()).Any(p => p.Id == plan.Id && p.UserId != ownerId))
+                    throw new InvalidOperationException("Identificativo scheda già usato da un altro account.");
+                plan.PendingSync = false;
+                await db.SavePlanAsync(plan);
+            }
+            SyncError = "";
+            Preferences.Set(migrationKey, true);
+            return true;
+        }
+        catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException or System.Text.Json.JsonException or InvalidOperationException)
+        {
+            System.Diagnostics.Debug.WriteLine($"[PlanSync] {ex.GetType().Name}");
+            SyncError = "Schede salvate su questo telefono. Sincronizzazione account non disponibile: riprova con la rete attiva e il server aggiornato prima di disinstallare.";
+            return false;
+        }
+        finally { planWriteGate.Release(); }
+    }
 
     public async Task EnsureStarterPlansAsync()
     {
@@ -21,7 +62,8 @@ public class PlanService
             var key = $"starter_plans_v1:{userId}";
             if (Preferences.Get(key, "") == "done") return;
             var existing = await LoadPlansAsync();
-            if (existing.Count == 0)
+            if (existing.Count == 0 && !string.IsNullOrEmpty(SyncError)) return;
+            if (existing.Count == 0 && !(await db.GetPlansAsync(userId)).Any())
             {
                 foreach (var (id, name, names) in new[] {
                     ("full", "Esempio · Full body", new[] { "Bodyweight Squat", "Push Up", "Plank" }),
@@ -84,11 +126,12 @@ public class PlanService
     public async Task<List<WorkoutPlan>> LoadPlansAsync()
     {
         await MigrateFromPreferencesAsync();
+        await SyncPlansAsync();
 
         var userId = pb.CurrentUser?.Id;
         if (string.IsNullOrEmpty(userId)) return [];
         var saved = await db.GetPlansAsync(userId);
-        return saved.Select(ToWorkoutPlan).ToList();
+        return saved.Where(p => !p.IsDeleted).Select(ToWorkoutPlan).ToList();
     }
 
     public async Task SavePlanAsync(WorkoutPlan plan)
@@ -96,6 +139,7 @@ public class PlanService
         await planWriteGate.WaitAsync();
         try { await SavePlanCoreAsync(plan); }
         finally { planWriteGate.Release(); }
+        await SyncPlansAsync();
     }
 
     public async Task SaveNotesAsync(string planId, string ownerId, string notes,
@@ -106,12 +150,13 @@ public class PlanService
         {
             if (string.IsNullOrEmpty(ownerId) || pb.CurrentUser?.Id != ownerId)
                 throw new InvalidOperationException("L’account della sessione è cambiato.");
-            var saved = (await db.GetPlansAsync(ownerId)).FirstOrDefault(p => p.Id == planId)
+            var saved = (await db.GetPlansAsync(ownerId)).FirstOrDefault(p => p.Id == planId && !p.IsDeleted)
                 ?? throw new InvalidOperationException("Scheda non disponibile.");
             var plan = ToWorkoutPlan(saved);
             if (PlanSessionChanges.ApplyNotes(plan, notes, exerciseNotes)) await SavePlanCoreAsync(plan);
         }
         finally { planWriteGate.Release(); }
+        await SyncPlansAsync();
     }
 
     private async Task SavePlanCoreAsync(WorkoutPlan plan)
@@ -123,7 +168,7 @@ public class PlanService
         if (existing != null && !string.IsNullOrEmpty(existing.UserId) && existing.UserId != userId)
             throw new InvalidOperationException("La scheda appartiene a un altro account.");
         plan.UserId = userId;
-        plan.UpdatedAt = DateTime.Now;
+        plan.UpdatedAt = DateTime.UtcNow;
         var sp = new SavedPlan
         {
             Id = plan.Id,
@@ -145,10 +190,15 @@ public class PlanService
         {
             var userId = pb.CurrentUser?.Id;
             if (string.IsNullOrEmpty(userId)) return;
-            if (!(await db.GetPlansAsync(userId)).Any(p => p.Id == planId)) return;
-            await db.DeletePlanAsync(planId);
+            var plan = (await db.GetPlansAsync(userId)).FirstOrDefault(p => p.Id == planId);
+            if (plan == null) return;
+            plan.IsDeleted = true;
+            plan.PendingSync = true;
+            plan.UpdatedAt = DateTime.UtcNow;
+            await db.SavePlanAsync(plan);
         }
         finally { planWriteGate.Release(); }
+        await SyncPlansAsync();
     }
 
     private static WorkoutPlan ToWorkoutPlan(SavedPlan sp)

@@ -32,6 +32,7 @@ internal sealed class Shell
 {
     public static Shell Current { get; } = new();
     public Task GoToAsync(string route) => Task.CompletedTask;
+    public Task GoToAsync(string route, IDictionary<string, object> parameters) => Task.CompletedTask;
 }
 
 namespace Microsoft.Maui.Controls

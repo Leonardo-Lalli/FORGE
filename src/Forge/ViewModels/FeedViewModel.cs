@@ -16,7 +16,8 @@ public partial class FeedPost : ObservableObject
     public string TimeAgo { get; set; } = string.Empty;
     public string Title { get; set; } = string.Empty;
     public string ExercisesList { get; set; } = string.Empty;
-    public string Volume { get; set; } = string.Empty;
+    public double VolumeKg { get; set; }
+    [ObservableProperty] private string volume = string.Empty;
     public string Duration { get; set; } = string.Empty;
     [ObservableProperty] private int likes;
     [ObservableProperty] private bool isLiked;
@@ -48,6 +49,7 @@ public partial class UserSearchResult : ObservableObject
 
 public partial class FeedViewModel : BaseViewModel
 {
+    private readonly WeightUnitService units;
     private readonly PocketBaseService pb;
 
     [ObservableProperty] private ObservableCollection<FeedPost> posts = new();
@@ -153,9 +155,11 @@ public partial class FeedViewModel : BaseViewModel
         }
     }
 
-    public FeedViewModel(PocketBaseService pb)
+    public FeedViewModel(PocketBaseService pb, WeightUnitService units)
     {
         this.pb = pb;
+        this.units = units;
+        WeakReferenceMessenger.Default.Register<FeedViewModel, WeightUnitChangedMessage>(this, static (vm, _) => { foreach (var post in vm.Posts) post.Volume = vm.units.Format(post.VolumeKg); });
 
         WeakReferenceMessenger.Default.Register<WorkoutSavedMessage>(this, async (_, _) =>
         {
@@ -199,7 +203,8 @@ public partial class FeedViewModel : BaseViewModel
                     TimeAgo = timeAgo,
                     Title = w.Name,
                     ExercisesList = string.Join(", ", w.Exercises ?? new()),
-                    Volume = $"{w.Volume:0.#} kg",
+                    VolumeKg = w.Volume,
+                    Volume = units.Format(w.Volume),
                     Duration = $"{w.Duration} min",
                     Likes = w.Likes,
                     IsLiked = likedBy.Contains(pb.CurrentUser?.Id ?? ""),

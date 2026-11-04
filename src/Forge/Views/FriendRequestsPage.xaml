@@ -2,13 +2,14 @@
 <ContentPage
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:controls="clr-namespace:Forge.Controls"
     xmlns:vm="clr-namespace:Forge.ViewModels"
     x:Class="Forge.Views.FriendRequestsPage"
     x:DataType="vm:FriendRequestsViewModel"
     Title="FriendRequests"
     Shell.NavBarIsVisible="False">
 
-    <Grid RowDefinitions="Auto,*" BackgroundColor="{DynamicResource Surface}">
+    <Grid RowDefinitions="Auto,*,Auto" BackgroundColor="{DynamicResource Surface}">
 
         <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" Padding="24,16" BackgroundColor="{DynamicResource Surface}">
             <Border Grid.Column="0" BackgroundColor="{DynamicResource SurfaceContainer}"
@@ -131,5 +132,6 @@
 
             </VerticalStackLayout>
         </ScrollView>
+        <controls:MiniWorkoutBar Grid.Row="2" />
     </Grid>
 </ContentPage>

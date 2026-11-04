@@ -32,3 +32,9 @@ La nuova firma stabile sostituisce certificati Debug diversi nelle vecchie distr
 L’utente ha autorizzato la pubblicazione di main, experiments e della prerelease. Le prove Docker/LXC e la consegna FCM reale restano limiti dichiarati, non verifiche superate.
 
 I controlli sul telefono, la consegna FCM e l’installazione backend nuova restano raccomandati e non completati. Il proprietario ha scelto una distribuzione beta per raccogliere feedback con questi limiti dichiarati.
+
+## Candidata develop: controllo avvio obbligatorio — 4 novembre 2026
+
+Prima di consegnare un nuovo APK eseguire anche il controllo runtime del pacchetto firmato, oltre alla build. Installarlo su un emulatore e avviare `tools/test-android-startup.ps1 -Serial emulator-5554` (seriale effettivo del test). La verifica deve raggiungere setup/login e mantenere processo e schermata attivi per due avvii a freddo. Quando si prova un aggiornamento dopo il setup, usare `-ExpectedText 'System Access'`: il login conferma che la preferenza server è conservata. Il test non modifica dati o installazione. La build 89 resta candidata 0.8.5-beta su develop; nessuna nuova pubblicazione autorizzata.
+
+Il controllo dell’APK deve includere `-Apk artifacts/FORGE-0.8.5-beta-startup-fix.apk`: prima di avviare verifica i callback JNI nelle librerie ARM64/x64 e salva l’hash. Il build 88 precedente viene correttamente rifiutato. Per la build 89 i controlli nativi/firma sono superati, ma i due avvii a freddo su emulatore sono inconclusivi per ANR anche dei servizi Android. Non dichiarare superato il collaudo del dispositivo; attendere il test Samsung A15 del proprietario.

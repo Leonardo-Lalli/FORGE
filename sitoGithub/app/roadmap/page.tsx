@@ -13,18 +13,20 @@ function Card({ children, className = "" }: { children: React.ReactNode; classNa
   return <div className={`rounded-[14px] border border-forge-border bg-forge-elev p-6 ${className}`}>{children}</div>
 }
 
-type Diff = "low" | "med" | "high" | "vhigh"
+type ImplementationInfo = { implementedOn: string; updatedOn: string; implementationRef: string; implementationNote: string; history: readonly { ref: string }[] }
+function ImplementationMeta({ item, lang }: { item: ImplementationInfo; lang: string }) {
+  const date = (value: string) => value.split("-").reverse().join("/")
+  return <>
+    {item.implementedOn && <p className="mt-2 text-xs text-forge-cyan">{lang === "it" ? "Implementato il" : "Implemented on"} {date(item.implementedOn)} · {item.implementationRef}</p>}
+    {item.updatedOn && item.updatedOn !== item.implementedOn && <p className="mt-1 text-xs text-forge-muted">{lang === "it" ? "Aggiornato il" : "Updated on"} {date(item.updatedOn)} · {item.history.at(-1)?.ref}</p>}
+    {item.implementationNote && <p className="mt-1 text-xs text-forge-muted">{item.implementationNote}</p>}
+  </>
+}
 
 export default function RoadmapPage() {
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
   const r = t.roadmapPage
 
-  const diffMeta: Record<Diff, { cls: string }> = {
-    low: { cls: "text-forge-cyan border-forge-cyan-dim bg-forge-cyan/[0.06]" },
-    med: { cls: "text-amber-300 border-amber-300/25 bg-amber-300/[0.06]" },
-    high: { cls: "text-orange-400 border-orange-400/25 bg-orange-400/[0.06]" },
-    vhigh: { cls: "text-red-400 border-red-400/25 bg-red-400/[0.06]" },
-  }
 
   return (
     <div className="relative min-h-screen overflow-x-hidden bg-forge-bg text-forge-fg">
@@ -55,17 +57,14 @@ export default function RoadmapPage() {
                       </div>
                       <div className="mt-4 space-y-3">
                         {rel.features.map((f, fi) => {
-                          const dm = diffMeta[f.diff as Diff] || diffMeta.low
                           return (
-                            <div key={fi} className="flex items-start gap-3 rounded-lg border border-forge-border/60 bg-forge-elev p-4">
+                            <div key={f.id} className="flex items-start gap-3 rounded-lg border border-forge-border/60 bg-forge-elev p-4">
                               <Sparkles className="mt-0.5 size-4 flex-shrink-0 text-forge-cyan" aria-hidden="true" />
                               <div className="flex-1 min-w-0">
                                 <p className="text-[15px] font-semibold text-forge-fg">{f.name}</p>
                                 <p className="text-[13px] text-forge-muted mt-0.5">{f.desc}</p>
+                                <ImplementationMeta item={f} lang={lang} />
                               </div>
-                              <span className={`inline-flex flex-shrink-0 items-center rounded-full border px-2.5 py-0.5 font-mono text-[11px] font-medium ${dm.cls}`}>
-                                {r.difficulty[f.diff as Diff] || f.diff}
-                              </span>
                             </div>
                           )
                         })}
@@ -96,12 +95,13 @@ export default function RoadmapPage() {
                 <h2 className="mb-8 text-[clamp(26px,4vw,36px)] font-extrabold">{r.backlog.title}</h2>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   {r.backlog.items.map((item, i) => (
-                    <Card key={i}>
+                    <Card key={item.id}>
                       <div className="flex items-start gap-3">
                         <span className="mt-0.5 text-forge-cyan" aria-hidden="true">▸</span>
                         <div>
                           <p className="text-[15px] font-semibold">{item.name}</p>
                           <p className="text-[13px] text-forge-muted mt-0.5">{item.desc}</p>
+                          <ImplementationMeta item={item} lang={lang} />
                         </div>
                       </div>
                     </Card>

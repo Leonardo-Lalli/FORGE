@@ -2,13 +2,14 @@
 <ContentPage
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:controls="clr-namespace:Forge.Controls"
     xmlns:vm="clr-namespace:Forge.ViewModels"
     x:Class="Forge.Views.SettingsPage"
     x:DataType="vm:SettingsViewModel"
     Title="Settings"
     Shell.NavBarIsVisible="False">
 
-    <Grid RowDefinitions="Auto,*" BackgroundColor="{DynamicResource Surface}">
+    <Grid RowDefinitions="Auto,*,Auto" BackgroundColor="{DynamicResource Surface}">
 
         <!-- Header -->
         <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" Padding="24,20">
@@ -64,6 +65,16 @@
                     </Grid>
                 </Border>
 
+                <Border Padding="16" StrokeShape="RoundRectangle 12" BackgroundColor="{DynamicResource SurfaceContainerHigh}" Stroke="{DynamicResource OutlineVariant}">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="Unità di peso" FontSize="16" FontAttributes="Bold" TextColor="{DynamicResource OnSurface}" />
+                        <Label Text="Chilogrammi (kg) / Libbre (lb)" FontSize="13" TextColor="{DynamicResource TextSecondary}" />
+                        <HorizontalStackLayout Spacing="12">
+                            <Label Text="Usa libbre" VerticalOptions="Center" TextColor="{DynamicResource OnSurface}" />
+                            <Switch IsToggled="{Binding Units.UsePounds}" OnColor="{DynamicResource ElectricBlue}" />
+                        </HorizontalStackLayout>
+                    </VerticalStackLayout>
+                </Border>
                 <!-- Language -->
                 <Label Text="LINGUA"
                        FontFamily="OpenSansSemibold" FontSize="11" FontAttributes="Bold"
@@ -158,7 +169,7 @@
                             <Label Text="Importa CSV"
                                    FontFamily="OpenSansSemibold" FontSize="16" FontAttributes="Bold"
                                    TextColor="{DynamicResource OnSurface}" />
-                            <Label Text="Importa allenamenti da altre app (Date,WorkoutName,ExerciseName,Sets,Reps,WeightKg,Notes)"
+                            <Label Text="Importa allenamenti da altre app (Date,WorkoutName,ExerciseName,Sets,Reps,WeightKg oppure WeightLb,Notes)"
                                    FontFamily="OpenSansRegular" FontSize="13"
                                    TextColor="{DynamicResource TextSecondary}" />
                         </VerticalStackLayout>
@@ -286,6 +297,7 @@
                 </VerticalStackLayout>
             </Border>
         </Grid>
+        <controls:MiniWorkoutBar Grid.Row="2" />
     </Grid>
 
 </ContentPage>

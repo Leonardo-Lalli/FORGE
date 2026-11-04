@@ -63,6 +63,16 @@ public class DatabaseService
             await d.InsertAsync(workout);
     }
 
+    public async Task CompleteWorkoutAsync(LocalWorkout workout, string? draftId)
+    {
+        var d = await GetDbAsync();
+        await d.RunInTransactionAsync(connection =>
+        {
+            connection.InsertOrReplace(workout);
+            if (draftId != null) connection.Delete<LocalWorkout>(draftId);
+        });
+    }
+
     public async Task MarkSyncedAsync(string workoutId, string? remoteId = null)
     {
         var d = await GetDbAsync();

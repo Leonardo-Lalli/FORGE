@@ -2,13 +2,14 @@
 <ContentPage
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:controls="clr-namespace:Forge.Controls"
     xmlns:vm="clr-namespace:Forge.ViewModels"
     x:Class="Forge.Views.FeedPage"
     x:DataType="vm:FeedViewModel"
     Title="Feed"
     Shell.NavBarIsVisible="False">
 
-    <Grid RowDefinitions="Auto,Auto,*" BackgroundColor="{DynamicResource Surface}">
+    <Grid RowDefinitions="Auto,Auto,*,Auto" BackgroundColor="{DynamicResource Surface}">
 
         <!-- TopBar -->
         <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto"
@@ -258,5 +259,6 @@
 
             </VerticalStackLayout>
         </ScrollView>
+        <controls:MiniWorkoutBar Grid.Row="3" />
     </Grid>
 </ContentPage>

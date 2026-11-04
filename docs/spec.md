@@ -367,3 +367,30 @@ Quick Start avvia sempre una nuova sessione senza esercizi, PlanId, note o foto 
 Roadmap completa ripristinata dal precedente sito: 54 obiettivi in 9 gruppi, senza date/versioni future; data e versione solo nei traguardi già rilasciati. Stile FORGE conservato, obiettivi incompleti e idee distinti dalle funzioni della beta. Foto workout sostituita con l’allegato recente del proprietario su README e sito, senza modificarne i pixel. I consigli di esecuzione a carosello sono descritti tra le funzionalità.
 
 Verifica richiesta sul telefono aggiornato: lasciare una bozza da scheda, avviare Quick Start e trovare zero esercizi; aggiungere esercizi e terminare senza popup di aggiornamento né nuova scheda; usare Riprendi e recuperare la bozza precedente; avviare una scheda, cambiare esercizi e verificare che il popup resti. Il tag v0.8.5-beta e il suo APK non includono automaticamente questa correzione.
+
+
+## Sessione protetta e recuperabile — 16 ottobre 2026
+
+La X e il tasto Indietro aprono una conferma con Continua, Salva e minimizza, Elimina. Solo Elimina scarta la sessione. Il pulsante freccia verso il basso minimizza direttamente. Una barra in fondo alle pagine autenticate permette di riprendere la sessione e vedere durata/recupero senza coprire il contenuto.
+
+Serie, ordine degli esercizi, note multilinea, nome e foto vengono salvati automaticamente in SQLite (dopo 200 ms dalle modifiche, con checkpoint ogni 5 secondi). La minimizzazione mantiene il recupero attivo mentre si naviga nell’app. Quando la finestra passa in secondo piano, durata e recupero si fermano e si salva lo stato; al ritorno la sessione è minimizzata. Dopo una nuova apertura, il login recupera la bozza del solo account corrente nella barra. Aprire un allenamento mentre ne esiste già uno attivo riprende quello: questo aggiorna la regola Quick Start del 13 ottobre per evitare sessioni concorrenti.
+
+Un esercizio entra nello storico solo se contiene almeno una serie completata con ripetizioni positive; le serie suggerite/non completate e gli esercizi vuoti restano soltanto nella bozza. Gli esercizi a corpo libero con peso zero sono validi. Un allenamento senza serie valide non può essere terminato.
+
+Il calendario Stats mostra sempre mesi di sei righe, con schede alte 520 unità, anche con filtro settimanale; il filtro continua a determinare il periodo dei riepiloghi. L’icona launcher usa l’immagine FORGE allegata dal proprietario. La roadmap social login include Google, Microsoft e Apple; l’autenticazione OAuth resta futura.
+
+## Schede nell’account e correzioni del telefono — 26 ottobre 2026
+
+Le schede non devono dipendere soltanto dall’installazione locale. La 0.8.7-beta salva prima in SQLite e sincronizza esercizi, serie, note e recuperi nell’account PocketBase. Le modifiche offline restano in attesa; una nuova installazione recupera le schede sincronizzate dello stesso utente. Le cancellazioni si propagano con marcatori privati. In caso di server/rete non disponibili Dashboard e Schede mostrano un avviso con Riprova, senza far credere che esista una copia remota.
+
+La barra minimizzata mostra nome della scheda e tempo di recupero, oppure Nessun recupero attivo; non mostra più la durata dell’allenamento. La conferma della X usa superficie, testi, pulsanti e colore errore dinamici del tema della pagina.
+
+La sincronizzazione richiede la nuova migrazione/hook server, preparati ma non distribuiti al server reale in questa sessione. Un aggiornamento in-place mantiene normalmente il database; disinstallare/cancellare dati lo elimina. Le schede già perse prima di questa funzione non si recuperano senza un’altra copia. Vedi `docs/account-plan-sync.md`.
+
+## Candidata 0.8.5-beta, unità e roadmap — 26 ottobre 2026
+
+Su richiesta del proprietario, tutte le modifiche attuali di develop sono candidate alla release **0.8.5-beta**. Le etichette 0.8.6/0.8.7 erano APK locali di prova, non nuove release da pubblicare. Il nome visibile resta 0.8.5-beta; il versionCode diventa 88 per consentire l’aggiornamento sopra gli APK interni 86/87 con la stessa firma. Nessuna promozione, pubblicazione o push prima della prova e approvazione del proprietario.
+
+Impostazioni permette di scegliere kg o libbre (lb), conservando la preferenza sul dispositivo. Tutti i dati restano in kg: schede, bozze, storico, sincronizzazione, calcolo volume e soglie achievement. UI e inserimenti convertono nella selezione corrente: serie, PREV, progressi, statistiche, feed, profilo, dettagli, dashboard e achievement. Cambiare unità non modifica i dati né i criteri di sblocco. I CSV esportano pesi nell’unità scelta con intestazione WeightKg/WeightLb e importano in base alla colonna, non all’impostazione corrente; Weight generico mantiene la compatibilità kg.
+
+Roadmap sito/Markdown senza difficoltà. Gli elementi implementati mostrano data, riferimento a develop/candidata e stato di validazione; la prima implementazione è separata dagli aggiornamenti successivi. Le funzioni future non ricevono date di implementazione inventate. La sync schede segnala ancora il requisito di aggiornamento del server. Ogni modifica segue docs/roadmap-policy.md e lo storico bilingue, verificato prima della build del sito.

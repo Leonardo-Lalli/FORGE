@@ -15,6 +15,8 @@ public partial class App : Application
         this.themeService = themeService;
         this.buildSecrets = buildSecrets;
         this.services = services;
+        Resources["WorkoutSession"] = services.GetRequiredService<WorkoutSession>();
+        Resources["PlanService"] = services.GetRequiredService<PlanService>();
     }
 
     protected override Window CreateWindow(IActivationState? activationState)
@@ -22,6 +24,16 @@ public partial class App : Application
         themeService.Initialize();
 
         var window = new Window(new ContentPage { BackgroundColor = Colors.Black });
+        window.Stopped += async (_, _) =>
+        {
+            var session = services.GetRequiredService<WorkoutSession>();
+            if (session.SuspendHandler != null) await session.SuspendHandler();
+        };
+        window.Resumed += async (_, _) =>
+        {
+            var session = services.GetRequiredService<WorkoutSession>();
+            if (session.ForegroundHandler != null) await session.ForegroundHandler();
+        };
         window.Created += async (_, _) =>
         {
             var splashPage = new SplashPage();

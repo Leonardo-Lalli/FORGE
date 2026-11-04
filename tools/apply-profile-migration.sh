@@ -41,3 +41,4 @@ echo 'Friends means an accepted follow in BOTH directions. Nginx and router sett
 echo 'Shared exercise metadata/URL cache installed. Restart the app to populate it; GIF files remain on the provider.'
 echo 'Follower/following visibility is separate and defaults PRIVATE. Change it in Edit account.'
 echo 'Account deletion, all profile badges and notification queue installed. Remote push stays inactive until Firebase and its worker are configured.'
+echo 'Private account plan sync installed. Open the FORGE 0.8.5-beta develop candidate (versionCode 88 or higher) while online to upload existing local plans before reinstalling.'

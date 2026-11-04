@@ -12,4 +12,8 @@ public class MainApplication : MauiApplication
 	}
 
 	protected override MauiApp CreateMauiApp() => MauiProgram.CreateMauiApp();
+
+    // Keep startup on the concrete JNI wrapper so the packaged entry point
+    // can be checked before distributing a Release APK.
+    public override void OnCreate() => base.OnCreate();
 }

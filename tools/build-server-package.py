@@ -15,7 +15,7 @@ for index, path in enumerate(files):
 block += ['bash "$forge_stage/tools/apply-profile-migration.sh" /opt/pocketbase pocketbase', 'systemctl is-active pocketbase', 'if command -v python3 >/dev/null; then python3 "$forge_stage/tools/audit-pocketbase-exercises.py" /opt/pocketbase/pb_data/data.db; fi', 'du -h /opt/pocketbase/pb_data/data.db', 'FORGE_LXC_UPDATE']
 (output / 'forge-lxc-update.sh').write_text('\n'.join(block) + '\n', encoding='utf-8', newline='\n')
 with zipfile.ZipFile(output / 'forge-profile-server-tools.zip', 'w', zipfile.ZIP_DEFLATED) as archive:
-    extra = ['docs/pocketbase-profile-migration.md', 'docs/push-notifications.md', 'docs/self-hosting.md',
+    extra = ['docs/pocketbase-profile-migration.md', 'docs/push-notifications.md', 'docs/self-hosting.md', 'docs/account-plan-sync.md',
         'tools/forge-push-worker.py', 'tools/install-push-worker.sh', 'tools/apply-docker-profile-migration.sh',
         'tools/install.sh', 'tools/community-install.sh', 'tools/proxmox-install.sh', 'tools/proxmox-create.sh', 'tools/setup.ps1',
         'tools/init-pocketbase.sh', 'tools/show-ip.sh', 'tools/nginx-pocketbase-hardening.conf',

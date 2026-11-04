@@ -46,6 +46,23 @@ try:
   accounts[name]=(user['id'],auth['token'])
   if name=='alice': alice_password=password
  a,at=accounts['alice']; b,bt=accounts['bob']; c,ct=accounts['carol']
+ plan={'id':'routine-local-id','userId':a,'name':'Account routine','notes':'Line one\nLine two','restSeconds':90,
+       'createdAt':'2026-01-01T00:00:00Z','updatedAt':'2026-01-01T00:00:00.0000001Z','exercisesJson':'[{"ExerciseName":"Squat","Sets":[{"WeightKg":60,"Reps":8}]}]','isDeleted':False}
+ code,saved=call('forge/plans/sync','POST',{'plans':[plan]},at)
+ check(code==200 and saved['plans'][0]['id']==plan['id'],'account plan upload succeeds: '+str(saved) if code!=200 else 'account plan upload succeeds')
+ check(call('forge/plans/sync','POST',{'plans':[]},at)[1]['plans'][0]['notes']=='Line one\nLine two','fresh client retrieves full account plan')
+ check(call('forge/plans/sync','POST',{'plans':[]},bt)[1]['plans']==[],'other account cannot see saved plans')
+ check(call('forge/plans/sync','POST',{'plans':[plan]},bt)[0]==400,'cannot upload plans for another owner')
+ check(call('forge/plans/sync','POST',{'plans':[]})[0] in [401,403],'anonymous plan sync denied')
+ check(call('collections/forge_plans/records',token=at)[0]==403,'raw plan collection API stays private')
+ deleted={**plan,'isDeleted':True,'updatedAt':'2026-01-01T00:00:00.0000002Z'}
+ code,tombstone=call('forge/plans/sync','POST',{'plans':[deleted]},at)
+ check(code==200 and tombstone['plans'][0]['isDeleted'],'rapid deletion preserves sub-millisecond ordering')
+ check(call('forge/plans/sync','POST',{'plans':[plan]},at)[1]['plans'][0]['isDeleted'],'stale client cannot resurrect deleted plan')
+ malformed={**plan,'exercisesJson':'invalid json'}
+ check(call('forge/plans/sync','POST',{'plans':[malformed]},at)[0]==400,'malformed plan JSON rejected')
+ check(call('forge/plans/sync','POST',{'plans':[{**plan,'updatedAt':2026}]},at)[0]==400,'non-string plan timestamp rejected')
+ check(call('forge/plans/sync','POST',{'plans':[plan,plan]},at)[0]==400,'duplicate plan changes rejected atomically')
  avatar=upload_avatar(a,at)
  file_path='files/users/'+a+'/'+avatar
  try:

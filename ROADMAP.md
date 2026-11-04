@@ -1,11 +1,25 @@
 # Roadmap FORGE
 
-Solo le funzioni che dobbiamo ancora aggiungere. Ciò che è già disponibile è descritto nella pagina Funzionalità; qui non fissiamo date o versioni future.
+La versione corrente approvata è **0.8.5-beta, build 89**, promossa su `main` il 05/11/2026. Le nuove richieste vengono sviluppate su `develop`. Le denominazioni 0.8.6/0.8.7 degli APK locali precedenti non identificano nuove release da pubblicare.
+
+Ogni modifica segue la [regola di tracciamento](docs/roadmap-policy.md): prima data di implementazione, riferimento reale e storico degli aggiornamenti.
+
+## Disponibile nella 0.8.5-beta — approvata il 05/11/2026
+
+| Elemento | Implementazione | Ultimo aggiornamento | Riferimento / stato |
+| --- | --- | --- | --- |
+| Correzione avvio Android dopo il logo | Implementato il 04/11/2026 | 04/11/2026 | v0.8.5-beta · build 89, build 89; firma/callback verificati; versione approvata dal proprietario, limiti del test emulatore documentati |
+| Unità kg / libbre in tutta l’app | Implementato il 26/10/2026 | 26/10/2026 | v0.8.5-beta · build 89, approvata dal proprietario |
+| Allenamento minimizzabile e recuperabile | Implementato il 16/10/2026 | 26/10/2026 | v0.8.5-beta · build 89; barra con recupero |
+| Conferma X / Indietro | Implementato il 16/10/2026 | 26/10/2026 | v0.8.5-beta · build 89; popup segue il tema |
+| Note multilinea ed esercizi vuoti esclusi | Implementato il 16/10/2026 | 16/10/2026 | v0.8.5-beta · build 89 |
+| Calendario Stats stabile e icona FORGE | Implementato il 16/10/2026 | 16/10/2026 | v0.8.5-beta · build 89 |
+| Sincronizzazione schede account | Implementato il 26/10/2026 | 26/10/2026 | v0.8.5-beta · build 89; richiede aggiornamento server, non ancora attivo sul server del proprietario |
 
 ## Account e dati
 
-- **Social login**: Google/Apple sign-in oltre a email/password
-- **Sincronizzazione delle schede**: Ritrovare schede e note su più dispositivi collegati allo stesso account.
+- **Social login**: Google/Microsoft/Apple sign-in oltre a email/password
+- **Attivazione della sincronizzazione schede**: codice implementato il 26/10/2026 su develop; aggiornare PocketBase prima della prima copia remota. Vedi [guida](docs/account-plan-sync.md).
 
 ## Evoluzione dell’allenamento
 

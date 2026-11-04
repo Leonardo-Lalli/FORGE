@@ -735,3 +735,66 @@ Generata chiave stabile di firma con backup privato ignorato da Git e accesso Wi
 Il monitor server ora produce solo un riepilogo health e non modifica continuamente README/main. Workflow di release manuale prepara una bozza firmata; pubblicazione attuale autorizzata dal proprietario. Nessuna nuova suite locale completa ripetuta. Conferma pubblicazione, firma dell’APK finale e stato CI da registrare dopo le operazioni.
 
 Verifica confezionamento: APK Release 0.8.5-beta, versionCode 85, firma CN=Leonardo Lalli verificata da apksigner; 94.789.711 byte. Build locale completata con tre avvisi Firebase già noti. CI Build & Test del commit dbd2c6d passata (run 38455094135), senza ulteriore suite locale. Corretto avviso aggiornamento: l’export CSV attuale è solo riepilogo, non backup completo di schede, foto o serie.
+
+
+## Iterazione: sessione protetta e recuperabile — 16 ottobre 2026
+
+### Obiettivo e richiesta
+
+Feedback del proprietario dopo un allenamento: conferma sulla X, note multilinea, esercizi vuoti esclusi dai conteggi, allenamento minimizzabile e recuperabile dopo chiusura, icona allegata, calendario Stats stabile e login Google/Microsoft nella roadmap.
+
+### Piano e implementazione
+
+Riutilizzato `develop`, aggiornato da `main` con fast-forward. Estesi i servizi e il ViewModel esistenti: una sessione condivisa, barra in fondo alle pagine autenticate, autosalvataggio bozza e sospensione tramite ciclo di vita finestra. Il recupero mantiene l’allenamento fermo fino alla riapertura dalla barra; il timer di recupero mostra il comando di ripresa. Minimizzare dentro l’app mantiene i timer attivi. Conferma della X con tre azioni esplicite. Nessuna dipendenza aggiunta.
+
+File nuovi: `MiniWorkoutBar.xaml` e code-behind, `WorkoutCompletion.cs`, `WorkoutRecoveryTests.cs`. File modificati: ViewModel allenamento/login/Stats, `WorkoutSession`, `DatabaseService`, `LocalWorkout`, app/DI, pagine autenticate, icona, progetto/stub dei test, roadmap e traduzioni sito, documenti di progetto.
+
+### Review
+
+ID bozza stabile; gate contro salvataggi concorrenti; completamento storico/rimozione bozza atomici; protezione dei dati per account; tempo esatto anche a zero secondi e compatibilità bozze legacy. Ripristino degli stati UI necessario dopo il passaggio del ViewModel a singleton. Esercizi a corpo libero validi anche con peso zero. Il calendario conserva sei righe anche nei mesi brevi e mostra il mese corrente nel filtro settimanale.
+
+### Verifiche
+
+107 test passati, build Android riuscita con tre avvisi Firebase preesistenti, XML XAML valido e icona generata ispezionata. Nessun dispositivo collegato: interazione con popup, navigazione, recupero reale dopo terminazione del processo e resa grafica restano da validare manualmente. Vedi `docs/test-matrix.md`.
+
+### Stato
+
+Implementazione e verifiche automatiche completate; accettazione su telefono da eseguire. Modifiche locali su `develop`, senza commit, push o pubblicazione. Login Google/Microsoft pianificato in roadmap, non implementato.
+
+## APK di prova locale — 20 ottobre 2026
+
+Su richiesta del proprietario generato artifacts/FORGE-0.8.6-beta.apk dal working tree di develop: Release, ApplicationId com.leoforge.forge, versione 0.8.6-beta, versionCode 86, 94.806.095 byte. Firma v1/v2/v3 verificata con apksigner; certificato SHA-256 87098c4bf774e2e2512d0635ef6f192de0939de844bc5953f4e6f142a04ebe87, identico all’APK 0.8.5-beta precedente. SHA-256 APK: 4527f933453f04ddd36684e22e4e2c5aaae87f5ce7daf495b0bb61b671ca8071. Versione applicata tramite parametri di publish; csproj e versione pubblica non modificati. Nessuna pubblicazione, commit o push. Prova su telefono affidata al proprietario; suite precedente 107/107 non ripetuta perché nessuna modifica al codice in questa fase.
+
+## Feedback telefono e schede account — 26 ottobre 2026
+
+Il proprietario ha chiarito di aver disinstallato/reinstallato l’app; le schede della 0.8.6 erano solo locali. Richiesto salvataggio nell’account, recupero al posto della durata nella barra e colori della pagina nel popup X. Implementata sincronizzazione per singola scheda con persistenza locale, coda offline, tombstone, isolamento account e avviso quando manca la copia remota. Nuovi endpoint/migrazione server privati. Risoluzione conflitti per data UTC; nessun pacchetto aggiunto.
+
+111 test .NET passati e suite PocketBase temporanea passata. Generato artifacts/FORGE-0.8.7-beta.apk, versionCode 87, firma stabile verificata (94.001.713 byte), senza cambiare la versione pubblica del csproj. Rigenerati forge-lxc-update.sh e forge-server-tools.zip, con guida docs/account-plan-sync.md. Non eseguito aggiornamento del server reale: il proprietario deve attivare la migrazione prima del primo backup cloud. Nessun commit, push o pubblicazione. Le schede già cancellate prima della sincronizzazione non sono recuperabili senza un’altra copia.
+
+## Candidata 0.8.5-beta, unità e roadmap — 26 ottobre 2026
+
+Il proprietario richiede che develop diventi eventualmente la 0.8.5-beta dopo il suo test, senza nuove release 0.8.6/0.8.7. Confermato nome visibile 0.8.5-beta, versionCode 88 per aggiornare le build di prova precedenti senza disinstallazione. Nessuna pubblicazione, merge, commit o push autorizzati in questa fase.
+
+Aggiunta scelta kg/libbre, conversione coerente nell’intera UI e negli inserimenti, dati salvati/sincronizzati ancora in kg. Gestiti PREV, progressi, aggregati, feed/profili, dettagli e descrizioni/progressi degli achievement. Esportazione CSV nell’unità scelta con header esplicito e importazione indipendente dall’impostazione; mantenute note multilinea, virgolette e riepiloghi legacy. Nessuna dipendenza aggiunta.
+
+Roadmap senza etichette di difficoltà; date e riferimenti per gli elementi implementati e storico append-only delle modifiche, distinguendo candidate, pianificato e requisito server. Controllo automatico prima della build e policy documentata. 119 test passati, 8 mirati ripetuti dopo l’ultima correzione CSV; sito statico/TypeScript e Android compilati. Verifica manuale e decisione di pubblicazione affidate al proprietario. La sincronizzazione account richiede ancora il pacchetto PocketBase già preparato; nessuna modifica al server reale.
+
+APK candidato verificato: artifacts/FORGE-0.8.5-beta-develop.apk, 94.014.001 byte, nome visibile 0.8.5-beta, versionCode 88. Certificato identico alle build precedenti. SHA-256 APK: 2fdc5493c6a75a3a4af56b659562f61af100be744d420769523ac04131a8ffef. Pronto per la prova del proprietario, senza pubblicazione.
+
+## Correzione avvio APK — 4 novembre 2026
+
+Il proprietario segnala logo e chiusura sul Samsung A15 4G, con l’ultima One UI disponibile per il dispositivo (numero Android non fornito). Riprodotta nell’emulatore l’eccezione Java `UnsatisfiedLinkError` per `MauiApplication.n_onCreate`, prima dell’avvio dell’interfaccia. Nel vecchio APK build 88 le librerie `libxamarin-app.so` ARM64/x64 non contenevano il callback JNI di avvio; il pacchetto compilava e aveva firma valida, quindi le precedenti verifiche di build erano insufficienti.
+
+Dichiarato esplicitamente `MainApplication.OnCreate` con delega al metodo MAUI e rigenerati integralmente bin/obj Release Android. La build finale conserva le ottimizzazioni native standard. Il tentativo preliminare con `AndroidEnableMarshalMethods=false` non è la configurazione consegnata. Cambiare la configurazione senza pulire gli intermedi aveva prodotto wrapper Java incompatibili: non riutilizzarli. Nessun nuovo pacchetto o schema dati; develop, versione visibile 0.8.5-beta, versionCode 89.
+
+Il nuovo controllo `tools/test-android-startup.ps1 -Serial emulator-5554 -Apk artifacts/FORGE-0.8.5-beta-startup-fix.apk` verifica i callback confezionati per entrambe le architetture, registra SHA-256 e controlla processo, crash, primo piano e schermata per due avvii. Il controllo rifiuta correttamente il vecchio build 88 prima di usare ADB. I callback risultano presenti nel nuovo APK, con 1268 simboli JNI nelle librerie native invece del solo TypeManager presente nel vecchio pacchetto. Firma stabile verificata.
+
+La prova runtime completa resta **inconclusiva**: il processo supera il precedente errore JNI e Android crea l’activity, ma l’emulatore Android 16 mostra timeout di avvio/input dell’app e anche dei servizi System UI/Bluetooth/Google. Nessuna coppia di avvii a freddo dichiarata superata. Usato un emulatore dedicato con dati nel repository, senza collegare/modificare il telefono o cancellare dati personali. Provati riduzione del carico, memoria/GPU hardware e chiusura dei build server. La prima prova con configurazione preliminare raggiungeva il setup; non vale come superamento della verifica dell’APK finale. Prova Samsung e approvazione ancora necessarie.
+
+APK consegnabile per la prova del proprietario: artifacts/FORGE-0.8.5-beta-startup-fix.apk e alias FORGE-0.8.5-beta-develop.apk; 94.949.455 byte, SHA-256 805d38ea6263ea9ffbaed6c6d92ae6ee030730e21926f38bdc6399334967b9c0. Certificato SHA-256 87098c4bf774e2e2512d0635ef6f192de0939de844bc5953f4e6f142a04ebe87, identico alle distribuzioni precedenti. Conservato build 88 come FORGE-0.8.5-beta-broken-build88.apk. Installare come aggiornamento senza disinstallare. Nessun merge, commit, push, aggiornamento server o pubblicazione.
+
+Roadmap IT/EN con data 04/11/2026 e stato candidata; limiti del test espliciti. Validatore passato e build Next.js/TypeScript completata con accesso ai font Google; un precedente tentativo senza rete era fallito scaricando i font. Suite 119 test della precedente iterazione non ripetuta: nessuna logica di dominio cambiata, verifica mirata sul pacchetto Android.
+
+## Promozione autorizzata — 5 novembre 2026
+
+Il proprietario approva la versione attuale e chiede main + ultima release 0.8.5-beta; le nuove richieste restano su develop. Preparata la promozione dell’APK build 89 già consegnato, mantenendo firma e hash. Aggiornati metadati roadmap e note release; server reale non modificato. Il test account/achievement dipendeva dall’ora corrente e sbloccava anche il badge notturno: fixture resa deterministica a mezzogiorno, senza modificare il comportamento dell’app. La vecchia prova emulatore inconclusiva resta documentata. Il flag GitHub prerelease viene disattivato esclusivamente per impostare Latest, mentre nome/tag mantengono beta.

@@ -121,13 +121,14 @@ public class SecurityRegressionTests
         try
         {
             var db = new DatabaseService(path);
-            await db.SaveWorkoutAsync(new() { Id = "bob", UserId = "bob", Date = DateTime.Now.ToString("O") });
+            var workoutDate = new DateTime(2026, 10, 5, 12, 0, 0, DateTimeKind.Local).ToString("O");
+            await db.SaveWorkoutAsync(new() { Id = "bob", UserId = "bob", Date = workoutDate });
             var pb = Service(new FakeFactory(_ => Json("{\"token\":\"token\",\"record\":{\"id\":\"alice\"}}")));
             await pb.LoginAsync("test@example.invalid", "password");
             var service = new AchievementService(db, pb);
             Assert.Equal(0, await service.GetUnlockedCountAsync());
             Assert.Equal(0, (await service.GetTrainingProgressAsync()).Experience);
-            await db.SaveWorkoutAsync(new() { Id = "alice", UserId = "alice", Date = DateTime.Now.ToString("O"), Duration = 60 });
+            await db.SaveWorkoutAsync(new() { Id = "alice", UserId = "alice", Date = workoutDate, Duration = 60 });
             Assert.True(await service.GetUnlockedCountAsync() > 0);
             Assert.InRange(await service.GetProgressPercentAsync(), 0.001, 1);
             Assert.Equal(100, (await service.GetTrainingProgressAsync()).Experience);

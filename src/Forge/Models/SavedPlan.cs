@@ -15,4 +15,6 @@ public class SavedPlan
     public DateTime CreatedAt { get; set; } = DateTime.Now;
     public DateTime UpdatedAt { get; set; } = DateTime.Now;
     public int RestSeconds { get; set; } = 90;
+    public bool PendingSync { get; set; } = true;
+    public bool IsDeleted { get; set; }
 }

@@ -2,6 +2,7 @@
 <ContentPage
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:controls="clr-namespace:Forge.Controls"
     xmlns:vm="clr-namespace:Forge.ViewModels"
     x:Name="profilePage"
     x:Class="Forge.Views.ProfilePage"
@@ -9,7 +10,7 @@
     Title="Profile"
     Shell.NavBarIsVisible="False">
 
-    <Grid RowDefinitions="Auto,*" BackgroundColor="{DynamicResource Surface}">
+    <Grid RowDefinitions="Auto,*,Auto" BackgroundColor="{DynamicResource Surface}">
 
         <!-- Header — mockup style -->
         <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto"
@@ -488,6 +489,7 @@
                 </VerticalStackLayout>
             </Border>
         </Grid>
+        <controls:MiniWorkoutBar Grid.Row="2" />
     </Grid>
 
 </ContentPage>

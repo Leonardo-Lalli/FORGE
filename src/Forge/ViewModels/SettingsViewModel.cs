@@ -8,6 +8,7 @@ namespace Forge.ViewModels;
 public partial class SettingsViewModel : BaseViewModel
 {
     private readonly ThemeService themeService;
+    public WeightUnitService Units { get; }
     private readonly PocketBaseService pb;
     private readonly CsvImportService csvImport;
     private readonly CsvExportService csvExport;
@@ -34,9 +35,10 @@ public partial class SettingsViewModel : BaseViewModel
     [ObservableProperty] private bool hasServerStatus;
 
     public SettingsViewModel(ThemeService themeService, PocketBaseService pb,
-        CsvImportService csvImport, CsvExportService csvExport, DatabaseService db, NotificationService notifications)
+        CsvImportService csvImport, CsvExportService csvExport, DatabaseService db, NotificationService notifications, WeightUnitService units)
     {
         this.themeService = themeService;
+        Units = units;
         this.pb = pb;
         this.csvImport = csvImport;
         this.csvExport = csvExport;

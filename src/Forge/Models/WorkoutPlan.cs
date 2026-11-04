@@ -59,17 +59,47 @@ public partial class WorkoutExercise : ObservableObject
 
 public partial class ExerciseSet : ObservableObject
 {
+    private Forge.Services.WeightUnitService? units;
+    private double? previousWeightKg;
+    private int previousReps;
+    public void ConfigureUnits(Forge.Services.WeightUnitService service)
+    {
+        units = service;
+        OnPropertyChanged(nameof(DisplayWeight));
+        OnPropertyChanged(nameof(PreviousDisplay));
+    }
+    [System.Text.Json.Serialization.JsonIgnore, SQLite.Ignore]
+    public double DisplayWeight
+    {
+        get => Math.Round(units?.ToDisplay(WeightKg) ?? WeightKg, 2);
+        set
+        {
+            if (!double.IsFinite(value) || value < 0 || Math.Abs(value - DisplayWeight) < 0.00000001) return;
+            WeightKg = units?.ToKilograms(value) ?? value;
+        }
+    }
+    [System.Text.Json.Serialization.JsonIgnore, SQLite.Ignore]
+    public string PreviousDisplay => previousWeightKg.HasValue
+        ? $"{(units?.Format(previousWeightKg.Value) ?? $"{previousWeightKg:0.##} kg")} × {previousReps}"
+        : PreviousText;
+    public void SetPrevious(double kilograms, int repetitions)
+    {
+        previousWeightKg = kilograms;
+        previousReps = repetitions;
+        PreviousText = $"{kilograms:0.#} × {repetitions}";
+        OnPropertyChanged(nameof(PreviousDisplay));
+    }
     public string Id { get; set; } = Guid.NewGuid().ToString();
     [ObservableProperty, NotifyPropertyChangedFor(nameof(DisplayLabel))] private int setNumber;
     [ObservableProperty, NotifyPropertyChangedFor(nameof(DisplayLabel))] private string kind = "normal";
     public string DisplayLabel => Kind switch { "warmup" => "W", "drop" => "D", "failure" => "F", _ => SetNumber.ToString() };
 
 
-    [ObservableProperty] private double weightKg;
+    [ObservableProperty, NotifyPropertyChangedFor(nameof(DisplayWeight))] private double weightKg;
     [ObservableProperty] private int reps;
     [ObservableProperty] private bool isCompleted;
     [ObservableProperty] private bool isSuggested;
-    [ObservableProperty] private string previousText = "—";
+    [ObservableProperty, NotifyPropertyChangedFor(nameof(PreviousDisplay))] private string previousText = "—";
     partial void OnWeightKgChanged(double value) => IsSuggested = false;
     partial void OnRepsChanged(int value) => IsSuggested = false;
 }

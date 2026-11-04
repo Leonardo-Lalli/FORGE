@@ -9,4 +9,10 @@ public partial class ActiveWorkoutPage : ContentPage
         InitializeComponent();
         BindingContext = vm;
     }
+
+    protected override bool OnBackButtonPressed()
+    {
+        if (BindingContext is ActiveWorkoutViewModel vm) vm.RequestCloseCommand.Execute(null);
+        return true;
+    }
 }

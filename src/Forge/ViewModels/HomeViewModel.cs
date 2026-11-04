@@ -50,9 +50,22 @@ public partial class HomeViewModel : BaseViewModel
     [ObservableProperty] private string nextAchievementText = string.Empty;
     [ObservableProperty] private bool hasNextAchievement;
 
-    public HomeViewModel(PocketBaseService pb, PlanService planService, AchievementService achievementService, ExerciseDbApiService exerciseDbApi, SyncService sync)
+    private readonly WeightUnitService units;
+    private string nextAchievementId = "";
+    private int nextProgress, nextMaximum;
+    private void RefreshAchievementUnits()
+    {
+        var definition = AchievementsCatalog.All.FirstOrDefault(a => a.Id == nextAchievementId);
+        if (definition == null) return;
+        NextAchievementDesc = units.AchievementDescription(definition.Id, definition.Description);
+        NextAchievementText = units.AchievementProgress(definition.Id, nextProgress, nextMaximum);
+    }
+
+    public HomeViewModel(PocketBaseService pb, PlanService planService, AchievementService achievementService, ExerciseDbApiService exerciseDbApi, SyncService sync, WeightUnitService units)
     {
         this.pb = pb;
+        this.units = units;
+        WeakReferenceMessenger.Default.Register<HomeViewModel, WeightUnitChangedMessage>(this, static (vm, _) => vm.RefreshAchievementUnits());
         this.planService = planService;
         this.achievementService = achievementService;
         this.exerciseDbApi = exerciseDbApi;
@@ -125,10 +138,12 @@ public partial class HomeViewModel : BaseViewModel
             if (next != default)
             {
                 NextAchievementName = next.Def.Name;
-                NextAchievementDesc = next.Def.Description;
+                nextAchievementId = next.Def.Id;
+                nextProgress = next.State.Progress;
+                nextMaximum = next.Def.MaxProgress;
+                RefreshAchievementUnits();
                 NextAchievementIcon = next.Def.Icon;
                 NextAchievementProgress = (double)next.State.Progress / next.Def.MaxProgress;
-                NextAchievementText = $"{next.State.Progress}/{next.Def.MaxProgress}";
                 HasNextAchievement = true;
             }
         }

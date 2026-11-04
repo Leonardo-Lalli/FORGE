@@ -5,34 +5,16 @@ namespace Forge.Services;
 public class CsvExportService
 {
     private readonly DatabaseService db;
+    private readonly WeightUnitService units;
 
-    public CsvExportService(DatabaseService db)
+    public CsvExportService(DatabaseService db, WeightUnitService units)
     {
         this.db = db;
+        this.units = units;
     }
 
     public async Task<string> ExportWorkoutsAsync(string userId)
-    {
-        var sb = new StringBuilder();
-        sb.AppendLine("Date,WorkoutName,ExerciseName,Sets,Reps,WeightKg,Notes");
-
-        var workouts = await db.GetWorkoutsAsync(userId);
-
-        foreach (var w in workouts.OrderBy(w => w.Date))
-        {
-            var exercises = System.Text.Json.JsonSerializer.Deserialize<List<string>>(w.ExercisesJson) ?? new();
-
-            foreach (var ex in exercises)
-            {
-                sb.AppendLine($"\"{EscapeCsv(w.Date)}\",\"{EscapeCsv(w.Name)}\",\"{EscapeCsv(ex)}\",1,0,0,\"{EscapeCsv(w.Notes)}\"");
-            }
-        }
-
-        return sb.ToString();
-    }
-
-    private static string EscapeCsv(string value) =>
-        (value ?? "").Replace("\"", "\"\"");
+        => CsvWorkoutWriter.Write(await db.GetWorkoutsAsync(userId), units);
 
     public async Task SaveCsvFileAsync(string userId)
     {

@@ -266,3 +266,30 @@ Il proprietario ha autorizzato la promozione di experiments a main, il push e la
 Generata chiave stabile di firma con backup privato ignorato da Git e accesso Windows limitato all’utente. Dopo un blocco della revisione automatica, il proprietario ha autorizzato esplicitamente payload e destinazione dei cinque secret di firma/Firebase Android su GitHub Actions. Nessuna chiave Firebase Admin del server letta o caricata. Le firme Debug di 0.8.0 e delle prove locali differiscono; avviso di backup/reinstallazione aggiunto a README e release notes.
 
 Il monitor server ora produce solo un riepilogo health e non modifica continuamente README/main. Workflow di release manuale prepara una bozza firmata; pubblicazione attuale autorizzata dal proprietario. Nessuna nuova suite locale completa ripetuta. Conferma pubblicazione, firma dell’APK finale e stato CI da registrare dopo le operazioni.
+
+
+## Iterazione: sessione protetta e recuperabile — 16 ottobre 2026
+
+Branch `develop` già presente, aggiornato a `main` con fast-forward. Obiettivo: proteggere l’allenamento in corso da uscite accidentali e consentire navigazione e ripresa dopo chiusura, insieme alle correzioni note/calendario/icona richieste dal proprietario.
+
+Componenti: `ActiveWorkoutViewModel` singleton, `WorkoutSession` condivisa, nuova `MiniWorkoutBar`, campi bozza SQLite e transazione di completamento. Aggiornamento delle pagine autenticate, login e ciclo di vita finestra. Nessun pacchetto aggiunto. Rischi da verificare su Android: chiusura forzata, selezione foto, timer, back di sistema, tema e dimensioni testo. OAuth Google/Microsoft aggiunto alla roadmap insieme ad Apple già previsto.
+
+Criteri: X non distruttiva; note su più righe; esercizi non eseguiti esclusi dallo storico; minimizzazione con navigazione; stato recuperato solo per l’account proprietario; completamento senza bozza fantasma; calendario di dimensioni stabili. Dettagli e verifiche nel diario tracciato `docs/project-journal.md` (i log in `docs/iterations/` sono locali per la configurazione Git del progetto).
+
+## Iterazione: schede account e feedback telefono — 26 ottobre 2026
+
+Richiesta del proprietario: schede conservate nell’account anche dopo aggiornamento/reinstallazione; recupero nella barra minimizzata; colori coerenti nel popup X. Confermato dal proprietario che la versione precedente era stata disinstallata: prima di questa iterazione le schede esistevano soltanto in SQLite.
+
+Estesi SavedPlan/PlanService con coda e cancellazioni, endpoint PocketBase privato per account, migrazione, avviso di mancata sincronizzazione e retry. Nessun nuovo pacchetto. Criteri: vecchio database preservato; nuovo database recupera schede dell’account; offline non perde dati; account separati; vecchi client non ricreano schede cancellate. Preparati APK 0.8.7-beta e pacchetto server, con guida `docs/account-plan-sync.md`. Server reale ancora da aggiornare, niente commit/push/pubblicazione.
+
+## Iterazione: kg/libbre e candidata 0.8.5-beta — 26 ottobre 2026
+
+Obiettivo: rendere coerente la scelta delle unità in tutta l’app e rendere tracciabili gli elementi della roadmap, mantenendo develop come candidata 0.8.5-beta dopo il test umano. Componenti nuovi: WeightUnitService, messaggio cambio unità, proiezioni non persistite delle serie, writer/lettore CSV e controllo roadmap pre-build. Estesi ViewModel/pagine interessati, senza pacchetti aggiuntivi.
+
+Criteri: 100 kg = 220,46 lb in lettura; 100 lb = 45,359237 kg salvati; cambio ripetuto senza deriva o perdita delle serie suggerite; conversioni negli aggregati, grafici, dettagli e achievement senza cambiare le soglie; CSV con unità esplicite e note multilinea; metadati roadmap coerenti IT/EN. Rischi manuali: tastiera numerica italiana, cambio unità con sessione minimizzata, pagine già aperte, resa grafica dei valori e dei temi. Fonte definitiva per la release: approvazione del proprietario, non i nomi degli APK precedenti.
+
+## Avvio Android della candidata — 4 novembre 2026
+
+Obiettivo: correggere la chiusura dopo il logo segnalata su Samsung A15 4G e consegnare un APK installabile come aggiornamento. Intervento limitato alla configurazione Release Android, senza modifiche al database o nuovi pacchetti. Il callback `MainApplication.OnCreate` viene dichiarato sul tipo concreto per la generazione JNI; nome 0.8.5-beta e versionCode 89. Riferimento tecnico: https://github.com/dotnet/maui/issues/35209.
+
+Criteri: APK firmato reale installato su emulatore pulito, schermata setup/login raggiunta, due riaperture a freddo senza crash e preferenza server conservata durante un aggiornamento. Test ripetibile con `tools/test-android-startup.ps1 -Serial emulator-5554`, dopo l’installazione dell’APK. Il test non installa, disinstalla o cancella dati; usa esclusivamente seriali di emulatori. La prova del proprietario sul Samsung rimane necessaria prima della promozione della candidata. Nessun commit, push o pubblicazione impliciti.

@@ -254,29 +254,213 @@ export const it = {
   "roadmapPage": {
     "eyebrow": "// Roadmap",
     "title": "Dove sta andando FORGE.",
-    "subtitle": "Solo le funzioni che dobbiamo ancora aggiungere. Ciò che è già disponibile è descritto nella pagina Funzionalità; qui non fissiamo date o versioni future.",
-    "legend": {
-      "difficulty": "Difficoltà"
-    },
-    "difficulty": {
-      "low": "Bassa",
-      "med": "Media",
-      "high": "Alta",
-      "vhigh": "Molto alta"
-    },
+    "subtitle": "Funzioni disponibili nella 0.8.5-beta e obiettivi futuri, con date e riferimenti verificabili.",
     "releases": [
+      {
+        "theme": "Disponibile — 0.8.5-beta",
+        "features": [
+          {
+            "id": "android-startup",
+            "name": "Correzione avvio Android",
+            "desc": "Corretta l’inizializzazione nativa che poteva chiudere la candidata dopo il logo.",
+            "implementedOn": "2026-11-04",
+            "updatedOn": "2026-11-05",
+            "implementationRef": "v0.8.5-beta · build 89",
+            "status": "released",
+            "implementationNote": "Versione approvata dal proprietario e promossa su main il 05/11/2026.",
+            "history": [
+              {
+                "date": "2026-11-04",
+                "ref": "develop · 0.8.5-beta · build 89",
+                "note": "Reso esplicito il callback di avvio Android e introdotto il controllo dell’APK reale."
+              },
+              {
+                "date": "2026-11-05",
+                "ref": "v0.8.5-beta · build 89",
+                "note": "Approvata la versione corrente; le nuove richieste proseguono su develop."
+              }
+            ]
+          },
+          {
+            "id": "weight-units",
+            "name": "Unità kg / libbre",
+            "desc": "Scelta nelle impostazioni; conversione coerente di input, storico, statistiche, progressi, achievement e CSV.",
+            "implementedOn": "2026-10-26",
+            "updatedOn": "2026-11-05",
+            "implementationRef": "v0.8.5-beta · build 89",
+            "status": "released",
+            "implementationNote": "Versione approvata dal proprietario e promossa su main il 05/11/2026.",
+            "history": [
+              {
+                "date": "2026-10-26",
+                "ref": "develop",
+                "note": "Implemented on develop."
+              },
+              {
+                "date": "2026-11-05",
+                "ref": "v0.8.5-beta · build 89",
+                "note": "Approvata la versione corrente; le nuove richieste proseguono su develop."
+              }
+            ]
+          },
+          {
+            "id": "session-recovery",
+            "name": "Allenamento minimizzabile e recuperabile",
+            "desc": "Sessione persistente e barra del recupero; ripresa dopo chiusura dell’app.",
+            "implementedOn": "2026-10-16",
+            "updatedOn": "2026-11-05",
+            "implementationRef": "v0.8.5-beta · build 89",
+            "status": "released",
+            "implementationNote": "Versione approvata dal proprietario e promossa su main il 05/11/2026.",
+            "history": [
+              {
+                "date": "2026-10-16",
+                "ref": "develop",
+                "note": "Implemented on develop."
+              },
+              {
+                "date": "2026-10-26",
+                "ref": "develop",
+                "note": "Rest timer and theme consistency."
+              },
+              {
+                "date": "2026-11-05",
+                "ref": "v0.8.5-beta · build 89",
+                "note": "Approvata la versione corrente; le nuove richieste proseguono su develop."
+              }
+            ]
+          },
+          {
+            "id": "workout-confirmation",
+            "name": "Conferma uscita allenamento",
+            "desc": "X e Indietro richiedono una scelta esplicita; popup coerente con il tema.",
+            "implementedOn": "2026-10-16",
+            "updatedOn": "2026-11-05",
+            "implementationRef": "v0.8.5-beta · build 89",
+            "status": "released",
+            "implementationNote": "Versione approvata dal proprietario e promossa su main il 05/11/2026.",
+            "history": [
+              {
+                "date": "2026-10-16",
+                "ref": "develop",
+                "note": "Implemented on develop."
+              },
+              {
+                "date": "2026-10-26",
+                "ref": "develop",
+                "note": "Rest timer and theme consistency."
+              },
+              {
+                "date": "2026-11-05",
+                "ref": "v0.8.5-beta · build 89",
+                "note": "Approvata la versione corrente; le nuove richieste proseguono su develop."
+              }
+            ]
+          },
+          {
+            "id": "workout-notes",
+            "name": "Note multilinea e conteggi corretti",
+            "desc": "Note su più righe; esercizi senza serie eseguite esclusi dallo storico.",
+            "implementedOn": "2026-10-16",
+            "updatedOn": "2026-11-05",
+            "implementationRef": "v0.8.5-beta · build 89",
+            "status": "released",
+            "implementationNote": "Versione approvata dal proprietario e promossa su main il 05/11/2026.",
+            "history": [
+              {
+                "date": "2026-10-16",
+                "ref": "develop",
+                "note": "Implemented on develop."
+              },
+              {
+                "date": "2026-11-05",
+                "ref": "v0.8.5-beta · build 89",
+                "note": "Approvata la versione corrente; le nuove richieste proseguono su develop."
+              }
+            ]
+          },
+          {
+            "id": "stats-calendar",
+            "name": "Calendario Stats stabile",
+            "desc": "Mesi sempre di sei righe, senza variazioni della dimensione della scheda.",
+            "implementedOn": "2026-10-16",
+            "updatedOn": "2026-11-05",
+            "implementationRef": "v0.8.5-beta · build 89",
+            "status": "released",
+            "implementationNote": "Versione approvata dal proprietario e promossa su main il 05/11/2026.",
+            "history": [
+              {
+                "date": "2026-10-16",
+                "ref": "develop",
+                "note": "Implemented on develop."
+              },
+              {
+                "date": "2026-11-05",
+                "ref": "v0.8.5-beta · build 89",
+                "note": "Approvata la versione corrente; le nuove richieste proseguono su develop."
+              }
+            ]
+          },
+          {
+            "id": "launcher-icon",
+            "name": "Icona FORGE",
+            "desc": "Nuova icona launcher scelta dal proprietario.",
+            "implementedOn": "2026-10-16",
+            "updatedOn": "2026-11-05",
+            "implementationRef": "v0.8.5-beta · build 89",
+            "status": "released",
+            "implementationNote": "Versione approvata dal proprietario e promossa su main il 05/11/2026.",
+            "history": [
+              {
+                "date": "2026-10-16",
+                "ref": "develop",
+                "note": "Implemented on develop."
+              },
+              {
+                "date": "2026-11-05",
+                "ref": "v0.8.5-beta · build 89",
+                "note": "Approvata la versione corrente; le nuove richieste proseguono su develop."
+              }
+            ]
+          }
+        ]
+      },
       {
         "theme": "Account e dati",
         "features": [
           {
             "name": "Social login",
-            "desc": "Google/Apple sign-in oltre a email/password",
-            "diff": "high"
+            "desc": "Google/Microsoft/Apple sign-in oltre a email/password",
+            "id": "social-login",
+            "implementedOn": "",
+            "updatedOn": "2026-10-16",
+            "implementationRef": "",
+            "status": "planned",
+            "implementationNote": "",
+            "history": [
+              {
+                "date": "2026-10-16",
+                "ref": "develop",
+                "note": "Google/Microsoft/Apple planned"
+              }
+            ]
           },
           {
             "name": "Sincronizzazione delle schede",
             "desc": "Ritrovare schede e note su più dispositivi collegati allo stesso account.",
-            "diff": "high"
+            "id": "plan-synchronization",
+            "implementedOn": "2026-10-26",
+            "updatedOn": "2026-10-26",
+            "implementationRef": "develop · 0.8.5-beta candidate",
+            "status": "server-required",
+            "implementationNote": "Codice implementato e testato; richiede aggiornamento di PocketBase. Non ancora attivato sul server del proprietario.",
+            "history": [
+              {
+                "date": "2026-10-26",
+                "ref": "develop",
+                "note": "Implemented account plan sync; server migration required."
+              }
+            ]
           }
         ]
       },
@@ -286,17 +470,35 @@ export const it = {
           {
             "name": "Modalità completamente locale",
             "desc": "Allenarsi senza account o server, con collegamento cloud facoltativo.",
-            "diff": "high"
+            "id": "fully-local-mode",
+            "implementedOn": "",
+            "updatedOn": "",
+            "implementationRef": "",
+            "status": "planned",
+            "implementationNote": "",
+            "history": []
           },
           {
             "name": "Voice input",
             "desc": "\"Cento chili, otto rep\" invece di digitare",
-            "diff": "med"
+            "id": "voice-input",
+            "implementedOn": "",
+            "updatedOn": "",
+            "implementationRef": "",
+            "status": "planned",
+            "implementationNote": "",
+            "history": []
           },
           {
             "name": "Video esercizi",
             "desc": "Video YouTube integrati oltre alle GIF",
-            "diff": "med"
+            "id": "exercise-videos",
+            "implementedOn": "",
+            "updatedOn": "",
+            "implementationRef": "",
+            "status": "planned",
+            "implementationNote": "",
+            "history": []
           }
         ]
       },
@@ -306,32 +508,68 @@ export const it = {
           {
             "name": "Commenti agli allenamenti",
             "desc": "Conversazioni sotto gli allenamenti condivisi, nel rispetto della visibilità scelta.",
-            "diff": "high"
+            "id": "workout-comments",
+            "implementedOn": "",
+            "updatedOn": "",
+            "implementationRef": "",
+            "status": "planned",
+            "implementationNote": "",
+            "history": []
           },
           {
             "name": "Sfide e classifiche",
             "desc": "Sfide tra amici e leaderboard con consenso",
-            "diff": "med"
+            "id": "challenges-and-leaderboards",
+            "implementedOn": "",
+            "updatedOn": "",
+            "implementationRef": "",
+            "status": "planned",
+            "implementationNote": "",
+            "history": []
           },
           {
             "name": "Riepiloghi condivisibili",
             "desc": "Generare un’immagine riepilogativa dell’allenamento da condividere fuori dall’app.",
-            "diff": "med"
+            "id": "shareable-summaries",
+            "implementedOn": "",
+            "updatedOn": "",
+            "implementationRef": "",
+            "status": "planned",
+            "implementationNote": "",
+            "history": []
           },
           {
             "name": "Mappe palestre",
             "desc": "Mappa delle palestre vicine con recensioni community",
-            "diff": "high"
+            "id": "gym-maps",
+            "implementedOn": "",
+            "updatedOn": "",
+            "implementationRef": "",
+            "status": "planned",
+            "implementationNote": "",
+            "history": []
           },
           {
             "name": "Gamification 2.0",
             "desc": "Estendere livelli e XP già presenti con stagioni competitive e nuove ricompense.",
-            "diff": "high"
+            "id": "gamification-2-0",
+            "implementedOn": "",
+            "updatedOn": "",
+            "implementationRef": "",
+            "status": "planned",
+            "implementationNote": "",
+            "history": []
           },
           {
             "name": "Ricompense per record delle serie",
             "desc": "Medagliette per record personali di peso, volume o ripetizioni; idea ancora da implementare.",
-            "diff": "med"
+            "id": "per-set-record-rewards",
+            "implementedOn": "",
+            "updatedOn": "",
+            "implementationRef": "",
+            "status": "planned",
+            "implementationNote": "",
+            "history": []
           }
         ]
       },
@@ -341,27 +579,57 @@ export const it = {
           {
             "name": "Analytics avanzate",
             "desc": "Massimale stimato 1RM, volume per muscolo e nuovi report di progressione.",
-            "diff": "med"
+            "id": "advanced-analytics",
+            "implementedOn": "",
+            "updatedOn": "",
+            "implementationRef": "",
+            "status": "planned",
+            "implementationNote": "",
+            "history": []
           },
           {
             "name": "Body tracking",
             "desc": "Misure e peso con scelte di riservatezza",
-            "diff": "high"
+            "id": "body-tracking",
+            "implementedOn": "",
+            "updatedOn": "",
+            "implementationRef": "",
+            "status": "planned",
+            "implementationNote": "",
+            "history": []
           },
           {
             "name": "Lingue e accessibilità",
             "desc": "Traduzioni complete e test di contrasto e dimensioni testo",
-            "diff": "high"
+            "id": "languages-and-accessibility",
+            "implementedOn": "",
+            "updatedOn": "",
+            "implementationRef": "",
+            "status": "planned",
+            "implementationNote": "",
+            "history": []
           },
           {
             "name": "Report e backup",
             "desc": "Export PDF e backup con ripristino verificato",
-            "diff": "med"
+            "id": "reports-and-backup",
+            "implementedOn": "",
+            "updatedOn": "",
+            "implementationRef": "",
+            "status": "planned",
+            "implementationNote": "",
+            "history": []
           },
           {
             "name": "Nutrizione tracker",
             "desc": "Calorie e macro insieme al tracking degli allenamenti",
-            "diff": "high"
+            "id": "nutrition-tracker",
+            "implementedOn": "",
+            "updatedOn": "",
+            "implementationRef": "",
+            "status": "planned",
+            "implementationNote": "",
+            "history": []
           }
         ]
       },
@@ -371,22 +639,46 @@ export const it = {
           {
             "name": "Widget e Wear OS",
             "desc": "Accesso rapido e companion per timer e serie",
-            "diff": "vhigh"
+            "id": "widgets-and-wear-os",
+            "implementedOn": "",
+            "updatedOn": "",
+            "implementationRef": "",
+            "status": "planned",
+            "implementationNote": "",
+            "history": []
           },
           {
             "name": "Integrazioni salute",
             "desc": "Valutazione delle API supportate e autorizzazioni esplicite",
-            "diff": "high"
+            "id": "health-integration",
+            "implementedOn": "",
+            "updatedOn": "",
+            "implementationRef": "",
+            "status": "planned",
+            "implementationNote": "",
+            "history": []
           },
           {
             "name": "Sensori",
             "desc": "Battito e passi dove supportati dal dispositivo",
-            "diff": "high"
+            "id": "sensors",
+            "implementedOn": "",
+            "updatedOn": "",
+            "implementationRef": "",
+            "status": "planned",
+            "implementationNote": "",
+            "history": []
           },
           {
             "name": "Apple Watch",
             "desc": "Supporto iOS + companion watchOS",
-            "diff": "vhigh"
+            "id": "apple-watch",
+            "implementedOn": "",
+            "updatedOn": "",
+            "implementationRef": "",
+            "status": "planned",
+            "implementationNote": "",
+            "history": []
           }
         ]
       },
@@ -396,32 +688,68 @@ export const it = {
           {
             "name": "Origine protetta",
             "desc": "Proxy o tunnel con dominio dedicato; IP domestico fuori dal DNS pubblico",
-            "diff": "high"
+            "id": "protected-origin",
+            "implementedOn": "",
+            "updatedOn": "",
+            "implementationRef": "",
+            "status": "planned",
+            "implementationNote": "",
+            "history": []
           },
           {
             "name": "Pubblicazione sul Play Store",
             "desc": "Portare la beta sullo store dopo i controlli richiesti, usando la firma stabile già presente.",
-            "diff": "med"
+            "id": "play-store-distribution",
+            "implementedOn": "",
+            "updatedOn": "",
+            "implementationRef": "",
+            "status": "planned",
+            "implementationNote": "",
+            "history": []
           },
           {
             "name": "Dashboard e API",
             "desc": "Web dashboard, API documentata e profili server",
-            "diff": "high"
+            "id": "dashboard-and-api",
+            "implementedOn": "",
+            "updatedOn": "",
+            "implementationRef": "",
+            "status": "planned",
+            "implementationNote": "",
+            "history": []
           },
           {
             "name": "Palestre",
             "desc": "Trainer dashboard, QR onboarding e isolamento tra palestre",
-            "diff": "vhigh"
+            "id": "gyms",
+            "implementedOn": "",
+            "updatedOn": "",
+            "implementationRef": "",
+            "status": "planned",
+            "implementationNote": "",
+            "history": []
           },
           {
             "name": "Aggiornamenti dall’app",
             "desc": "Scaricare e avviare l’installazione di APK firmati senza cercarli manualmente su GitHub.",
-            "diff": "high"
+            "id": "in-app-updates",
+            "implementedOn": "",
+            "updatedOn": "",
+            "implementationRef": "",
+            "status": "planned",
+            "implementationNote": "",
+            "history": []
           },
           {
             "name": "Proxmox Community Scripts",
             "desc": "Adattare l’installer agli standard del progetto, provarlo su Proxmox e proporlo per revisione. Non ancora integrato ufficialmente.",
-            "diff": "high"
+            "id": "proxmox-community-scripts",
+            "implementedOn": "",
+            "updatedOn": "",
+            "implementationRef": "",
+            "status": "planned",
+            "implementationNote": "",
+            "history": []
           }
         ]
       }
@@ -451,7 +779,14 @@ export const it = {
       "items": [
         {
           "name": "AI form check",
-          "desc": "Un esperimento per analizzare un breve video dell’esercizio e segnalare possibili errori di postura o movimento. Fattibilità e accuratezza sono ancora da valutare; la funzione non è disponibile nell’app."
+          "desc": "Un esperimento per analizzare un breve video dell’esercizio e segnalare possibili errori di postura o movimento. Fattibilità e accuratezza sono ancora da valutare; la funzione non è disponibile nell’app.",
+          "id": "idea-ai-form-check",
+          "implementedOn": "",
+          "updatedOn": "",
+          "implementationRef": "",
+          "status": "planned",
+          "implementationNote": "",
+          "history": []
         }
       ]
     },

@@ -33,6 +33,7 @@ public static class MauiProgram
         // Services
         builder.Services.AddSingleton<BuildSecrets>();
         builder.Services.AddSingleton<ThemeService>();
+        builder.Services.AddSingleton<WeightUnitService>();
         builder.Services.AddSingleton<WorkoutSession>();
         builder.Services.AddSingleton<DatabaseService>();
         builder.Services.AddSingleton<ConnectivityService>();
@@ -66,7 +67,7 @@ public static class MauiProgram
         builder.Services.AddTransient<FeedViewModel>();
         builder.Services.AddTransient<StatsViewModel>();
         builder.Services.AddTransient<SettingsViewModel>();
-        builder.Services.AddTransient<ActiveWorkoutViewModel>();
+        builder.Services.AddSingleton<ActiveWorkoutViewModel>();
         builder.Services.AddTransient<ProfileViewModel>();
         builder.Services.AddTransient<StartSessionViewModel>();
         builder.Services.AddTransient<SetupViewModel>();

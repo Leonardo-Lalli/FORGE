@@ -1,3 +1,5 @@
+using CommunityToolkit.Mvvm.Messaging;
+using Forge.Messages;
 using System.Collections.ObjectModel;
 using System.Text.Json;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -22,6 +24,7 @@ public partial class DetailSet : ObservableObject
     public string Kind { get; set; } = "normal";
     public string DisplayLabel => Kind switch { "warmup" => "W", "drop" => "D", "failure" => "F", _ => SetNumber.ToString() };
     public double WeightKg { get; set; }
+    [ObservableProperty] private string weightDisplay = "";
     public int Reps { get; set; }
     public bool IsCompleted { get; set; }
     public string CompletedIcon => IsCompleted ? "\u2713" : "";
@@ -33,6 +36,14 @@ public partial class WorkoutDetailViewModel : BaseViewModel, IQueryAttributable
     {
         Source = query.TryGetValue("source", out var source) ? source.ToString() ?? "pocketbase" : "pocketbase";
         WorkoutId = query.TryGetValue("workoutId", out var id) ? Uri.UnescapeDataString(id.ToString() ?? "") : "";
+    }
+    private readonly WeightUnitService units;
+    private double volumeKg;
+    private void RefreshUnits()
+    {
+        Volume = units.Format(volumeKg, "N0");
+        foreach (var exercise in Exercises)
+            foreach (var set in exercise.Sets) set.WeightDisplay = units.Format(set.WeightKg);
     }
     private readonly PocketBaseService pb;
     private readonly DatabaseService db;
@@ -56,9 +67,11 @@ public partial class WorkoutDetailViewModel : BaseViewModel, IQueryAttributable
     [ObservableProperty] private string selectedPhoto = string.Empty;
     [ObservableProperty] private bool isPhotoExpanded;
 
-    public WorkoutDetailViewModel(PocketBaseService pb, DatabaseService db)
+    public WorkoutDetailViewModel(PocketBaseService pb, DatabaseService db, WeightUnitService units)
     {
         this.pb = pb;
+        this.units = units;
+        WeakReferenceMessenger.Default.Register<WorkoutDetailViewModel, WeightUnitChangedMessage>(this, static (vm, _) => { vm.RefreshUnits(); });
         this.db = db;
         HasData = true;
     }
@@ -106,7 +119,7 @@ public partial class WorkoutDetailViewModel : BaseViewModel, IQueryAttributable
         WorkoutName = w.Name;
         WorkoutDate = DateTime.TryParse(w.Date, out var d) ? d.ToString("dd MMM yyyy HH:mm") : w.Date;
         Duration = $"{w.Duration}min";
-        Volume = $"{w.Volume:F0} kg";
+        volumeKg = w.Volume; Volume = units.Format(volumeKg, "N0");
         Notes = w.Notes;
         HasNotes = !string.IsNullOrWhiteSpace(w.Notes);
         UserName = w.UserName;
@@ -129,7 +142,7 @@ public partial class WorkoutDetailViewModel : BaseViewModel, IQueryAttributable
         WorkoutName = record.Name;
         WorkoutDate = DateTime.TryParse(record.Date, out var d) ? d.ToString("dd MMM yyyy HH:mm") : record.Date;
         Duration = $"{record.Duration}min";
-        Volume = $"{record.Volume:F0} kg";
+        volumeKg = record.Volume; Volume = units.Format(volumeKg, "N0");
         Notes = record.Notes;
         HasNotes = !string.IsNullOrWhiteSpace(record.Notes);
         Likes = record.Likes;
@@ -169,6 +182,7 @@ public partial class WorkoutDetailViewModel : BaseViewModel, IQueryAttributable
                     {
                         var set = new DetailSet { SetNumber = i++, Kind = s.TryGetProperty("kind", out var kind) ? kind.GetString() ?? "normal" : "normal" };
                         if (s.TryGetProperty("weightKg", out var wk) && wk.TryGetDouble(out var w)) set.WeightKg = w;
+                        set.WeightDisplay = units.Format(set.WeightKg);
                         if (s.TryGetProperty("reps", out var rp) && rp.TryGetInt32(out var r)) set.Reps = r;
                         if (s.TryGetProperty("isCompleted", out var ic) && ic.ValueKind == JsonValueKind.True) set.IsCompleted = true;
                         ex.Sets.Add(set);

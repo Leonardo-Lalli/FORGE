@@ -2,13 +2,14 @@
 <ContentPage
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:controls="clr-namespace:Forge.Controls"
     xmlns:vm="clr-namespace:Forge.ViewModels"
     x:Class="Forge.Views.HomePage"
     x:DataType="vm:HomeViewModel"
     Title="FORGE"
     Shell.NavBarIsVisible="False">
 
-    <Grid RowDefinitions="Auto,*" BackgroundColor="{DynamicResource Surface}">
+    <Grid RowDefinitions="Auto,*,Auto" BackgroundColor="{DynamicResource Surface}">
 
         <!-- TopBar — profilo elite nero opaco mockup -->
         <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto"
@@ -50,6 +51,7 @@
         <!-- Main Scroll -->
         <ScrollView Grid.Row="1" Padding="24,0,24,100">
             <VerticalStackLayout Spacing="48">
+                <controls:PlanSyncStatus />
 
                 <!-- ===== Squad Activity ===== -->
                 <VerticalStackLayout Spacing="16">
@@ -244,6 +246,7 @@
 
             </VerticalStackLayout>
         </ScrollView>
+        <controls:MiniWorkoutBar Grid.Row="2" />
     </Grid>
 
 </ContentPage>

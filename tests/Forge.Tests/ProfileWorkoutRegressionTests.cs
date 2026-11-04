@@ -167,5 +167,16 @@ public class ProfileWorkoutRegressionTests : IAsyncLifetime
     }
     private static HttpResponseMessage Json(string value) => new(HttpStatusCode.OK) { Content = new StringContent(value, Encoding.UTF8, "application/json") };
     private sealed class Factory(Func<HttpRequestMessage, HttpResponseMessage> respond) : IHttpClientFactory { public HttpClient CreateClient(string name) => new(new Handler(respond)); }
-    private sealed class Handler(Func<HttpRequestMessage, HttpResponseMessage> respond) : HttpMessageHandler { protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken token) => Task.FromResult(respond(request)); }
+    private sealed class Handler(Func<HttpRequestMessage, HttpResponseMessage> respond) : HttpMessageHandler
+    {
+        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken token)
+        {
+            if (request.RequestUri!.AbsolutePath.EndsWith("forge/plans/sync"))
+            {
+                var body = await request.Content!.ReadAsStringAsync(token);
+                return Json("{\"plans\":" + JsonDocument.Parse(body).RootElement.GetProperty("plans").GetRawText() + "}");
+            }
+            return respond(request);
+        }
+    }
 }

@@ -1,37 +1,27 @@
-# FORGE 0.8.5 beta
+# FORGE 0.8.5-beta
 
-Beta Android per provare FORGE e segnalare problemi. Codice, README e sito sono allineati al tag v0.8.5-beta.
+Versione approvata dal proprietario il 5 novembre 2026 e promossa su main. APK Android build 89, stesso certificato di firma delle precedenti build Release. Questa release sostituisce il precedente asset 0.8.5-beta: non sono pubblicate versioni 0.8.6/0.8.7.
 
-## Novità
+## Novità della versione approvata
 
-- Allenamento nei due temi, immagini e consigli rotanti, menu per sostituzione/ordine/rimozione degli esercizi.
-- Recupero per esercizio 0–5 minuti, timer Android con avanzamento, suono e vibrazione.
-- Note salvate automaticamente nelle schede; conferma separata per modifiche strutturali e nome.
-- Serie normali, warm-up, drop set e cedimento; suggerimenti dai carichi precedenti.
-- Profili, foto, dettagli allenamenti, follower/seguiti e privacy pubblica/privata/amici reciproci.
-- Achievement supportati retroattivi, livello da badge e badge selezionabili nel profilo.
-- Calendario/statistiche e refresh aggiornati, filtri esercizi corretti.
-- Invito condivisibile alla community con link al sito; stato vuoto utile sul server personale.
-- Documentazione e sito riscritti, gamification e schermate reali di sviluppo, roadmap semplificata.
-- Pacchetto server completo: Docker, installer LXC, hook, quattro migrazioni e worker FCM opzionale.
+- Allenamento minimizzabile, barra del recupero e salvataggio/ripristino della sessione per account.
+- Conferma X/Indietro con popup a tema, note multilinea ed esercizi non eseguiti esclusi dai conteggi.
+- Unità kg/libbre nelle impostazioni, applicata a inserimenti, storico, statistiche, profili, achievement e CSV; dati canonici in kg.
+- Icona FORGE e calendario Stats con dimensioni stabili.
+- Schede locali con sincronizzazione privata nell’account e coda offline: richiede l’aggiornamento PocketBase incluso nel pacchetto server.
+- Correzione dell’avvio Android: callback JNI esplicito e pacchetto rigenerato con verifica dei binari ARM64/x64.
+- Roadmap senza etichette di difficoltà, con date e storico.
 
-## Installazione e aggiornamento
+## Aggiornamento
 
-Scarica FORGE.apk e installa su Android 6.0/API 23 o successivo. Usa il server predefinito o imposta la tua istanza.
+Installare FORGE.apk come aggiornamento senza disinstallare. ApplicationId com.leoforge.forge, versionCode 89; firma SHA-256 87098c4bf774e2e2512d0635ef6f192de0939de844bc5953f4e6f142a04ebe87. APK SHA-256 805d38ea6263ea9ffbaed6c6d92ae6ee030730e21926f38bdc6399334967b9c0.
 
-**Firma nuova:** la 0.8.0 pubblicata e gli APK di prova avevano certificati Debug diversi. La 0.8.5 usa una chiave di release stabile e versionCode 85. Android potrebbe richiedere una reinstallazione: **il CSV è un riepilogo, non un backup completo di schede, foto, serie e carichi.** Verifica la sincronizzazione e conserva separatamente le schede e le foto prima di rimuovere l’app. Disinstallare senza conservare i dati li elimina dal telefono; gli allenamenti già sincronizzati restano sul server.
+Chi usa ancora vecchie build Debug con firma diversa deve conservare i dati prima di una migrazione: il CSV non è un backup completo di schede e foto. Disinstallare elimina i dati locali. Le schede cancellate prima dell’attivazione del backup account non ricompaiono automaticamente.
 
-Per il backend leggi docs/self-hosting.md: non basta avviare PocketBase o scaricare soltanto Compose. Le push social richiedono Firebase compatibile, chiave Admin solo server e worker. Il timer locale non richiede Firebase.
+## Server e limiti
 
-## Limiti della beta
+Il pacchetto server contiene hook/migrazioni per le schede account; la pubblicazione non aggiorna il server del proprietario. Seguire docs/account-plan-sync.md e docs/self-hosting.md. Nessun aggiornamento del server reale eseguito qui.
 
-- Prove sul dispositivo del proprietario, nessuna garanzia su tutti i telefoni.
-- Note automatiche/inviti recenti ancora da provare sul telefono; push FCM reale e nuova installazione Docker/LXC non verificate.
-- Schede locali associate all’account, nessuna promessa di sincronizzazione tra dispositivi o modalità completamente locale senza account.
-- Community separate per server, nessuna federazione o gestione trainer/palestre completa.
-- Alcuni criteri del catalogo achievement non implementati; medaglie per record delle singole serie solo idea futura.
-- GIF ospitate dal provider; conteggi del database includono duplicati e record senza media.
-- Schermate pubblicate tratte dall’archivio di sviluppo e precedenti ad alcuni aggiornamenti UI.
-- Aggiornamento dall’app non implementato; server predefinito senza disponibilità garantita.
+Prove automatiche .NET e controllo firma/callback confezionati; la precedente prova di due aperture nell’emulatore era inconclusiva per ANR anche di System UI. Il proprietario ha successivamente approvato l’app corrente; non si dichiara copertura su tutti i telefoni. Le richieste aggiuntive del 5 novembre (serie eliminabili, avambracci, timer continuo, CSV 5 MiB, riepilogo modifiche e navigazione mesi) appartengono alla successiva build develop e non a questo APK.
 
-Segnala problemi nelle issue indicando versione, Android, modello e passaggi per riprodurli, senza credenziali o dati privati.
+Il nome resta beta. Per rendere questa la release corrente anche su /releases/latest, il metadato GitHub prerelease viene disattivato: GitHub non consente il flag Latest sulle prerelease. Riferimento: https://docs.github.com/en/rest/releases/releases#update-a-release.

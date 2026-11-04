@@ -16,7 +16,8 @@ public partial class ProfileWorkout : ObservableObject
     public string Date { get; set; } = string.Empty;
     public string Exercises { get; set; } = string.Empty;
     public string Duration { get; set; } = string.Empty;
-    public string Volume { get; set; } = string.Empty;
+    public double VolumeKg { get; set; }
+    [ObservableProperty] private string volume = string.Empty;
     public int Likes { get; set; }
     public string BorderColor { get; set; } = "#ffb4ab";
     public string Notes { get; set; } = string.Empty;
@@ -51,6 +52,7 @@ public partial class ProfileViewModel : BaseViewModel
     public ObservableCollection<BadgeChoice> BadgeChoices { get; } = new();
     private Models.Dto.PocketBaseUserRecord? displayedUser;
     private List<Models.Dto.SocialGraphRecord> relationships = [];
+    private readonly WeightUnitService units;
     private readonly PocketBaseService pb;
     private readonly AchievementService achievementService;
     private readonly DatabaseService db;
@@ -79,9 +81,12 @@ public partial class ProfileViewModel : BaseViewModel
     [ObservableProperty] private bool hasUnlockedBadges;
     [ObservableProperty] private string achievementSummary = string.Empty;
 
-    public ProfileViewModel(PocketBaseService pb, AchievementService achievementService, DatabaseService db)
+    public ProfileViewModel(PocketBaseService pb, AchievementService achievementService, DatabaseService db, WeightUnitService units)
     {
         this.pb = pb;
+        this.units = units;
+        WeakReferenceMessenger.Default.Register<ProfileViewModel, WeightUnitChangedMessage>(this, static (vm, _) => { foreach (var workout in vm.RecentWorkouts) workout.Volume = vm.units.Format(workout.VolumeKg);
+            vm.TotalVolume = vm.units.Format(vm.loadedWorkouts.Sum(w => w.Volume)); });
         this.achievementService = achievementService;
         this.db = db;
         HasData = true;
@@ -190,7 +195,8 @@ public partial class ProfileViewModel : BaseViewModel
                     Date = dateStr,
                     Exercises = string.Join(", ", w.Exercises ?? new()),
                     Duration = $"{w.Duration} min",
-                    Volume = $"{w.Volume:0.#} kg",
+                    VolumeKg = w.Volume,
+                    Volume = units.Format(w.Volume),
                     Likes = w.Likes,
                     BorderColor = colors[ci % colors.Length],
                     Notes = w.Notes ?? "",
@@ -201,7 +207,7 @@ public partial class ProfileViewModel : BaseViewModel
                 ci++;
             }
 
-            TotalVolume = $"{totalVol:0.#} kg";
+            TotalVolume = units.Format(totalVol);
             TotalLikesReceived = totalLikes.ToString();
 
             if (workouts.Count == 0)
@@ -216,7 +222,7 @@ public partial class ProfileViewModel : BaseViewModel
         {
             System.Diagnostics.Debug.WriteLine($"[Profile] LoadRealWorkouts ex: {ex}");
             TotalWorkouts = "0";
-            TotalVolume = "0 kg";
+            TotalVolume = units.Format(0);
             WorkoutLoadError = $"Errore caricamento: {ex.Message}";
             HasWorkoutError = true;
         }

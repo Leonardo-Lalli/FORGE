@@ -11,6 +11,10 @@ namespace Forge.ViewModels;
 public partial class ActiveWorkoutViewModel : BaseViewModel, IQueryAttributable
 {
     private readonly WorkoutSession workoutSession;
+    private readonly WeightUnitService units;
+    public string WeightUnitLabel => units.Symbol.ToUpperInvariant();
+    public string MaxWeightMetric => $"Peso massimo ({units.Symbol})";
+    public string VolumeMetric => $"Volume totale ({units.Symbol})";
     private readonly ExerciseDbApiService exerciseDbApi;
     private readonly PocketBaseService pb;
     private readonly PlanService planService;
@@ -28,6 +32,114 @@ public partial class ActiveWorkoutViewModel : BaseViewModel, IQueryAttributable
     private CancellationTokenSource? notesSaveCts;
     private readonly SemaphoreSlim notesSaveGate = new(1, 1);
     private readonly HashSet<WorkoutExercise> noteSubscriptions = [];
+    private readonly HashSet<ExerciseSet> setSubscriptions = [];
+    private readonly HashSet<System.Collections.ObjectModel.ObservableCollection<ExerciseSet>> setCollections = [];
+    private readonly SemaphoreSlim draftGate = new(1, 1);
+    private CancellationTokenSource? draftSaveCts;
+    private bool sessionSuspended;
+    private int suspendedElapsedSeconds;
+    private string sessionOwner = "";
+    private bool sessionClosed = true;
+    [ObservableProperty] private bool isCloseConfirmationVisible;
+    [RelayCommand] private void RequestClose() => IsCloseConfirmationVisible = true;
+    [RelayCommand] private void KeepWorkout() => IsCloseConfirmationVisible = false;
+    [RelayCommand]
+    private async Task DiscardWorkoutAsync()
+    {
+        if (IsBusy || IsFinishingWorkout) return;
+        if (!await PersistPlanNotesAsync()) return;
+        await draftGate.WaitAsync();
+        try
+        {
+            if (sessionDraftId != null) await db.DeleteWorkoutAsync(sessionDraftId);
+            sessionClosed = true;
+            draftSaveCts?.Cancel();
+            sessionDraftId = null;
+        }
+        catch (Exception ex) { System.Diagnostics.Debug.WriteLine(ex.GetType().Name); ShowNotification("Impossibile eliminare la bozza. Riprova."); return; }
+        finally { draftGate.Release(); }
+        IsCloseConfirmationVisible = false;
+        StopSession();
+        await Shell.Current.GoToAsync("..");
+    }
+    private void StopSession()
+    {
+        sessionClosed = true;
+        draftSaveCts?.Cancel();
+        elapsedCts?.Cancel();
+        restCts?.Cancel();
+        notifications.CancelRest();
+        IsTimerRunning = false;
+        IsCreating = false;
+        sessionSuspended = false;
+        IsCloseConfirmationVisible = false;
+        IsRestTimerActive = false;
+        RestTimerText = "";
+        IsRestPaused = false;
+        IsSearchVisible = false;
+        searchCts?.Cancel();
+        searchGeneration++;
+        IsExerciseDetailVisible = false;
+        IsExerciseMenuVisible = false;
+        IsRestPickerVisible = false;
+        IsSetKindVisible = false;
+        IsProgressMetricMenuVisible = false;
+        SelectedExercise = null;
+        NotificationMessage = "";
+        planNotesReady = false;
+        notesSaveCts?.Cancel();
+        workoutSession.SuspendHandler = null;
+        workoutSession.ForegroundHandler = null;
+        workoutSession.End();
+    }
+    private void QueueDraftSave()
+    {
+        if (sessionClosed || restoringDraft || IsBusy || !IsTimerRunning) return;
+        draftSaveCts?.Cancel();
+        draftSaveCts = new();
+        _ = SaveDraftAfterTypingAsync(draftSaveCts.Token);
+    }
+    private async Task SaveDraftAfterTypingAsync(CancellationToken token)
+    {
+        try { await Task.Delay(200, token); await SaveDraftAsync(); }
+        catch (OperationCanceledException) { }
+    }
+    private void TrackDraftSets()
+    {
+        foreach (var collection in setCollections) collection.CollectionChanged -= OnSetsChanged;
+        setCollections.Clear();
+        foreach (var set in setSubscriptions) set.PropertyChanged -= OnSetChanged;
+        setSubscriptions.Clear();
+        foreach (var ex in Exercises)
+        {
+            if (setCollections.Add(ex.Sets)) ex.Sets.CollectionChanged += OnSetsChanged;
+            foreach (var set in ex.Sets)
+                if (setSubscriptions.Add(set)) { set.ConfigureUnits(units); set.PropertyChanged += OnSetChanged; }
+        }
+    }
+    private void OnSetsChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e) { TrackDraftSets(); QueueDraftSave(); }
+    private void OnSetChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e) { if (e.PropertyName is nameof(ExerciseSet.Reps) or nameof(ExerciseSet.WeightKg) or nameof(ExerciseSet.IsCompleted) or nameof(ExerciseSet.Kind)) QueueDraftSave(); }
+    partial void OnPlanNameInputChanged(string value) => QueueDraftSave();
+    private async Task SuspendSessionAsync()
+    {
+        if (!IsTimerRunning || sessionClosed || sessionSuspended) return;
+        suspendedElapsedSeconds = Math.Max(0, (int)(DateTime.Now - workoutStartTime).TotalSeconds);
+        sessionSuspended = true;
+        workoutSession.Suspend();
+        elapsedCts?.Cancel();
+        restCts?.Cancel();
+        if (notifications.RestRemaining > 0 && !notifications.IsRestPaused) notifications.ToggleRestPause();
+        await SaveDraftAsync();
+    }
+    private async Task ShowMinimizedAfterResumeAsync()
+    {
+        if (!sessionSuspended || sessionClosed) return;
+        if (!workoutSession.IsMinimized)
+        {
+            workoutSession.Minimize();
+            await Shell.Current.GoToAsync("..");
+        }
+    }
     private int activeRestDuration;
     private List<LocalWorkout> previousHistory = [];
     private WorkoutExercise? replacingExercise;
@@ -59,7 +171,7 @@ public partial class ActiveWorkoutViewModel : BaseViewModel, IQueryAttributable
     [RelayCommand] private void PauseRestTimer() { notifications.ToggleRestPause(); IsRestPaused = notifications.IsRestPaused; }
     [RelayCommand] private void RestSoundSettings() => notifications.OpenRestSoundSettings();
     [RelayCommand] private void EnableExactRest() => notifications.RequestExactRestPermission();
-    public IReadOnlyList<string> ProgressMetrics { get; } = new[] { "Peso massimo (kg)", "Serie completate", "Ripetizioni totali", "Volume totale (kg)" };
+    public IReadOnlyList<string> ProgressMetrics => new[] { MaxWeightMetric, "Serie completate", "Ripetizioni totali", VolumeMetric };
     [ObservableProperty, NotifyPropertyChangedFor(nameof(SelectedProgressMetric))] private int progressMetricIndex;
     public string SelectedProgressMetric => ProgressMetrics[Math.Clamp(ProgressMetricIndex, 0, ProgressMetrics.Count - 1)];
     [ObservableProperty] private bool isProgressMetricMenuVisible;
@@ -71,7 +183,7 @@ public partial class ActiveWorkoutViewModel : BaseViewModel, IQueryAttributable
     partial void OnProgressMetricIndexChanged(int value) => BuildExerciseProgress();
     private void BuildExerciseProgress()
     {
-        ExerciseProgressPoints = new(SelectedExercise == null ? [] : ExerciseProgress.Build(previousHistory, SelectedExercise, ProgressMetricIndex));
+        ExerciseProgressPoints = new(SelectedExercise == null ? [] : ExerciseProgress.Build(previousHistory, SelectedExercise, ProgressMetricIndex).Select(p => p with { Value = ProgressMetricIndex is 0 or 3 ? units.ToDisplay(p.Value) : p.Value }));
         HasExerciseProgress = ExerciseProgressPoints.Count > 0;
     }
     public IReadOnlyList<int> RestMinuteOptions { get; } = Enumerable.Range(0, 6).ToList();
@@ -118,7 +230,7 @@ public partial class ActiveWorkoutViewModel : BaseViewModel, IQueryAttributable
     [ObservableProperty] private string planNameInput = string.Empty;
     [ObservableProperty] private double progressPercent = 37.5;
     [ObservableProperty] private string workoutNotes = string.Empty;
-    partial void OnWorkoutNotesChanged(string value) => QueueNotesSave();
+    partial void OnWorkoutNotesChanged(string value) { QueueNotesSave(); QueueDraftSave(); }
 
     private void TrackExerciseNotes()
     {
@@ -133,6 +245,7 @@ public partial class ActiveWorkoutViewModel : BaseViewModel, IQueryAttributable
     private void OnExerciseNoteChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(WorkoutExercise.Notes)) QueueNotesSave();
+        if (e.PropertyName is nameof(WorkoutExercise.Notes) or nameof(WorkoutExercise.RestSeconds) or nameof(WorkoutExercise.Order)) QueueDraftSave();
     }
     private void QueueNotesSave()
     {
@@ -266,9 +379,20 @@ public partial class ActiveWorkoutViewModel : BaseViewModel, IQueryAttributable
         }
     }
 
-    public ActiveWorkoutViewModel(WorkoutSession workoutSession, ExerciseDbApiService exerciseDbApi, PocketBaseService pb, PlanService planService, DatabaseService db, ConnectivityService connectivity, NotificationService notifications)
+    public ActiveWorkoutViewModel(WorkoutSession workoutSession, ExerciseDbApiService exerciseDbApi, PocketBaseService pb, PlanService planService, DatabaseService db, ConnectivityService connectivity, NotificationService notifications, WeightUnitService units)
     {
         this.workoutSession = workoutSession;
+        this.units = units;
+        WeakReferenceMessenger.Default.Register<ActiveWorkoutViewModel, WeightUnitChangedMessage>(this, static (vm, _) =>
+        {
+            vm.TrackDraftSets();
+            vm.OnPropertyChanged(nameof(WeightUnitLabel));
+            vm.OnPropertyChanged(nameof(MaxWeightMetric));
+            vm.OnPropertyChanged(nameof(VolumeMetric));
+            vm.OnPropertyChanged(nameof(ProgressMetrics));
+            vm.OnPropertyChanged(nameof(SelectedProgressMetric));
+            vm.BuildExerciseProgress();
+        });
         this.exerciseDbApi = exerciseDbApi;
         this.pb = pb;
         this.planService = planService;
@@ -284,7 +408,8 @@ public partial class ActiveWorkoutViewModel : BaseViewModel, IQueryAttributable
 
         workoutStartTime = DateTime.Now;
 
-        Exercises.CollectionChanged += (_, _) => { HasExercises = Exercises.Count > 0; TrackExerciseNotes(); };
+        Exercises.CollectionChanged += (_, _) => { HasExercises = Exercises.Count > 0; TrackExerciseNotes(); TrackDraftSets(); QueueDraftSave(); };
+        WorkoutPhotos.CollectionChanged += (_, _) => QueueDraftSave();
 
         MuscleFilters = new ObservableCollection<FilterChip>
         {
@@ -321,8 +446,30 @@ public partial class ActiveWorkoutViewModel : BaseViewModel, IQueryAttributable
 
     private async Task InitializeSessionAsync(string requestedMode, string requestedPlanId)
     {
-        if (IsBusy || IsTimerRunning || IsCreating) return;
+        if (IsBusy || IsFinishingWorkout) return;
+        if (IsTimerRunning && !sessionClosed && sessionOwner == (pb.CurrentUser?.Id ?? ""))
+        {
+            if (sessionSuspended)
+            {
+                workoutStartTime = DateTime.Now.AddSeconds(-suspendedElapsedSeconds);
+                sessionSuspended = false;
+                _ = RunElapsedTimerAsync();
+                if (notifications.RestRemaining > 0) { activeRestDuration = notifications.RestRemaining; restCts = new(); RunTimerAsync(restCts.Token); }
+            }
+            workoutSession.Restore();
+            workoutSession.SuspendHandler = SuspendSessionAsync;
+            workoutSession.ForegroundHandler = ShowMinimizedAfterResumeAsync;
+            return;
+        }
+        if (workoutSession.IsActive && (sessionClosed || sessionOwner != (pb.CurrentUser?.Id ?? ""))) requestedMode = "resume";
         IsBusy = true;
+        await draftGate.WaitAsync();
+        try
+        {
+            StopSession();
+            sessionOwner = pb.CurrentUser?.Id ?? "";
+        }
+        finally { draftGate.Release(); }
         ErrorMessage = null;
         HasData = false;
         IsEmptyState = false;
@@ -340,6 +487,7 @@ public partial class ActiveWorkoutViewModel : BaseViewModel, IQueryAttributable
             HasWorkoutPhotos = false;
             WorkoutNotes = "";
             PlanNameInput = "";
+            TotalSetsCompleted = 0;
             PlanName = IsCreating ? "Nuova Scheda" : "Allenamento Libero";
             originalPlanSignature = null;
             sessionDraftId = null;
@@ -351,12 +499,18 @@ public partial class ActiveWorkoutViewModel : BaseViewModel, IQueryAttributable
             if (Mode != "resume") notifications.CancelRest();
             if (Mode == "plan") await LoadPlanAsync();
             else if (Mode == "resume") await LoadDraftAsync();
+            TotalSetsCompleted = Exercises.Sum(e => e.Sets.Count(WorkoutCompletion.IsLoggedSet));
 
             HasData = true;
             if (!IsCreating)
             {
+                sessionClosed = false;
                 IsTimerRunning = true;
                 workoutSession.Start(PlanName);
+                workoutSession.SuspendHandler = SuspendSessionAsync;
+                workoutSession.ForegroundHandler = ShowMinimizedAfterResumeAsync;
+                TrackDraftSets();
+                await SaveDraftAsync();
                 _ = RunElapsedTimerAsync();
                 if (notifications.RestRemaining > 0) { IsRestTimerActive = true; activeRestDuration = notifications.RestRemaining; restCts = new(); RunTimerAsync(restCts.Token); }
             }
@@ -616,7 +770,10 @@ public partial class ActiveWorkoutViewModel : BaseViewModel, IQueryAttributable
         };
         var previous = PreviousPerformance.Find(previousHistory, exercise);
         foreach (var (weight, reps) in previous)
-            exercise.Sets.Add(new ExerciseSet { SetNumber = exercise.Sets.Count + 1, WeightKg = weight, Reps = reps, IsSuggested = true, PreviousText = $"{weight:0.#} × {reps}" });
+        {
+            exercise.Sets.Add(new ExerciseSet { SetNumber = exercise.Sets.Count + 1, WeightKg = weight, Reps = reps, IsSuggested = true });
+            exercise.Sets.Last().SetPrevious(weight, reps);
+        }
         if (exercise.Sets.Count == 0) exercise.Sets.Add(new ExerciseSet { SetNumber = 1, Reps = 10 });
         var index = replacingExercise == null ? -1 : Exercises.IndexOf(replacingExercise);
         if (index >= 0)
@@ -628,7 +785,7 @@ public partial class ActiveWorkoutViewModel : BaseViewModel, IQueryAttributable
         else Exercises.Add(exercise);
         replacingExercise = null;
         Renumber();
-        TotalSetsCompleted = Exercises.Sum(e => e.Sets.Count(s => s.IsCompleted));
+        TotalSetsCompleted = Exercises.Sum(e => e.Sets.Count(WorkoutCompletion.IsLoggedSet));
         IsSearchVisible = false;
         SearchQuery = string.Empty;
         SearchResults.Clear();
@@ -648,7 +805,8 @@ public partial class ActiveWorkoutViewModel : BaseViewModel, IQueryAttributable
         var last = ex.Sets.LastOrDefault();
         var previous = PreviousPerformance.Find(previousHistory, ex);
         var suggestion = ex.Sets.Count < previous.Count ? previous[ex.Sets.Count] : ((double Weight, int Reps)?)null;
-        ex.Sets.Add(new ExerciseSet { SetNumber = ex.Sets.Count + 1, WeightKg = suggestion?.Weight ?? last?.WeightKg ?? 0, Reps = suggestion?.Reps ?? last?.Reps ?? 10, IsSuggested = suggestion != null, PreviousText = suggestion is { } previousSet ? $"{previousSet.Weight:0.#} × {previousSet.Reps}" : "—" });
+        ex.Sets.Add(new ExerciseSet { SetNumber = ex.Sets.Count + 1, WeightKg = suggestion?.Weight ?? last?.WeightKg ?? 0, Reps = suggestion?.Reps ?? last?.Reps ?? 10, IsSuggested = suggestion != null });
+        if (suggestion is { } previousSet) ex.Sets.Last().SetPrevious(previousSet.Weight, previousSet.Reps);
     }
 
     [RelayCommand]
@@ -661,8 +819,8 @@ public partial class ActiveWorkoutViewModel : BaseViewModel, IQueryAttributable
 
     [RelayCommand] private void IncReps(ExerciseSet s) => s.Reps++;
     [RelayCommand] private void DecReps(ExerciseSet s) { if (s.Reps > 1) s.Reps--; }
-    [RelayCommand] private void IncWeight(ExerciseSet s) => s.WeightKg += 2.5;
-    [RelayCommand] private void DecWeight(ExerciseSet s) { if (s.WeightKg >= 2.5) s.WeightKg -= 2.5; }
+    [RelayCommand] private void IncWeight(ExerciseSet s) => s.DisplayWeight += 2.5;
+    [RelayCommand] private void DecWeight(ExerciseSet s) { if (s.DisplayWeight >= 2.5) s.DisplayWeight -= 2.5; }
 
     [RelayCommand]
     private async Task CompleteSetAsync(ExerciseSet set)
@@ -717,6 +875,7 @@ public partial class ActiveWorkoutViewModel : BaseViewModel, IQueryAttributable
         RefreshRestTimerUI();
         workoutSession.UpdateRestTimer(true, RestTimerText);
         RunTimerAsync(token);
+        QueueDraftSave();
     }
 
     private void RunTimerAsync(CancellationToken token)
@@ -844,7 +1003,9 @@ public partial class ActiveWorkoutViewModel : BaseViewModel, IQueryAttributable
 
         try
         {
-            var exerciseData = Exercises.Select(e => new
+            var completedExercises = WorkoutCompletion.LoggedExercises(Exercises);
+            if (completedExercises.Count == 0) { ShowNotification("Completa almeno una serie con ripetizioni prima di terminare."); return false; }
+            var exerciseData = completedExercises.Select(e => new
             {
                 id = e.Id,
                 exerciseId = e.ExerciseId,
@@ -853,7 +1014,7 @@ public partial class ActiveWorkoutViewModel : BaseViewModel, IQueryAttributable
                 equipment = e.Equipment,
                 notes = e.Notes,
                 restSeconds = e.RestSeconds,
-                sets = e.Sets.Select(s => new
+                sets = e.Sets.Where(WorkoutCompletion.IsLoggedSet).Select(s => new
                 {
                     setNumber = s.SetNumber,
                     kind = s.Kind,
@@ -863,7 +1024,7 @@ public partial class ActiveWorkoutViewModel : BaseViewModel, IQueryAttributable
                 }).ToList()
             }).ToList();
 
-            var volume = Exercises.Sum(e => e.Sets.Where(s => s.IsCompleted).Sum(s => s.WeightKg * s.Reps));
+            var volume = completedExercises.Sum(e => e.Sets.Where(WorkoutCompletion.IsLoggedSet).Sum(s => s.WeightKg * s.Reps));
             var duration = (int)(DateTime.Now - workoutStartTime).TotalMinutes;
 
             var localWorkout = new Models.LocalWorkout
@@ -872,7 +1033,7 @@ public partial class ActiveWorkoutViewModel : BaseViewModel, IQueryAttributable
                 UserId = user.Id,
                 Name = name,
                 Date = workoutStartTime.ToUniversalTime().ToString("o"),
-                ExercisesJson = System.Text.Json.JsonSerializer.Serialize(Exercises.Select(e => e.ExerciseName).ToList()),
+                ExercisesJson = System.Text.Json.JsonSerializer.Serialize(completedExercises.Select(e => e.ExerciseName).ToList()),
                 Volume = volume,
                 Duration = Math.Max(1, duration),
                 Notes = WorkoutNotes ?? "",
@@ -882,7 +1043,15 @@ public partial class ActiveWorkoutViewModel : BaseViewModel, IQueryAttributable
                 PendingSync = true
             };
             // Durable local save is the success boundary, before any network request.
-            await db.SaveWorkoutAsync(localWorkout);
+            await draftGate.WaitAsync();
+            try
+            {
+                await db.CompleteWorkoutAsync(localWorkout, sessionDraftId);
+                sessionClosed = true;
+                draftSaveCts?.Cancel();
+                sessionDraftId = null;
+            }
+            finally { draftGate.Release(); }
             WeakReferenceMessenger.Default.Send(new WorkoutSavedMessage());
 
             try
@@ -905,26 +1074,27 @@ public partial class ActiveWorkoutViewModel : BaseViewModel, IQueryAttributable
     [RelayCommand]
     private async Task MinimizeWorkoutAsync()
     {
-        if (IsBusy) return;
+        if (IsBusy || IsFinishingWorkout) return;
+        IsCloseConfirmationVisible = false;
         if (!await PersistPlanNotesAsync()) return;
-        if (Exercises.Count > 0)
+        if (!IsCreating)
         {
             if (!await SaveDraftAsync()) return;
             workoutSession.Minimize();
         }
         else
         {
-            workoutSession.End();
+            StopSession();
         }
-        elapsedCts?.Cancel();
-        restCts?.Cancel();
         await Shell.Current.GoToAsync("..");
     }
 
     private async Task<bool> SaveDraftAsync()
     {
+        await draftGate.WaitAsync();
         try
         {
+            if (sessionClosed || sessionOwner != (pb.CurrentUser?.Id ?? "")) return true;
             // Replace only this session's draft; an unrelated interrupted workout stays available.
             var oldDraftId = sessionDraftId;
 
@@ -953,7 +1123,7 @@ public partial class ActiveWorkoutViewModel : BaseViewModel, IQueryAttributable
 
             var draft = new Models.LocalWorkout
             {
-                Id = "draft_" + Guid.NewGuid().ToString()[..8],
+                Id = sessionDraftId ?? "draft_" + Guid.NewGuid().ToString()[..8],
                 PlanId = IsPlanWorkout ? PlanId : "",
                 UserId = pb.IsLoggedIn ? pb.CurrentUser?.Id ?? "" : "",
                 Name = string.IsNullOrWhiteSpace(PlanNameInput) ? PlanName : PlanNameInput,
@@ -962,6 +1132,9 @@ public partial class ActiveWorkoutViewModel : BaseViewModel, IQueryAttributable
                 ExerciseDataJson = System.Text.Json.JsonSerializer.Serialize(exerciseData),
                 Volume = volume,
                 Duration = Math.Max(1, duration),
+                DraftElapsedSeconds = sessionSuspended ? suspendedElapsedSeconds : Math.Max(0, (int)(DateTime.Now - workoutStartTime).TotalSeconds),
+                DraftRestSeconds = notifications.RestRemaining,
+                DraftStateVersion = 1,
                 Notes = WorkoutNotes ?? "",
                 UserName = pb.IsLoggedIn ? pb.CurrentUser?.Name ?? "" : "",
                 PhotosJson = System.Text.Json.JsonSerializer.Serialize(WorkoutPhotos.ToList()),
@@ -969,7 +1142,7 @@ public partial class ActiveWorkoutViewModel : BaseViewModel, IQueryAttributable
             };
             await db.SaveWorkoutAsync(draft);
             sessionDraftId = draft.Id;
-            if (oldDraftId != null) await db.DeleteWorkoutAsync(oldDraftId);
+            if (oldDraftId != null && oldDraftId != draft.Id) await db.DeleteWorkoutAsync(oldDraftId);
             System.Diagnostics.Debug.WriteLine($"[Draft] saved id={draft.Id}");
             return true;
         }
@@ -979,6 +1152,7 @@ public partial class ActiveWorkoutViewModel : BaseViewModel, IQueryAttributable
             ShowNotification("Impossibile salvare la bozza. L’allenamento resta aperto: riprova.");
             return false;
         }
+        finally { draftGate.Release(); }
     }
 
     private async Task<List<LocalWorkout>> GetDraftsAsync()
@@ -1045,7 +1219,12 @@ public partial class ActiveWorkoutViewModel : BaseViewModel, IQueryAttributable
             PlanName = draft.Name;
             PlanNameInput = draft.Name;
             WorkoutNotes = draft.Notes;
-            workoutStartTime = DateTime.Now.AddMinutes(-draft.Duration);
+            workoutStartTime = DateTime.Now.AddSeconds(-WorkoutCompletion.ElapsedSeconds(draft));
+            if (draft.DraftRestSeconds > 0)
+            {
+                notifications.ScheduleRest(draft.DraftRestSeconds);
+                notifications.ToggleRestPause();
+            }
             if (!string.IsNullOrEmpty(PlanId))
             {
                 var original = (await planService.LoadPlansAsync()).FirstOrDefault(p => p.Id == PlanId);
@@ -1087,6 +1266,11 @@ public partial class ActiveWorkoutViewModel : BaseViewModel, IQueryAttributable
     }
     private async Task FinishWorkoutCoreAsync()
     {
+        if (WorkoutCompletion.LoggedExercises(Exercises).Count == 0)
+        {
+            ShowNotification("Completa almeno una serie con ripetizioni prima di terminare.");
+            return;
+        }
         if (!await PersistPlanNotesAsync()) return;
         if (IsPlanWorkout && originalPlanSignature != null && CurrentPlanSignature() != originalPlanSignature && !planChoiceResolved)
         { IsPlanUpdateVisible = true; return; }
@@ -1097,9 +1281,9 @@ public partial class ActiveWorkoutViewModel : BaseViewModel, IQueryAttributable
         }
         if (Exercises.Count > 0 && IsTimerRunning)
         {
+            draftSaveCts?.Cancel();
             if (!await SaveToPocketBaseAsync(string.IsNullOrWhiteSpace(PlanNameInput) ? PlanName : PlanNameInput.Trim())) { planChoiceResolved = false; return; }
-            // Remove recovery data only after the finished workout is durable.
-            if (sessionDraftId != null) await db.DeleteWorkoutAsync(sessionDraftId);
+            // The local transaction saves the workout and removes its draft together.
         }
 
         elapsedCts?.Cancel();
@@ -1108,7 +1292,7 @@ public partial class ActiveWorkoutViewModel : BaseViewModel, IQueryAttributable
 
         planNotesReady = false;
         notesSaveCts?.Cancel();
-        workoutSession.End();
+        StopSession();
         await Shell.Current.GoToAsync("..");
     }
 
@@ -1147,6 +1331,7 @@ public partial class ActiveWorkoutViewModel : BaseViewModel, IQueryAttributable
                 var e = DateTime.Now - workoutStartTime;
                 ElapsedTime = $"{(int)e.TotalHours:D2}:{e.Minutes:D2}:{e.Seconds:D2}";
                 workoutSession.UpdateElapsed(ElapsedTime);
+                if (e.Seconds % 5 == 0) await SaveDraftAsync();
                 if (e.Seconds % 6 == 0) foreach (var exercise in Exercises) exercise.AdvanceExecutionTip();
                 await Task.Delay(1000, token);
             }

@@ -3,14 +3,24 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Forge.Models;
 using Forge.Services;
+using CommunityToolkit.Mvvm.Messaging;
+using Forge.Messages;
 
 namespace Forge.ViewModels;
 
 public partial class AchievementDisplay : ObservableObject
 {
+    private WeightUnitService? units;
+    public void ConfigureUnits(WeightUnitService service)
+    {
+        units = service;
+        var definition = AchievementsCatalog.All.First(a => a.Id == Id);
+        Description = service.AchievementDescription(Id, definition.Description);
+        OnPropertyChanged(nameof(ProgressText));
+    }
     public string Id { get; set; } = string.Empty;
     public string Name { get; set; } = string.Empty;
-    public string Description { get; set; } = string.Empty;
+    [ObservableProperty] private string description = string.Empty;
     public string Category { get; set; } = string.Empty;
     public string Icon { get; set; } = "🏆";
     public int Progress { get; set; }
@@ -18,7 +28,7 @@ public partial class AchievementDisplay : ObservableObject
     public bool IsUnlocked { get; set; }
     public double ProgressPercent => MaxProgress > 0 ? Math.Clamp((double)Progress / MaxProgress, 0, 1) : 0;
     public double CardOpacity => IsUnlocked ? 1 : 0.65;
-    public string ProgressText => $"{Progress}/{MaxProgress}";
+    public string ProgressText => units?.AchievementProgress(Id, Progress, MaxProgress) ?? $"{Progress}/{MaxProgress}";
     public string CategoryIcon => Category switch
     {
         "Costanza" => "📅",
@@ -34,6 +44,11 @@ public partial class AchievementDisplay : ObservableObject
 public partial class AchievementsViewModel : BaseViewModel
 {
     private readonly AchievementService achievementService;
+    private readonly WeightUnitService units;
+    private void RefreshUnits()
+    {
+        foreach (var achievement in Achievements.Concat(RecentUnlocks)) achievement.ConfigureUnits(units);
+    }
 
     [ObservableProperty] private ObservableCollection<AchievementDisplay> achievements = new();
     [ObservableProperty] private ObservableCollection<AchievementDisplay> recentUnlocks = new();
@@ -45,9 +60,11 @@ public partial class AchievementsViewModel : BaseViewModel
     [ObservableProperty] private string experienceText = "Livello 1 · 0 XP";
     [ObservableProperty] private double levelProgress;
 
-    public AchievementsViewModel(AchievementService achievementService)
+    public AchievementsViewModel(AchievementService achievementService, WeightUnitService units)
     {
         this.achievementService = achievementService;
+        this.units = units;
+        WeakReferenceMessenger.Default.Register<AchievementsViewModel, WeightUnitChangedMessage>(this, static (vm, _) => vm.RefreshUnits());
         HasData = true;
     }
 
@@ -97,6 +114,7 @@ public partial class AchievementsViewModel : BaseViewModel
                     IsUnlocked = true
                 }));
             HasRecentUnlocks = RecentUnlocks.Count > 0;
+            RefreshUnits();
 
             SetSuccess(true);
         }

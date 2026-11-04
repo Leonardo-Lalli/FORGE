@@ -7,6 +7,7 @@ namespace Forge.ViewModels;
 public partial class LoginViewModel : BaseViewModel
 {
     private readonly PocketBaseService pb;
+    private readonly WorkoutSession workoutSession;
 
     [ObservableProperty] private string email = string.Empty;
     [ObservableProperty] private string password = string.Empty;
@@ -14,9 +15,10 @@ public partial class LoginViewModel : BaseViewModel
     [ObservableProperty] private string name = string.Empty;
     [ObservableProperty] private bool isRegistering;
 
-    public LoginViewModel(PocketBaseService pb)
+    public LoginViewModel(PocketBaseService pb, WorkoutSession workoutSession)
     {
         this.pb = pb;
+        this.workoutSession = workoutSession;
         HasData = true;
         _ = TryAutoLoginAsync().ContinueWith(t =>
         {
@@ -32,6 +34,7 @@ public partial class LoginViewModel : BaseViewModel
         var success = await pb.TryAutoLoginAsync();
         if (success)
         {
+            await workoutSession.RecoverAsync();
             var window = App.Current!.Windows[0];
             window.Page = new AppShell();
         }
@@ -52,6 +55,7 @@ public partial class LoginViewModel : BaseViewModel
 
         if (success)
         {
+            await workoutSession.RecoverAsync();
             SetSuccess(true);
             var window = App.Current!.Windows[0];
             window.Page = new AppShell();
@@ -85,6 +89,7 @@ public partial class LoginViewModel : BaseViewModel
 
         if (success)
         {
+            await workoutSession.RecoverAsync();
             SetSuccess(true);
             var window = App.Current!.Windows[0];
             window.Page = new AppShell();

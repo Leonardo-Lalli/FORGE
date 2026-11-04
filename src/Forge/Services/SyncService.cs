@@ -10,13 +10,15 @@ public class SyncService
     private readonly DatabaseService db;
     private readonly PocketBaseService pb;
     private readonly ConnectivityService connectivity;
+    private readonly PlanService plans;
     private readonly SemaphoreSlim syncGate = new(1, 1);
 
-    public SyncService(DatabaseService db, PocketBaseService pb, ConnectivityService connectivity)
+    public SyncService(DatabaseService db, PocketBaseService pb, ConnectivityService connectivity, PlanService plans)
     {
         this.db = db;
         this.pb = pb;
         this.connectivity = connectivity;
+        this.plans = plans;
         connectivity.ConnectivityChanged += (_, online) =>
         {
             if (online) _ = SyncPendingWorkoutsAsync().ContinueWith(t =>
@@ -32,6 +34,7 @@ public class SyncService
         if (!IsOnline || !await syncGate.WaitAsync(0)) return;
         try
         {
+            await plans.SyncPlansAsync();
             var userId = pb.CurrentUser?.Id;
             var pending = await db.GetPendingSyncAsync();
             foreach (var w in pending.Where(w => w.UserId == userId && !w.IsDraft))

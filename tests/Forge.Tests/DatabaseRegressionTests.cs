@@ -42,6 +42,45 @@ public sealed class DatabaseRegressionTests : IAsyncLifetime
     }
 
     [Fact]
+    public async Task CompletingWorkoutRemovesOnlyItsDraftInTheSameTransaction()
+    {
+        await db.SaveWorkoutAsync(new() { Id = "draft", UserId = "alice", IsDraft = true });
+        await db.SaveWorkoutAsync(new() { Id = "other", UserId = "bob", IsDraft = true });
+        await db.CompleteWorkoutAsync(new() { Id = "finished", UserId = "alice", PendingSync = true }, "draft");
+        Assert.False(Assert.Single(await db.GetWorkoutsAsync("alice")).IsDraft);
+        Assert.True(Assert.Single(await db.GetWorkoutsAsync("bob")).IsDraft);
+        Assert.Equal("finished", Assert.Single(await db.GetPendingSyncAsync()).Id);
+    }
+
+    [Fact]
+    public async Task UpgradeAddsPlanSyncColumnsWithoutLosingExistingPlans()
+    {
+        var legacy = new SQLite.SQLiteAsyncConnection(path, SQLite.SQLiteOpenFlags.ReadWrite | SQLite.SQLiteOpenFlags.Create | SQLite.SQLiteOpenFlags.SharedCache);
+        await legacy.CreateTableAsync<LegacyPlan>();
+        await legacy.InsertAsync(new LegacyPlan { Id = "existing", UserId = "alice", Name = "Before update", ExercisesJson = "[]", Notes = "Keep my notes" });
+        var saved = Assert.Single(await db.GetPlansAsync("alice"));
+        Assert.Equal("Before update", saved.Name);
+        Assert.Equal("Keep my notes", saved.Notes);
+        Assert.False(saved.IsDeleted);
+        saved.PendingSync = true;
+        await db.SavePlanAsync(saved);
+        Assert.Equal("existing", Assert.Single(await new DatabaseService(path).GetPlansAsync("alice")).Id);
+    }
+
+    [SQLite.Table("saved_plans")]
+    public class LegacyPlan
+    {
+        [SQLite.PrimaryKey] public string Id { get; set; } = "";
+        public string UserId { get; set; } = "";
+        public string Name { get; set; } = "";
+        public string Notes { get; set; } = "";
+        public string ExercisesJson { get; set; } = "[]";
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+        public int RestSeconds { get; set; } = 90;
+    }
+
+    [Fact]
     public async Task NativeSqliteIsAtLeastTheSecurityFixedVersion()
     {
         SQLitePCL.Batteries_V2.Init();

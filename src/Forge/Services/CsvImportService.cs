@@ -32,7 +32,9 @@ public class CsvImportService
             return (0, 0, errors);
         }
 
-        var lines = csvContent.Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        string[] lines;
+        try { lines = CsvWorkoutWriter.SplitRows(csvContent); }
+        catch (FormatException ex) { errors.Add(ex.Message); return (0, 0, errors); }
         if (lines.Length < 2)
         {
             errors.Add("CSV vuoto o con sola intestazione.");
@@ -50,7 +52,7 @@ public class CsvImportService
         var exIdx = IndexOf(header, "exercisename", "esercizio", "exercise");
         var setsIdx = IndexOf(header, "sets", "serie");
         var repsIdx = IndexOf(header, "reps", "ripetizioni", "repetitions");
-        var weightIdx = IndexOf(header, "weightkg", "pesokg", "peso", "weight");
+        var weightIdx = IndexOf(header, "weightkg", "pesokg", "weightlb", "weightlbs", "pesolb", "peso", "weight");
         var notesIdx = IndexOf(header, "notes", "note");
 
         if (dateIdx < 0 || exIdx < 0)
@@ -90,6 +92,7 @@ public class CsvImportService
                 if (setsIdx >= 0 && parts.Length > setsIdx) int.TryParse(parts[setsIdx].Trim(), out sets);
                 if (repsIdx >= 0 && parts.Length > repsIdx) int.TryParse(parts[repsIdx].Trim(), out reps);
                 if (weightIdx >= 0 && parts.Length > weightIdx) double.TryParse(parts[weightIdx].Trim(), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out weightKg);
+                if (weightIdx >= 0) weightKg = WeightUnitService.CsvToKilograms(weightKg, header[weightIdx]);
 
                 var isNewWorkout = currentDate != date || currentWorkoutName != workoutName;
                 if (isNewWorkout && currentDate != null && currentExercises.Count > 0)
@@ -191,29 +194,5 @@ public class CsvImportService
         return -1;
     }
 
-    private static string[] ParseCsvLine(string line)
-    {
-        var result = new List<string>();
-        var current = "";
-        var inQuotes = false;
-
-        foreach (var c in line)
-        {
-            if (c == '"')
-            {
-                inQuotes = !inQuotes;
-            }
-            else if (c == ',' && !inQuotes)
-            {
-                result.Add(current);
-                current = "";
-            }
-            else
-            {
-                current += c;
-            }
-        }
-        result.Add(current);
-        return result.ToArray();
-    }
+    private static string[] ParseCsvLine(string line) => CsvWorkoutWriter.ParseRow(line);
 }

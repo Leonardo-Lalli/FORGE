@@ -12,6 +12,8 @@ Diario di allenamento Android open source: schede personali, timer, statistiche 
 
 [Scarica l’app](https://leonardo-lalli.github.io/FORGE/#download) · [Sito](https://leonardo-lalli.github.io/FORGE/) · [Self-hosting](#installa-il-tuo-server) · [Roadmap](ROADMAP.md) · [Segnala un problema](https://github.com/Leonardo-Lalli/FORGE/issues)
 
+**Aggiornamento 5 novembre 2026:** 0.8.5-beta build 89 approvata dal proprietario, con sessioni recuperabili/minimizzabili, conferma uscita, note multilinea, unità kg/libbre e correzione avvio Android. La sincronizzazione delle schede richiede l’aggiornamento server incluso nel pacchetto: vedi [guida](docs/account-plan-sync.md). Le nuove richieste restano su `develop`.
+
 ## Per il tuo allenamento
 
 - **Le tue schede:** senza un limite imposto dall’app, oppure una sessione libera; serie normali, warm-up, drop set e cedimento.

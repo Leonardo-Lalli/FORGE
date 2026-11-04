@@ -1,6 +1,4 @@
-import type { Dictionary } from "./types"
-
-export const en: Dictionary = {
+export const en = {
   "nav": {
     "features": "Features",
     "selfHosting": "Self-Hosting",
@@ -256,29 +254,213 @@ export const en: Dictionary = {
   "roadmapPage": {
     "eyebrow": "// Roadmap",
     "title": "Where FORGE is heading.",
-    "subtitle": "Only features we still need to add. Available features are described on the Features page; no future dates or versions are promised here.",
-    "legend": {
-      "difficulty": "Difficulty"
-    },
-    "difficulty": {
-      "low": "Low",
-      "med": "Medium",
-      "high": "High",
-      "vhigh": "Very high"
-    },
+    "subtitle": "Features available in 0.8.5-beta and future goals, with dates and verifiable references.",
     "releases": [
+      {
+        "theme": "Available — 0.8.5-beta",
+        "features": [
+          {
+            "id": "android-startup",
+            "name": "Android startup fix",
+            "desc": "Fixed native initialization that could close the candidate after the splash screen.",
+            "implementedOn": "2026-11-04",
+            "updatedOn": "2026-11-05",
+            "implementationRef": "v0.8.5-beta · build 89",
+            "status": "released",
+            "implementationNote": "Owner-approved version promoted to main on 5 November 2026.",
+            "history": [
+              {
+                "date": "2026-11-04",
+                "ref": "develop · 0.8.5-beta · build 89",
+                "note": "Declared the Android startup callback explicitly and added a startup check for the actual APK."
+              },
+              {
+                "date": "2026-11-05",
+                "ref": "v0.8.5-beta · build 89",
+                "note": "Current version approved; new requests continue on develop."
+              }
+            ]
+          },
+          {
+            "id": "weight-units",
+            "name": "Kilograms / pounds",
+            "desc": "Settings preference with consistent input, history, stats, progress, achievement and CSV conversion.",
+            "implementedOn": "2026-10-26",
+            "updatedOn": "2026-11-05",
+            "implementationRef": "v0.8.5-beta · build 89",
+            "status": "released",
+            "implementationNote": "Owner-approved version promoted to main on 5 November 2026.",
+            "history": [
+              {
+                "date": "2026-10-26",
+                "ref": "develop",
+                "note": "Implemented on develop."
+              },
+              {
+                "date": "2026-11-05",
+                "ref": "v0.8.5-beta · build 89",
+                "note": "Current version approved; new requests continue on develop."
+              }
+            ]
+          },
+          {
+            "id": "session-recovery",
+            "name": "Minimized and recoverable workouts",
+            "desc": "Persistent session with a rest timer bar; resume after closing the app.",
+            "implementedOn": "2026-10-16",
+            "updatedOn": "2026-11-05",
+            "implementationRef": "v0.8.5-beta · build 89",
+            "status": "released",
+            "implementationNote": "Owner-approved version promoted to main on 5 November 2026.",
+            "history": [
+              {
+                "date": "2026-10-16",
+                "ref": "develop",
+                "note": "Implemented on develop."
+              },
+              {
+                "date": "2026-10-26",
+                "ref": "develop",
+                "note": "Rest timer and theme consistency."
+              },
+              {
+                "date": "2026-11-05",
+                "ref": "v0.8.5-beta · build 89",
+                "note": "Current version approved; new requests continue on develop."
+              }
+            ]
+          },
+          {
+            "id": "workout-confirmation",
+            "name": "Workout exit confirmation",
+            "desc": "X and Back require an explicit choice; the dialog follows the page theme.",
+            "implementedOn": "2026-10-16",
+            "updatedOn": "2026-11-05",
+            "implementationRef": "v0.8.5-beta · build 89",
+            "status": "released",
+            "implementationNote": "Owner-approved version promoted to main on 5 November 2026.",
+            "history": [
+              {
+                "date": "2026-10-16",
+                "ref": "develop",
+                "note": "Implemented on develop."
+              },
+              {
+                "date": "2026-10-26",
+                "ref": "develop",
+                "note": "Rest timer and theme consistency."
+              },
+              {
+                "date": "2026-11-05",
+                "ref": "v0.8.5-beta · build 89",
+                "note": "Current version approved; new requests continue on develop."
+              }
+            ]
+          },
+          {
+            "id": "workout-notes",
+            "name": "Multiline notes and correct counts",
+            "desc": "Multiline notes; exercises without performed sets are excluded from history.",
+            "implementedOn": "2026-10-16",
+            "updatedOn": "2026-11-05",
+            "implementationRef": "v0.8.5-beta · build 89",
+            "status": "released",
+            "implementationNote": "Owner-approved version promoted to main on 5 November 2026.",
+            "history": [
+              {
+                "date": "2026-10-16",
+                "ref": "develop",
+                "note": "Implemented on develop."
+              },
+              {
+                "date": "2026-11-05",
+                "ref": "v0.8.5-beta · build 89",
+                "note": "Current version approved; new requests continue on develop."
+              }
+            ]
+          },
+          {
+            "id": "stats-calendar",
+            "name": "Stable Stats calendar",
+            "desc": "Months use six rows with a consistent card size.",
+            "implementedOn": "2026-10-16",
+            "updatedOn": "2026-11-05",
+            "implementationRef": "v0.8.5-beta · build 89",
+            "status": "released",
+            "implementationNote": "Owner-approved version promoted to main on 5 November 2026.",
+            "history": [
+              {
+                "date": "2026-10-16",
+                "ref": "develop",
+                "note": "Implemented on develop."
+              },
+              {
+                "date": "2026-11-05",
+                "ref": "v0.8.5-beta · build 89",
+                "note": "Current version approved; new requests continue on develop."
+              }
+            ]
+          },
+          {
+            "id": "launcher-icon",
+            "name": "FORGE app icon",
+            "desc": "New launcher icon selected by the owner.",
+            "implementedOn": "2026-10-16",
+            "updatedOn": "2026-11-05",
+            "implementationRef": "v0.8.5-beta · build 89",
+            "status": "released",
+            "implementationNote": "Owner-approved version promoted to main on 5 November 2026.",
+            "history": [
+              {
+                "date": "2026-10-16",
+                "ref": "develop",
+                "note": "Implemented on develop."
+              },
+              {
+                "date": "2026-11-05",
+                "ref": "v0.8.5-beta · build 89",
+                "note": "Current version approved; new requests continue on develop."
+              }
+            ]
+          }
+        ]
+      },
       {
         "theme": "Accounts and data",
         "features": [
           {
             "name": "Social login",
-            "desc": "Google/Apple sign-in alongside email/password",
-            "diff": "high"
+            "desc": "Google/Microsoft/Apple sign-in alongside email/password",
+            "id": "social-login",
+            "implementedOn": "",
+            "updatedOn": "2026-10-16",
+            "implementationRef": "",
+            "status": "planned",
+            "implementationNote": "",
+            "history": [
+              {
+                "date": "2026-10-16",
+                "ref": "develop",
+                "note": "Google/Microsoft/Apple planned"
+              }
+            ]
           },
           {
             "name": "Plan synchronization",
             "desc": "Find plans and notes across devices connected to the same account.",
-            "diff": "high"
+            "id": "plan-synchronization",
+            "implementedOn": "2026-10-26",
+            "updatedOn": "2026-10-26",
+            "implementationRef": "develop · 0.8.5-beta candidate",
+            "status": "server-required",
+            "implementationNote": "Implemented and tested in code; requires the PocketBase update. Not yet enabled on the owner’s server.",
+            "history": [
+              {
+                "date": "2026-10-26",
+                "ref": "develop",
+                "note": "Implemented account plan sync; server migration required."
+              }
+            ]
           }
         ]
       },
@@ -288,17 +470,35 @@ export const en: Dictionary = {
           {
             "name": "Fully local mode",
             "desc": "Train without an account or server, with optional cloud connection.",
-            "diff": "high"
+            "id": "fully-local-mode",
+            "implementedOn": "",
+            "updatedOn": "",
+            "implementationRef": "",
+            "status": "planned",
+            "implementationNote": "",
+            "history": []
           },
           {
             "name": "Voice input",
             "desc": "\"A hundred kilos, eight reps\" instead of typing",
-            "diff": "med"
+            "id": "voice-input",
+            "implementedOn": "",
+            "updatedOn": "",
+            "implementationRef": "",
+            "status": "planned",
+            "implementationNote": "",
+            "history": []
           },
           {
             "name": "Exercise videos",
             "desc": "Embedded YouTube videos alongside the GIFs",
-            "diff": "med"
+            "id": "exercise-videos",
+            "implementedOn": "",
+            "updatedOn": "",
+            "implementationRef": "",
+            "status": "planned",
+            "implementationNote": "",
+            "history": []
           }
         ]
       },
@@ -308,32 +508,68 @@ export const en: Dictionary = {
           {
             "name": "Workout comments",
             "desc": "Conversations below shared workouts, respecting their chosen visibility.",
-            "diff": "high"
+            "id": "workout-comments",
+            "implementedOn": "",
+            "updatedOn": "",
+            "implementationRef": "",
+            "status": "planned",
+            "implementationNote": "",
+            "history": []
           },
           {
             "name": "Challenges and leaderboards",
             "desc": "Friend challenges with consent",
-            "diff": "med"
+            "id": "challenges-and-leaderboards",
+            "implementedOn": "",
+            "updatedOn": "",
+            "implementationRef": "",
+            "status": "planned",
+            "implementationNote": "",
+            "history": []
           },
           {
             "name": "Shareable summaries",
             "desc": "Generate a workout summary image to share outside the app.",
-            "diff": "med"
+            "id": "shareable-summaries",
+            "implementedOn": "",
+            "updatedOn": "",
+            "implementationRef": "",
+            "status": "planned",
+            "implementationNote": "",
+            "history": []
           },
           {
             "name": "Gym maps",
             "desc": "Map of nearby gyms with community reviews",
-            "diff": "high"
+            "id": "gym-maps",
+            "implementedOn": "",
+            "updatedOn": "",
+            "implementationRef": "",
+            "status": "planned",
+            "implementationNote": "",
+            "history": []
           },
           {
             "name": "Gamification 2.0",
             "desc": "Extend existing levels and XP with competitive seasons and new rewards.",
-            "diff": "high"
+            "id": "gamification-2-0",
+            "implementedOn": "",
+            "updatedOn": "",
+            "implementationRef": "",
+            "status": "planned",
+            "implementationNote": "",
+            "history": []
           },
           {
             "name": "Per-set record rewards",
             "desc": "Medals for personal weight, volume or repetition records; not implemented yet.",
-            "diff": "med"
+            "id": "per-set-record-rewards",
+            "implementedOn": "",
+            "updatedOn": "",
+            "implementationRef": "",
+            "status": "planned",
+            "implementationNote": "",
+            "history": []
           }
         ]
       },
@@ -343,27 +579,57 @@ export const en: Dictionary = {
           {
             "name": "Advanced analytics",
             "desc": "Estimated 1RM, volume per muscle and additional progress reports.",
-            "diff": "med"
+            "id": "advanced-analytics",
+            "implementedOn": "",
+            "updatedOn": "",
+            "implementationRef": "",
+            "status": "planned",
+            "implementationNote": "",
+            "history": []
           },
           {
             "name": "Body tracking",
             "desc": "Measurements with privacy controls",
-            "diff": "high"
+            "id": "body-tracking",
+            "implementedOn": "",
+            "updatedOn": "",
+            "implementationRef": "",
+            "status": "planned",
+            "implementationNote": "",
+            "history": []
           },
           {
             "name": "Languages and accessibility",
             "desc": "Full translations and contrast/font size checks",
-            "diff": "high"
+            "id": "languages-and-accessibility",
+            "implementedOn": "",
+            "updatedOn": "",
+            "implementationRef": "",
+            "status": "planned",
+            "implementationNote": "",
+            "history": []
           },
           {
             "name": "Reports and backup",
             "desc": "PDF export and tested backup restoration",
-            "diff": "med"
+            "id": "reports-and-backup",
+            "implementedOn": "",
+            "updatedOn": "",
+            "implementationRef": "",
+            "status": "planned",
+            "implementationNote": "",
+            "history": []
           },
           {
             "name": "Nutrition tracker",
             "desc": "Calories and macros alongside workout tracking",
-            "diff": "high"
+            "id": "nutrition-tracker",
+            "implementedOn": "",
+            "updatedOn": "",
+            "implementationRef": "",
+            "status": "planned",
+            "implementationNote": "",
+            "history": []
           }
         ]
       },
@@ -373,22 +639,46 @@ export const en: Dictionary = {
           {
             "name": "Widgets and Wear OS",
             "desc": "Quick access and workout companion",
-            "diff": "vhigh"
+            "id": "widgets-and-wear-os",
+            "implementedOn": "",
+            "updatedOn": "",
+            "implementationRef": "",
+            "status": "planned",
+            "implementationNote": "",
+            "history": []
           },
           {
             "name": "Health integration",
             "desc": "Evaluate supported APIs with explicit permission",
-            "diff": "high"
+            "id": "health-integration",
+            "implementedOn": "",
+            "updatedOn": "",
+            "implementationRef": "",
+            "status": "planned",
+            "implementationNote": "",
+            "history": []
           },
           {
             "name": "Sensors",
             "desc": "Heart rate and steps on supported devices",
-            "diff": "high"
+            "id": "sensors",
+            "implementedOn": "",
+            "updatedOn": "",
+            "implementationRef": "",
+            "status": "planned",
+            "implementationNote": "",
+            "history": []
           },
           {
             "name": "Apple Watch",
             "desc": "iOS support + watchOS companion",
-            "diff": "vhigh"
+            "id": "apple-watch",
+            "implementedOn": "",
+            "updatedOn": "",
+            "implementationRef": "",
+            "status": "planned",
+            "implementationNote": "",
+            "history": []
           }
         ]
       },
@@ -398,32 +688,68 @@ export const en: Dictionary = {
           {
             "name": "Protected origin",
             "desc": "Dedicated-domain proxy or tunnel; home IP out of public DNS",
-            "diff": "high"
+            "id": "protected-origin",
+            "implementedOn": "",
+            "updatedOn": "",
+            "implementationRef": "",
+            "status": "planned",
+            "implementationNote": "",
+            "history": []
           },
           {
             "name": "Play Store distribution",
             "desc": "Bring the beta to the store after the required checks, using the existing stable signing key.",
-            "diff": "med"
+            "id": "play-store-distribution",
+            "implementedOn": "",
+            "updatedOn": "",
+            "implementationRef": "",
+            "status": "planned",
+            "implementationNote": "",
+            "history": []
           },
           {
             "name": "Dashboard and API",
             "desc": "Web dashboard, documented API and server profiles",
-            "diff": "high"
+            "id": "dashboard-and-api",
+            "implementedOn": "",
+            "updatedOn": "",
+            "implementationRef": "",
+            "status": "planned",
+            "implementationNote": "",
+            "history": []
           },
           {
             "name": "Gyms",
             "desc": "Trainer dashboard, QR onboarding and tenant isolation",
-            "diff": "vhigh"
+            "id": "gyms",
+            "implementedOn": "",
+            "updatedOn": "",
+            "implementationRef": "",
+            "status": "planned",
+            "implementationNote": "",
+            "history": []
           },
           {
             "name": "In-app updates",
             "desc": "Download and start installing signed APK updates without finding them manually on GitHub.",
-            "diff": "high"
+            "id": "in-app-updates",
+            "implementedOn": "",
+            "updatedOn": "",
+            "implementationRef": "",
+            "status": "planned",
+            "implementationNote": "",
+            "history": []
           },
           {
             "name": "Proxmox Community Scripts",
             "desc": "Adapt the installer to project standards, test it on Proxmox and submit it for review. Not officially integrated yet.",
-            "diff": "high"
+            "id": "proxmox-community-scripts",
+            "implementedOn": "",
+            "updatedOn": "",
+            "implementationRef": "",
+            "status": "planned",
+            "implementationNote": "",
+            "history": []
           }
         ]
       }
@@ -453,7 +779,14 @@ export const en: Dictionary = {
       "items": [
         {
           "name": "AI form check",
-          "desc": "An experiment to analyze a short exercise video and flag possible posture or movement errors. Feasibility and accuracy still need evaluation; this feature is not available in the app."
+          "desc": "An experiment to analyze a short exercise video and flag possible posture or movement errors. Feasibility and accuracy still need evaluation; this feature is not available in the app.",
+          "id": "idea-ai-form-check",
+          "implementedOn": "",
+          "updatedOn": "",
+          "implementationRef": "",
+          "status": "planned",
+          "implementationNote": "",
+          "history": []
         }
       ]
     },
@@ -699,4 +1032,4 @@ export const en: Dictionary = {
     "copyFallback": "Copy the command by selecting the text below.",
     "manualTitle": "Prefer a manual installation?"
   }
-}
+} as const

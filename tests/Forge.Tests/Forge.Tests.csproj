@@ -31,6 +31,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="../../src/Forge/Services/CsvWorkoutWriter.cs" Link="Shared/Services/CsvWorkoutWriter.cs" />
+    <Compile Include="../../src/Forge/Services/WeightUnitService.cs" Link="Shared/Services/WeightUnitService.cs" />
+    <Compile Include="../../src/Forge/Services/WorkoutCompletion.cs" Link="Shared/Services/WorkoutCompletion.cs" />
+    <Compile Include="../../src/Forge/Services/WorkoutSession.cs" Link="Shared/Services/WorkoutSession.cs" />
     <Compile Include="..\..\src\Forge\Models\*.cs" Link="Shared\Models\%(Filename)%(Extension)" />
     <Compile Include="..\..\src\Forge\Models\Dto\*.cs" Link="Shared\Models\Dto\%(Filename)%(Extension)" />
     <Compile Include="..\..\src\Forge\Converters\*.cs" Link="Shared\Converters\%(Filename)%(Extension)" />
@@ -48,6 +52,7 @@
     <Compile Include="..\..\src\Forge\Services\PocketBaseService.Profiles.cs" Link="Shared/Services/PocketBaseService.Profiles.cs" />
     <Compile Include="..\..\src\Forge\Services\PlanService.cs" Link="Shared/Services/PlanService.cs" />
     <Compile Include="..\..\src\Forge\Services\PocketBaseService.cs" Link="Shared\Services\PocketBaseService.cs" />
+    <Compile Include="../../src/Forge/Services/PocketBaseService.Plans.cs" Link="Shared/Services/PocketBaseService.Plans.cs" />
     <Compile Include="../../src/Forge/Services/CommunityInvite.cs" Link="Shared/Services/CommunityInvite.cs" />
     <Compile Include="..\..\src\Forge\Services\ServerAddress.cs" Link="Shared\Services\ServerAddress.cs" />
     <Compile Include="..\..\src\Forge\Services\BuildSecrets.cs" Link="Shared\Services\BuildSecrets.cs" />

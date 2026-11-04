@@ -21,6 +21,9 @@ public class LocalWorkout
     public string UserName { get; set; } = string.Empty;
     public string PhotosJson { get; set; } = "[]";
     public bool IsDraft { get; set; }
+    public int DraftElapsedSeconds { get; set; }
+    public int DraftRestSeconds { get; set; }
+    public int DraftStateVersion { get; set; }
 
     [Indexed]
     public bool PendingSync { get; set; }

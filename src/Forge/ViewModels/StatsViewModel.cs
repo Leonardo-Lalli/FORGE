@@ -28,12 +28,13 @@ public class LabelEntry
 
 public partial class StatsViewModel : BaseViewModel
 {
+    private readonly WeightUnitService units;
     private readonly PocketBaseService pb;
     private readonly DatabaseService db;
     public ObservableCollection<VolumeBar> VolumeBars { get; } = new();
     private List<Models.Dto.LoggedWorkoutRecord> allWorkouts = new();
     [ObservableProperty] private ObservableCollection<CalendarMonthBlock> calendarMonths = new();
-    [ObservableProperty] private int calendarHeight = 180;
+    [ObservableProperty] private int calendarHeight = 520;
     [ObservableProperty] private ObservableCollection<CalendarWorkout> dayWorkouts = new();
     [ObservableProperty] private bool isDayWorkoutsVisible;
 
@@ -58,9 +59,11 @@ public partial class StatsViewModel : BaseViewModel
     [ObservableProperty] private ImageSource? userAvatarSource;
     [ObservableProperty] private bool hasUserAvatar;
 
-    public StatsViewModel(PocketBaseService pb, DatabaseService db)
+    public StatsViewModel(PocketBaseService pb, DatabaseService db, WeightUnitService units)
     {
         this.pb = pb;
+        this.units = units;
+        WeakReferenceMessenger.Default.Register<StatsViewModel, WeightUnitChangedMessage>(this, static (vm, _) => { vm.ApplyFilter(vm.SelectedFilter); });
         this.db = db;
 
         WeakReferenceMessenger.Default.Register<WorkoutSavedMessage>(this, async (_, _) =>
@@ -129,7 +132,7 @@ public partial class StatsViewModel : BaseViewModel
 
     private void ApplyFilter(string filter)
     {
-        if (allWorkouts.Count == 0) { VolumeBars.Clear(); TopLifts.Clear(); TotalHours = "0h"; TotalVolume = "0 kg"; Workouts = "0"; return; }
+        if (allWorkouts.Count == 0) { VolumeBars.Clear(); TopLifts.Clear(); TotalHours = "0h"; TotalVolume = units.Format(0); Workouts = "0"; return; }
 
         var cutoff = StatsPeriod.Start(filter, DateTime.Now.Date, allWorkouts.Select(w => AchievementEvaluator.ParseDate(w.Date)).OfType<DateTime>().DefaultIfEmpty(DateTime.Now.Date).Min());
 
@@ -143,7 +146,7 @@ public partial class StatsViewModel : BaseViewModel
 
         Workouts = filtered.Count.ToString();
         TotalHours = $"{(int)filtered.Sum(w => w.Duration) / 60.0:0.#}h";
-        TotalVolume = $"{filtered.Sum(w => w.Volume) / 1000.0:0.#}k kg";
+        TotalVolume = units.FormatCompact(filtered.Sum(w => w.Volume));
 
         var prev = filtered.Count > 0 ? "+" : "";
         TotalHoursTrend = prev;
@@ -158,7 +161,7 @@ public partial class StatsViewModel : BaseViewModel
     {
         VolumeBars.Clear();
         foreach (var bar in VolumeChart.Build(workouts, filter, DateTime.Now.Date))
-            VolumeBars.Add(new VolumeBar { Height = bar.Height, Label = bar.Label, VolumeLabel = $"{bar.Volume:0.#}" });
+            VolumeBars.Add(new VolumeBar { Height = bar.Height, Label = bar.Label, VolumeLabel = units.FormatCompact(bar.Volume) });
     }
 
     private void BuildTopLifts(List<Models.Dto.LoggedWorkoutRecord> workouts)
@@ -198,7 +201,7 @@ public partial class StatsViewModel : BaseViewModel
             {
                 Name = kv.Key,
                 Label = "MAX",
-                Weight = $"{kv.Value:0.#} kg"
+                Weight = units.Format(kv.Value)
             });
         }
     }
@@ -261,10 +264,10 @@ public partial class StatsViewModel : BaseViewModel
             .Where(w => w.Date.HasValue).GroupBy(w => w.Date!.Value.Date).ToDictionary(g => g.Key, g => g.Select(w => w.Workout).ToList());
         var start = StatsPeriod.Start(SelectedFilter, today, dated.Keys.DefaultIfEmpty(today).Min());
         var blocks = new List<CalendarMonthBlock>();
-        var cursor = SelectedFilter == "week" ? start : new DateTime(start.Year, start.Month, 1);
+        var cursor = SelectedFilter == "week" ? new DateTime(today.Year, today.Month, 1) : new DateTime(start.Year, start.Month, 1);
         do
         {
-            var end = SelectedFilter == "week" ? cursor.AddDays(6) : cursor.AddMonths(1).AddDays(-1);
+            var end = cursor.AddMonths(1).AddDays(-1);
             var days = new List<CalendarDay>();
             for (var i = 0; i < ((int)cursor.DayOfWeek + 6) % 7; i++) days.Add(new());
             for (var date = cursor; date <= end; date = date.AddDays(1))
@@ -273,11 +276,11 @@ public partial class StatsViewModel : BaseViewModel
                 days.Add(new CalendarDay { Day = date.Day.ToString(), IsToday = date == today, HasWorkout = workouts.Count > 0,
                     WorkoutName = workouts.FirstOrDefault()?.Name ?? "", Workouts = workouts.Select(w => new CalendarWorkout { Id = w.Id, Name = w.Name, Source = w.IsLocal ? "local" : "pocketbase" }).ToList() });
             }
-            while (days.Count % 7 != 0) days.Add(new());
-            blocks.Add(new CalendarMonthBlock { Title = SelectedFilter == "week" ? $"{cursor:dd MMM} – {end:dd MMM yyyy}" : cursor.ToString("MMMM yyyy"), Days = new(days), Height = days.Count / 7 * 72 });
+            while (days.Count < 42) days.Add(new());
+            blocks.Add(new CalendarMonthBlock { Title = cursor.ToString("MMMM yyyy"), Days = new(days), Height = days.Count / 7 * 72 });
             cursor = cursor.AddMonths(1);
         } while (SelectedFilter != "week" && cursor <= today);
-        CalendarHeight = SelectedFilter == "week" ? 170 : 520;
+        CalendarHeight = 520;
         CalendarMonths = new(blocks);
     }
     [RelayCommand] private async Task OpenCalendarDayAsync(CalendarDay day)
