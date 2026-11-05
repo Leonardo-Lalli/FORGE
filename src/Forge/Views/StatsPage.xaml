@@ -202,7 +202,20 @@
                 </Border>
 
                 <!-- Calendar follows the same period as the statistics. -->
+                <Grid ColumnDefinitions="44,*,44" IsVisible="{Binding IsMonthFilter}" Margin="0,8">
+                    <Grid.GestureRecognizers>
+                        <SwipeGestureRecognizer Direction="Left" Command="{Binding PreviousMonthCommand}" />
+                        <SwipeGestureRecognizer Direction="Right" Command="{Binding NextMonthCommand}" />
+                    </Grid.GestureRecognizers>
+                    <Button Text="‹" Command="{Binding PreviousMonthCommand}" SemanticProperties.Description="Mese precedente" BackgroundColor="Transparent" TextColor="{DynamicResource OnSurface}" FontSize="28" Padding="0" />
+                    <Label Grid.Column="1" Text="{Binding SelectedMonthLabel}" FontFamily="Lexend" TextColor="{DynamicResource OnSurface}" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
+                    <Button Grid.Column="2" Text="›" Command="{Binding NextMonthCommand}" IsEnabled="{Binding CanNextMonth}" SemanticProperties.Description="Mese successivo" BackgroundColor="Transparent" TextColor="{DynamicResource OnSurface}" FontSize="28" Padding="0" />
+                </Grid>
                 <CollectionView ItemsSource="{Binding CalendarMonths}" HeightRequest="{Binding CalendarHeight}" SelectionMode="None" HorizontalScrollBarVisibility="Never">
+                    <CollectionView.GestureRecognizers>
+                        <SwipeGestureRecognizer Direction="Left" Command="{Binding PreviousMonthCommand}" />
+                        <SwipeGestureRecognizer Direction="Right" Command="{Binding NextMonthCommand}" />
+                    </CollectionView.GestureRecognizers>
 <CollectionView.ItemsLayout><LinearItemsLayout Orientation="Horizontal" ItemSpacing="12" SnapPointsType="MandatorySingle" SnapPointsAlignment="Start" /></CollectionView.ItemsLayout>
                     <CollectionView.ItemTemplate>
                             <DataTemplate x:DataType="vm:CalendarMonthBlock">

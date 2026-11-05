@@ -159,13 +159,13 @@ public partial class SettingsViewModel : BaseViewModel
             if (result == null) return;
 
             using var stream = await result.OpenReadAsync();
-            using var reader = new StreamReader(stream);
-            var content = await reader.ReadToEndAsync();
+            SetImportStatus("Importazione in corso...");
+            var content = await CsvFileLimit.ReadAsync(stream);
 
             var (imported, skipped, errors) = await csvImport.ImportFromCsvAsync(
                 content, pb.CurrentUser.Id, pb.CurrentUser.Name);
 
-            var msg = $"Importati {imported} allenamenti. Saltati {skipped}.";
+            var msg = $"Importati {imported} allenamenti (righe raggruppate per data e nome). Righe saltate: {skipped}.";
             if (errors.Count > 0)
                 msg += $"\nErrori: {string.Join("; ", errors.Take(3))}";
             SetImportStatus(msg);

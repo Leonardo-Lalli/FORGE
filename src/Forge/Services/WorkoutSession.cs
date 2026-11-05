@@ -8,8 +8,9 @@ public partial class WorkoutSession : ObservableObject
     private readonly DatabaseService db;
     private readonly PocketBaseService pb;
     public WorkoutSession(DatabaseService db, PocketBaseService pb) { this.db = db; this.pb = pb; }
-    public Func<Task>? SuspendHandler { get; set; }
+    public Func<Task>? BackgroundHandler { get; set; }
     public Func<Task>? ForegroundHandler { get; set; }
+    public Task OnBackgroundAsync() => BackgroundHandler?.Invoke() ?? Task.CompletedTask;
     public bool ShowMiniBar => IsActive && IsMinimized;
     public bool IsSuspended { get; private set; }
     public string MiniLabel => PlanName;
@@ -17,9 +18,9 @@ public partial class WorkoutSession : ObservableObject
     public string RecoveryError { get; private set; } = "";
     public async Task RecoverAsync()
     {
-        if (SuspendHandler != null) await SuspendHandler();
+        if (BackgroundHandler != null) await BackgroundHandler();
         End();
-        SuspendHandler = null;
+        BackgroundHandler = null;
         ForegroundHandler = null;
         RecoveryError = "";
         try

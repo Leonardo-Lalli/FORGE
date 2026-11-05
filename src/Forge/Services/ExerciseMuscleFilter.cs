@@ -2,6 +2,7 @@ namespace Forge.Services;
 
 public static class ExerciseMuscleFilter
 {
+    public const string ForearmAliases = "forearms,forearm,lower arms,brachioradialis,wrist flexors,wrist extensors,flexor carpi radialis,flexor carpi ulnaris,extensor carpi radialis,extensor carpi ulnaris,pronator teres,pronator quadratus,supinator";
     // Primary muscles take precedence over broad body regions and secondary stabilizers.
     public static bool Matches(string bodyPart, string targets, string category, IEnumerable<string> aliases)
     {

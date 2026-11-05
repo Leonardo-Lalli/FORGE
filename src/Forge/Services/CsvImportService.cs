@@ -5,18 +5,13 @@ namespace Forge.Services;
 public class CsvImportService
 {
     private readonly DatabaseService db;
-    private readonly ExerciseDbApiService exerciseDbApi;
     private readonly PocketBaseService pb;
 
-    public CsvImportService(DatabaseService db, ExerciseDbApiService exerciseDbApi, PocketBaseService pb)
+    public CsvImportService(DatabaseService db, PocketBaseService pb)
     {
         this.db = db;
-        this.exerciseDbApi = exerciseDbApi;
         this.pb = pb;
     }
-
-    private const int MaxCsvBytes = 2 * 1024 * 1024; // 2MB
-    private const int MaxCsvRows = 1000;
 
     public async Task<(int Imported, int Skipped, List<string> Errors)> ImportFromCsvAsync(string csvContent, string userId, string userName)
     {
@@ -24,13 +19,9 @@ public class CsvImportService
         var skipped = 0;
         var errors = new List<string>();
 
-        if (string.IsNullOrWhiteSpace(csvContent) || csvContent.Length > MaxCsvBytes)
-        {
-            errors.Add(csvContent.Length > MaxCsvBytes
-                ? $"CSV troppo grande (max {MaxCsvBytes / 1024 / 1024}MB)."
-                : "CSV vuoto.");
-            return (0, 0, errors);
-        }
+        if (string.IsNullOrWhiteSpace(csvContent)) { errors.Add("CSV vuoto."); return (0, 0, errors); }
+        if (System.Text.Encoding.UTF8.GetByteCount(csvContent) > CsvFileLimit.MaxBytes)
+        { errors.Add(CsvFileLimit.ErrorMessage); return (0, 0, errors); }
 
         string[] lines;
         try { lines = CsvWorkoutWriter.SplitRows(csvContent); }
@@ -40,13 +31,7 @@ public class CsvImportService
             errors.Add("CSV vuoto o con sola intestazione.");
             return (0, lines.Length, errors);
         }
-        if (lines.Length > MaxCsvRows)
-        {
-            errors.Add($"CSV contiene {lines.Length} righe (max {MaxCsvRows}).");
-            return (0, 0, errors);
-        }
-
-        var header = lines[0].ToLowerInvariant().Split(',');
+        var header = CsvWorkoutWriter.ParseRow(lines[0]).Select(h => h.Trim().TrimStart('\uFEFF').ToLowerInvariant()).ToArray();
         var dateIdx = IndexOf(header, "date", "data");
         var nameIdx = IndexOf(header, "workoutname", "nomeallenamento", "workout");
         var exIdx = IndexOf(header, "exercisename", "esercizio", "exercise");
@@ -75,9 +60,9 @@ public class CsvImportService
             try
             {
                 var date = parts.Length > dateIdx ? parts[dateIdx].Trim() : "";
-                var workoutName = parts.Length > nameIdx ? parts[nameIdx].Trim() : "Imported Workout";
+                var workoutName = nameIdx >= 0 && parts.Length > nameIdx ? parts[nameIdx].Trim() : "Imported Workout";
                 var exerciseName = parts.Length > exIdx ? parts[exIdx].Trim() : "";
-                var notes = parts.Length > notesIdx ? parts[notesIdx].Trim() : "";
+                var notes = notesIdx >= 0 && parts.Length > notesIdx ? parts[notesIdx].Trim() : "";
 
                 if (string.IsNullOrWhiteSpace(exerciseName))
                 {
@@ -134,7 +119,10 @@ public class CsvImportService
     private async Task SaveWorkoutAsync(string userId, string userName, string name, string date,
         string? notes, List<string> exercises, List<object> exerciseData)
     {
-        var volume = 0.0;
+        var volume = exerciseData.Sum(exercise => {
+            var data = System.Text.Json.JsonSerializer.SerializeToElement(exercise);
+            return data.GetProperty("sets").EnumerateArray().Sum(set => set.GetProperty("weightKg").GetDouble() * set.GetProperty("reps").GetInt32());
+        });
         var local = new LocalWorkout
         {
             Id = Guid.NewGuid().ToString(),
@@ -157,19 +145,7 @@ public class CsvImportService
         {
             try
             {
-                var payload = new Dictionary<string, object?>
-                {
-                    ["user"] = userId,
-                    ["user_name"] = userName,
-                    ["name"] = name,
-                    ["date"] = date,
-                    ["notes"] = notes ?? "",
-                    ["exercises"] = exercises,
-                    ["exercise_data"] = System.Text.Json.JsonSerializer.Serialize(exerciseData),
-                    ["volume"] = volume,
-                    ["duration"] = exercises.Count * 5
-                };
-                var (ok, _) = await pb.CreateRecordAsync("logged_workouts", payload);
+                var ok = await pb.UploadWorkoutAsync(local);
                 if (ok)
                 {
                     local.PendingSync = false;

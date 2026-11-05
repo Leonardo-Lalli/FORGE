@@ -50,11 +50,7 @@ jobs:
           FORGE_KEY_PASS: ${{ secrets.ANDROID_KEY_PASSWORD }}
           FORGE_STORE_PASS: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
         run: |
-          dotnet publish src/Forge/Forge.csproj -f net10.0-android -c Release -p:AndroidPackageFormats=apk -p:PublishTrimmed=false -p:RunAOTCompilation=false -p:EmbedAssembliesIntoApk=true -p:AndroidKeyStore=true "-p:AndroidSigningKeyStore=$env:RUNNER_TEMP/forge-release.keystore" "-p:AndroidSigningKeyAlias=$env:FORGE_KEY_ALIAS" -p:AndroidSigningKeyPass=env:FORGE_KEY_PASS -p:AndroidSigningStorePass=env:FORGE_STORE_PASS "-p:ApplicationDisplayVersion=$($env:RELEASE_VERSION.TrimStart('v'))" "-p:ApplicationVersion=$env:RELEASE_CODE"
-          if ($LASTEXITCODE -ne 0) { throw 'APK publish failed.' }
-          $apk = Get-ChildItem 'src/Forge/bin/Release/net10.0-android/publish/' -Filter '*-Signed.apk' | Select-Object -First 1
-          if (-not $apk) { throw 'Signed APK missing.' }
-          Copy-Item $apk.FullName 'FORGE.apk'
+          ./tools/publish-android.ps1 -KeyStore "$env:RUNNER_TEMP/forge-release.keystore" -KeyAlias $env:FORGE_KEY_ALIAS -OutputApk FORGE.apk -DisplayVersion ($env:RELEASE_VERSION.TrimStart('v')) -VersionCode ([int]$env:RELEASE_CODE)
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'

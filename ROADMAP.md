@@ -4,6 +4,17 @@ La versione corrente approvata è **0.8.5-beta, build 89**, promossa su `main` i
 
 Ogni modifica segue la [regola di tracciamento](docs/roadmap-policy.md): prima data di implementazione, riferimento reale e storico degli aggiornamenti.
 
+## In verifica su develop — build 90
+
+Implementato il **05/11/2026** · riferimento `develop · 0.8.5-beta-develop · build 90`. Tutti gli elementi seguenti sono candidate da provare sul telefono; non modificano la release pubblica build 89.
+
+- Eliminazione delle singole serie con rinumerazione e conteggi aggiornati.
+- Filtro avambracci basato sui muscoli primari.
+- Timer continuo quando l’app va in background o l’allenamento viene minimizzato; pausa manuale rispettata.
+- CSV fino a 5 MiB senza limite di righe, lettura bounded e gruppi per data/nome.
+- Salvataggio del solo nome della scheda senza serie confermate; popup con le sole differenze, senza workout fittizi.
+- Navigazione dei mesi in Stats con calendario, grafico e aggregati riferiti al mese selezionato.
+
 ## Disponibile nella 0.8.5-beta — approvata il 05/11/2026
 
 | Elemento | Implementazione | Ultimo aggiornamento | Riferimento / stato |

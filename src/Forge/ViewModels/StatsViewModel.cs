@@ -47,7 +47,22 @@ public partial class StatsViewModel : BaseViewModel
     [ObservableProperty] private ObservableCollection<LiftEntry> topLifts = new();
     [ObservableProperty] private ObservableCollection<BarEntry> barHeights = new();
     [ObservableProperty] private ObservableCollection<LabelEntry> barLabels = new();
-    [ObservableProperty] private string selectedFilter = "week";
+    [ObservableProperty, NotifyPropertyChangedFor(nameof(IsMonthFilter))] private string selectedFilter = "week";
+    [ObservableProperty, NotifyPropertyChangedFor(nameof(SelectedMonthLabel)), NotifyPropertyChangedFor(nameof(CanNextMonth))]
+    private DateTime selectedMonth = new(DateTime.Today.Year, DateTime.Today.Month, 1);
+    public bool IsMonthFilter => SelectedFilter == "month";
+    public string SelectedMonthLabel => SelectedMonth.ToString("MMMM yyyy");
+    public bool CanNextMonth => SelectedMonth < new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
+    [RelayCommand] private void PreviousMonth() => MoveMonth(-1);
+    [RelayCommand] private void NextMonth() { if (CanNextMonth) MoveMonth(1); }
+    private void MoveMonth(int offset)
+    {
+        if (!IsMonthFilter) return;
+        SelectedMonth = SelectedMonth.AddMonths(offset);
+        IsDayWorkoutsVisible = false;
+        ApplyFilter(SelectedFilter);
+        BuildCalendar();
+    }
     [ObservableProperty] private string statsError = string.Empty;
     [ObservableProperty] private bool hasStatsError;
     [ObservableProperty] private ObservableCollection<LikeNotification> likeNotifications = new();
@@ -108,7 +123,6 @@ public partial class StatsViewModel : BaseViewModel
                 HasData = true;
             }
             ApplyFilter(SelectedFilter);
-            BuildLikeNotifications();
             BuildCalendar();
         }
         catch (Exception ex)
@@ -132,17 +146,10 @@ public partial class StatsViewModel : BaseViewModel
 
     private void ApplyFilter(string filter)
     {
-        if (allWorkouts.Count == 0) { VolumeBars.Clear(); TopLifts.Clear(); TotalHours = "0h"; TotalVolume = units.Format(0); Workouts = "0"; return; }
-
-        var cutoff = StatsPeriod.Start(filter, DateTime.Now.Date, allWorkouts.Select(w => AchievementEvaluator.ParseDate(w.Date)).OfType<DateTime>().DefaultIfEmpty(DateTime.Now.Date).Min());
-
-        var filtered = allWorkouts
-            .Where(w =>
-            {
-                var d = AchievementEvaluator.ParseDate(w.Date);
-                return d.HasValue && d.Value >= cutoff;
-            })
-            .ToList();
+        var period = StatsPeriod.Range(filter, DateTime.Now.Date,
+            allWorkouts.Select(w => AchievementEvaluator.ParseDate(w.Date)).OfType<DateTime>().DefaultIfEmpty(DateTime.Now.Date).Min(), SelectedMonth);
+        var filtered = allWorkouts.Where(w => AchievementEvaluator.ParseDate(w.Date) is { } d && d >= period.Start && d < period.EndExclusive).ToList();
+        BuildLikeNotifications(filtered);
 
         Workouts = filtered.Count.ToString();
         TotalHours = $"{(int)filtered.Sum(w => w.Duration) / 60.0:0.#}h";
@@ -160,7 +167,7 @@ public partial class StatsViewModel : BaseViewModel
     private void BuildBarChart(List<Models.Dto.LoggedWorkoutRecord> workouts, string filter)
     {
         VolumeBars.Clear();
-        foreach (var bar in VolumeChart.Build(workouts, filter, DateTime.Now.Date))
+        foreach (var bar in VolumeChart.Build(workouts, filter, filter == "month" ? SelectedMonth.AddMonths(1).AddDays(-1) : DateTime.Now.Date))
             VolumeBars.Add(new VolumeBar { Height = bar.Height, Label = bar.Label, VolumeLabel = units.FormatCompact(bar.Volume) });
     }
 
@@ -179,7 +186,7 @@ public partial class StatsViewModel : BaseViewModel
                 if (data == null) continue;
                 foreach (var ex in data)
                 {
-                    var maxKg = ex.Sets?.Max(s => s.WeightKg) ?? 0;
+                    var maxKg = ex.Sets?.Select(s => s.WeightKg).DefaultIfEmpty().Max() ?? 0;
                     if (maxKg <= 0) continue;
                     if (exerciseStats.ContainsKey(ex.Name))
                         exerciseStats[ex.Name] = Math.Max(exerciseStats[ex.Name], maxKg);
@@ -242,10 +249,10 @@ public partial class StatsViewModel : BaseViewModel
         }
     }
 
-    private void BuildLikeNotifications()
+    private void BuildLikeNotifications(IEnumerable<Models.Dto.LoggedWorkoutRecord> source)
     {
         LikeNotifications.Clear();
-        foreach (var w in allWorkouts.Where(w => w.Likes > 0))
+        foreach (var w in source.Where(w => w.Likes > 0))
         {
             LikeNotifications.Add(new LikeNotification
             {
@@ -264,7 +271,7 @@ public partial class StatsViewModel : BaseViewModel
             .Where(w => w.Date.HasValue).GroupBy(w => w.Date!.Value.Date).ToDictionary(g => g.Key, g => g.Select(w => w.Workout).ToList());
         var start = StatsPeriod.Start(SelectedFilter, today, dated.Keys.DefaultIfEmpty(today).Min());
         var blocks = new List<CalendarMonthBlock>();
-        var cursor = SelectedFilter == "week" ? new DateTime(today.Year, today.Month, 1) : new DateTime(start.Year, start.Month, 1);
+        var cursor = SelectedFilter == "month" ? SelectedMonth : SelectedFilter == "week" ? new DateTime(today.Year, today.Month, 1) : new DateTime(start.Year, start.Month, 1);
         do
         {
             var end = cursor.AddMonths(1).AddDays(-1);
@@ -279,7 +286,7 @@ public partial class StatsViewModel : BaseViewModel
             while (days.Count < 42) days.Add(new());
             blocks.Add(new CalendarMonthBlock { Title = cursor.ToString("MMMM yyyy"), Days = new(days), Height = days.Count / 7 * 72 });
             cursor = cursor.AddMonths(1);
-        } while (SelectedFilter != "week" && cursor <= today);
+        } while (SelectedFilter is not ("week" or "month") && cursor <= today);
         CalendarHeight = 520;
         CalendarMonths = new(blocks);
     }

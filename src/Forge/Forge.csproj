@@ -34,8 +34,8 @@
 		<ApplicationId>com.leoforge.forge</ApplicationId>
 
 		<!-- Versions -->
-		<ApplicationDisplayVersion>0.8.5-beta</ApplicationDisplayVersion>
-		<ApplicationVersion>89</ApplicationVersion>
+		<ApplicationDisplayVersion>0.8.5-beta-develop</ApplicationDisplayVersion>
+		<ApplicationVersion>90</ApplicationVersion>
 
 		<!-- To develop, package, and publish an app to the Microsoft Store, see: https://aka.ms/MauiTemplateUnpackaged -->
 		<WindowsPackageType>None</WindowsPackageType>

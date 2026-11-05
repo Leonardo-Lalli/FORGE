@@ -1,9 +1,14 @@
+[CmdletBinding(DefaultParameterSetName = "Runtime")]
 param(
-    [Parameter(Mandatory = $true)]
+    [Parameter(Mandatory = $true, ParameterSetName = "Runtime")]
     [ValidatePattern('^emulator-\d+$')]
     [string]$Serial,
     [string]$Adb = 'C:/Program Files (x86)/Android/android-sdk/platform-tools/adb.exe',
+    [Parameter(ParameterSetName = "Runtime")]
+    [Parameter(Mandatory = $true, ParameterSetName = "Package")]
     [string]$Apk,
+    [Parameter(Mandatory = $true, ParameterSetName = "Package")]
+    [switch]$PackageOnly,
     [ValidateRange(10, 90)]
     [int]$ObserveSeconds = 40,
     [ValidateRange(1, 3)]
@@ -41,6 +46,8 @@ if ($Apk) {
         Set-Content -LiteralPath (Join-Path $OutputDirectory 'apk-sha256.txt') -Encoding ascii
     Write-Output 'PASS packaged startup callbacks: arm64-v8a and x86_64.'
 }
+
+if ($PackageOnly) { return }
 
 function Invoke-Device([string[]]$Arguments, [switch]$AllowFailure) {
     $result = & $Adb -s $Serial @Arguments 2>&1

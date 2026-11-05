@@ -257,6 +257,113 @@ export const en = {
     "subtitle": "Features available in 0.8.5-beta and future goals, with dates and verifiable references.",
     "releases": [
       {
+        "theme": "Testing on develop — build 90",
+        "features": [
+          {
+            "id": "set-removal",
+            "name": "Remove individual sets",
+            "desc": "Remove a set, renumber remaining sets and keep counts consistent.",
+            "implementedOn": "2026-11-05",
+            "updatedOn": "2026-11-05",
+            "implementationRef": "develop · 0.8.5-beta-develop · build 90",
+            "status": "candidate",
+            "implementationNote": "Implemented on develop; build 90 awaits phone testing and is not part of the public build 89 release.",
+            "history": [
+              {
+                "date": "2026-11-05",
+                "ref": "develop · build 90",
+                "note": "Implemented on develop; build 90 awaits phone testing and is not part of the public build 89 release."
+              }
+            ]
+          },
+          {
+            "id": "forearm-filter",
+            "name": "Forearm filter",
+            "desc": "A dedicated filter based on primary catalog muscles.",
+            "implementedOn": "2026-11-05",
+            "updatedOn": "2026-11-05",
+            "implementationRef": "develop · 0.8.5-beta-develop · build 90",
+            "status": "candidate",
+            "implementationNote": "Implemented on develop; build 90 awaits phone testing and is not part of the public build 89 release.",
+            "history": [
+              {
+                "date": "2026-11-05",
+                "ref": "develop · build 90",
+                "note": "Implemented on develop; build 90 awaits phone testing and is not part of the public build 89 release."
+              }
+            ]
+          },
+          {
+            "id": "continuous-background-timers",
+            "name": "Continuous background timer",
+            "desc": "Rest and duration continue in the background and while minimized; pausing is explicit.",
+            "implementedOn": "2026-11-05",
+            "updatedOn": "2026-11-05",
+            "implementationRef": "develop · 0.8.5-beta-develop · build 90",
+            "status": "candidate",
+            "implementationNote": "Implemented on develop; build 90 awaits phone testing and is not part of the public build 89 release.",
+            "history": [
+              {
+                "date": "2026-11-05",
+                "ref": "develop · build 90",
+                "note": "Implemented on develop; build 90 awaits phone testing and is not part of the public build 89 release."
+              }
+            ]
+          },
+          {
+            "id": "csv-size-limit",
+            "name": "CSV up to 5 MiB",
+            "desc": "A size limit instead of a row limit; bounded reading and grouped sessions.",
+            "implementedOn": "2026-11-05",
+            "updatedOn": "2026-11-05",
+            "implementationRef": "develop · 0.8.5-beta-develop · build 90",
+            "status": "candidate",
+            "implementationNote": "Implemented on develop; build 90 awaits phone testing and is not part of the public build 89 release.",
+            "history": [
+              {
+                "date": "2026-11-05",
+                "ref": "develop · build 90",
+                "note": "Implemented on develop; build 90 awaits phone testing and is not part of the public build 89 release."
+              }
+            ]
+          },
+          {
+            "id": "contextual-plan-edit",
+            "name": "Contextual plan changes",
+            "desc": "Rename without confirmed sets and show only actual changes, without a fake workout.",
+            "implementedOn": "2026-11-05",
+            "updatedOn": "2026-11-05",
+            "implementationRef": "develop · 0.8.5-beta-develop · build 90",
+            "status": "candidate",
+            "implementationNote": "Implemented on develop; build 90 awaits phone testing and is not part of the public build 89 release.",
+            "history": [
+              {
+                "date": "2026-11-05",
+                "ref": "develop · build 90",
+                "note": "Implemented on develop; build 90 awaits phone testing and is not part of the public build 89 release."
+              }
+            ]
+          },
+          {
+            "id": "stats-month-navigation",
+            "name": "Selected-month statistics",
+            "desc": "Browse months with the calendar and all statistics sharing the same period.",
+            "implementedOn": "2026-11-05",
+            "updatedOn": "2026-11-05",
+            "implementationRef": "develop · 0.8.5-beta-develop · build 90",
+            "status": "candidate",
+            "implementationNote": "Implemented on develop; build 90 awaits phone testing and is not part of the public build 89 release.",
+            "history": [
+              {
+                "date": "2026-11-05",
+                "ref": "develop · build 90",
+                "note": "Implemented on develop; build 90 awaits phone testing and is not part of the public build 89 release."
+              }
+            ]
+          }
+        ]
+      },
+      {
         "theme": "Available — 0.8.5-beta",
         "features": [
           {

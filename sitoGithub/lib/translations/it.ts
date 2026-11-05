@@ -257,6 +257,113 @@ export const it = {
     "subtitle": "Funzioni disponibili nella 0.8.5-beta e obiettivi futuri, con date e riferimenti verificabili.",
     "releases": [
       {
+        "theme": "In verifica su develop — build 90",
+        "features": [
+          {
+            "id": "set-removal",
+            "name": "Eliminazione singole serie",
+            "desc": "Pulsante per togliere una serie, rinumerazione e conteggi coerenti.",
+            "implementedOn": "2026-11-05",
+            "updatedOn": "2026-11-05",
+            "implementationRef": "develop · 0.8.5-beta-develop · build 90",
+            "status": "candidate",
+            "implementationNote": "Implementato su develop; build 90 da provare sul telefono, non inclusa nella release pubblica build 89.",
+            "history": [
+              {
+                "date": "2026-11-05",
+                "ref": "develop · build 90",
+                "note": "Implementato su develop; build 90 da provare sul telefono, non inclusa nella release pubblica build 89."
+              }
+            ]
+          },
+          {
+            "id": "forearm-filter",
+            "name": "Filtro avambracci",
+            "desc": "Filtro dedicato basato sui muscoli primari del catalogo.",
+            "implementedOn": "2026-11-05",
+            "updatedOn": "2026-11-05",
+            "implementationRef": "develop · 0.8.5-beta-develop · build 90",
+            "status": "candidate",
+            "implementationNote": "Implementato su develop; build 90 da provare sul telefono, non inclusa nella release pubblica build 89.",
+            "history": [
+              {
+                "date": "2026-11-05",
+                "ref": "develop · build 90",
+                "note": "Implementato su develop; build 90 da provare sul telefono, non inclusa nella release pubblica build 89."
+              }
+            ]
+          },
+          {
+            "id": "continuous-background-timers",
+            "name": "Timer continuo in background",
+            "desc": "Recupero e durata proseguono al background e alla minimizzazione; pausa soltanto manuale.",
+            "implementedOn": "2026-11-05",
+            "updatedOn": "2026-11-05",
+            "implementationRef": "develop · 0.8.5-beta-develop · build 90",
+            "status": "candidate",
+            "implementationNote": "Implementato su develop; build 90 da provare sul telefono, non inclusa nella release pubblica build 89.",
+            "history": [
+              {
+                "date": "2026-11-05",
+                "ref": "develop · build 90",
+                "note": "Implementato su develop; build 90 da provare sul telefono, non inclusa nella release pubblica build 89."
+              }
+            ]
+          },
+          {
+            "id": "csv-size-limit",
+            "name": "CSV fino a 5 MiB",
+            "desc": "Limite sulla dimensione, senza limite di righe; lettura bounded e sessioni raggruppate.",
+            "implementedOn": "2026-11-05",
+            "updatedOn": "2026-11-05",
+            "implementationRef": "develop · 0.8.5-beta-develop · build 90",
+            "status": "candidate",
+            "implementationNote": "Implementato su develop; build 90 da provare sul telefono, non inclusa nella release pubblica build 89.",
+            "history": [
+              {
+                "date": "2026-11-05",
+                "ref": "develop · build 90",
+                "note": "Implementato su develop; build 90 da provare sul telefono, non inclusa nella release pubblica build 89."
+              }
+            ]
+          },
+          {
+            "id": "contextual-plan-edit",
+            "name": "Modifiche scheda contestualizzate",
+            "desc": "Rinomina senza serie confermate e riepilogo delle sole differenze, senza storico fittizio.",
+            "implementedOn": "2026-11-05",
+            "updatedOn": "2026-11-05",
+            "implementationRef": "develop · 0.8.5-beta-develop · build 90",
+            "status": "candidate",
+            "implementationNote": "Implementato su develop; build 90 da provare sul telefono, non inclusa nella release pubblica build 89.",
+            "history": [
+              {
+                "date": "2026-11-05",
+                "ref": "develop · build 90",
+                "note": "Implementato su develop; build 90 da provare sul telefono, non inclusa nella release pubblica build 89."
+              }
+            ]
+          },
+          {
+            "id": "stats-month-navigation",
+            "name": "Statistiche per mese selezionato",
+            "desc": "Navigazione dei mesi con calendario e tutte le statistiche coerenti nello stesso periodo.",
+            "implementedOn": "2026-11-05",
+            "updatedOn": "2026-11-05",
+            "implementationRef": "develop · 0.8.5-beta-develop · build 90",
+            "status": "candidate",
+            "implementationNote": "Implementato su develop; build 90 da provare sul telefono, non inclusa nella release pubblica build 89.",
+            "history": [
+              {
+                "date": "2026-11-05",
+                "ref": "develop · build 90",
+                "note": "Implementato su develop; build 90 da provare sul telefono, non inclusa nella release pubblica build 89."
+              }
+            ]
+          }
+        ]
+      },
+      {
         "theme": "Disponibile — 0.8.5-beta",
         "features": [
           {

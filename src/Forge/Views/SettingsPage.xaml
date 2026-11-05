@@ -169,7 +169,7 @@
                             <Label Text="Importa CSV"
                                    FontFamily="OpenSansSemibold" FontSize="16" FontAttributes="Bold"
                                    TextColor="{DynamicResource OnSurface}" />
-                            <Label Text="Importa allenamenti da altre app (Date,WorkoutName,ExerciseName,Sets,Reps,WeightKg oppure WeightLb,Notes)"
+                            <Label Text="Importa allenamenti da altre app (Date,WorkoutName,ExerciseName,Sets,Reps,WeightKg oppure WeightLb,Notes). Massimo 5 MiB, senza limite di righe. Le righe della stessa sessione vengono raggruppate."
                                    FontFamily="OpenSansRegular" FontSize="13"
                                    TextColor="{DynamicResource TextSecondary}" />
                         </VerticalStackLayout>

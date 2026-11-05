@@ -31,6 +31,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="../../src/Forge/Services/CsvImportService.cs" Link="Shared/Services/CsvImportService.cs" />
+    <Compile Include="../../src/Forge/Services/CsvFileLimit.cs" Link="Shared/Services/CsvFileLimit.cs" />
+    <Compile Include="../../src/Forge/Services/WorkoutSetEditor.cs" Link="Shared/Services/WorkoutSetEditor.cs" />
     <Compile Include="../../src/Forge/Services/CsvWorkoutWriter.cs" Link="Shared/Services/CsvWorkoutWriter.cs" />
     <Compile Include="../../src/Forge/Services/WeightUnitService.cs" Link="Shared/Services/WeightUnitService.cs" />
     <Compile Include="../../src/Forge/Services/WorkoutCompletion.cs" Link="Shared/Services/WorkoutCompletion.cs" />

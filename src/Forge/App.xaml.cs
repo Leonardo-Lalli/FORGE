@@ -27,7 +27,7 @@ public partial class App : Application
         window.Stopped += async (_, _) =>
         {
             var session = services.GetRequiredService<WorkoutSession>();
-            if (session.SuspendHandler != null) await session.SuspendHandler();
+            await session.OnBackgroundAsync();
         };
         window.Resumed += async (_, _) =>
         {

@@ -63,3 +63,7 @@ La roadmap ha ID stabili, status, implementedOn, updatedOn, implementationRef e 
 ## Android Release: registrazione nativa — 4 novembre 2026
 
 `MainApplication.OnCreate` dichiara esplicitamente il callback di avvio e delega a `MauiApplication.OnCreate`. Il wrapper JNI viene generato sul tipo concreto anziché dipendere soltanto da quello ereditato. Non contiene logica di dominio o navigazione. La configurazione Release mantiene le ottimizzazioni Android standard; verificare l’APK firmato a runtime dopo cambi di SDK e rigenerare i file intermedi quando cambia la configurazione JNI. L’errore iniziale osservato è `MauiApplication.n_onCreate` mancante. Riferimento tecnico: https://github.com/dotnet/maui/issues/35209.
+
+## Feedback develop — 5 novembre 2026
+
+`WorkoutSession.BackgroundHandler` salva senza sospendere la sessione; il recupero dopo ricreazione del processo resta distinto dal background. `PlanSessionChanges.Describe` usa snapshot e identità delle righe per produrre differenze contestuali. Gli Id delle serie sono conservati nelle copie e nelle bozze. Il salvataggio di una scheda senza serie eseguite elimina la bozza senza creare un workout completato. `CsvFileLimit` limita la lettura a 5 MiB anche per stream non seekable; l’upload CSV riusa gli ID stabili di PocketBaseService. Stats usa un intervallo [inizio, fine esclusa) per tutte le viste e il mese selezionato come riferimento del grafico. Nuovi servizi puri condivisi con i test; nessuna dipendenza aggiunta.
